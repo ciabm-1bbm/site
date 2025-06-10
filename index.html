@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMPANHIA DE BOMBEIRO MILITAR</title>
-    <!-- Carrega o Tailwind CSS para estilização -->
+    <title>COMPANHIA DE BOMBEIRO MILITAR do 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuração do Tailwind CSS para cores personalizadas e fonte -->
     <script>
         tailwind.config = {
             theme: {
@@ -25,7 +23,6 @@
             }
         }
     </script>
-    <!-- Carrega o Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Define a fonte Inter como padrão para todo o corpo */
@@ -108,161 +105,164 @@
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
-    <!-- Seção do Cabeçalho -->
     <header class="bg-gray-800 py-4 shadow-lg">
         <div class="container mx-auto px-4">
-            <!-- Contêiner para o logo e o título - centralizado vertical e horizontalmente -->
             <div class="header-container">
-                <!-- Logo do Corpo de Bombeiros Militar do RS -->
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-12 md:h-16 w-auto">
-                <!-- Título Principal do Site - Centralizado abaixo do logo -->
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-20 md:h-24 w-auto">
                 <div class="title-container">
                     <h1 class="text-2xl md:text-3xl font-extrabold text-bombeiros-yellow">
-                        COMPANHIA DE BOMBEIRO MILITAR
+                        COMPANHIA DE BOMBEIRO MILITAR do 1º BBM
                     </h1>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Seção Principal com Imagem de Fundo -->
     <main class="flex-grow hero-background flex items-center justify-center py-12 md:py-20">
         <div class="container mx-auto px-4 text-center">
-            <!-- Mensagem de Boas-Vindas ou Destaque - Tamanho ajustado para menor -->
             <h2 class="text-xl md:text-2xl font-bold text-white mb-6">
                 Bem-vindos, <span class="text-bombeiros-orange">Guerreiros do Fogo!</span>
             </h2>
             
-            <!-- Texto de descrição atualizado -->
             <p class="description-text text-gray-200">
-                Aqui tu consegues acessar as principais ferramentas criadas pelos membros da CIA para facilitar o teu acesso às demandas Administrativas, e o nosso trabalho em prol da sociedade gaúcha. Avante CBMRS!!!
+                Aqui tu poderás acessar as principais ferramentas criadas pelos membros da CIA para facilitar o acesso às demandas Administrativas, otimizando nosso trabalho em prol da sociedade Porto Alegrense e Gaúcha. Avante CBMRS!
             </p>
 
-            <!-- Seção de Ícones de Atalho -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 md:gap-6 justify-center mb-16">
 
-                <!-- Atalho: ESCALA ÚNICA -->
                 <a href="https://docs.google.com/spreadsheets/d/1LC76nOlcZO-yg5oRMTslHYmVmpFvfRNIN4-pimNMGqo/edit?gid=543709939#gid=543709939" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-calendar-alt text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">ESCALA ÚNICA</span>
                 </a>
 
-                <!-- Atalho: MAPA MENSAL -->
                 <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-map-marked-alt text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">MAPA MENSAL</span>
                 </a>
 
-                <!-- Atalho: RELAÇÃO EFETIVO GERAL -->
                 <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-users text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">RELAÇÃO EFETIVO GERAL</span>
                 </a>
 
-                <!-- Atalho: EFETIVO POR PERÍODO -->
                 <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=687299112#gid=687299112" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-clock text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">EFETIVO POR PERÍODO</span>
                 </a>
 
-                <!-- Atalho: PLANO DE FÉRIAS -->
                 <a href="https://docs.google.com/spreadsheets/d/144g1qOiO44steK7mbICkFt-pXF_vebDqDyPmzgd22hM/edit?gid=1128532433#gid=1128532433" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-plane-departure text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de avião/férias -->
+                    <i class="fas fa-plane-departure text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">PLANO DE FÉRIAS</span>
                 </a>
 
-                <!-- Atalho: CONFIRMAÇÃO DE FÉRIAS -->
                 <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-calendar-check text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de calendário com check -->
+                    <i class="fas fa-calendar-check text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">CONFIRMAÇÃO DE FÉRIAS</span>
                 </a>
 
-                <!-- Atalho: PARTES ENTREGUES A SLOG -->
                 <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-clipboard-list text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">PARTES ENTREGUES A SLOG</span>
                 </a>
 
-
-                <!-- Atalho: CONTROLE DE AFASTAMENTOS HBM/FSR -->
                 <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-hospital-alt text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de hospital/saúde -->
+                    <i class="fas fa-hospital-alt text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">CONTROLE DE AFASTAMENTOS HBM/FSR</span>
                 </a>
 
-                <!-- Atalho: VALIDADE CURSO CCVTE -->
                 <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-certificate text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de certificado -->
+                    <i class="fas fa-certificate text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">VALIDADE CURSO CCVTE</span>
                 </a>
 
-                <!-- Atalho: VALIDADE TOXICOLÓGICO DO EFETIVO -->
                 <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-flask text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de frasco/laboratório -->
+                    <i class="fas fa-flask text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">VALIDADE TOXICOLÓGICO DO EFETIVO</span>
                 </a>
 
-
-                   <!-- Atalho: ESTATÍSTICAS DE OCORRÊNCIAS -->
                 <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-chart-bar text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">ESTATÍSTICAS DE OCORRÊNCIAS</span>
                 </a>
 
-                <!-- Atalho: Mergulhadores e Cinotécnicos Disponíveis -->
                 <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-water text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de água para mergulhadores -->
+                    <i class="fas fa-water text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">MERGULHADORES E CINOTÉCNICOS</span>
                 </a>
 
-                <!-- Atalho: FUNÇÕES DE CADA INTEGRANTE DA CIA -->
                 <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-user-tie text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de pessoa com gravata (função) -->
+                    <i class="fas fa-user-tie text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">FUNÇÕES DE CADA INTEGRANTE DA CIA</span>
                 </a>
 
-                <!-- Atalho: CONTROLE MENSAGENS EXPRESSAS -->
                 <a href="https://docs.google.com/spreadsheets/d/1tO5BvhpvN3z0U8v2V7ZGiVA9tm054k1QdX2dnvMtLAM/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-comment-dots text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de balões de fala -->
+                    <i class="fas fa-comment-dots text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">CONTROLE MENSAGENS EXPRESSAS</span>
                 </a>
+                
+                <a href="https://drive.google.com/file/d/1QzmPk-RvWS5wl8sR3xPaWpmDAGU1cNET/view?usp=sharing" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-route text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">TUTORIAL DIÁRIAS DE VIAGENS</span>
+                </a>
 
-                <!-- Atalho: E-193 -->
-                <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                <a href="https://docs.google.com/spreadsheets/d/17UVmvKgC_bgrtR245o07PThuHrduCUK7rI203q2GbG8/edit#gid=0" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-truck-moving text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">VIATURAS do 1º BBM</span>
+                </a>
+
+                <a href="https://docs.google.com/spreadsheets/d/1X2tn-ay7Xc0zOxV9lpJzN24KEelkzzB6JS7ewQzVCwE/edit?gid=926343856#gid=926343856" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-ship text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">BOTES, MOTOSSERRAS E MOTORES</span>
+                </a>
+
+                <a href="https://drive.google.com/drive/u/1/folders/16hXVQaxmRfkn9YPNG1-4yTPgdong0UYm" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-gas-pump text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">CONTROLE DE ABASTECIMENTOS</span>
+                </a>
+
+                <a href="https://docs.google.com/document/d/1DRnUQCHcH__eoh_gcvJxhUUXp_nvavyguV-lyVkW20g/edit?usp=sharing" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-list-check text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">CHEKLIST CONFERÊNCIA DE MAPAS</span>
+                </a>
+
+                <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-calendar-times text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">INDISPONIBILIDADE MENSAL</span>
+                </a>
+
+                <a href="https://drive.google.com/drive/u/1/folders/1rDz7ecttIN-z7h--wEdSQQO4cLkINZkk" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
+                    <i class="fas fa-folder-open text-xl md:text-2xl text-bombeiros-yellow"></i>
+                    <span class="text-base md:text-lg font-semibold text-white mt-1">MODELOS DE DOCUMENTOS</span>
+                </a>
+                
+                 <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-phone-alt text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">E-193</span>
                 </a>
 
-                <!-- Atalho: INTRANET -->
                 <a href="https://intranet.cbm.rs.gov.br/" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fas fa-globe text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">INTRANET</span>
                 </a>
 
-                <!-- Atalho: E-mail Funcional (Outlook) -->
                 <a href="https://outlook.live.com/mail/0/" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
-                    <i class="fas fa-envelope-open-text text-xl md:text-2xl text-bombeiros-yellow"></i> <!-- Ícone de envelope -->
+                    <i class="fas fa-envelope-open-text text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">E-MAIL FUNCIONAL (OUTLOOK)</span>
                 </a>
 
-                <!-- Atalho: WHATSAPP FUNCIONAL DA CIABM -->
                 <a href="https://wa.me/+5555984423613" target="_blank" class="shortcut-button block bg-bombeiros-orange text-white p-3 rounded-lg shadow-md hover:bg-opacity-90 transition duration-300 transform flex flex-col items-center justify-center space-y-1">
                     <i class="fab fa-whatsapp text-xl md:text-2xl text-bombeiros-yellow"></i>
                     <span class="text-base md:text-lg font-semibold text-white mt-1">WHATSAPP FUNCIONAL DA CIABM</span>
                 </a>
 
-
-                
             </div>
         </div>
     </main>
 
-    <!-- Seção do Rodapé -->
     <footer class="bg-gray-800 text-gray-400 py-6 mt-auto">
         <div class="container mx-auto px-4 text-center">
             <p>&copy; 2025 Companhia de Bombeiro Militar. Todos os direitos reservados.</p>
             <p class="text-sm mt-2">Site desenvolvido por Gustavo Medeiros para uso dos Bombeiros do 1º Batalhão de Bombeiro Militar de Porto Alegre/RS.</p>
-            <!-- Link para o site oficial do CBMRS -->
             <a href="https://bombeiros.rs.gov.br/" target="_blank" class="text-cbmrs-light-blue hover:underline mt-2 inline-block">Acesse o site oficial do CBMRS</a>
         </div>
     </footer>
