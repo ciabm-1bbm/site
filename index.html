@@ -112,8 +112,6 @@
             transition: background-color 0.3s;
         }
         .login-box button:hover { background-color: #cc7000; }
-
-        /* --- ESTILO PARA LINKS BLOQUEADOS --- */
         .link-bloqueado {
             opacity: 0.5;
             cursor: not-allowed;
@@ -153,6 +151,11 @@
         <div class="container mx-auto px-4 text-center">
             <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
                 
+                <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
+                    <i class="fas fa-clipboard-list text-2xl md:text-3xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">FORMULÁRIO</span>
+                </a>
+
                 <a href="https://docs.google.com/spreadsheets/d/1LC76nOlcZO-yg5oRMTslHYmVmpFvfRNIN4-pimNMGqo/edit?gid=543709939#gid=543709939" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
                     <i class="fas fa-calendar-alt text-2xl md:text-3xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">ESCALA ÚNICA</span>
@@ -293,12 +296,9 @@
             const loginError = document.getElementById('login-error');
             const protectedLinks = document.querySelectorAll('.shortcut-button');
 
-            // ! LISTA DE EFETIVO COM CARGOS
-            // Cientes dos riscos, a lista de nomes de guerra para validação.
             const efetivo = {
-                // --- ADMINISTRADORES ---
                 "MARTINS": { role: "admin" }, "LOPES": { role: "admin" }, "DA COSTA": { role: "admin" }, "MEDEIROS": { role: "admin" },
-                "HERMENEGILDO": { role: "admin" }, "GARIBALDI": { role: "admin" }, "LAMADRIL": { role: "admin" }, "SCHNEIDER": { role: "admin" },
+                "HERMENEGILDO": { role: "admin" }, "GARIBALDI": { role: "admin" }, "JÚLIA": { role: "admin" }, "BRUNO": { role: "admin" }, "LAMADRIL": { role: "admin" }, "SCHNEIDER": { role: "admin" },
                 "DILMAR": { role: "admin" }, "FREITAS": { role: "admin" }, "FLAVIO": { role: "admin" }, "DELAVECHIA": { role: "admin" },
                 "VIEIRA": { role: "admin" }, "LUCIANO": { role: "admin" }, "ALBUQUERQUE": { role: "admin" }, "SITENESKI": { role: "admin" },
                 "LINCOLN": { role: "admin" }, "JUNIOR": { role: "admin" }, "PATRICIO": { role: "admin" }, "POSENATO": { role: "admin" },
@@ -306,7 +306,6 @@
                 "CHIEZA": { role: "admin" }, "GUEDES": { role: "admin" }, "PAIM": { role: "admin" }, "SAUL": { role: "admin" },
                 "MEDINA": { role: "admin" }, "AIRTON": { role: "admin" }, "FABRICIO": { role: "admin" }, "FERNANDO": { role: "admin" },
                 "ARIAS": { role: "admin" }, "BECKER": { role: "admin" },
-                // --- USUÁRIOS PADRÃO ---
                 "TAIRONE": { role: "padrao" }, "RIBEIRO": { role: "padrao" }, "MOREIRA": { role: "padrao" }, "DONATTO": { role: "padrao" },
                 "ARAGAO": { role: "padrao" }, "KANOFRE": { role: "padrao" }, "GUIMARAES": { role: "padrao" }, "ESPINOSA": { role: "padrao" },
                 "LAGO": { role: "padrao" }, "ALISSON": { role: "padrao" }, "JULIAN": { role: "padrao" }, "ALESSANDRO": { role: "padrao" },
@@ -354,16 +353,11 @@
                     }
                 });
             }
-
-            // *** NOVA LÓGICA DE GERAÇÃO DE SENHA ***
+            
             function gerarSenhaEsperada(nome) {
-                // 1. Converte para minúsculas
                 let senha = nome.toLowerCase();
-                // 2. Remove espaços (para nomes compostos)
                 senha = senha.replace(/\s/g, '');
-                // 3. Remove acentos e caracteres especiais
                 senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                // 4. Adiciona o sufixo
                 return senha + "193";
             }
 
