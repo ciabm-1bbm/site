@@ -286,9 +286,9 @@
 <div id="login-overlay" class="login-overlay">
     <div class="login-box">
         <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 w-auto mx-auto mb-4">
-        <h2 class="text-xl font-bold text-white mb-4">Acesso Restrito ao Efetivo</h2>
+        <h2 class="text-xl font-bold text-white mb-4">Acesso Restrito</h2>
         <form id="login-form">
-            <input type="text" id="username" placeholder="Nome de Guerra" required>
+            <input type="text" id="username" placeholder="ID Funcional" required>
             <input type="password" id="password" placeholder="Senha" required>
             <button type="submit">Entrar</button>
             <p id="login-error" class="text-red-500 text-sm mt-3" style="display: none;">Dados inválidos. Tente novamente.</p>
@@ -306,46 +306,176 @@
         const protectedLinks = document.querySelectorAll('.shortcut-button');
 
         const efetivo = {
-                "MARTINS": { role: "admin" },"HOMRICH": { role: "admin" }, "LOPES": { role: "admin" }, "DA COSTA": { role: "admin" }, "MEDEIROS": { role: "admin" },
-                "HERMENEGILDO": { role: "admin" }, "GARIBALDI": { role: "admin" }, "JÚLIA": { role: "admin" }, "BRUNO": { role: "admin" }, "LAMADRIL": { role: "admin" }, "SCHNEIDER": { role: "admin" },
-                "DILMAR": { role: "admin" }, "FREITAS": { role: "admin" }, "FLAVIO": { role: "admin" }, "DELAVECHIA": { role: "admin" },
-                "VIEIRA": { role: "admin" }, "LUCIANO": { role: "admin" }, "ALBUQUERQUE": { role: "admin" }, "SITENESKI": { role: "admin" },
-                "LINCOLN": { role: "admin" }, "JUNIOR": { role: "admin" }, "PATRICIO": { role: "admin" }, "POSENATO": { role: "admin" },
-                "RONALDO": { role: "admin" }, "EDSON": { role: "admin" }, "ASSIS": { role: "admin" }, "JULIANO": { role: "admin" },
-                "CHIEZA": { role: "admin" }, "GUEDES": { role: "admin" }, "PAIM": { role: "admin" }, "SAUL": { role: "admin" },
-                "MEDINA": { role: "admin" }, "AIRTON": { role: "admin" }, "FABRICIO": { role: "admin" }, "FERNANDO": { role: "admin" },
-                "ARIAS": { role: "admin" }, "BECKER": { role: "admin" },
-                "TAIRONE": { role: "padrao" }, "RIBEIRO": { role: "padrao" }, "MOREIRA": { role: "padrao" }, "DONATTO": { role: "padrao" },
-                "ARAGAO": { role: "padrao" }, "KANOFRE": { role: "padrao" }, "GUIMARAES": { role: "padrao" }, "ESPINOSA": { role: "padrao" },
-                "LAGO": { role: "padrao" }, "ALISSON": { role: "padrao" }, "JULIAN": { role: "padrao" }, "ALESSANDRO": { role: "padrao" },
-                "IBALDO": { role: "padrao" }, "PIRES": { role: "padrao" }, "MAURICIO": { role: "padrao" }, "ASSUNCAO": { role: "padrao" },
-                "NATHAN": { role: "padrao" }, "TEIXEIRA": { role: "padrao" }, "CORREA": { role: "padrao" }, "PAULINO": { role: "padrao" },
-                "GOMES": { role: "padrao" }, "BEN HUR": { role: "padrao" }, "CARGNELUTTI": { role: "padrao" }, "DOMINGUES": { role: "padrao" },
-                "ZEMPER": { role: "padrao" }, "THIAGO COELHO": { role: "padrao" }, "DEIVID": { role: "padrao" }, "CASSIANO": { role: "padrao" },
-                "TOMIELLO": { role: "padrao" }, "GONCALVES": { role: "padrao" }, "HIDALGO": { role: "padrao" }, "JORDAN": { role: "padrao" },
-                "CARDOSO": { role: "padrao" }, "PANAZZOLO": { role: "padrao" }, "COAN": { role: "padrao" }, "LEANDRO": { role: "padrao" },
-                "EUGENIO": { role: "padrao" }, "BRUM": { role: "padrao" }, "RAUBACH": { role: "padrao" }, "PORCELIS": { role: "padrao" },
-                "BAIGORRA": { role: "padrao" }, "CECCON": { role: "padrao" }, "MAIA": { role: "padrao" }, "PETER": { role: "padrao" },
-                "PINTO": { role: "padrao" }, "SALDANHA": { role: "padrao" }, "LUIZ": { role: "padrao" }, "PRADIER": { role: "padrao" },
-                "BERGHAHN": { role: "padrao" }, "PESSOTA": { role: "padrao" }, "FINGER": { role: "padrao" }, "FABIO": { role: "padrao" },
-                "BRUNO SIQUEIRA": { role: "padrao" }, "BARRETO": { role: "padrao" }, "VANDERLAN": { role: "padrao" }, "DAYKER": { role: "padrao" },
-                "THIAGO": { role: "padrao" }, "CATELAN": { role: "padrao" }, "VOLZ": { role: "padrao" }, "MENDES": { role: "padrao" },
-                "FERREIRA": { role: "padrao" }, "MARTINEZ": { role: "padrao" }, "RAUBUSTT": { role: "padrao" }, "ROGER": { role: "padrao" },
-                "DETONI": { role: "padrao" }, "ADRIANO BARBOSA": { role: "padrao" }, "RAFAEL": { role: "padrao" }, "COSME": { role: "padrao" },
-                "EVERTON": { role: "padrao" }, "DACHI": { role: "padrao" }, "CASTRO": { role: "padrao" }, "FARIAS": { role: "padrao" },
-                "VICENTE": { role: "padrao" }, "DANILO": { role: "padrao" }, "BOTEGA": { role: "padrao" }, "CRISTIANO": { role: "padrao" },
-                "DA SILVA": { role: "padrao" }, "ROGAN": { role: "padrao" }, "ACACIO": { role: "padrao" }, "FRANCIS": { role: "padrao" },
-                "CAMPOS": { role: "padrao" }, "FONTANA": { role: "padrao" }, "KINGESKI": { role: "padrao" }, "DOTTA": { role: "padrao" },
-                "SIQUEIRA": { role: "padrao" }, "BOTTINI": { role: "padrao" }, "MATHEUS": { role: "padrao" }, "THAIS": { role: "padrao" },
-                "BITENCOURT": { role: "padrao" }, "PEDRO": { role: "padrao" }, "THALIN": { role: "padrao" }, "DREYER": { role: "padrao" },
-                "THIAGO RIBEIRO": { role: "padrao" }, "MONTEIRO": { role: "padrao" }, "BARBOSA": { role: "padrao" }, "ISMAEL": { role: "padrao" },
-                "BUENO": { role: "padrao" }, "EIDER": { role: "padrao" }, "GAUTIER": { role: "padrao" }, "SOARES": { role: "padrao" },
-                "SPERLING": { role: "padrao" }, "RAMOS": { role: "padrao" }, "BARREIRO": { role: "padrao" }, "JUSSIE": { role: "padrao" },
-                "PATRICK": { role: "padrao" }, "BATISTA": { role: "padrao" }, "BELOMO": { role: "padrao" }, "BRUNO EDUARDO": { role: "padrao" },
-                "JONATHAN": { role: "padrao" }, "SANTOS": { role: "padrao" }, "VARGAS": { role: "padrao" }, "BERNARDES": { role: "padrao" },
-                "CABRAL": { role: "padrao" }, "RENAN": { role: "padrao" }, "SEIBT": { role: "padrao" }, "ZANETTI": { role: "padrao" },
-                "VIANEI": { role: "padrao" }, "DORNELES": { role: "padrao" }, "GUTERRES": { role: "padrao" }, "AZEREDO": { role: "padrao" },
-                "VILAR": { role: "padrao" }, "ROSEANE": { role: "padrao" }, "ARAUJO": { role: "padrao" }, "AMARANTE": { role: "padrao" }
+            "2685582": { role: "admin", nomeGuerra: "HOMRICH" },
+            "3698653": { role: "admin", nomeGuerra: "JULIA" },
+            "4354737": { role: "admin", nomeGuerra: "BRUNO" },
+            "4279310": { role: "admin", nomeGuerra: "MARTINS" },
+            "3146316": { role: "admin", nomeGuerra: "LOPES" },
+            "3696790": { role: "admin", nomeGuerra: "DA COSTA" },
+            "2822130": { role: "admin", nomeGuerra: "MEDEIROS" },
+            "3696391": { role: "padrao", nomeGuerra: "BOTTINI" },
+            "3205614": { role: "admin", nomeGuerra: "HERMENEGILDO" },
+            "4672410": { role: "admin", nomeGuerra: "GARIBALDI" },
+            "2423154": { role: "padrao", nomeGuerra: "SOBIESKI" },
+            "2328674": { role: "padrao", nomeGuerra: "TAIRONE" },
+            "2267373": { role: "admin", nomeGuerra: "DILMAR" },
+            "2262070": { role: "padrao", nomeGuerra: "RIBEIRO" },
+            "2260280": { role: "padrao", nomeGuerra: "MOREIRA" },
+            "2241951": { role: "padrao", nomeGuerra: "DONATTO" },
+            "2328828": { role: "padrao", nomeGuerra: "FRANCO" },
+            "2414155": { role: "admin", nomeGuerra: "FREITAS" },
+            "2879620": { role: "admin", nomeGuerra: "FLÁVIO" },
+            "2328925": { role: "admin", nomeGuerra: "DELAVECHIA" },
+            "2262290": { role: "padrao", nomeGuerra: "ARAGÃO" },
+            "3696715": { role: "padrao", nomeGuerra: "KANOFRE" },
+            "4279808": { role: "padrao", nomeGuerra: "GUIMARÃES" },
+            "2810727": { role: "padrao", nomeGuerra: "HOFFMANN" },
+            "2993996": { role: "padrao", nomeGuerra: "ESPINOSA" },
+            "3150631": { role: "padrao", nomeGuerra: "ESEQUIEL" },
+            "3696944": { role: "padrao", nomeGuerra: "LAGO" },
+            "4289102": { role: "padrao", nomeGuerra: "ALISSON" },
+            "4387759": { role: "padrao", nomeGuerra: "JULIAN" },
+            "3872319": { role: "padrao", nomeGuerra: "ALESSANDRO" },
+            "4387767": { role: "padrao", nomeGuerra: "IBALDO" },
+            "4550552": { role: "padrao", nomeGuerra: "PIRES" },
+            "4626290": { role: "padrao", nomeGuerra: "MAURÍCIO" },
+            "4782534": { role: "padrao", nomeGuerra: "ASSUNÇÃO" },
+            "4782917": { role: "padrao", nomeGuerra: "NATHAN" },
+            "4843673": { role: "padrao", nomeGuerra: "TEIXEIRA" },
+            "4490193": { role: "padrao", nomeGuerra: "CORREA" },
+            "4490266": { role: "padrao", nomeGuerra: "PAULINO" },
+            "2423219": { role: "admin", nomeGuerra: "VIEIRA" },
+            "2414066": { role: "admin", nomeGuerra: "LUCIANO" },
+            "2823900": { role: "admin", nomeGuerra: "ALBUQUERQUE" },
+            "3148947": { role: "padrao", nomeGuerra: "GOMES" },
+            "2519720": { role: "padrao", nomeGuerra: "BEN HUR" },
+            "2248204": { role: "padrao", nomeGuerra: "CARGNELUTTI" },
+            "2968550": { role: "padrao", nomeGuerra: "DOMINGUES" },
+            "3718093": { role: "padrao", nomeGuerra: "ZEMPER" },
+            "3695034": { role: "padrao", nomeGuerra: "THIAGO COELHO" },
+            "4289366": { role: "padrao", nomeGuerra: "DEIVID" },
+            "4278623": { role: "padrao", nomeGuerra: "CASSIANO" },
+            "4353781": { role: "padrao", nomeGuerra: "TOMIELLO" },
+            "4354273": { role: "padrao", nomeGuerra: "GONÇALVES" },
+            "4388178": { role: "padrao", nomeGuerra: "HIDALGO" },
+            "4550846": { role: "padrao", nomeGuerra: "JORDAN" },
+            "4490614": { role: "padrao", nomeGuerra: "CARDOSO" },
+            "2683520": { role: "admin", nomeGuerra: "SITENESKI" },
+            "2414600": { role: "admin", nomeGuerra: "LINCOLN" },
+            "2878143": { role: "padrao", nomeGuerra: "PANAZZOLO" },
+            "2877708": { role: "admin", nomeGuerra: "JUNIOR" },
+            "4353927": { role: "padrao", nomeGuerra: "COAN" },
+            "2994500": { role: "padrao", nomeGuerra: "LEANDRO" },
+            "3139581": { role: "padrao", nomeGuerra: "EUGENIO" },
+            "3697193": { role: "padrao", nomeGuerra: "BRUM" },
+            "4355113": { role: "padrao", nomeGuerra: "RAUBACH" },
+            "4387821": { role: "padrao", nomeGuerra: "PORCELIS" },
+            "4490576": { role: "padrao", nomeGuerra: "BAIGORRA" },
+            "4982924": { role: "padrao", nomeGuerra: "ROSEANE" },
+            "4490169": { role: "padrao", nomeGuerra: "MAIA" },
+            "4490355": { role: "padrao", nomeGuerra: "PETER" },
+            "4490452": { role: "padrao", nomeGuerra: "PINTO" },
+            "2689138": { role: "admin", nomeGuerra: "PATRÍCIO" },
+            "3136019": { role: "admin", nomeGuerra: "POSENATO" },
+            "2615134": { role: "admin", nomeGuerra: "RONALDO" },
+            "2250470": { role: "padrao", nomeGuerra: "SALDANHA" },
+            "2691175": { role: "padrao", nomeGuerra: "LUIZ" },
+            "2877015": { role: "padrao", nomeGuerra: "PRADIER" },
+            "3137600": { role: "padrao", nomeGuerra: "BERGHAHN" },
+            "2871980": { role: "padrao", nomeGuerra: "PESSOTA" },
+            "3136671": { role: "padrao", nomeGuerra: "FINGER" },
+            "3698602": { role: "padrao", nomeGuerra: "FÁBIO" },
+            "3697673": { role: "padrao", nomeGuerra: "BRUNO" },
+            "3696758": { role: "padrao", nomeGuerra: "BARRETO" },
+            "4353935": { role: "padrao", nomeGuerra: "VANDERLAN" },
+            "4388380": { role: "padrao", nomeGuerra: "MARTINS" },
+            "4230760": { role: "padrao", nomeGuerra: "DAYKER" },
+            "4845544": { role: "padrao", nomeGuerra: "THIAGO" },
+            "4983793": { role: "padrao", nomeGuerra: "CATELAN" },
+            "4490800": { role: "padrao", nomeGuerra: "VOLZ" },
+            "2303876": { role: "admin", nomeGuerra: "EDSON" },
+            "3085120": { role: "admin", nomeGuerra: "ASSIS" },
+            "2612887": { role: "admin", nomeGuerra: "JULIANO" },
+            "2880601": { role: "admin", nomeGuerra: "CHIEZA" },
+            "3697630": { role: "padrao", nomeGuerra: "MENDES" },
+            "3136728": { role: "padrao", nomeGuerra: "FERREIRA" },
+            "2826097": { role: "padrao", nomeGuerra: "MARTINEZ" },
+            "3696510": { role: "padrao", nomeGuerra: "RAUBUSTT" },
+            "3697290": { role: "padrao", nomeGuerra: "ROGER" },
+            "3726207": { role: "padrao", nomeGuerra: "MAURÍCIO" },
+            "4299140": { role: "padrao", nomeGuerra: "DETONI" },
+            "4388283": { role: "padrao", nomeGuerra: "ADRIANO BARBOSA" },
+            "4395476": { role: "padrao", nomeGuerra: "RAFAEL" },
+            "4982975": { role: "padrao", nomeGuerra: "COSME" },
+            "4490479": { role: "padrao", nomeGuerra: "EVERTON" },
+            "2686589": { role: "admin", nomeGuerra: "GUEDES" },
+            "2856476": { role: "admin", nomeGuerra: "PAIM" },
+            "2260670": { role: "padrao", nomeGuerra: "DACHI" },
+            "2915219": { role: "admin", nomeGuerra: "SAUL" },
+            "3695832": { role: "padrao", nomeGuerra: "CASTRO" },
+            "2919478": { role: "padrao", nomeGuerra: "FARIAS" },
+            "3140717": { role: "padrao", nomeGuerra: "VICENTE" },
+            "3139859": { role: "padrao", nomeGuerra: "DANILO" },
+            "2985675": { role: "padrao", nomeGuerra: "BOTEGA" },
+            "3701638": { role: "padrao", nomeGuerra: "CRISTIANO" },
+            "3697550": { role: "padrao", nomeGuerra: "DA SILVA" },
+            "3698734": { role: "padrao", nomeGuerra: "ROGAN" },
+            "3696847": { role: "padrao", nomeGuerra: "ACÁCIO" },
+            "4355229": { role: "padrao", nomeGuerra: "FRANCIS" },
+            "4387775": { role: "padrao", nomeGuerra: "CAMPOS" },
+            "4375149": { role: "padrao", nomeGuerra: "FONTANA" },
+            "4672445": { role: "padrao", nomeGuerra: "KINGESKI" },
+            "4490665": { role: "padrao", nomeGuerra: "DOTTA" },
+            "4490258": { role: "padrao", nomeGuerra: "SIQUEIRA" },
+            "4490843": { role: "padrao", nomeGuerra: "BOTTINI" },
+            "2684640": { role: "admin", nomeGuerra: "MEDINA" },
+            "2919540": { role: "admin", nomeGuerra: "AIRTON" },
+            "3137473": { role: "padrao", nomeGuerra: "MATHEUS" },
+            "2885450": { role: "admin", nomeGuerra: "FABRÍCIO" },
+            "2882337": { role: "padrao", nomeGuerra: "THAÍS" },
+            "3696111": { role: "padrao", nomeGuerra: "BITENCOURT" },
+            "3695212": { role: "padrao", nomeGuerra: "PEDRO" },
+            "3696669": { role: "padrao", nomeGuerra: "THALIN" },
+            "3696570": { role: "padrao", nomeGuerra: "DREYER" },
+            "3699145": { role: "padrao", nomeGuerra: "THIAGO RIBEIRO" },
+            "4353986": { role: "padrao", nomeGuerra: "MONTEIRO" },
+            "4355822": { role: "padrao", nomeGuerra: "BARBOSA" },
+            "4354435": { role: "padrao", nomeGuerra: "ISMAEL" },
+            "4388003": { role: "padrao", nomeGuerra: "BUENO" },
+            "4388305": { role: "padrao", nomeGuerra: "EIDER" },
+            "4395140": { role: "padrao", nomeGuerra: "GAUTIER" },
+            "4490738": { role: "padrao", nomeGuerra: "SOARES" },
+            "4490541": { role: "padrao", nomeGuerra: "SPERLING" },
+            "2690721": { role: "admin", nomeGuerra: "FERNANDO" },
+            "2993767": { role: "admin", nomeGuerra: "ARIAS" },
+            "2688379": { role: "admin", nomeGuerra: "BECKER" },
+            "2237423": { role: "padrao", nomeGuerra: "RAMOS" },
+            "2971577": { role: "padrao", nomeGuerra: "BARREIRO" },
+            "2987120": { role: "padrao", nomeGuerra: "JUSSIE" },
+            "3169804": { role: "padrao", nomeGuerra: "PATRICK" },
+            "3696049": { role: "padrao", nomeGuerra: "BATISTA" },
+            "4289064": { role: "padrao", nomeGuerra: "BELOMO" },
+            "3725570": { role: "padrao", nomeGuerra: "BRUNO EDUARDO" },
+            "4354583": { role: "padrao", nomeGuerra: "JONATHAN" },
+            "4354532": { role: "padrao", nomeGuerra: "SANTOS" },
+            "4354680": { role: "padrao", nomeGuerra: "VARGAS" },
+            "3622363": { role: "padrao", nomeGuerra: "BERNARDES" },
+            "4843584": { role: "padrao", nomeGuerra: "CABRAL" },
+            "4490053": { role: "padrao", nomeGuerra: "RENAN" },
+            "4490223": { role: "padrao", nomeGuerra: "SEIBT" },
+            "4490339": { role: "padrao", nomeGuerra: "ZANETTI" },
+            "2919591": { role: "admin", nomeGuerra: "LAMADRIL" },
+            "3694623": { role: "admin", nomeGuerra: "SCHNEIDER" },
+            "4356047": { role: "padrao", nomeGuerra: "VIANEI" },
+            "2423146": { role: "padrao", nomeGuerra: "DORNELES" },
+            "2970031": { role: "padrao", nomeGuerra: "BRUM" },
+            "3697100": { role: "padrao", nomeGuerra: "GUTERRES" },
+            "4355148": { role: "padrao", nomeGuerra: "LOPES" },
+            "4626672": { role: "padrao", nomeGuerra: "AZEREDO" },
+            "4845510": { role: "padrao", nomeGuerra: "VILAR" },
+            "4982991": { role: "padrao", nomeGuerra: "ARAUJO" },
+            "4980662": { role: "padrao", nomeGuerra: "SANTOS" },
+            "4490835": { role: "padrao", nomeGuerra: "AMARANTE" }
         };
 
         let clickedLinkHref = null;
@@ -353,13 +483,11 @@
         function atualizarInterface(userRole) {
             protectedLinks.forEach(link => {
                 const requiredRole = link.dataset.role;
-                // Os links que precisam de permissão de admin são bloqueados se o usuário não for admin
                 if (requiredRole === 'admin' && userRole !== 'admin') {
                     link.classList.add('link-bloqueado');
                     link.title = "Acesso restrito ao comando.";
                 } else {
                     link.classList.remove('link-bloqueado');
-                    // Limpa o título apenas se ele foi definido para bloqueio
                     if (link.title === "Acesso restrito ao comando.") {
                         link.title = "";
                     }
@@ -375,13 +503,12 @@
         }
 
         function handleLogin() {
-            const enteredUsername = usernameInput.value.trim();
+            const enteredUsername = usernameInput.value.trim(); // ID Funcional
             const enteredPassword = passwordInput.value.trim();
-            const userToUpper = enteredUsername.toUpperCase();
-            const userData = efetivo[userToUpper];
+            const userData = efetivo[enteredUsername];
 
             if (userData) {
-                const expectedPassword = gerarSenhaEsperada(enteredUsername);
+                const expectedPassword = gerarSenhaEsperada(userData.nomeGuerra);
                 if (enteredPassword === expectedPassword) {
                     sessionStorage.setItem('isBbmAuthenticated', 'true');
                     sessionStorage.setItem('bbmUserRole', userData.role);
@@ -410,19 +537,16 @@
             loginOverlay.style.display = 'none';
             atualizarInterface(userRole);
         } else {
-            atualizarInterface('none'); // Bloqueia links de admin por padrão
-            // AJUSTE 2: Mostra o overlay de login após 3 segundos se não estiver autenticado
+            atualizarInterface('none'); 
             setTimeout(() => {
-                // Verificação extra para garantir que o usuário não se autenticou nesse meio tempo
                 if (sessionStorage.getItem('isBbmAuthenticated') !== 'true') {
                     loginOverlay.style.display = 'flex';
                     usernameInput.focus();
                 }
-            }, 3000); // 3000 milissegundos = 3 segundos
+            }, 3000); 
         }
 
         protectedLinks.forEach(link => {
-            // Verifica se o link não é o de e-mail, que não precisa de autenticação
             if (link.href.startsWith('mailto:')) {
                 return;
             }
@@ -450,7 +574,6 @@
             handleLogin();
         });
 
-        // Fecha o overlay de login se clicar fora da caixa
         loginOverlay.addEventListener('click', (event) => {
             if (event.target === loginOverlay) {
                 loginOverlay.style.display = 'none';
