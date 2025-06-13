@@ -78,7 +78,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
-            display: none; /* Initially hidden */
+            display: flex; /* Mostrar por padrão agora */
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -123,16 +123,40 @@
             box-shadow: none;
             background-color: #4A5568 !important;
         }
+        .content-wrapper {
+            display: none; /* Inicialmente oculto até a autenticação */
+        }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col">
 
-<div class="flex-grow hero-background">
+<!-- Tela de login (agora visível por padrão) -->
+<div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+        <div class="flex justify-center items-center gap-4 mb-4">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 w-auto">
+            <img src="images/brasao 1BBM para site.png" alt="Brasão 1BBM" class="h-16 w-auto">
+        </div>
+        <h2 class="text-xl font-bold text-white mb-4">Acesso Restrito ao Efetivo</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Nome de Guerra" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+            <p id="login-error" class="text-red-500 text-sm mt-3" style="display: none;">Dados inválidos. Tente novamente.</p>
+        </form>
+    </div>
+</div>
+
+<!-- Conteúdo principal (oculto até autenticação) -->
+<div id="content-wrapper" class="content-wrapper flex-grow hero-background">
     <header class="py-4 shadow-lg z-10">
         <div class="container mx-auto px-4 text-center">
             <div class="flex flex-wrap items-center justify-center gap-4">
                 <div class="bg-cbmrs-blue p-2 rounded-lg">
                     <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 md:h-20 w-auto">
+                </div>
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="images/brasao 1BBM para site.png" alt="Brasão 1BBM" class="h-16 md:h-20 w-auto">
                 </div>
                 <div>
                     <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
@@ -270,7 +294,7 @@
     </main>
 </div>
 
-<footer class="bg-gray-800 text-gray-400 py-3 z-10">
+<footer id="footer" class="content-wrapper bg-gray-800 text-gray-400 py-3 z-10">
     <div class="container mx-auto px-4 text-center text-xs">
         <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
         <p class="mt-1">
@@ -280,19 +304,6 @@
     </div>
 </footer>
 
-<div id="login-overlay" class="login-overlay">
-    <div class="login-box">
-        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 w-auto mx-auto mb-4">
-        <h2 class="text-xl font-bold text-white mb-4">Acesso Restrito ao Efetivo</h2>
-        <form id="login-form">
-            <input type="text" id="username" placeholder="Nome de Guerra" required>
-            <input type="password" id="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-            <p id="login-error" class="text-red-500 text-sm mt-3" style="display: none;">Dados inválidos. Tente novamente.</p>
-        </form>
-    </div>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const loginOverlay = document.getElementById('login-overlay');
@@ -301,48 +312,50 @@
         const passwordInput = document.getElementById('password');
         const loginError = document.getElementById('login-error');
         const protectedLinks = document.querySelectorAll('.shortcut-button');
+        const contentWrapper = document.getElementById('content-wrapper');
+        const footer = document.getElementById('footer');
 
         const efetivo = {
                 "MARTINS": { role: "admin" }, "LOPES": { role: "admin" }, "DA COSTA": { role: "admin" }, "MEDEIROS": { role: "admin" },
-                "HERMENEGILDO": { role: "admin" }, "GARIBALDI": { role: "admin" }, "JÚLIA": { role: "admin" }, "BRUNO": { role: "admin" }, "LAMADRIL": { role: "admin" }, "SCHNEIDER": { role: "admin" },
-                "DILMAR": { role: "admin" }, "FREITAS": { role: "admin" }, "FLAVIO": { role: "admin" }, "DELAVECHIA": { role: "admin" },
-                "VIEIRA": { role: "admin" }, "LUCIANO": { role: "admin" }, "ALBUQUERQUE": { role: "admin" }, "SITENESKI": { role: "admin" },
-                "LINCOLN": { role: "admin" }, "JUNIOR": { role: "admin" }, "PATRICIO": { role: "admin" }, "POSENATO": { role: "admin" },
-                "RONALDO": { role: "admin" }, "EDSON": { role: "admin" }, "ASSIS": { role: "admin" }, "JULIANO": { role: "admin" },
-                "CHIEZA": { role: "admin" }, "GUEDES": { role: "admin" }, "PAIM": { role: "admin" }, "SAUL": { role: "admin" },
-                "MEDINA": { role: "admin" }, "AIRTON": { role: "admin" }, "FABRICIO": { role: "admin" }, "FERNANDO": { role: "admin" },
-                "ARIAS": { role: "admin" }, "BECKER": { role: "admin" },
-                "TAIRONE": { role: "padrao" }, "RIBEIRO": { role: "padrao" }, "MOREIRA": { role: "padrao" }, "DONATTO": { role: "padrao" },
-                "ARAGAO": { role: "padrao" }, "KANOFRE": { role: "padrao" }, "GUIMARAES": { role: "padrao" }, "ESPINOSA": { role: "padrao" },
-                "LAGO": { role: "padrao" }, "ALISSON": { role: "padrao" }, "JULIAN": { role: "padrao" }, "ALESSANDRO": { role: "padrao" },
-                "IBALDO": { role: "padrao" }, "PIRES": { role: "padrao" }, "MAURICIO": { role: "padrao" }, "ASSUNCAO": { role: "padrao" },
-                "NATHAN": { role: "padrao" }, "TEIXEIRA": { role: "padrao" }, "CORREA": { role: "padrao" }, "PAULINO": { role: "padrao" },
-                "GOMES": { role: "padrao" }, "BEN HUR": { role: "padrao" }, "CARGNELUTTI": { role: "padrao" }, "DOMINGUES": { role: "padrao" },
-                "ZEMPER": { role: "padrao" }, "THIAGO COELHO": { role: "padrao" }, "DEIVID": { role: "padrao" }, "CASSIANO": { role: "padrao" },
-                "TOMIELLO": { role: "padrao" }, "GONCALVES": { role: "padrao" }, "HIDALGO": { role: "padrao" }, "JORDAN": { role: "padrao" },
-                "CARDOSO": { role: "padrao" }, "PANAZZOLO": { role: "padrao" }, "COAN": { role: "padrao" }, "LEANDRO": { role: "padrao" },
-                "EUGENIO": { role: "padrao" }, "BRUM": { role: "padrao" }, "RAUBACH": { role: "padrao" }, "PORCELIS": { role: "padrao" },
-                "BAIGORRA": { role: "padrao" }, "CECCON": { role: "padrao" }, "MAIA": { role: "padrao" }, "PETER": { role: "padrao" },
-                "PINTO": { role: "padrao" }, "SALDANHA": { role: "padrao" }, "LUIZ": { role: "padrao" }, "PRADIER": { role: "padrao" },
-                "BERGHAHN": { role: "padrao" }, "PESSOTA": { role: "padrao" }, "FINGER": { role: "padrao" }, "FABIO": { role: "padrao" },
-                "BRUNO SIQUEIRA": { role: "padrao" }, "BARRETO": { role: "padrao" }, "VANDERLAN": { role: "padrao" }, "DAYKER": { role: "padrao" },
-                "THIAGO": { role: "padrao" }, "CATELAN": { role: "padrao" }, "VOLZ": { role: "padrao" }, "MENDES": { role: "padrao" },
-                "FERREIRA": { role: "padrao" }, "MARTINEZ": { role: "padrao" }, "RAUBUSTT": { role: "padrao" }, "ROGER": { role: "padrao" },
-                "DETONI": { role: "padrao" }, "ADRIANO BARBOSA": { role: "padrao" }, "RAFAEL": { role: "padrao" }, "COSME": { role: "padrao" },
-                "EVERTON": { role: "padrao" }, "DACHI": { role: "padrao" }, "CASTRO": { role: "padrao" }, "FARIAS": { role: "padrao" },
-                "VICENTE": { role: "padrao" }, "DANILO": { role: "padrao" }, "BOTEGA": { role: "padrao" }, "CRISTIANO": { role: "padrao" },
-                "DA SILVA": { role: "padrao" }, "ROGAN": { role: "padrao" }, "ACACIO": { role: "padrao" }, "FRANCIS": { role: "padrao" },
-                "CAMPOS": { role: "padrao" }, "FONTANA": { role: "padrao" }, "KINGESKI": { role: "padrao" }, "DOTTA": { role: "padrao" },
-                "SIQUEIRA": { role: "padrao" }, "BOTTINI": { role: "padrao" }, "MATHEUS": { role: "padrao" }, "THAIS": { role: "padrao" },
-                "BITENCOURT": { role: "padrao" }, "PEDRO": { role: "padrao" }, "THALIN": { role: "padrao" }, "DREYER": { role: "padrao" },
-                "THIAGO RIBEIRO": { role: "padrao" }, "MONTEIRO": { role: "padrao" }, "BARBOSA": { role: "padrao" }, "ISMAEL": { role: "padrao" },
-                "BUENO": { role: "padrao" }, "EIDER": { role: "padrao" }, "GAUTIER": { role: "padrao" }, "SOARES": { role: "padrao" },
-                "SPERLING": { role: "padrao" }, "RAMOS": { role: "padrao" }, "BARREIRO": { role: "padrao" }, "JUSSIE": { role: "padrao" },
-                "PATRICK": { role: "padrao" }, "BATISTA": { role: "padrao" }, "BELOMO": { role: "padrao" }, "BRUNO EDUARDO": { role: "padrao" },
-                "JONATHAN": { role: "padrao" }, "SANTOS": { role: "padrao" }, "VARGAS": { role: "padrao" }, "BERNARDES": { role: "padrao" },
-                "CABRAL": { role: "padrao" }, "RENAN": { role: "padrao" }, "SEIBT": { role: "padrao" }, "ZANETTI": { role: "padrao" },
-                "VIANEI": { role: "padrao" }, "DORNELES": { role: "padrao" }, "GUTERRES": { role: "padrao" }, "AZEREDO": { role: "padrao" },
-                "VILAR": { role: "padrao" }, "ROSEANE": { role: "padrao" }, "ARAUJO": { role: "padrao" }, "AMARANTE": { role: "padrao" }
+                "HERMENEGILDO": { role: "admin" }, "GARIBALDI": { role: "admin" }, "JÚLIA": { role: "admin" }, "BRUNO": { role: "admin" }, "LAMADRIL": { role: "admin" }, "SCHNEIDER": { role: "admin" },
+                "DILMAR": { role: "admin" }, "FREITAS": { role: "admin" }, "FLAVIO": { role: "admin" }, "DELAVECHIA": { role: "admin" },
+                "VIEIRA": { role: "admin" }, "LUCIANO": { role: "admin" }, "ALBUQUERQUE": { role: "admin" }, "SITENESKI": { role: "admin" },
+                "LINCOLN": { role: "admin" }, "JUNIOR": { role: "admin" }, "PATRICIO": { role: "admin" }, "POSENATO": { role: "admin" },
+                "RONALDO": { role: "admin" }, "EDSON": { role: "admin" }, "ASSIS": { role: "admin" }, "JULIANO": { role: "admin" },
+                "CHIEZA": { role: "admin" }, "GUEDES": { role: "admin" }, "PAIM": { role: "admin" }, "SAUL": { role: "admin" },
+                "MEDINA": { role: "admin" }, "AIRTON": { role: "admin" }, "FABRICIO": { role: "admin" }, "FERNANDO": { role: "admin" },
+                "ARIAS": { role: "admin" }, "BECKER": { role: "admin" },
+                "TAIRONE": { role: "padrao" }, "RIBEIRO": { role: "padrao" }, "MOREIRA": { role: "padrao" }, "DONATTO": { role: "padrao" },
+                "ARAGAO": { role: "padrao" }, "KANOFRE": { role: "padrao" }, "GUIMARAES": { role: "padrao" }, "ESPINOSA": { role: "padrao" },
+                "LAGO": { role: "padrao" }, "ALISSON": { role: "padrao" }, "JULIAN": { role: "padrao" }, "ALESSANDRO": { role: "padrao" },
+                "IBALDO": { role: "padrao" }, "PIRES": { role: "padrao" }, "MAURICIO": { role: "padrao" }, "ASSUNCAO": { role: "padrao" },
+                "NATHAN": { role: "padrao" }, "TEIXEIRA": { role: "padrao" }, "CORREA": { role: "padrao" }, "PAULINO": { role: "padrao" },
+                "GOMES": { role: "padrao" }, "BEN HUR": { role: "padrao" }, "CARGNELUTTI": { role: "padrao" }, "DOMINGUES": { role: "padrao" },
+                "ZEMPER": { role: "padrao" }, "THIAGO COELHO": { role: "padrao" }, "DEIVID": { role: "padrao" }, "CASSIANO": { role: "padrao" },
+                "TOMIELLO": { role: "padrao" }, "GONCALVES": { role: "padrao" }, "HIDALGO": { role: "padrao" }, "JORDAN": { role: "padrao" },
+                "CARDOSO": { role: "padrao" }, "PANAZZOLO": { role: "padrao" }, "COAN": { role: "padrao" }, "LEANDRO": { role: "padrao" },
+                "EUGENIO": { role: "padrao" }, "BRUM": { role: "padrao" }, "RAUBACH": { role: "padrao" }, "PORCELIS": { role: "padrao" },
+                "BAIGORRA": { role: "padrao" }, "CECCON": { role: "padrao" }, "MAIA": { role: "padrao" }, "PETER": { role: "padrao" },
+                "PINTO": { role: "padrao" }, "SALDANHA": { role: "padrao" }, "LUIZ": { role: "padrao" }, "PRADIER": { role: "padrao" },
+                "BERGHAHN": { role: "padrao" }, "PESSOTA": { role: "padrao" }, "FINGER": { role: "padrao" }, "FABIO": { role: "padrao" },
+                "BRUNO SIQUEIRA": { role: "padrao" }, "BARRETO": { role: "padrao" }, "VANDERLAN": { role: "padrao" }, "DAYKER": { role: "padrao" },
+                "THIAGO": { role: "padrao" }, "CATELAN": { role: "padrao" }, "VOLZ": { role: "padrao" }, "MENDES": { role: "padrao" },
+                "FERREIRA": { role: "padrao" }, "MARTINEZ": { role: "padrao" }, "RAUBUSTT": { role: "padrao" }, "ROGER": { role: "padrao" },
+                "DETONI": { role: "padrao" }, "ADRIANO BARBOSA": { role: "padrao" }, "RAFAEL": { role: "padrao" }, "COSME": { role: "padrao" },
+                "EVERTON": { role: "padrao" }, "DACHI": { role: "padrao" }, "CASTRO": { role: "padrao" }, "FARIAS": { role: "padrao" },
+                "VICENTE": { role: "padrao" }, "DANILO": { role: "padrao" }, "BOTEGA": { role: "padrao" }, "CRISTIANO": { role: "padrao" },
+                "DA SILVA": { role: "padrao" }, "ROGAN": { role: "padrao" }, "ACACIO": { role: "padrao" }, "FRANCIS": { role: "padrao" },
+                "CAMPOS": { role: "padrao" }, "FONTANA": { role: "padrao" }, "KINGESKI": { role: "padrao" }, "DOTTA": { role: "padrao" },
+                "SIQUEIRA": { role: "padrao" }, "BOTTINI": { role: "padrao" }, "MATHEUS": { role: "padrao" }, "THAIS": { role: "padrao" },
+                "BITENCOURT": { role: "padrao" }, "PEDRO": { role: "padrao" }, "THALIN": { role: "padrao" }, "DREYER": { role: "padrao" },
+                "THIAGO RIBEIRO": { role: "padrao" }, "MONTEIRO": { role: "padrao" }, "BARBOSA": { role: "padrao" }, "ISMAEL": { role: "padrao" },
+                "BUENO": { role: "padrao" }, "EIDER": { role: "padrao" }, "GAUTIER": { role: "padrao" }, "SOARES": { role: "padrao" },
+                "SPERLING": { role: "padrao" }, "RAMOS": { role: "padrao" }, "BARREIRO": { role: "padrao" }, "JUSSIE": { role: "padrao" },
+                "PATRICK": { role: "padrao" }, "BATISTA": { role: "padrao" }, "BELOMO": { role: "padrao" }, "BRUNO EDUARDO": { role: "padrao" },
+                "JONATHAN": { role: "padrao" }, "SANTOS": { role: "padrao" }, "VARGAS": { role: "padrao" }, "BERNARDES": { role: "padrao" },
+                "CABRAL": { role: "padrao" }, "RENAN": { role: "padrao" }, "SEIBT": { role: "padrao" }, "ZANETTI": { role: "padrao" },
+                "VIANEI": { role: "padrao" }, "DORNELES": { role: "padrao" }, "GUTERRES": { role: "padrao" }, "AZEREDO": { role: "padrao" },
+                "VILAR": { role: "padrao" }, "ROSEANE": { role: "padrao" }, "ARAUJO": { role: "padrao" }, "AMARANTE": { role: "padrao" }
         };
 
         let clickedLinkHref = null;
@@ -382,6 +395,8 @@
                     sessionStorage.setItem('isBbmAuthenticated', 'true');
                     sessionStorage.setItem('bbmUserRole', userData.role);
                     loginOverlay.style.display = 'none';
+                    contentWrapper.style.display = 'block';
+                    footer.style.display = 'block';
                     atualizarInterface(userData.role);
 
                     if (clickedLinkHref) {
@@ -403,44 +418,5 @@
         const userRole = sessionStorage.getItem('bbmUserRole');
 
         if (isAuthenticated && userRole) {
-            loginOverlay.style.display = 'none';
-            atualizarInterface(userRole);
-        } else {
-            atualizarInterface('none'); // Block admin links by default
-        }
-
-        protectedLinks.forEach(link => {
-            link.addEventListener('click', (event) => {
-                const linkIsBlocked = link.classList.contains('link-bloqueado');
-                const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
-
-                if (linkIsBlocked) {
-                    event.preventDefault();
-                    return;
-                }
-
-                if (!userIsAuthenticated) {
-                     event.preventDefault(); 
-                    clickedLinkHref = link.href;
-                    loginOverlay.style.display = 'flex';
-                    usernameInput.focus();
-                }
-            });
-        });
-
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            handleLogin();
-        });
-
-        // Close login overlay if clicked outside the box
-        loginOverlay.addEventListener('click', (event) => {
-            if (event.target === loginOverlay) {
-                loginOverlay.style.display = 'none';
-                clickedLinkHref = null;
-            }
-        });
-    });
-</script>
-</body>
-</html>
+            loginOverlay.style
+            
