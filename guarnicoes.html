@@ -6,15 +6,22 @@
     <title>Guarnições de Serviço do 1º BBM - Porto Alegre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Configuração Tailwind CSS (Mantenha as cores padrão para uso global)
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'bombeiros-orange': '#FF8C00',
-                        'bombeiros-yellow': '#FFD700',
-                        'cbmrs-blue': '#1A5276',
-                        'cbmrs-light-blue': '#4A90E2',
-                        'fire-red': '#DC2626',
+                        'bombeiros-orange': '#FF8C00', /* Laranja principal */
+                        'bombeiros-yellow': '#FFD700', /* Amarelo dourado */
+                        'cbmrs-blue': '#1A5276', /* Azul escuro original */
+                        'cbmrs-light-blue': '#4A90E2', /* Azul claro original */
+                        'fire-red': '#DC2626', /* Vermelho original */
+                        'dark-bg': '#1a202c', /* Fundo escuro geral */
+                        'card-bg': '#2d3748', /* Fundo dos cartões */
+                        'green-accent': '#2ecc71', /* Verde para 2ª Cia */
+                        'green-dark': '#1e8449', /* Verde mais escuro para 2ª Cia */
+                        'orange-accent': '#FF8C00', /* Laranja para 1ª Cia */
+                        'orange-dark': '#cc6600', /* Laranja mais escuro para 1ª Cia */
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -26,42 +33,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css"> <link rel="icon" type="image/png" href="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png">
 </head>
-<body class="text-white min-h-screen flex flex-col bg-gray-900">
+<body class="bg-dark-bg text-white min-h-screen flex flex-col">
 
-    <header>
-    <div class="header-container">
-        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="header-logo">
-        <div class="header-title-wrapper">
-            <h1 class="header-title">GUARNIÇÕES DE SERVIÇO DO 1º BBM</h1>
-            <p id="guarnicoes-data" class="header-date">CARREGANDO DATA...</p>
-        </div>
-        <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="header-logo">
-    </div>
-    <a href="index.html" class="back-link">
-        &larr; Voltar para a Página Inicial
-    </a>
-</header>
-
-   <main>
-    <div id="companhias-container" class="container mx-auto px-4">
-        <div class="companhias-flex-container">
-            <div class="companhia-section bg-cbmrs-blue">
-                <h2 class="companhia-section-title">1ª COMPANHIA</h2>
-                <div class="quartels-grid" id="cia1-quartels">
-                    </div>
+    <header class="py-4 shadow-xl bg-card-bg">
+        <div class="header-content container mx-auto px-4">
+            <div class="header-logos-title">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="header-logo cbmrs-logo">
+                <div class="header-main-title">
+                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
+                        GUARNIÇÕES DE SERVIÇO DO 1º BBM
+                    </h1>
+                    <p id="guarnicoes-data" class="text-lg md:text-xl font-bold text-white mt-1">CARREGANDO DATA...</p>
+                </div>
+                <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="header-logo bbm-logo">
             </div>
+            <a href="index.html" class="back-home-link">
+                &larr; Voltar para a Página Inicial
+            </a>
+        </div>
+    </header>
 
-            <div class="companhia-section bg-fire-red">
-                <h2 class="companhia-section-title">2ª COMPANHIA</h2>
-                <div class="quartels-grid" id="cia2-quartels">
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div id="companies-wrapper" class="companies-wrapper">
+            <section class="company-section primary-orange-theme">
+                <h2 class="company-title">1ª COMPANHIA</h2>
+                <div class="quarters-grid" id="cia1-quarters">
                     </div>
-            </div>
-        </div>
-        </div>
-</main>
+            </section>
 
-    <footer class="bg-gray-800 text-gray-400 py-3 z-10">
-        <div class="container mx-auto px-4 text-center text-xs">
+            <section class="company-section primary-green-theme">
+                <h2 class="company-title">2ª COMPANHIA</h2>
+                <div class="quarters-grid" id="cia2-quarters">
+                    </div>
+            </section>
+        </div>
+        </main>
+
+    <footer class="bg-card-bg text-gray-400 py-3 z-10 text-center text-xs">
+        <div class="container mx-auto px-4">
             <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
             <p class="mt-1">
                 Para demais assuntos acesse a
@@ -70,7 +79,6 @@
         </div>
     </footer>
 
-    <script src="guarnicoes-data.js"></script>
     <script type="module" src="guarnicoes-script.js"></script>
 </body>
 </html>
