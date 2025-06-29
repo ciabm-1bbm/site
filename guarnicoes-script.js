@@ -11,9 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tituloGuarnicoes.textContent = `DATA INDEFINIDA`;
     }
 
-    const cia1QuartersGrid = document.getElementById('cia1-quarters'); // ID atualizado para 'quarters'
-    const cia2QuartersGrid = document.getElementById('cia2-quarters'); // ID atualizado para 'quarters'
-    const companiesWrapper = document.getElementById('companies-wrapper'); // O novo container flex para as seções de companhia
+    // Seletores corrigidos para as grids de quartéis dentro de suas seções
+    const cia1QuartersGrid = document.getElementById('cia1-quarters');
+    const cia2QuartersGrid = document.getElementById('cia2-quarters');
+    const companiesWrapper = document.getElementById('companies-wrapper');
 
     // Lista de quartéis a serem ocultados
     const quartelsToHide = [
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             crewHtml += '</div>';
         }
 
-        const vehicleIconClass = getViaturaIcon(vehicle.tipo); // Agora retorna a classe FA
+        const vehicleIconClass = getViaturaIcon(vehicle.tipo);
 
         return `
             <div class="vehicle-block">
@@ -63,11 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function createQuarterHtml(quarterName, quarterData) {
         // Verifica se o quartel deve ser ocultado
         if (quartelsToHide.includes(quarterName)) {
-            return ''; // Retorna string vazia para não renderizar o quartel
+            return '';
         }
 
         let vehiclesHtml = '';
-        let tooltipVehicleList = ''; // Para o texto do tooltip
+        let tooltipVehicleList = '';
         if (quarterData.viaturas && quarterData.viaturas.length > 0) {
             quarterData.viaturas.forEach(vehicle => {
                 vehiclesHtml += createVehicleHtml(vehicle);
@@ -78,9 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltipVehicleList = 'Nenhuma viatura escalada.';
         }
 
-        // Divide o nome do quartel em duas linhas para o cabeçalho
         const nameParts = quarterName.split(' - ');
-        let quarterNameLine1 = quarterName; // Default se não tiver '-'
+        let quarterNameLine1 = quarterName;
         let quarterNameLine2 = '';
 
         if (nameParts.length > 1) {
@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carregar e renderizar as guarnições
     function loadGuarnicoes() {
+        // Limpar grids antes de adicionar
         if (cia1QuartersGrid) cia1QuartersGrid.innerHTML = '';
         if (cia2QuartersGrid) cia2QuartersGrid.innerHTML = '';
 
@@ -114,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quarter in GUARNICOES['1ª CIA']) {
                     if (GUARNICOES['1ª CIA'].hasOwnProperty(quarter)) {
                         const quarterData = GUARNICOES['1ª CIA'][quarter];
+                        // Adiciona o HTML do quartel ao innerHTML da grid
                         cia1QuartersGrid.innerHTML += createQuarterHtml(quarter, quarterData);
                     }
                 }
@@ -124,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quarter in GUARNICOES['2ª CIA']) {
                     if (GUARNICOES['2ª CIA'].hasOwnProperty(quarter)) {
                         const quarterData = GUARNICOES['2ª CIA'][quarter];
+                        // Adiciona o HTML do quartel ao innerHTML da grid
                         cia2QuartersGrid.innerHTML += createQuarterHtml(quarter, quarterData);
                     }
                 }
@@ -141,8 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (hasNonClassifiedToShow) {
-                const nonClassifiedSection = document.createElement('section'); // Usando <section> para melhor semântica
-                nonClassifiedSection.className = 'company-section non-classified-theme'; // Nova classe para outros
+                const nonClassifiedSection = document.createElement('section');
+                nonClassifiedSection.className = 'company-section non-classified-theme';
                 nonClassifiedSection.innerHTML = `
                     <h2 class="company-title">OUTROS QUARTÉIS / SETORES</h2>
                     <div class="quarters-grid"></div>
@@ -157,15 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
-                if(companiesWrapper) { // Adiciona ao container principal flex
+                if(companiesWrapper) {
                     companiesWrapper.appendChild(nonClassifiedSection);
                 }
             }
 
-            // Adiciona a funcionalidade de clique para expandir/colapsar (agora só no quartel clicado)
+            // Adiciona a funcionalidade de clique para expandir/colapsar
             document.querySelectorAll('.quarter-card').forEach(card => {
                 card.addEventListener('click', (event) => {
-                    // Impede que o clique no tooltip feche o card
                     if (event.target.closest('.tooltip-text')) {
                         return;
                     }
