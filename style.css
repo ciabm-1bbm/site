@@ -93,4 +93,384 @@ header {
 /* Login overlay (mantido) */
 .login-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba
+    background-color: rgba(0, 0, 0, 0.85); display: none; align-items: center;
+    justify-content: center; z-index: 1000;
+}
+.login-box {
+    background-color: #2D3748; padding: 2rem; border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); text-align: center;
+    width: 90%; max-width: 400px;
+}
+.login-box input {
+    width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 0.25rem;
+    background-color: #4A5568; color: white; border: 1px solid #718096;
+}
+.login-box input::placeholder { color: #A0AEC0; }
+.login-box button {
+    width: 100%; padding: 0.75rem; border-radius: 0.25rem;
+    background-color: #FF8C00; color: white; font-weight: bold;
+    cursor: pointer; transition: background-color 0.3s;
+}
+.login-box button:hover { background-color: #cc7000; }
+.link-bloqueado {
+    opacity: 0.5; cursor: not-allowed; background-color: #4A5568 !important;
+}
+.link-bloqueado:hover {
+    transform: none; box-shadow: none; background-color: #4A5568 !important;
+}
+
+/* --- ESTILOS DA PÁGINA DE GUARNIÇÕES --- */
+
+main {
+    flex-grow: 1;
+    padding: 1.5rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box; /* Garante que padding não estoure a largura */
+}
+
+/* Seções de Companhia (1ª CIA, 2ª CIA, Outros) */
+.companhia-section {
+    border: 2px solid;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    background-color: #1A202C; /* Fundo mais escuro para as seções */
+}
+
+.companhia-section h2 {
+    font-size: 1.8rem; /* Título da Companhia maior */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #FFD700; /* Título da companhia sempre amarelo */
+}
+
+/* Containers dos Quartéis dentro da Companhia */
+.quartels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Quartéis em uma linha flexível */
+    gap: 1rem; /* Espaçamento entre os cartões */
+}
+
+/* Quartel Card (Item clicável) */
+.quartel-card {
+    background-color: #2D3748; /* Fundo mais escuro para os cartões dos quartéis */
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem; /* Padding reduzido */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Borda mais sutil */
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column; /* Para empilhar header e content */
+}
+
+.quartel-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Cabeçalho do Quartel (Parte visível quando fechado) */
+.quartel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #FFD700; /* Nome do quartel sempre amarelo */
+    font-size: 0.95rem; /* Fonte do nome do quartel menor */
+    font-weight: 700;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.3rem;
+}
+
+/* Ícone da Seta (para baixo) */
+.quartel-toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.8rem; /* Tamanho da seta menor */
+    transform: rotate(0deg); /* Seta para baixo por padrão */
+}
+
+.quartel-card.active .quartel-toggle-icon {
+    transform: rotate(180deg); /* Gira para cima quando ativo */
+}
+
+/* Conteúdo Colapsável do Quartel */
+.quartel-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    padding-top: 0.2rem;
+}
+
+.quartel-card.active .quartel-content {
+    max-height: 1500px; /* Aumentado para garantir que todo conteúdo caiba */
+    opacity: 1;
+}
+
+/* Bloco da Viatura (cada viatura com sua guarnição) */
+.viatura-block {
+    display: flex;
+    flex-direction: column;
+    background-color: #3B455C; /* Fundo para cada bloco de viatura */
+    padding: 0.5rem; /* Padding menor */
+    border-radius: 0.2rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.viatura-block:last-child {
+    margin-bottom: 0; /* Remove margem do último bloco de viatura */
+}
+
+.viatura-main-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.3rem; /* Espaço entre a linha da viatura e a guarnição */
+}
+
+/* Ícone da Viatura */
+.viatura-icon {
+    margin-right: 0.5rem;
+    width: 28px; /* Ícone da viatura menor */
+    height: 28px;
+    min-width: 28px;
+    color: #FFD700; /* Ícone da viatura sempre amarelo */
+    font-size: 1.6rem; /* Tamanho do ícone Font Awesome */
+}
+
+/* Detalhes da Viatura (Prefixo e Turno) */
+.viatura-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.viatura-details .prefixo-turno {
+    font-weight: bold;
+    color: #FF8C00; /* Prefixo da viatura sempre laranja */
+    font-size: 0.9rem; /* Tamanho do prefixo */
+    line-height: 1.1;
+}
+
+.viatura-details .text-gray-300 { /* Para o turno */
+    font-size: 0.75rem; /* Tamanho do turno menor */
+    line-height: 1.1;
+    color: #CBD5E0; /* um cinza mais claro */
+}
+
+/* Lista de Militares */
+.militar-list {
+    margin-left: 0;
+    font-size: 0.75rem; /* Texto dos militares menor */
+    color: #E2E8F0;
+    line-height: 1.3;
+}
+
+.militar-item {
+    display: flex;
+    align-items: center;
+    padding-left: 0.3rem;
+    border-left: 2px solid #4A90E2; /* Linha azul clara para cada militar */
+    margin-bottom: 0.05rem; /* Pequeno espaço entre os militares */
+}
+
+/* Ícone do Bombeiro ao lado do nome */
+.bombeiro-icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    vertical-align: middle;
+    color: #4A90E2; /* Ícone do militar sempre azul claro */
+}
+
+
+/* --- Cores Padronizadas por Companhia --- */
+
+/* 1ª Companhia (Laranja Principal) */
+.companhia-section.bg-cbmrs-blue {
+    border-color: #FF8C00; /* Borda da seção laranja */
+}
+.companhia-section.bg-cbmrs-blue .quartel-card {
+    background-color: #2D3748; /* Cor de fundo do cartão */
+}
+.companhia-section.bg-cbmrs-blue .quartel-header {
+    background-color: #CC6600; /* Laranja mais escuro para o cabeçalho do quartel */
+    border-bottom-color: #FF8C00; /* Linha do cabeçalho laranja */
+    color: #FFD700; /* Texto do cabeçalho amarelo */
+}
+.companhia-section.bg-cbmrs-blue .quartel-toggle-icon {
+    color: #FF8C00; /* Ícone da seta laranja */
+}
+
+/* 2ª Companhia (Verde Escuro) */
+.companhia-section.bg-fire-red { /* Usamos bg-fire-red no HTML, mas aqui mudamos a cor */
+    border-color: #1E8449; /* Borda da seção verde escuro */
+}
+.companhia-section.bg-fire-red .companhia-section-title { /* Se houver um h2 aqui */
+    color: #2ECC71; /* Um verde mais claro para o título da companhia */
+}
+.companhia-section.bg-fire-red .quartel-card {
+    background-color: #2D3748; /* Cor de fundo do cartão */
+}
+.companhia-section.bg-fire-red .quartel-header {
+    background-color: #145A32; /* Verde mais escuro para o cabeçalho do quartel */
+    border-bottom-color: #1E8449; /* Linha do cabeçalho verde escuro */
+    color: #2ECC71; /* Texto do cabeçalho verde claro */
+}
+.companhia-section.bg-fire-red .quartel-toggle-icon {
+    color: #2ECC71; /* Ícone da seta verde claro */
+}
+
+/* Outros Quartéis / Não Classificados */
+.companhia-section.bg-gray-700 { /* Mantido cinza para outros, como COBOM, AODCA etc. */
+    border-color: #A0AEC0;
+}
+.companhia-section.bg-gray-700 .companhia-section-title {
+    color: #CBD5E0;
+}
+.companhia-section.bg-gray-700 .quartel-card {
+    background-color: #2D3748;
+}
+.companhia-section.bg-gray-700 .quartel-header {
+    background-color: #64748B;
+    border-bottom-color: #A0AEC0;
+    color: #CBD5E0;
+}
+.companhia-section.bg-gray-700 .quartel-toggle-icon {
+    color: #A0AEC0;
+}
+
+
+/* --- Media Queries para Responsividade (Smartphone) --- */
+
+@media (max-width: 768px) { /* Tablets e smartphones em modo paisagem */
+    .header-logo {
+        height: 3.5rem; /* Logos menores */
+    }
+    .header-title {
+        font-size: 1.2rem; /* Título principal menor */
+    }
+    .header-date {
+        font-size: 0.9rem; /* Data menor */
+    }
+    .header-container {
+        flex-direction: column; /* Logos e título empilhados */
+        gap: 0.5rem;
+    }
+    .header-title-wrapper {
+        order: 3; /* Título abaixo dos logos */
+    }
+    .header-logo:nth-child(1) { order: 1; }
+    .header-logo:nth-child(2) { order: 2; }
+
+
+    main {
+        padding: 1rem 0.5rem; /* Padding menor nas laterais */
+    }
+
+    .companhia-section {
+        padding: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    .companhia-section h2 {
+        font-size: 1.5rem; /* Título da companhia menor */
+        margin-bottom: 1rem;
+    }
+    .quartels-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Min-width menor para caber mais */
+        gap: 0.8rem;
+    }
+    .quartel-card {
+        padding: 0.6rem 0.8rem;
+        margin-bottom: 0.6rem;
+    }
+    .quartel-header {
+        font-size: 0.9rem; /* Nome do quartel menor */
+    }
+    .quartel-toggle-icon {
+        font-size: 0.7rem;
+    }
+    .viatura-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1.4rem;
+    }
+    .viatura-details .prefixo-turno {
+        font-size: 0.8rem;
+    }
+    .viatura-details .text-gray-300 {
+        font-size: 0.7rem;
+    }
+    .militar-list {
+        font-size: 0.7rem;
+    }
+    .bombeiro-icon {
+        width: 12px;
+        height: 12px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) { /* Smartphones em modo retrato */
+    .header-logo {
+        height: 3rem; /* Logos ainda menores */
+    }
+    .header-title {
+        font-size: 1rem; /* Título principal ainda menor */
+    }
+    .header-date {
+        font-size: 0.8rem;
+    }
+    .back-link {
+        font-size: 0.8rem;
+    }
+
+    main {
+        padding: 0.8rem 0.5rem;
+    }
+    .companhia-section {
+        padding: 0.6rem;
+        margin-bottom: 1rem;
+    }
+    .companhia-section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+    .quartels-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Min-width para 2 por linha em telas menores */
+        gap: 0.6rem;
+    }
+    .quartel-card {
+        padding: 0.5rem 0.6rem;
+        margin-bottom: 0.5rem;
+    }
+    .quartel-header {
+        font-size: 0.85rem;
+    }
+    .quartel-toggle-icon {
+        font-size: 0.6rem;
+    }
+    .viatura-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 1.1rem;
+    }
+    .viatura-details .prefixo-turno {
+        font-size: 0.75rem;
+    }
+    .viatura-details .text-gray-300 {
+        font-size: 0.65rem;
+    }
+    .militar-list {
+        font-size: 0.65rem;
+    }
+    .bombeiro-icon {
+        width: 10px;
+        height: 10px;
+        font-size: 0.65rem;
+    }
+}
