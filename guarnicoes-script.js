@@ -16,12 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
         'BBS - TERRESTRE',
         'BBS - CANIL',
         'BBS - AQUÁTICA',
-        'BBS - MERGULHO', // Adicionado pois estava nos dados fornecidos
-        'AODCA', // Adicionado pois estava nos dados fornecidos
-        'COBOM-DCCI', // Adicionado pois estava nos dados fornecidos
-        '1º BBM / ESTADO MAIOR', // Adicionado pois estava nos dados fornecidos
-        'DA / DLP' // Adicionado pois estava nos dados fornecidos
+        'BBS - MERGULHO',
+        'AODCA',
+        'COBOM-DCCI',
+        '1º BBM / ESTADO MAIOR',
+        'DA / DLP'
     ];
+
+    // ATENÇÃO: As funções getViaturaIcon e getMilitarIcon devem ser definidas no guarnicoes-data.js
+    // ou seja, o output do parser-guarnicoes.js deve incluir essas funções no guarnicoes-data.js.
+    // Garanta que elas estejam lá para evitar erros de "função indefinida".
 
     // Função para criar o HTML de uma viatura e sua guarnição
     function createViaturaHtml(viatura) {
@@ -39,18 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
             militaresHtml += '</div>';
         }
 
-        let viaturaIconHtml;
-        const iconResult = getViaturaIcon(viatura.tipo);
-        if (iconResult.startsWith('<img')) {
-            viaturaIconHtml = iconResult;
-        } else {
-            viaturaIconHtml = `<i class="${iconResult} viatura-icon"></i>`;
-        }
+        // Recupera o ícone da viatura. A função getViaturaIcon agora fornece a classe FA diretamente.
+        const viaturaIconClass = getViaturaIcon(viatura.tipo);
 
         return `
             <div class="viatura-block">
                 <div class="viatura-main-info">
-                    ${viaturaIconHtml}
+                    <i class="${viaturaIconClass} viatura-icon"></i>
                     <div class="viatura-details">
                         <span class="prefixo-turno">${viatura.tipo} ${viatura.prefixo}</span>
                         <span class="text-gray-300 text-sm">${viatura.turno}</span>
@@ -77,11 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
             viaturasHtml = '<p class="text-gray-400 text-center text-sm py-4">Nenhuma viatura escalada para este quartel.</p>';
         }
 
+        // A seta para baixo (fa-chevron-down) é a nova padrão.
+        // O CSS fará a rotação para cima quando 'active'.
         return `
-            <div class="quartel-card ${quartelData.colorClass || 'bg-gray-700'}">
+            <div class="quartel-card">
                 <div class="quartel-header">
                     <span>${nomeQuartel}</span>
-                    <i class="fas fa-chevron-right quartel-toggle-icon"></i>
+                    <i class="fas fa-chevron-down quartel-toggle-icon"></i>
                 </div>
                 <div class="quartel-content">
                     ${viaturasHtml}
@@ -101,6 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quartel in GUARNICOES['1ª CIA']) {
                     if (GUARNICOES['1ª CIA'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['1ª CIA'][quartel];
+                        // Aplica a classe da companhia para controle de cor no CSS
+                        if (!cia1QuartelsDiv.closest('.companhia-section').classList.contains('bg-cbmrs-blue')) {
+                             cia1QuartelsDiv.closest('.companhia-section').classList.add('bg-cbmrs-blue');
+                        }
                         cia1QuartelsDiv.innerHTML += createQuartelHtml(quartel, quartelData);
                     }
                 }
@@ -111,18 +116,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quartel in GUARNICOES['2ª CIA']) {
                     if (GUARNICOES['2ª CIA'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['2ª CIA'][quartel];
+                        // Aplica a classe da companhia para controle de cor no CSS
+                        // Note que no HTML está 'bg-fire-red', mas o CSS customizado vai sobrescrever
+                        if (!cia2QuartelsDiv.closest('.companhia-section').classList.contains('bg-fire-red')) {
+                             cia2QuartelsDiv.closest('.companhia-section').classList.add('bg-fire-red');
+                        }
                         cia2QuartelsDiv.innerHTML += createQuartelHtml(quartel, quartelData);
                     }
                 }
             }
 
-            // A seção "NAO CLASSIFICADO" só será exibida se houver quartéis não filtrados lá dentro
+            // Se houver quartéis "NAO CLASSIFICADO" e que não estão na lista de ocultar
             let hasNonClassifiedToShow = false;
             if (GUARNICOES['NAO CLASSIFICADO']) {
                 for (const quartel in GUARNICOES['NAO CLASSIFICADO']) {
                     if (GUARNICOES['NAO CLASSIFICADO'].hasOwnProperty(quartel) && !quartelsToHide.includes(quartel)) {
                         hasNonClassifiedToShow = true;
-                        break; // Basta um quartel para mostrar a seção
+                        break;
                     }
                 }
             }
@@ -130,25 +140,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hasNonClassifiedToShow) {
                 let naoClassificadoHtml = `
                     <div class="companhia-section bg-gray-700 p-6 rounded-lg shadow-xl lg:col-span-2 mt-8">
-                        <h2 class="text-2xl font-bold text-center text-gray-300 mb-6">OUTROS QUARTÉIS / SETORES</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <h2 class="text-2xl font-bold text-center text-gray-300 mb-6 companhia-section-title">OUTROS QUARTÉIS / SETORES</h2>
+                        <div class="quartels-grid">
                 `;
                 for (const quartel in GUARNICOES['NAO CLASSIFICADO']) {
                     if (GUARNICOES['NAO CLASSIFICADO'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['NAO CLASSIFICADO'][quartel];
-                        // Renderiza apenas se não estiver na lista de ocultar
                         if (!quartelsToHide.includes(quartel)) {
                            naoClassificadoHtml += createQuartelHtml(quartel, quartelData);
                         }
                     }
                 }
                 naoClassificadoHtml += `</div></div>`;
-                const mainContainer = document.querySelector('main .container > div');
+                const mainContainer = document.querySelector('main > .grid'); // Seleciona o grid principal dentro de main
                 if (mainContainer) {
                     mainContainer.innerHTML += naoClassificadoHtml;
                 }
             }
-
 
             // Adiciona a funcionalidade de clique para expandir/colapsar
             document.querySelectorAll('.quartel-card').forEach(card => {
