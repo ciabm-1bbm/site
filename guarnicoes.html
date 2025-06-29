@@ -28,27 +28,19 @@
 </head>
 <body class="text-white min-h-screen flex flex-col bg-gray-900">
 
-    <header class="py-4 shadow-lg bg-gray-800">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
-                <div class="p-2 rounded-lg">
-                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 md:h-20 w-auto">
-                </div>
-                <div class="text-center">
-                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
-                        GUARNIÇÕES DE SERVIÇO DO 1º BBM
-                    </h1>
-                    <p id="guarnicoes-data" class="text-lg md:text-xl font-bold text-white mt-1">CARREGANDO DATA...</p>
-                </div>
-                <div class="p-2 rounded-lg">
-                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-16 md:h-20 w-auto">
-                </div>
-            </div>
-            <a href="index.html" class="text-cbmrs-light-blue hover:underline text-sm md:text-base">
-                &larr; Voltar para a Página Inicial
-            </a>
+    <header>
+    <div class="header-container">
+        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="header-logo">
+        <div class="header-title-wrapper">
+            <h1 class="header-title">GUARNIÇÕES DE SERVIÇO DO 1º BBM</h1>
+            <p id="guarnicoes-data" class="header-date">CARREGANDO DATA...</p>
         </div>
-    </header>
+        <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="header-logo">
+    </div>
+    <a href="index.html" class="back-link">
+        &larr; Voltar para a Página Inicial
+    </a>
+</header>
 
     <main class="flex-grow container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
