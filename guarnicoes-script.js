@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tituloGuarnicoes.textContent = `DATA INDEFINIDA`;
     }
 
-    const cia1QuartelsDiv = document.getElementById('cia1-quartels');
-    const cia2QuartelsDiv = document.getElementById('cia2-quartels');
+    const cia1QuartelsGrid = document.getElementById('cia1-quartels'); // Referência para a GRID de quartéis da CIA 1
+    const cia2QuartelsGrid = document.getElementById('cia2-quartels'); // Referência para a GRID de quartéis da CIA 2
 
     // Lista de quartéis a serem ocultados
     const quartelsToHide = [
@@ -22,10 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         '1º BBM / ESTADO MAIOR',
         'DA / DLP'
     ];
-
-    // ATENÇÃO: As funções getViaturaIcon e getMilitarIcon devem ser definidas no guarnicoes-data.js
-    // ou seja, o output do parser-guarnicoes.js deve incluir essas funções no guarnicoes-data.js.
-    // Garanta que elas estejam lá para evitar erros de "função indefinida".
 
     // Função para criar o HTML de uma viatura e sua guarnição
     function createViaturaHtml(viatura) {
@@ -43,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             militaresHtml += '</div>';
         }
 
-        // Recupera o ícone da viatura. A função getViaturaIcon agora fornece a classe FA diretamente.
         const viaturaIconClass = getViaturaIcon(viatura.tipo);
 
         return `
@@ -76,8 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
             viaturasHtml = '<p class="text-gray-400 text-center text-sm py-4">Nenhuma viatura escalada para este quartel.</p>';
         }
 
-        // A seta para baixo (fa-chevron-down) é a nova padrão.
-        // O CSS fará a rotação para cima quando 'active'.
         return `
             <div class="quartel-card">
                 <div class="quartel-header">
@@ -93,35 +86,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carregar e renderizar as guarnições
     function loadGuarnicoes() {
-        if (cia1QuartelsDiv) cia1QuartelsDiv.innerHTML = '';
-        if (cia2QuartelsDiv) cia2QuartelsDiv.innerHTML = '';
+        if (cia1QuartelsGrid) cia1QuartelsGrid.innerHTML = '';
+        if (cia2QuartelsGrid) cia2QuartelsGrid.innerHTML = '';
 
         if (typeof GUARNICOES === 'object' && GUARNICOES !== null) {
             // 1ª CIA
             if (GUARNICOES['1ª CIA']) {
+                // Adiciona a classe ao título da companhia para estilização
+                const cia1Title = document.querySelector('.companhia-section.bg-cbmrs-blue .companhia-section-title');
+                if(cia1Title) cia1Title.classList.add('companhia-section-title'); // Garante a classe de título
+
                 for (const quartel in GUARNICOES['1ª CIA']) {
                     if (GUARNICOES['1ª CIA'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['1ª CIA'][quartel];
-                        // Aplica a classe da companhia para controle de cor no CSS
-                        if (!cia1QuartelsDiv.closest('.companhia-section').classList.contains('bg-cbmrs-blue')) {
-                             cia1QuartelsDiv.closest('.companhia-section').classList.add('bg-cbmrs-blue');
-                        }
-                        cia1QuartelsDiv.innerHTML += createQuartelHtml(quartel, quartelData);
+                        cia1QuartelsGrid.innerHTML += createQuartelHtml(quartel, quartelData);
                     }
                 }
             }
 
             // 2ª CIA
             if (GUARNICOES['2ª CIA']) {
+                // Adiciona a classe ao título da companhia para estilização
+                const cia2Title = document.querySelector('.companhia-section.bg-fire-red .companhia-section-title');
+                if(cia2Title) cia2Title.classList.add('companhia-section-title'); // Garante a classe de título
+
+
                 for (const quartel in GUARNICOES['2ª CIA']) {
                     if (GUARNICOES['2ª CIA'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['2ª CIA'][quartel];
-                        // Aplica a classe da companhia para controle de cor no CSS
-                        // Note que no HTML está 'bg-fire-red', mas o CSS customizado vai sobrescrever
-                        if (!cia2QuartelsDiv.closest('.companhia-section').classList.contains('bg-fire-red')) {
-                             cia2QuartelsDiv.closest('.companhia-section').classList.add('bg-fire-red');
-                        }
-                        cia2QuartelsDiv.innerHTML += createQuartelHtml(quartel, quartelData);
+                        cia2QuartelsGrid.innerHTML += createQuartelHtml(quartel, quartelData);
                     }
                 }
             }
@@ -138,23 +131,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (hasNonClassifiedToShow) {
-                let naoClassificadoHtml = `
-                    <div class="companhia-section bg-gray-700 p-6 rounded-lg shadow-xl lg:col-span-2 mt-8">
-                        <h2 class="text-2xl font-bold text-center text-gray-300 mb-6 companhia-section-title">OUTROS QUARTÉIS / SETORES</h2>
-                        <div class="quartels-grid">
+                // Cria a seção "Outros Quartéis / Setores" dinamicamente
+                const outrosSection = document.createElement('div');
+                outrosSection.className = 'companhia-section bg-gray-700 mt-8'; // Adiciona classes de estilo
+                outrosSection.innerHTML = `
+                    <h2 class="companhia-section-title">OUTROS QUARTÉIS / SETORES</h2>
+                    <div class="quartels-grid"></div>
                 `;
+                const outrosQuartelsGrid = outrosSection.querySelector('.quartels-grid');
+
                 for (const quartel in GUARNICOES['NAO CLASSIFICADO']) {
                     if (GUARNICOES['NAO CLASSIFICADO'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['NAO CLASSIFICADO'][quartel];
                         if (!quartelsToHide.includes(quartel)) {
-                           naoClassificadoHtml += createQuartelHtml(quartel, quartelData);
+                           outrosQuartelsGrid.innerHTML += createQuartelHtml(quartel, quartelData);
                         }
                     }
                 }
-                naoClassificadoHtml += `</div></div>`;
-                const mainContainer = document.querySelector('main > .grid'); // Seleciona o grid principal dentro de main
-                if (mainContainer) {
-                    mainContainer.innerHTML += naoClassificadoHtml;
+                const companhiasContainer = document.getElementById('companhias-container');
+                if(companhiasContainer) {
+                    companhiasContainer.appendChild(outrosSection);
                 }
             }
 
@@ -167,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             console.error("Variável GUARNICOES não encontrada ou não é um objeto válido.");
-            const mainContainer = document.querySelector('main .container');
+            const mainContainer = document.getElementById('companhias-container'); // Agora acessa o container geral
             if (mainContainer) {
                 mainContainer.innerHTML = '<p class="text-red-500 text-center text-xl mt-10">Erro ao carregar dados das guarnições. Verifique o arquivo guarnicoes-data.js e o console do navegador para detalhes.</p>';
             }
