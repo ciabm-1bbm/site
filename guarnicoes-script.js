@@ -1,7 +1,7 @@
 // guarnicoes-script.js
 
-// Importa as variáveis e funções do guarnicoes-data.js
-import { DATA_GUARNA, GUARNICOES, getViaturaIcon, getMilitarIcon } from './guarnicoes-data.js';
+// REMOVIDO: import { DATA_GUARNA, GUARNICOES, getViaturaIcon, getMilitarIcon } from './guarnicoes-data.js';
+// As variáveis e funções serão carregadas globalmente pelo script guarnicoes-data.js
 
 document.addEventListener('DOMContentLoaded', () => {
     const tituloGuarnicoes = document.getElementById('guarnicoes-data');
@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tituloGuarnicoes.textContent = `DATA INDEFINIDA`;
     }
 
-    // Seletores corrigidos para as grids de quartéis dentro de suas seções
     const cia1QuartersGrid = document.getElementById('cia1-quarters');
     const cia2QuartersGrid = document.getElementById('cia2-quarters');
     const companiesWrapper = document.getElementById('companies-wrapper');
@@ -88,9 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
             quarterNameLine2 = nameParts[1].trim();
         }
 
+        // Adiciona a classe 'two-lines' se houver segunda linha para o CSS customizar a seta
+        const quarterHeaderClass = quarterNameLine2 ? 'quarter-header two-lines' : 'quarter-header';
+
         return `
             <div class="quarter-card">
-                <div class="quarter-header">
+                <div class="${quarterHeaderClass}">
                     <span class="quarter-name-line1">${quarterNameLine1}</span>
                     ${quarterNameLine2 ? `<span class="quarter-name-line2">${quarterNameLine2}</span>` : ''}
                     <i class="fas fa-chevron-down quarter-toggle-icon"></i>
@@ -115,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quarter in GUARNICOES['1ª CIA']) {
                     if (GUARNICOES['1ª CIA'].hasOwnProperty(quarter)) {
                         const quarterData = GUARNICOES['1ª CIA'][quarter];
-                        // Adiciona o HTML do quartel ao innerHTML da grid
                         cia1QuartersGrid.innerHTML += createQuarterHtml(quarter, quarterData);
                     }
                 }
@@ -126,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quarter in GUARNICOES['2ª CIA']) {
                     if (GUARNICOES['2ª CIA'].hasOwnProperty(quarter)) {
                         const quarterData = GUARNICOES['2ª CIA'][quarter];
-                        // Adiciona o HTML do quartel ao innerHTML da grid
                         cia2QuartersGrid.innerHTML += createQuarterHtml(quarter, quarterData);
                     }
                 }
@@ -168,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Adiciona a funcionalidade de clique para expandir/colapsar
             document.querySelectorAll('.quarter-card').forEach(card => {
                 card.addEventListener('click', (event) => {
+                    // Impede que o clique no tooltip feche o card
                     if (event.target.closest('.tooltip-text')) {
                         return;
                     }
