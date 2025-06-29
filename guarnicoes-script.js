@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cia1QuartelsGrid = document.getElementById('cia1-quartels');
     const cia2QuartelsGrid = document.getElementById('cia2-quartels');
+    const companhiasContainer = document.getElementById('companhias-container'); // O container principal das companhias
 
     // Lista de quartéis a serem ocultados
     const quartelsToHide = [
@@ -66,20 +67,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let viaturasHtml = '';
+        let tooltipViaturaList = ''; // Para o texto do tooltip
         if (quartelData.viaturas && quartelData.viaturas.length > 0) {
             quartelData.viaturas.forEach(viatura => {
                 viaturasHtml += createViaturaHtml(viatura);
+                tooltipViaturaList += `${viatura.tipo} ${viatura.prefixo} (${viatura.turno})<br>`;
             });
         } else {
             viaturasHtml = '<p class="text-gray-400 text-center text-sm py-4">Nenhuma viatura escalada para este quartel.</p>';
+            tooltipViaturaList = 'Nenhuma viatura escalada.';
+        }
+
+        // Divide o nome do quartel em duas linhas para o cabeçalho
+        const nomeParts = nomeQuartel.split(' - ');
+        let quartelNameLine1 = nomeQuartel; // Default se não tiver '-'
+        let quartelNameLine2 = '';
+
+        if (nomeParts.length > 1) {
+            quartelNameLine1 = nomeParts[0].trim();
+            quartelNameLine2 = nomeParts[1].trim();
         }
 
         return `
-            <div class="quartel-card">
+            <div class="quartel-card" style="position: relative;">
                 <div class="quartel-header">
-                    <span>${nomeQuartel}</span>
+                    <span class="quartel-name-line1">${quartelNameLine1}</span>
+                    ${quartelNameLine2 ? `<span class="quartel-name-line2">${quartelNameLine2}</span>` : ''}
                     <i class="fas fa-chevron-down quartel-toggle-icon"></i>
                 </div>
+                <span class="tooltip-text">${tooltipViaturaList}</span>
                 <div class="quartel-content">
                     ${viaturasHtml}
                 </div>
@@ -140,15 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
-                const companhiasContainer = document.getElementById('companhias-container');
-                if(companhiasContainer) {
-                    companhiasContainer.appendChild(outrosSection);
+                const companhiasFlexContainer = document.querySelector('.companhias-flex-container'); // Adicionado ao container flex
+                if(companhiasFlexContainer) {
+                    companhiasFlexContainer.appendChild(outrosSection);
                 }
             }
 
+            // Adiciona a funcionalidade de clique para expandir/colapsar
             document.querySelectorAll('.quartel-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    card.classList.toggle('active');
+                card.addEventListener('click', (event) => {
+                    // Evita que o tooltip feche o card se o clique for sobre ele
+                    if (!event.target.closest('.tooltip-text')) {
+                        card.classList.toggle('active');
+                    }
                 });
             });
 
