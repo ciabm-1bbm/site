@@ -42,21 +42,22 @@
     </a>
 </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="companhia-section bg-cbmrs-blue p-6 rounded-lg shadow-xl">
-                <h2 class="text-2xl font-bold text-center text-bombeiros-yellow mb-6">1ª COMPANHIA</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="cia1-quartels">
-                    </div>
-            </div>
-
-            <div class="companhia-section bg-fire-red p-6 rounded-lg shadow-xl">
-                <h2 class="text-2xl font-bold text-center text-bombeiros-yellow mb-6">2ª COMPANHIA</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="cia2-quartels">
-                    </div>
-            </div>
+    <main>
+    <div id="companhias-container" class="container mx-auto px-4 py-8">
+        <div class="companhia-section bg-cbmrs-blue">
+            <h2 class="companhia-section-title">1ª COMPANHIA</h2>
+            <div class="quartels-grid" id="cia1-quartels">
+                </div>
         </div>
-    </main>
+
+        <div class="companhia-section bg-fire-red">
+            <h2 class="companhia-section-title">2ª COMPANHIA</h2>
+            <div class="quartels-grid" id="cia2-quartels">
+                </div>
+        </div>
+
+        </div>
+</main>
 
     <footer class="bg-gray-800 text-gray-400 py-3 z-10">
         <div class="container mx-auto px-4 text-center text-xs">
