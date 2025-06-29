@@ -130,17 +130,26 @@ main {
     box-sizing: border-box; /* Garante que padding não estoure a largura */
 }
 
+/* Containers das Companhias - Para colocá-las lado a lado em telas grandes */
+.companhias-flex-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar em linha em telas pequenas */
+    gap: 2rem; /* Espaço entre as seções de companhia */
+}
+
 /* Seções de Companhia (1ª CIA, 2ª CIA, Outros) */
 .companhia-section {
     border: 2px solid;
     border-radius: 0.75rem;
     padding: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0; /* Remove margem inferior, o gap do flex container já lida */
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     background-color: #1A202C; /* Fundo mais escuro para as seções */
+    flex: 1; /* Permite que as seções ocupem espaço igual */
+    min-width: 300px; /* Largura mínima para cada seção de companhia */
 }
 
-.companhia-section h2 {
+.companhia-section h2.companhia-section-title {
     font-size: 1.8rem; /* Título da Companhia maior */
     font-weight: bold;
     text-align: center;
@@ -151,8 +160,8 @@ main {
 /* Containers dos Quartéis dentro da Companhia */
 .quartels-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Quartéis em uma linha flexível */
-    gap: 1rem; /* Espaçamento entre os cartões */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Quartéis em uma linha flexível e menores */
+    gap: 0.8rem; /* Espaçamento entre os cartões */
 }
 
 /* Quartel Card (Item clicável) */
@@ -177,25 +186,41 @@ main {
 /* Cabeçalho do Quartel (Parte visível quando fechado) */
 .quartel-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* Nome BRAVO na linha 1, NOME QUARTEL na linha 2 */
+    justify-content: center; /* Centraliza verticalmente o texto */
+    align-items: flex-start; /* Alinha o texto à esquerda */
     color: #FFD700; /* Nome do quartel sempre amarelo */
-    font-size: 0.95rem; /* Fonte do nome do quartel menor */
     font-weight: 700;
     padding-bottom: 0.3rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 0.3rem;
+    position: relative; /* Para posicionar a seta */
+    min-height: 40px; /* Altura mínima para o cabeçalho do quartel */
 }
+
+.quartel-header .quartel-name-line1 {
+    font-size: 0.9rem; /* Tamanho da fonte para "BRAVO 1" */
+    line-height: 1.1;
+}
+.quartel-header .quartel-name-line2 {
+    font-size: 0.8rem; /* Tamanho da fonte para "AÇORIANOS" */
+    line-height: 1.1;
+    color: #D1D5DB; /* Um cinza mais claro para a segunda linha */
+}
+
 
 /* Ícone da Seta (para baixo) */
 .quartel-toggle-icon {
     transition: transform 0.3s ease;
     font-size: 0.8rem; /* Tamanho da seta menor */
-    transform: rotate(0deg); /* Seta para baixo por padrão */
+    position: absolute; /* Posiciona a seta no canto */
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg); /* Seta para baixo por padrão */
 }
 
 .quartel-card.active .quartel-toggle-icon {
-    transform: rotate(180deg); /* Gira para cima quando ativo */
+    transform: translateY(-50%) rotate(180deg); /* Gira para cima quando ativo */
 }
 
 /* Conteúdo Colapsável do Quartel */
@@ -296,6 +321,7 @@ main {
 }
 .companhia-section.bg-cbmrs-blue .quartel-card {
     background-color: #2D3748; /* Cor de fundo do cartão */
+    border-color: #FF8C00; /* Borda do cartão laranja */
 }
 .companhia-section.bg-cbmrs-blue .quartel-header {
     background-color: #CC6600; /* Laranja mais escuro para o cabeçalho do quartel */
@@ -310,11 +336,12 @@ main {
 .companhia-section.bg-fire-red { /* Usamos bg-fire-red no HTML, mas aqui mudamos a cor */
     border-color: #1E8449; /* Borda da seção verde escuro */
 }
-.companhia-section.bg-fire-red .companhia-section-title { /* Se houver um h2 aqui */
+.companhia-section.bg-fire-red .companhia-section-title {
     color: #2ECC71; /* Um verde mais claro para o título da companhia */
 }
 .companhia-section.bg-fire-red .quartel-card {
     background-color: #2D3748; /* Cor de fundo do cartão */
+    border-color: #1E8449; /* Borda do cartão verde */
 }
 .companhia-section.bg-fire-red .quartel-header {
     background-color: #145A32; /* Verde mais escuro para o cabeçalho do quartel */
@@ -334,6 +361,7 @@ main {
 }
 .companhia-section.bg-gray-700 .quartel-card {
     background-color: #2D3748;
+    border-color: #A0AEC0;
 }
 .companhia-section.bg-gray-700 .quartel-header {
     background-color: #64748B;
@@ -344,8 +372,55 @@ main {
     color: #A0AEC0;
 }
 
+/* --- Aviso de Viatura (Tooltip) --- */
+.quartel-card .tooltip-text {
+    visibility: hidden;
+    width: 200px; /* Largura do tooltip */
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 105%; /* Posição acima do elemento */
+    left: 50%;
+    margin-left: -100px; /* Centraliza o tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.quartel-card .tooltip-text::after {
+    content: " ";
+    position: absolute;
+    top: 100%; /* Seta para baixo */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.quartel-card:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
 
 /* --- Media Queries para Responsividade (Smartphone) --- */
+
+@media (min-width: 769px) { /* Em telas maiores, coloca as companhias lado a lado */
+    .companhias-flex-container {
+        flex-direction: row; /* Volta a ser row em telas maiores */
+        justify-content: space-between; /* Espaço entre as companhias */
+    }
+    .companhia-section {
+        margin-bottom: 0; /* Remove margem inferior extra, o gap já trata */
+    }
+}
 
 @media (max-width: 768px) { /* Tablets e smartphones em modo paisagem */
     .header-logo {
@@ -372,16 +447,21 @@ main {
         padding: 1rem 0.5rem; /* Padding menor nas laterais */
     }
 
+    .companhias-flex-container {
+        flex-direction: column; /* Companhias empilhadas em telas pequenas */
+        gap: 1.5rem;
+    }
+
     .companhia-section {
         padding: 0.8rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0; /* Remove margem inferior extra */
     }
     .companhia-section h2 {
         font-size: 1.5rem; /* Título da companhia menor */
         margin-bottom: 1rem;
     }
     .quartels-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Min-width menor para caber mais */
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Min-width menor para caber mais */
         gap: 0.8rem;
     }
     .quartel-card {
@@ -434,22 +514,25 @@ main {
     }
     .companhia-section {
         padding: 0.6rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0;
     }
     .companhia-section h2 {
         font-size: 1.3rem;
         margin-bottom: 0.8rem;
     }
     .quartels-grid {
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Min-width para 2 por linha em telas menores */
-        gap: 0.6rem;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Mínimo para caber 2 por linha */
+        gap: 0.5rem;
     }
     .quartel-card {
         padding: 0.5rem 0.6rem;
         margin-bottom: 0.5rem;
     }
-    .quartel-header {
-        font-size: 0.85rem;
+    .quartel-header .quartel-name-line1 {
+        font-size: 0.8rem;
+    }
+    .quartel-header .quartel-name-line2 {
+        font-size: 0.7rem;
     }
     .quartel-toggle-icon {
         font-size: 0.6rem;
