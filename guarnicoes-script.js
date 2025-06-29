@@ -11,8 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const cia1QuartelsDiv = document.getElementById('cia1-quartels');
     const cia2QuartelsDiv = document.getElementById('cia2-quartels');
 
-    // AVISO: As funções getViaturaIcon e getMilitarIcon devem vir do guarnicoes-data.js
-    // Verifique se elas foram coladas corretamente lá pelo parser.
+    // Lista de quartéis a serem ocultados
+    const quartelsToHide = [
+        'BBS - TERRESTRE',
+        'BBS - CANIL',
+        'BBS - AQUÁTICA',
+        'BBS - MERGULHO', // Adicionado pois estava nos dados fornecidos
+        'AODCA', // Adicionado pois estava nos dados fornecidos
+        'COBOM-DCCI', // Adicionado pois estava nos dados fornecidos
+        '1º BBM / ESTADO MAIOR', // Adicionado pois estava nos dados fornecidos
+        'DA / DLP' // Adicionado pois estava nos dados fornecidos
+    ];
 
     // Função para criar o HTML de uma viatura e sua guarnição
     function createViaturaHtml(viatura) {
@@ -22,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             viatura.guarnicao.forEach(militar => {
                 militaresHtml += `
                     <p class="militar-item">
-                        <i class="${getMilitarIcon(militar.funcao)}"></i>
+                        <i class="${getMilitarIcon(militar.funcao)} bombero-icon"></i>
                         <span class="font-semibold">${militar.funcao}:</span> ${militar.nomeGuerra}
                     </p>
                 `;
@@ -35,10 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (iconResult.startsWith('<img')) {
             viaturaIconHtml = iconResult;
         } else {
-            viaturaIconHtml = `<i class="${iconResult} viatura-icon"></i>`; // Classe 'viatura-icon' agora está no CSS
+            viaturaIconHtml = `<i class="${iconResult} viatura-icon"></i>`;
         }
 
-        // A estrutura para o turno agora está junto do prefixo
         return `
             <div class="viatura-block">
                 <div class="viatura-main-info">
@@ -55,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Função para criar o HTML de um quartel
     function createQuartelHtml(nomeQuartel, quartelData) {
+        // Verifica se o quartel deve ser ocultado
+        if (quartelsToHide.includes(nomeQuartel)) {
+            return ''; // Retorna string vazia para não renderizar o quartel
+        }
+
         let viaturasHtml = '';
         if (quartelData.viaturas && quartelData.viaturas.length > 0) {
             quartelData.viaturas.forEach(viatura => {
@@ -64,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
             viaturasHtml = '<p class="text-gray-400 text-center text-sm py-4">Nenhuma viatura escalada para este quartel.</p>';
         }
 
-        // Adiciona a estrutura de header para o clique e o content para o deslizamento
         return `
             <div class="quartel-card ${quartelData.colorClass || 'bg-gray-700'}">
                 <div class="quartel-header">
@@ -104,8 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Se houver quartéis não classificados em 1ª ou 2ª CIA, adicione uma seção para eles
-            if (GUARNICOES['NAO CLASSIFICADO'] && Object.keys(GUARNICOES['NAO CLASSIFICADO']).length > 0) {
+            // A seção "NAO CLASSIFICADO" só será exibida se houver quartéis não filtrados lá dentro
+            let hasNonClassifiedToShow = false;
+            if (GUARNICOES['NAO CLASSIFICADO']) {
+                for (const quartel in GUARNICOES['NAO CLASSIFICADO']) {
+                    if (GUARNICOES['NAO CLASSIFICADO'].hasOwnProperty(quartel) && !quartelsToHide.includes(quartel)) {
+                        hasNonClassifiedToShow = true;
+                        break; // Basta um quartel para mostrar a seção
+                    }
+                }
+            }
+
+            if (hasNonClassifiedToShow) {
                 let naoClassificadoHtml = `
                     <div class="companhia-section bg-gray-700 p-6 rounded-lg shadow-xl lg:col-span-2 mt-8">
                         <h2 class="text-2xl font-bold text-center text-gray-300 mb-6">OUTROS QUARTÉIS / SETORES</h2>
@@ -114,7 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const quartel in GUARNICOES['NAO CLASSIFICADO']) {
                     if (GUARNICOES['NAO CLASSIFICADO'].hasOwnProperty(quartel)) {
                         const quartelData = GUARNICOES['NAO CLASSIFICADO'][quartel];
-                        naoClassificadoHtml += createQuartelHtml(quartel, quartelData);
+                        // Renderiza apenas se não estiver na lista de ocultar
+                        if (!quartelsToHide.includes(quartel)) {
+                           naoClassificadoHtml += createQuartelHtml(quartel, quartelData);
+                        }
                     }
                 }
                 naoClassificadoHtml += `</div></div>`;
@@ -123,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     mainContainer.innerHTML += naoClassificadoHtml;
                 }
             }
+
 
             // Adiciona a funcionalidade de clique para expandir/colapsar
             document.querySelectorAll('.quartel-card').forEach(card => {
