@@ -2,25 +2,69 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #111827; /* Fallback bg-color */
+    margin: 0;
+    padding: 0;
 }
-.hero-background {
-    background-image: url('images/background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+
+/* Header: Logos e Título */
+header {
+    background-color: #1A202C; /* Um cinza escuro para o header */
+    padding: 1rem 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     position: relative;
-    z-index: 0;
+    z-index: 10;
 }
-.hero-background::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: -1;
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    gap: 0.5rem 1rem; /* Espaçamento entre itens */
+    max-width: 1200px; /* Limita largura do header */
+    margin: 0 auto;
+    padding: 0 1rem;
 }
+
+.header-logo {
+    height: 4.5rem; /* Ajuste o tamanho inicial dos logos */
+    width: auto;
+}
+
+.header-title-wrapper {
+    text-align: center;
+    flex-shrink: 1; /* Permite que o título encolha */
+    min-width: 150px; /* Largura mínima para o título */
+}
+
+.header-title {
+    font-size: 1.5rem; /* Tamanho do título principal */
+    font-weight: 800;
+    color: #FFD700; /* bombeiros-yellow */
+    line-height: 1.2;
+}
+
+.header-date {
+    font-size: 1.1rem; /* Tamanho da data */
+    font-weight: bold;
+    color: #FFFFFF;
+    margin-top: 0.2rem;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 0.8rem;
+    color: #4A90E2;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.back-link:hover {
+    color: #FF8C00;
+}
+
+/* Shortcuts da página inicial (mantidos para consistência) */
 .shortcut-button {
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -45,175 +89,8 @@ body {
     word-break: break-word;
     hyphens: auto;
 }
+
+/* Login overlay (mantido) */
 .login-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    display: none; /* Initially hidden */
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-.login-box {
-    background-color: #2D3748;
-    padding: 2rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-}
-.login-box input {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border-radius: 0.25rem;
-    background-color: #4A5568;
-    color: white;
-    border: 1px solid #718096;
-}
-.login-box input::placeholder { color: #A0AEC0; }
-.login-box button {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    background-color: #FF8C00;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.login-box button:hover { background-color: #cc7000; }
-.link-bloqueado {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: #4A5568 !important;
-}
-.link-bloqueado:hover {
-    transform: none;
-    box-shadow: none;
-    background-color: #4A5568 !important;
-}
-
-/* --- ESTILOS DA PÁGINA DE GUARNIÇÕES --- */
-
-.companhia-section {
-    border: 2px solid;
-    border-color: var(--bombeiros-yellow); /* Borda amarela para as seções de companhia */
-    /* Remove padding/background-color para usar o default do body ou tailwind */
-}
-
-/* Quartel Card (Item clicável) */
-.quartel-card {
-    background-color: #2D3748; /* Fundo mais escuro para os cartões */
-    border-radius: 0.5rem;
-    padding: 0.8rem 1.2rem; /* Padding ligeiramente menor */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease-in-out;
-    margin-bottom: 0.75rem; /* Espaço entre os cartões dos quartéis */
-}
-
-.quartel-card:hover {
-    transform: translateY(-2px); /* Pequeno levantamento no hover */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
-}
-
-/* Cabeçalho do Quartel (Parte visível quando fechado) */
-.quartel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 0.4rem;
-    color: #FFD700; /* Texto do cabeçalho sempre amarelo */
-    font-size: 1.1rem; /* Tamanho do nome do quartel (ajustado) */
-    font-weight: 700;
-}
-
-.quartel-toggle-icon {
-    transition: transform 0.3s ease;
-    font-size: 0.9rem; /* Ícone da seta menor */
-}
-
-.quartel-content {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
-    padding-top: 0.2rem; /* Pequeno padding extra quando abre */
-}
-
-.quartel-card.active .quartel-content {
-    max-height: 1000px; /* Suficientemente grande para a maioria dos conteúdos */
-    opacity: 1;
-}
-
-.quartel-card.active .quartel-toggle-icon {
-    transform: rotate(90deg);
-}
-
-/* Bloco da Viatura (cada viatura com sua guarnição) */
-.viatura-block {
-    display: flex;
-    flex-direction: column;
-    background-color: #3B455C; /* Fundo para cada bloco de viatura */
-    padding: 0.6rem; /* Padding menor */
-    border-radius: 0.25rem;
-    margin-bottom: 0.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-}
-
-.viatura-main-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.4rem; /* Espaço entre a linha da viatura e a guarnição */
-}
-
-/* Ícone da Viatura */
-.viatura-icon {
-    margin-right: 0.6rem;
-    width: 30px; /* Ícone da viatura menor */
-    height: 30px;
-    min-width: 30px;
-    color: #FFD700; /* Ícone da viatura sempre amarelo */
-    font-size: 1.8rem; /* Tamanho do ícone Font Awesome */
-}
-
-.viatura-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.viatura-details .prefixo-turno {
-    font-weight: bold;
-    color: #FF8C00; /* Prefixo da viatura sempre laranja */
-    font-size: 0.95rem; /* Tamanho do prefixo */
-    line-height: 1.2;
-}
-
-.viatura-details .text-gray-300 { /* Para o turno */
-    font-size: 0.8rem; /* Tamanho do turno menor */
-    line-height: 1.2;
-}
-
-/* Lista de Militares */
-.militar-list {
-    margin-left: 0;
-    font-size: 0.8rem; /* Texto dos militares menor */
-    color: #E2E8F0;
-    line-height: 1.4;
-}
-
-.militar-item {
-    display: flex;
-    align-items: center;
-    padding-left: 0.4rem;
-    border-
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba
