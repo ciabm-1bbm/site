@@ -1,579 +1,112 @@
 /* --- Global Styles & Base Colors --- */
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #111827; /* Darkest background */
-    color: #E2E8F0; /* Light text color */
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-}
+ body {
+     font-family: 'Inter', sans-serif;
+     background-color: #111827; /* Darkest background */
+     color: #E2E8F0; /* Light text color */
+     line-height: 1.6;
+     margin: 0;
+     padding: 0;
+ }
 
-/* Base colors from Tailwind config */
-.text-bombeiros-orange { color: #FF8C00; }
-.text-bombeiros-yellow { color: #FFD700; }
-.text-cbmrs-blue { color: #1A5276; }
-.text-cbmrs-light-blue { color: #4A90E2; }
-.text-fire-red { color: #DC2626; }
-.bg-dark-bg { background-color: #1a202c; }
-.bg-card-bg { background-color: #2d3748; }
-.bg-green-accent { background-color: #2ecc71; }
-.bg-green-dark { background-color: #1e8449; }
-.bg-orange-accent { background-color: #FF8C00; }
-.bg-orange-dark { background-color: #cc6600; }
-
-
-/* --- Header Styles --- */
-header {
-    background-color: #232d3d; /* Slightly lighter than main body for contrast */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    padding: 1.2rem 0;
-    position: sticky; /* Keeps header visible on scroll */
-    top: 0;
-    z-index: 100;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-}
-
-.header-logos-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap; /* Allows wrapping on small screens */
-    gap: 0.5rem 1rem; /* Spacing between elements */
-    margin-bottom: 0.8rem;
-}
-
-.header-logo {
-    height: 4.8rem; /* Default size for logos */
-    transition: height 0.3s ease; /* Smooth transition for sizing */
-}
-
-.header-main-title {
-    flex-shrink: 1;
-    min-width: 180px; /* Minimum width for title wrapper */
-}
-
-.header-main-title h1 {
-    font-size: 1.6rem;
-    line-height: 1.1;
-    margin-bottom: 0.2rem;
-}
-
-.header-main-title p#guarnicoes-data {
-    font-size: 1.05rem;
-    line-height: 1.1;
-    color: #BBB; /* Slightly muted date color */
-}
-
-.back-home-link {
-    font-size: 0.9rem;
-    color: #4A90E2;
-    text-decoration: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 0.3rem;
-    background-color: rgba(74, 144, 226, 0.1);
-    transition: all 0.3s ease;
-}
-.back-home-link:hover {
-    background-color: #4A90E2;
-    color: white;
-    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
-}
-
-/* --- Main Content Area --- */
-main {
-    padding: 1.5rem 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.companies-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem; /* Space between company sections */
-    justify-content: center; /* Center company sections */
-}
-
-.company-section {
-    border: 2px solid;
-    border-radius: 0.75rem;
-    padding: 1.2rem;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    background-color: #2D3748; /* Dark background for the section itself */
-    flex: 1; /* Allows sections to take equal space */
-    min-width: 300px; /* Minimum width for each company section */
-    max-width: calc(50% - 1rem); /* Max width for two columns */
-    display: flex;
-    flex-direction: column;
-}
-
-.company-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: #FFD700; /* Yellow title for all companies */
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
-}
-
-.quarters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Compact quarters */
-    gap: 0.8rem; /* Space between quarter cards */
-}
-
-/* Quarter Card (Clickable Item) */
-.quarter-card {
-    background-color: #3b455c; /* Slightly lighter card background */
-    border-radius: 0.6rem;
-    padding: 0.8rem 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    position: relative; /* For tooltip positioning */
-}
-
-.quarter-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-/* Quarter Header (Visible when collapsed) */
-.quarter-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    font-weight: 700;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 0.4rem;
-    position: relative;
-    min-height: 45px; /* Ensures consistent height */
-    color: #FFD700; /* Quarter name always yellow */
-}
-
-.quarter-header .quarter-name-line1 {
-    font-size: 0.95rem; /* Larger for 'BRAVO X' */
-    line-height: 1.1;
-    white-space: nowrap; /* Prevents wrapping 'BRAVO 1' */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Adds '...' if too long */
-    width: calc(100% - 20px); /* Leave space for toggle icon */
-}
-
-.quarter-header .quarter-name-line2 {
-    font-size: 0.8rem; /* Smaller for 'AÇORIANOS' */
-    line-height: 1.1;
-    color: #B0BACC; /* Slightly lighter gray */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: calc(100% - 20px);
-}
-
-/* Toggle Icon (Chevron) */
-.quarter-toggle-icon {
-    transition: transform 0.3s ease;
-    font-size: 0.8rem;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg); /* Starts pointing down */
-    color: #4A90E2; /* Blue for visibility */
-}
-
-.quarter-card.active .quarter-toggle-icon {
-    transform: translateY(-50%) rotate(180deg); /* Points up when active */
-}
-
-/* Collapsible Content Area */
-.quarter-content {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
-    padding-top: 0.2rem;
-}
-
-.quarter-card.active .quarter-content {
-    max-height: 2000px; /* Large enough for any content */
-    opacity: 1;
-}
-
-/* Viatura Block (Each vehicle with its crew) */
-.vehicle-block {
-    display: flex;
-    flex-direction: column;
-    background-color: #4a5568; /* Darker background for vehicle blocks */
-    padding: 0.6rem;
-    border-radius: 0.3rem;
-    margin-bottom: 0.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-.vehicle-block:last-child {
-    margin-bottom: 0;
-}
-
-.vehicle-main-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.4rem;
-}
-
-/* Vehicle Icon */
-.vehicle-icon {
-    margin-right: 0.6rem;
-    width: 32px; /* Slightly larger for clarity */
-    height: 32px;
-    min-width: 32px;
-    color: #FFD700; /* Yellow for all vehicle icons */
-    font-size: 1.8rem;
-}
-
-.vehicle-details {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-}
-
-.vehicle-details .prefix-and-type {
-    font-weight: bold;
-    color: #FF8C00; /* Orange for prefix */
-    font-size: 0.95rem;
-}
-
-.vehicle-details .turno-info {
-    font-size: 0.75rem;
-    color: #CBD5E0;
-}
-
-/* Crew List */
-.crew-list {
-    margin-left: 0;
-    font-size: 0.75rem;
-    color: #E2E8F0;
-    line-height: 1.4;
-}
-
-.crew-member-item {
-    display: flex;
-    align-items: center;
-    padding-left: 0.4rem;
-    border-left: 2px solid #4A90E2; /* Blue accent line */
-    margin-bottom: 0.1rem;
-}
-
-/* Crew Member Icon */
-.crew-member-icon {
-    width: 15px;
-    height: 15px;
-    margin-right: 4px;
-    vertical-align: middle;
-    color: #4A90E2; /* Blue for crew icons */
-}
-
-/* --- Themed Colors for Companies --- */
-
-/* 1ª Companhia - Orange Theme */
-.company-section.primary-orange-theme {
-    border-color: #FF8C00; /* Orange border */
-}
-.company-section.primary-orange-theme .quarter-card {
-    border-color: #FF8C00; /* Orange border for cards */
-}
-.company-section.primary-orange-theme .quarter-header {
-    background: linear-gradient(to right, #cc6600, #FF8C00); /* Gradient for header */
-    border-bottom-color: #FF8C00;
-}
-.company-section.primary-orange-theme .quarter-toggle-icon {
-    color: #FFD700; /* Yellow for contrast */
-}
-
-/* 2ª Companhia - Green Theme */
-.company-section.primary-green-theme {
-    border-color: #2ECC71; /* Green border */
-}
-.company-section.primary-green-theme .quarter-card {
-    border-color: #2ECC71; /* Green border for cards */
-}
-.company-section.primary-green-theme .quarter-header {
-    background: linear-gradient(to right, #1E8449, #2ECC71); /* Gradient for header */
-    border-bottom-color: #2ECC71;
-}
-.company-section.primary-green-theme .quarter-toggle-icon {
-    color: #FFD700; /* Yellow for contrast */
-}
-
-/* Non-Classified Section - Gray Theme */
-.company-section.non-classified-theme {
-    border-color: #A0AEC0; /* Gray border */
-}
-.company-section.non-classified-theme .company-title {
-    color: #CBD5E0;
-}
-.company-section.non-classified-theme .quarter-card {
-    border-color: #A0AEC0;
-}
-.company-section.non-classified-theme .quarter-header {
-    background: linear-gradient(to right, #64748B, #A0AEC0); /* Gray gradient */
-    border-bottom-color: #A0AEC0;
-}
-.company-section.non-classified-theme .quarter-toggle-icon {
-    color: #CBD5E0;
-}
+ /* Base colors from Tailwind config */
+ .text-bombeiros-orange { color: #FF8C00; }
+ .text-bombeiros-yellow { color: #FFD700; }
+ .text-cbmrs-blue { color: #1A5276; }
+ .text-cbmrs-light-blue { color: #4A90E2; }
+ .text-fire-red { color: #DC2626; }
+ .bg-dark-bg { background-color: #1a202c; }
+ .bg-card-bg { background-color: #2d3748; }
+ .bg-green-accent { background-color: #2ecc71; }
+ .bg-green-dark { background-color: #1e8449; }
+ .bg-orange-accent { background-color: #FF8C00; }
+ .bg-orange-dark { background-color: #cc6600; }
 
 
-/* --- Tooltip Styles --- */
-.quarter-card .tooltip-text {
-    visibility: hidden;
-    width: max-content; /* Adjusts width to content */
-    min-width: 150px;
-    background-color: rgba(30, 30, 30, 0.95);
-    color: #fff;
-    text-align: left;
-    border-radius: 8px;
-    padding: 8px 12px;
-    position: absolute;
-    z-index: 10;
-    bottom: 105%; /* Position above the element */
-    left: 50%;
-    transform: translateX(-50%); /* Centers the tooltip */
-    opacity: 0;
-    transition: opacity 0.3s, visibility 0.3s;
-    font-size: 0.75rem;
-    line-height: 1.4;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.15);
-    pointer-events: none; /* Allows clicks through to the card */
-    max-height: 200px; /* Limit height for long lists */
-    overflow-y: auto; /* Scroll if content overflows */
-}
+ /* --- Header Styles --- */
+ header {
+     background-color: #232d3d; /* Slightly lighter than main body for contrast */
+     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+     padding: 1.2rem 0;
+     position: sticky; /* Keeps header visible on scroll */
+     top: 0;
+     z-index: 100;
+ }
 
-.quarter-card .tooltip-text::after {
-    content: " ";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -8px;
-    border-width: 8px;
-    border-style: solid;
-    border-color: rgba(30, 30, 30, 0.95) transparent transparent transparent;
-}
+ .header-content {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     text-align: center;
+     width: 100%;
+ }
 
-.quarter-card:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
+ .header-logos-title {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     flex-wrap: wrap; /* Allows wrapping on small screens */
+     gap: 0.5rem 1rem; /* Spacing between elements */
+     margin-bottom: 0.8rem;
+ }
 
-/* --- Responsive Adjustments --- */
+ .header-logo {
+     height: 4.8rem; /* Default size for logos */
+     transition: height 0.3s ease; /* Smooth transition for sizing */
+ }
 
-/* For smaller desktops / large tablets */
-@media (max-width: 1024px) {
-    .header-logo {
-        height: 4rem;
-    }
-    .header-main-title h1 {
-        font-size: 1.4rem;
-    }
-    .header-main-title p#guarnicoes-data {
-        font-size: 0.95rem;
-    }
-    .company-section {
-        min-width: 280px;
-        max-width: calc(50% - 1rem);
-    }
-    .company-title {
-        font-size: 1.6rem;
-    }
-    .quarters-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    }
-    .quarter-header .quarter-name-line1 {
-        font-size: 0.9rem;
-    }
-    .quarter-header .quarter-name-line2 {
-        font-size: 0.75rem;
-    }
-    .vehicle-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 1.6rem;
-    }
-    .vehicle-details .prefix-and-type {
-        font-size: 0.85rem;
-    }
-    .vehicle-details .turno-info {
-        font-size: 0.7rem;
-    }
-    .crew-list {
-        font-size: 0.7rem;
-    }
-    .crew-member-icon {
-        width: 13px;
-        height: 13px;
-        font-size: 0.7rem;
-    }
-}
+ .header-main-title {
+     flex-shrink: 1;
+     min-width: 180px; /* Minimum width for title wrapper */
+ }
 
-/* For tablets (portrait) and larger smartphones */
-@media (max-width: 768px) {
-    .header-logo {
-        height: 3.5rem;
-    }
-    .header-main-title h1 {
-        font-size: 1.25rem;
-    }
-    .header-main-title p#guarnicoes-data {
-        font-size: 0.9rem;
-    }
-    .header-logos-title {
-        flex-direction: column; /* Stack logos and title */
-        gap: 0.5rem;
-    }
-    .header-main-title {
-        order: 3; /* Move title below logos */
-    }
-    .cbmrs-logo { order: 1; }
-    .bbm-logo { order: 2; }
+ .header-main-title h1 {
+     font-size: 1.6rem;
+     line-height: 1.1;
+     margin-bottom: 0.2rem;
+ }
 
-    .companies-wrapper {
-        flex-direction: column; /* Stack company sections */
-        gap: 1.5rem;
-    }
-    .company-section {
-        min-width: unset; /* Remove min-width to let it shrink */
-        max-width: 100%; /* Take full width */
-        padding: 1rem;
-    }
-    .company-title {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .quarters-grid {
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Allow 2 or 3 per row on small screens */
-        gap: 0.7rem;
-    }
-    .quarter-card {
-        padding: 0.7rem 0.8rem;
-    }
-    .quarter-header {
-        min-height: 40px;
-    }
-    .quarter-header .quarter-name-line1 {
-        font-size: 0.85rem;
-    }
-    .quarter-header .quarter-name-line2 {
-        font-size: 0.7rem;
-    }
-    .quarter-toggle-icon {
-        font-size: 0.7rem;
-    }
-    .vehicle-icon {
-        width: 24px;
-        height: 24px;
-        font-size: 1.4rem;
-    }
-    .vehicle-details .prefix-and-type {
-        font-size: 0.8rem;
-    }
-    .vehicle-details .turno-info {
-        font-size: 0.65rem;
-    }
-    .crew-list {
-        font-size: 0.65rem;
-    }
-    .crew-member-item {
-        padding-left: 0.3rem;
-    }
-    .crew-member-icon {
-        width: 12px;
-        height: 12px;
-        font-size: 0.65rem;
-    }
-}
+ .header-main-title p#guarnicoes-data {
+     font-size: 1.05rem;
+     line-height: 1.1;
+     color: #BBB; /* Slightly muted date color */
+ }
 
-/* For very small smartphones (portrait) */
-@media (max-width: 480px) {
-    header {
-        padding: 0.8rem 0;
-    }
-    .header-logo {
-        height: 3rem;
-    }
-    .header-main-title h1 {
-        font-size: 1.05rem;
-    }
-    .header-main-title p#guarnicoes-data {
-        font-size: 0.8rem;
-    }
-    .back-home-link {
-        font-size: 0.75rem;
-        padding: 0.3rem 0.6rem;
-    }
+ .back-home-link {
+     font-size: 0.9rem;
+     color: #4A90E2;
+     text-decoration: none;
+     padding: 0.4rem 0.8rem;
+     border-radius: 0.3rem;
+     background-color: rgba(74, 144, 226, 0.1);
+     transition: all 0.3s ease;
+ }
+ .back-home-link:hover {
+     background-color: #4A90E2;
+     color: white;
+     box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
+ }
 
-    main {
-        padding: 1rem 0.5rem;
-    }
-    .company-section {
-        padding: 0.8rem;
-    }
-    .company-title {
-        font-size: 1.3rem;
-        margin-bottom: 0.8rem;
-    }
-    .quarters-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Even smaller for more columns on tiny screens */
-        gap: 0.6rem;
-    }
-    .quarter-card {
-        padding: 0.6rem 0.7rem;
-    }
-    .quarter-header {
-        min-height: 35px;
-    }
-    .quarter-header .quarter-name-line1 {
-        font-size: 0.75rem;
-    }
-    .quarter-header .quarter-name-line2 {
-        font-size: 0.65rem;
-    }
-    .quarter-toggle-icon {
-        font-size: 0.6rem;
-    }
-    .vehicle-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 1.2rem;
-    }
-    .vehicle-details .prefix-and-type {
-        font-size: 0.75rem;
-    }
-    .vehicle-details .turno-info {
-        font-size: 0.6rem;
-    }
-    .crew-list {
-        font-size: 0.6rem;
-    }
-    .crew-member-item {
-        padding-left: 0.2rem;
-    }
-    .crew-member-icon {
-        width: 10px;
-        height: 10px;
-        font-size: 0.6rem;
-    }
-}
+ /* --- Main Content Area --- */
+ main {
+     padding: 1.5rem 1rem;
+     max-width: 1200px;
+     margin: 0 auto;
+     width: 100%;
+     box-sizing: border-box;
+ }
+
+ .companies-wrapper {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 2rem; /* Space between company sections */
+     justify-content: center; /* Center company sections */
+ }
+
+ .company-section {
+     border: 2px solid;
+     border-radius: 0.75rem;
+     padding: 1.2rem;
+     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+     background-color: #2D3748; /* Dark background for the section itself */
+     flex: 1; /* Allows sections to take equal space */
+     min-width: 300px; /* Minimum width
