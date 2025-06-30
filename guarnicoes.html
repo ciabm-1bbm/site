@@ -3,25 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições de Serviço do 1º BBM - Porto Alegre</title>
+    <title>Guarnições de Serviço - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Configuração Tailwind CSS (Mantenha as cores padrão para uso global)
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'bombeiros-orange': '#FF8C00', /* Laranja principal */
-                        'bombeiros-yellow': '#FFD700', /* Amarelo dourado */
-                        'cbmrs-blue': '#1A5276', /* Azul escuro original */
-                        'cbmrs-light-blue': '#4A90E2', /* Azul claro original */
-                        'fire-red': '#DC2626', /* Vermelho original */
-                        'dark-bg': '#1a202c', /* Fundo escuro geral */
-                        'card-bg': '#2d3748', /* Fundo dos cartões */
-                        'green-accent': '#2ecc71', /* Verde para 2ª Cia */
-                        'green-dark': '#1e8449', /* Verde mais escuro para 2ª Cia */
-                        'orange-accent': '#FF8C00', /* Laranja para 1ª Cia */
-                        'orange-dark': '#cc6600', /* Laranja mais escuro para 1ª Cia */
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'cbmrs-blue': '#1A5276',
+                        'cbmrs-light-blue': '#4A90E2',
+                        'fire-red': '#DC2626',
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -31,57 +24,446 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css"> <link rel="icon" type="image/png" href="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Fallback bg-color */
+        }
+        .hero-background {
+            background-image: url('images/background.jpg'); /* Certifique-se de que esta imagem exista ou remova */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            z-index: 0;
+        }
+        .hero-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+        .accordion-header {
+            background-color: #2D3748; /* Darker blue for headers */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+        .accordion-header:hover {
+            background-color: #3d4a5c; /* Slightly lighter on hover */
+        }
+        .accordion-content {
+            background-color: #1F2937; /* Even darker for content */
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: -0.5rem; /* Overlap with header border-radius */
+            margin-bottom: 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        .accordion-content.active {
+            max-height: 500px; /* Adjust based on max content height */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .accordion-content .accordion-item {
+            margin-bottom: 1rem;
+            border-left: 4px solid #b74f00; /* Bombeiros orange highlight */
+            padding-left: 1rem;
+        }
+        .accordion-content .accordion-item:last-child {
+            margin-bottom: 0;
+        }
+        .accordion-content .accordion-item h4 {
+            color: #FFD700; /* Yellow for viatura */
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .accordion-content .accordion-item p {
+            color: #E5E7EB; /* Light gray for text */
+            margin-bottom: 0.25rem;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        .accordion-header.active .accordion-icon {
+            transform: rotate(90deg);
+        }
+    </style>
 </head>
-<body class="bg-dark-bg text-white min-h-screen flex flex-col">
+<body class="text-white min-h-screen flex flex-col">
 
-    <header class="py-4 shadow-xl bg-card-bg">
-        <div class="header-content container mx-auto px-4">
-            <div class="header-logos-title">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="header-logo cbmrs-logo">
-                <div class="header-main-title">
-                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
-                        GUARNIÇÕES DE SERVIÇO DO 1º BBM
-                    </h1>
-                    <p id="guarnicoes-data" class="text-lg md:text-xl font-bold text-white mt-1">CARREGANDO DATA...</p>
+<div class="flex-grow hero-background">
+    <header class="py-4 shadow-lg z-10">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 md:h-20 w-auto">
                 </div>
-                <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="header-logo bbm-logo">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
+                        Guarnições de Serviço do 1º BBM
+                    </h1>
+                </div>
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-16 md:h-20 w-auto">
+                </div>
             </div>
-            <a href="index.html" class="back-home-link">
-                &larr; Voltar para a Página Inicial
-            </a>
+            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-3">
+                Informações atualizadas sobre as equipes em serviço em Porto Alegre.
+            </p>
+            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-1">
+                **Atualizado às: 21:04 de 29/06/2025**
+            </p>
         </div>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <div id="companies-wrapper" class="companies-wrapper">
-            <section class="company-section primary-orange-theme">
-                <h2 class="company-title">1ª COMPANHIA</h2>
-                <div class="quarters-grid" id="cia1-quarters">
+    <main class="flex-grow py-8 px-4">
+        <div class="container mx-auto max-w-4xl">
+
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-bombeiros-orange mb-4 text-center">
+                    <i class="fas fa-person-digging mr-2"></i> Quem Está de Serviço Agora
+                </h2>
+                <p class="text-gray-300 text-center mb-6">
+                    Equipes que assumiram o serviço às 20:00 de 29/06/2025 e estão ativas até 08:00 de 30/06/2025.
+                </p>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
-            </section>
-
-            <section class="company-section primary-green-theme">
-                <h2 class="company-title">2ª COMPANHIA</h2>
-                <div class="quarters-grid" id="cia2-quarters">
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0595</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 2º SGT KANOFRE</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD PIRES</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD TEMP PAULINO</p>
+                        </div>
                     </div>
-            </section>
-        </div>
-        </main>
+                </div>
 
-    <footer class="bg-card-bg text-gray-400 py-3 z-10 text-center text-xs">
-        <div class="container mx-auto px-4">
-            <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
-            <p class="mt-1">
-                Para demais assuntos acesse a
-                <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
-            </p>
-        </div>
-    </footer>
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABTS-866</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 1º SGT ZANINI</p>
+                            <p><strong>Resgatista 2:</strong> AL SD JOSÉ</p>
+                        </div>
+                    </div>
+                </div>
 
-    <script src="guarnicoes-data.js"></script>
-    <script src="guarnicoes-script.js"></script>
-</body>
-</html>
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABC-793</h4>
+                            <p><strong>Cinotécnico:</strong> 2º SGT CESAR ZANFONATO</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            ---
+
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-bombeiros-orange mb-4 text-center">
+                    <i class="fas fa-stopwatch mr-2"></i> Quem Ainda Está no Turno de 24 Horas
+                </h2>
+                <p class="text-gray-300 text-center mb-6">
+                    Estas guarnições iniciaram o serviço às 08:00 de 29/06/2025 e continuam ativas até 08:00 de 30/06/2025.
+                </p>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0594</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 2º SGT PME CARGNELUTTI</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD TEMP CARDOSO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD ZEMPERCOV</p>
+                        </div>
+                        <div class="accordion-item">
+                            <h4>Viatura: AR-0766</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> SD ARAUJO</p>
+                            <p><strong>Comandante de Guarnição:</strong> SD BRUM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0596</h4>
+                            <p><strong>Chefe de Linha Direita:</strong> SD BAIGORRA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 2ª CIA / 1º PEL / FLORESTA</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0597</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 2º SGT CASTRO</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD DA SILVA</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD TEMP WESLEY</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0598</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> 1º SGT RONALDO</p>
+                            <p><strong>Comandante de Guarnição:</strong> SD DAYKER</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD THIAGO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0599</h4>
+                            <p><strong>Chefe de Linha Esquerda:</strong> SD COSME</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD FERREIRA</p>
+                            <p><strong>Comandante de Socorro:</strong> SD MARTINEZ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-0600</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD DREYER</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD ISMAEL</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD TEMP SOARES</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABT-327</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> SD BERNARDES</p>
+                            <p><strong>Comandante de Guarnição:</strong> SD PATRICK</p>
+                            <p><strong>Auxiliar de Linha Direita:</strong> SD TEMP ZANETTI</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABTS-866</h4>
+                            <p><strong>Resgatista 1:</strong> SD MONTEIRO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD NAIANY</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ABC-793</h4>
+                            <p><strong>Cinotécnico:</strong> SD LOPES</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: AEM-0482</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> SD NATHAN</p>
+                        </div>
+                        <div class="accordion-item">
+                            <h4>Viatura: AT-0672</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> SD NATHAN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">AODC (Centro de Comando e Controle)</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: AODC-CCOB</h4>
+                            <p><strong>Oficial Supervisor:</strong> CAP VIEIRA</p>
+                            <p><strong>Operador CCOB:</strong> SD NATASCHA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">BBS / 2ª CIA / 2º PEL / MERGULHO</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ATP-0555</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 2º SGT SPOHN</p>
+                            <p><strong>Mergulhador:</strong> SD DAMIEL</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD DERLI</p>
+                            <p><strong>Mergulhador:</strong> SD MAURO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / ESTADO MAIOR</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: ATP-201</h4>
+                            <p><strong>Motorista de Dia:</strong> 2º SGT FABRICIO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">BBS / 2ª CIA / 1º PEL / AQUÁTICA</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viaturas: EAL-716, EIN-713, EIN-714, EMN-943, EMN-948</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD PETERSEN</p>
+                            <p><strong>Condutor Naval:</strong> SD ADRIANO</p>
+                            <p><strong>Auxiliar de Condutor Naval 1:</strong> SD FIORAVANTE</p>
+                            <p><strong>Auxiliar de Condutor Naval 2:</strong> SD MOTTA</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            ---
+
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-bombeiros-orange mb-4 text-center">
+                    <i class="fas fa-hourglass-start mr-2"></i> Próximos a Assumir
+                </h2>
+                <p class="text-gray-300 text-center mb-6">
+                    Esta equipe se prepara para iniciar o turno da manhã (07:00 de 30/06/2025).
+                </p>
+
+                <div class="accordion-section mb-4">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="text-lg font-semibold text-white">1º BBM / COBOM-DCCI</h3>
+                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-item">
+                            <h4>Viatura: COBOM-DCCI</h4>
+                            <p><strong>Operador COBOM:</strong> 1º SGT RIBEIRO</p>
+                            <p><strong>Operador COBOM:</strong> 2º SGT BARBARA</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<footer class="bg-gray-800 text-gray-400 py-3 z-10">
+    <div class="container mx-auto px-4 text-center text-xs">
+        <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+        <p class="mt-1">
+            Para demais assuntos acesse a
+            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    function toggleAccordion(element) {
+        const content = element.nextElementSibling;
+        const icon = element.querySelector('.accordion-icon');
+
+        element.classList.toggle('active');
+        icon.classList.toggle('active');
+
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            content.style.paddingTop = '0';
+            content.style.paddingBottom = '0';
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.paddingTop = '1rem';
+            content.style.paddingBottom = '1rem';
+        }
+    }
+</script>
 </body>
 </html>
