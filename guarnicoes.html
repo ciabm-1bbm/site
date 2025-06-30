@@ -88,8 +88,8 @@
         /* Estilo para o Tooltip (guarnicao-details-tooltip) */
         .guarnicao-details-tooltip {
             position: absolute;
-            top: auto; /* Remover top: 100% para posicionamento dinâmico */
-            bottom: auto; /* Remover bottom: auto */
+            top: auto; /* Posicionamento será definido por JS */
+            bottom: auto; /* Posicionamento será definido por JS */
             left: 50%;
             transform: translateX(-50%);
             background-color: #1F2937; /* Fundo escuro */
@@ -102,7 +102,8 @@
             z-index: 9999; /* Z-index MUITO ALTO para garantir que fique na frente de tudo */
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease; /* Removendo transição de top/bottom para posicionamento JS */
+            /* Animação mais suave para opacidade, visibilidade E posição */
+            transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease, bottom 0.3s ease; 
             text-align: left; /* Alinhar texto do tooltip à esquerda */
             pointer-events: none; /* Permite que o mouse passe por cima sem sumir imediatamente */
         }
@@ -110,14 +111,12 @@
             opacity: 1;
             visibility: visible;
         }
-        /* Nova regra para o posicionamento do tooltip com JS */
+        /* Classes para o posicionamento dinâmico do tooltip */
         .guarnicao-details-tooltip.positioned-top {
             bottom: calc(100% + 0.5rem);
-            margin-bottom: 0.5rem;
         }
         .guarnicao-details-tooltip.positioned-bottom {
             top: calc(100% + 0.5rem);
-            margin-top: 0.5rem;
         }
 
         .guarnicao-details-tooltip h3 {
@@ -146,10 +145,12 @@
         /* Nova estrutura de grid para organizar por quartel */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            /* Garante que haja pelo menos 140px por coluna, e as colunas se expandam */
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            /* Fixa as 8 colunas para 140px, evitando alongamento e mantendo o mesmo tamanho */
+            grid-template-columns: repeat(8, 140px); 
             gap: 1rem; /* Diminuído para 1rem para menos espaçamento */
-            justify-content: center;
+            justify-content: center; /* Centraliza o grid completo na tela */
+            max-width: 1232px; /* Largura total: 8*140px (colunas) + 7*16px (gaps) = 1120 + 112 = 1232px */
+            margin: 0 auto; /* Centraliza o grid em relação ao seu container */
         }
 
         .quartel-column {
@@ -157,29 +158,35 @@
             flex-direction: column;
             gap: 0.5rem; /* Espaço entre os botões dentro de uma mesma coluna de quartel */
             align-items: center; /* Centraliza os botões na coluna */
+            width: 100%; /* Garante que a coluna ocupe sua largura de grid */
         }
         
-        /* Ajustes responsivos para o número de colunas (8 pelotões desejados) */
-        @media (min-width: 640px) { /* sm */
+        /* Ajustes responsivos: A grade muda para menos colunas em telas menores */
+        @media (max-width: 1279px) { /* xl breakpoint - 1px para baixo */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(3, 1fr); 
+                grid-template-columns: repeat(6, 140px); /* 6 colunas */
+                max-width: calc(6 * 140px + 5 * 1rem); /* Nova max-width */
             }
         }
-        @media (min-width: 768px) { /* md */
+        @media (max-width: 1023px) { /* lg breakpoint - 1px para baixo */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(4, 1fr); 
+                grid-template-columns: repeat(4, 140px); /* 4 colunas */
+                max-width: calc(4 * 140px + 3 * 1rem); /* Nova max-width */
             }
         }
-        @media (min-width: 1024px) { /* lg */
+        @media (max-width: 767px) { /* md breakpoint - 1px para baixo */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(6, 1fr); 
+                grid-template-columns: repeat(3, 140px); /* 3 colunas */
+                max-width: calc(3 * 140px + 2 * 1rem); /* Nova max-width */
             }
         }
-        @media (min-width: 1280px) { /* xl */
+        @media (max-width: 639px) { /* sm breakpoint - 1px para baixo */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(8, 1fr); /* Força 8 colunas para os 8 pelotões no extra grande */
+                grid-template-columns: repeat(2, 140px); /* 2 colunas em telas muito pequenas */
+                max-width: calc(2 * 140px + 1 * 1rem); /* Nova max-width */
             }
         }
+
         /* O main container é max-w-full para dar o máximo de espaço possível */
         .main-container-fluid {
             max-width: 100%; /* Permite que o container ocupe a largura total */
@@ -223,7 +230,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 01:50**
+                **Atualizado em: 30/06/2025 às 10:55**
             </p>
         </div>
     </header>
@@ -451,7 +458,6 @@
 </footer>
 
 <script>
-    // Este script agora lida com o posicionamento dinâmico dos tooltips para evitar cortes.
     document.addEventListener('DOMContentLoaded', () => {
         const tooltipElements = document.querySelectorAll('.guarnicao-details-tooltip');
 
@@ -466,12 +472,16 @@
                 // Temporariamente mostra o tooltip para medir
                 tooltip.style.opacity = '1';
                 tooltip.style.visibility = 'visible';
-
+                tooltip.style.left = '50%'; // Garante que a medição seja do centro
+                tooltip.style.transform = 'translateX(-50%)'; // Garante que a medição seja do centro
+                
                 const tooltipRect = tooltip.getBoundingClientRect();
                 const buttonRect = parentButton.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
                 const viewportHeight = window.innerHeight;
 
-                // Calcula se há espaço suficiente abaixo
+                // --- Posicionamento Vertical ---
+                // Tenta posicionar abaixo por padrão
                 if (buttonRect.bottom + tooltipRect.height + 10 > viewportHeight && buttonRect.top - tooltipRect.height - 10 > 0) {
                     // Se não há espaço abaixo, mas há acima, posiciona acima
                     tooltip.classList.add('positioned-top');
@@ -480,18 +490,17 @@
                     tooltip.classList.add('positioned-bottom');
                 }
 
-                // Ajusta a posição horizontal para evitar corte nas laterais
-                // Mede novamente após posicionamento vertical (que pode influenciar a largura se quebrar linha)
+                // --- Posicionamento Horizontal ---
+                // Re-medir após posicionamento vertical, pois a altura pode mudar e influenciar a largura se houver quebra de linha
                 const finalTooltipRect = tooltip.getBoundingClientRect(); 
-                if (finalTooltipRect.left < 0) {
-                    // Se cortado à esquerda, move para a direita
-                    tooltip.style.transform = `translateX(0)`;
-                    tooltip.style.left = '0';
-                } else if (finalTooltipRect.right > window.innerWidth) {
-                    // Se cortado à direita, move para a esquerda
-                    tooltip.style.transform = `translateX(-100%)`;
-                    tooltip.style.left = 'auto'; // Reseta left para usar right
-                    tooltip.style.right = '0';
+
+                if (finalTooltipRect.left < 5) { // Quase na borda esquerda (5px de margem)
+                    tooltip.style.transform = `translateX(0)`; // Alinha à esquerda
+                    tooltip.style.left = '5px'; // Distância da borda
+                } else if (finalTooltipRect.right > viewportWidth - 5) { // Quase na borda direita (5px de margem)
+                    tooltip.style.transform = `translateX(-100%)`; // Alinha à direita
+                    tooltip.style.left = 'auto'; // Remove 'left' para usar 'right'
+                    tooltip.style.right = '5px'; // Distância da borda
                 } else {
                     // Centraliza normalmente se houver espaço
                     tooltip.style.transform = `translateX(-50%)`;
@@ -504,10 +513,11 @@
                 tooltip.style.visibility = '';
             });
 
-            // Oculta o tooltip ao sair do hover (controlado por CSS transition)
+            // Oculta o tooltip ao sair do hover
             parentButton.addEventListener('mouseleave', () => {
                 tooltip.classList.remove('positioned-top', 'positioned-bottom');
-                tooltip.style.transform = `translateX(-50%)`; // Reseta para o próximo hover
+                // Resetar a posição horizontal para o estado padrão de centralização
+                tooltip.style.transform = `translateX(-50%)`;
                 tooltip.style.left = '50%';
                 tooltip.style.right = 'auto';
             });
