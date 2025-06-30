@@ -49,14 +49,15 @@
         }
         .accordion-header {
             background-color: #2D3748; /* Darker blue for headers */
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.25rem; /* Reduced vertical padding */
             border-radius: 0.5rem;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: background-color 0.3s ease;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem; /* Reduced bottom margin */
+            min-height: 3.75rem; /* Approx. 5 cm */
         }
         .accordion-header:hover {
             background-color: #3d4a5c; /* Slightly lighter on hover */
@@ -65,8 +66,8 @@
             background-color: #1F2937; /* Even darker for content */
             padding: 1rem 1.5rem;
             border-radius: 0.5rem;
-            margin-top: -0.5rem; /* Overlap with header border-radius */
-            margin-bottom: 1rem;
+            margin-top: -0.3rem; /* Adjust top margin to compensate */
+            margin-bottom: 0.75rem; /* Reduced bottom margin */
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s ease-out, padding 0.5s ease-out;
@@ -77,7 +78,7 @@
             padding-bottom: 1rem;
         }
         .accordion-content .accordion-item {
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem; /* Reduced bottom margin for items */
             border-left: 4px solid #b74f00; /* Bombeiros orange highlight */
             padding-left: 1rem;
         }
@@ -87,17 +88,24 @@
         .accordion-content .accordion-item h4 {
             color: #FFD700; /* Yellow for viatura */
             font-weight: bold;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem; /* Reduced bottom margin for viatura title */
+            font-size: 1rem; /* Slightly reduced font size for viatura title */
         }
         .accordion-content .accordion-item p {
             color: #E5E7EB; /* Light gray for text */
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.1rem; /* Reduced bottom margin for paragraphs */
+            font-size: 0.9rem; /* Slightly reduced font size for paragraphs */
+            line-height: 1.2; /* Adjusted line height */
         }
         .accordion-icon {
             transition: transform 0.3s ease;
+            font-size: 1rem; /* Reduced icon size */
         }
         .accordion-header.active .accordion-icon {
             transform: rotate(90deg);
+        }
+        .accordion-header h3 {
+            font-size: 1rem; /* Reduced font size for section header */
         }
     </style>
 </head>
@@ -108,40 +116,40 @@
         <div class="container mx-auto px-4 text-center">
             <div class="flex flex-wrap items-center justify-center gap-4">
                 <div class="bg-cbmrs-blue p-2 rounded-lg">
-                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 md:h-20 w-auto">
+                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-12 md:h-16 w-auto">
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
+                    <h1 class="text-lg md:text-xl font-extrabold text-bombeiros-yellow">
                         Guarnições de Serviço do 1º BBM
                     </h1>
                 </div>
                 <div class="bg-cbmrs-blue p-2 rounded-lg">
-                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-16 md:h-20 w-auto">
+                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-12 md:h-16 w-auto">
                 </div>
             </div>
-            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-3">
+            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-2">
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
-            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-1">
-                **Atualizado às: 21:04 de 29/06/2025**
+            <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
+                **Atualizado às: 22:06 de 29/06/2025**
             </p>
         </div>
     </header>
 
-    <main class="flex-grow py-8 px-4">
+    <main class="flex-grow py-6 px-4">
         <div class="container mx-auto max-w-4xl">
 
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-bombeiros-orange mb-4 text-center">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-bombeiros-orange mb-3 text-center">
                     <i class="fas fa-person-digging mr-2"></i> Quem Está de Serviço Agora
                 </h2>
-                <p class="text-gray-300 text-center mb-6">
+                <p class="text-gray-300 text-center mb-4 text-sm">
                     Equipes que assumiram o serviço às 20:00 de 29/06/2025 e estão ativas até 08:00 de 30/06/2025.
                 </p>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -154,9 +162,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
+                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -168,9 +176,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
+                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -183,19 +191,19 @@
 
             </div>
 
-            ---
+            <hr class="border-gray-600 my-4">
 
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-bombeiros-orange mb-4 text-center">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-bombeiros-orange mb-3 text-center">
                     <i class="fas fa-stopwatch mr-2"></i> Quem Ainda Está no Turno de 24 Horas
                 </h2>
-                <p class="text-gray-300 text-center mb-6">
+                <p class="text-gray-300 text-center mb-4 text-sm">
                     Estas guarnições iniciaram o serviço às 08:00 de 29/06/2025 e continuam ativas até 08:00 de 30/06/2025.
                 </p>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -213,9 +221,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -226,9 +234,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 2ª CIA / 1º PEL / FLORESTA</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 2ª CIA / 1º PEL / FLORESTA</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -241,9 +249,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -256,9 +264,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -271,9 +279,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -286,9 +294,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -301,9 +309,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
+                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -315,9 +323,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
+                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -328,9 +336,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -345,9 +353,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">AODC (Centro de Comando e Controle)</h3>
+                        <h3 class="text-sm font-semibold text-white">AODC (Centro de Comando e Controle)</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -359,9 +367,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">BBS / 2ª CIA / 2º PEL / MERGULHO</h3>
+                        <h3 class="text-sm font-semibold text-white">BBS / 2ª CIA / 2º PEL / MERGULHO</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -375,9 +383,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / ESTADO MAIOR</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / ESTADO MAIOR</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -388,9 +396,9 @@
                     </div>
                 </div>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">BBS / 2ª CIA / 1º PEL / AQUÁTICA</h3>
+                        <h3 class="text-sm font-semibold text-white">BBS / 2ª CIA / 1º PEL / AQUÁTICA</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -406,19 +414,19 @@
 
             </div>
 
-            ---
+            <hr class="border-gray-600 my-4">
 
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-bombeiros-orange mb-4 text-center">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-bombeiros-orange mb-3 text-center">
                     <i class="fas fa-hourglass-start mr-2"></i> Próximos a Assumir
                 </h2>
-                <p class="text-gray-300 text-center mb-6">
+                <p class="text-gray-300 text-center mb-4 text-sm">
                     Esta equipe se prepara para iniciar o turno da manhã (07:00 de 30/06/2025).
                 </p>
 
-                <div class="accordion-section mb-4">
+                <div class="accordion-section mb-3">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-lg font-semibold text-white">1º BBM / COBOM-DCCI</h3>
+                        <h3 class="text-sm font-semibold text-white">1º BBM / COBOM-DCCI</h3>
                         <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
                     </div>
                     <div class="accordion-content">
@@ -458,10 +466,14 @@
             content.style.maxHeight = null;
             content.style.paddingTop = '0';
             content.style.paddingBottom = '0';
+            content.style.marginTop = '-0.3rem'; // Ensure it snaps back correctly
+            content.style.marginBottom = '0.75rem'; // Ensure it snaps back correctly
         } else {
             content.style.maxHeight = content.scrollHeight + "px";
             content.style.paddingTop = '1rem';
             content.style.paddingBottom = '1rem';
+            content.style.marginTop = '0'; // Adjust for expanded state
+            content.style.marginBottom = '1rem'; // Adjust for expanded state
         }
     }
 </script>
