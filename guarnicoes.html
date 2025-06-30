@@ -88,7 +88,8 @@
         /* Estilo para o Tooltip (guarnicao-details-tooltip) */
         .guarnicao-details-tooltip {
             position: absolute;
-            top: 100%; /* APARECE ABAIXO do botão */
+            top: auto; /* Remover top: 100% para posicionamento dinâmico */
+            bottom: auto; /* Remover bottom: auto */
             left: 50%;
             transform: translateX(-50%);
             background-color: #1F2937; /* Fundo escuro */
@@ -97,42 +98,49 @@
             border-radius: 0.5rem;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             width: max-content; /* Ajusta a largura ao conteúdo */
-            max-width: 350px; /* Aumentei o limite da largura */
+            max-width: min(calc(100vw - 2rem), 350px); /* Max 350px ou 100vw menos padding */
             z-index: 9999; /* Z-index MUITO ALTO para garantir que fique na frente de tudo */
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease; /* Transição para 'top' */
-            margin-top: 0.5rem; /* Espaço entre o botão e o tooltip */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* Removendo transição de top/bottom para posicionamento JS */
             text-align: left; /* Alinhar texto do tooltip à esquerda */
             pointer-events: none; /* Permite que o mouse passe por cima sem sumir imediatamente */
         }
         .guarnicao-button:hover .guarnicao-details-tooltip {
             opacity: 1;
             visibility: visible;
-            top: calc(100% + 0.5rem); /* Posição final ao aparecer */
+        }
+        /* Nova regra para o posicionamento do tooltip com JS */
+        .guarnicao-details-tooltip.positioned-top {
+            bottom: calc(100% + 0.5rem);
+            margin-bottom: 0.5rem;
+        }
+        .guarnicao-details-tooltip.positioned-bottom {
+            top: calc(100% + 0.5rem);
+            margin-top: 0.5rem;
         }
 
         .guarnicao-details-tooltip h3 {
-            font-size: 1.1rem;
+            font-size: 1rem; /* Diminuído para 1rem */
             font-weight: bold;
             color: #bombeiros-orange;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem; /* Ajustado */
             text-align: left;
         }
         .guarnicao-details-tooltip h4 {
-            font-size: 0.95rem;
+            font-size: 0.85rem; /* Diminuído para 0.85rem */
             font-weight: bold;
             color: #FFD700;
-            margin-top: 0.75rem;
-            margin-bottom: 0.25rem;
+            margin-top: 0.6rem; /* Ajustado */
+            margin-bottom: 0.2rem; /* Ajustado */
             border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-            padding-bottom: 0.25rem;
+            padding-bottom: 0.2rem; /* Ajustado */
         }
         .guarnicao-details-tooltip p {
-            font-size: 0.85rem;
+            font-size: 0.75rem; /* Diminuído para 0.75rem */
             color: #E5E7EB;
             margin-bottom: 0.1rem;
-            line-height: 1.2;
+            line-height: 1.1; /* Ajustado para mais compacto */
         }
 
         /* Nova estrutura de grid para organizar por quartel */
@@ -140,7 +148,7 @@
             display: grid;
             /* Garante que haja pelo menos 140px por coluna, e as colunas se expandam */
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
-            gap: 1.5rem; /* Espaço entre as "colunas" de quartéis */
+            gap: 1rem; /* Diminuído para 1rem para menos espaçamento */
             justify-content: center;
         }
 
@@ -154,22 +162,22 @@
         /* Ajustes responsivos para o número de colunas (8 pelotões desejados) */
         @media (min-width: 640px) { /* sm */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(3, 1fr); /* 3 colunas em telas menores */
+                grid-template-columns: repeat(3, 1fr); 
             }
         }
         @media (min-width: 768px) { /* md */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(4, 1fr); /* 4 colunas no médio */
+                grid-template-columns: repeat(4, 1fr); 
             }
         }
         @media (min-width: 1024px) { /* lg */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(6, 1fr); /* 6 colunas no grande */
+                grid-template-columns: repeat(6, 1fr); 
             }
         }
         @media (min-width: 1280px) { /* xl */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(8, 1fr); /* 8 colunas para os 8 pelotões no extra grande */
+                grid-template-columns: repeat(8, 1fr); /* Força 8 colunas para os 8 pelotões no extra grande */
             }
         }
         /* O main container é max-w-full para dar o máximo de espaço possível */
@@ -215,7 +223,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 01:45**
+                **Atualizado em: 30/06/2025 às 01:50**
             </p>
         </div>
     </header>
@@ -443,8 +451,68 @@
 </footer>
 
 <script>
-    // Não há necessidade de JavaScript para esta funcionalidade de hover,
-    // pois tudo é controlado via CSS.
+    // Este script agora lida com o posicionamento dinâmico dos tooltips para evitar cortes.
+    document.addEventListener('DOMContentLoaded', () => {
+        const tooltipElements = document.querySelectorAll('.guarnicao-details-tooltip');
+
+        tooltipElements.forEach(tooltip => {
+            const parentButton = tooltip.closest('.guarnicao-button');
+
+            // Adiciona listeners para hover in/out no botão pai
+            parentButton.addEventListener('mouseenter', () => {
+                // Remove classes de posicionamento antigas
+                tooltip.classList.remove('positioned-top', 'positioned-bottom');
+                
+                // Temporariamente mostra o tooltip para medir
+                tooltip.style.opacity = '1';
+                tooltip.style.visibility = 'visible';
+
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const buttonRect = parentButton.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+
+                // Calcula se há espaço suficiente abaixo
+                if (buttonRect.bottom + tooltipRect.height + 10 > viewportHeight && buttonRect.top - tooltipRect.height - 10 > 0) {
+                    // Se não há espaço abaixo, mas há acima, posiciona acima
+                    tooltip.classList.add('positioned-top');
+                } else {
+                    // Senão, posiciona abaixo (padrão)
+                    tooltip.classList.add('positioned-bottom');
+                }
+
+                // Ajusta a posição horizontal para evitar corte nas laterais
+                // Mede novamente após posicionamento vertical (que pode influenciar a largura se quebrar linha)
+                const finalTooltipRect = tooltip.getBoundingClientRect(); 
+                if (finalTooltipRect.left < 0) {
+                    // Se cortado à esquerda, move para a direita
+                    tooltip.style.transform = `translateX(0)`;
+                    tooltip.style.left = '0';
+                } else if (finalTooltipRect.right > window.innerWidth) {
+                    // Se cortado à direita, move para a esquerda
+                    tooltip.style.transform = `translateX(-100%)`;
+                    tooltip.style.left = 'auto'; // Reseta left para usar right
+                    tooltip.style.right = '0';
+                } else {
+                    // Centraliza normalmente se houver espaço
+                    tooltip.style.transform = `translateX(-50%)`;
+                    tooltip.style.left = '50%';
+                    tooltip.style.right = 'auto';
+                }
+                
+                // Restaura a opacidade e visibilidade para a transição
+                tooltip.style.opacity = '';
+                tooltip.style.visibility = '';
+            });
+
+            // Oculta o tooltip ao sair do hover (controlado por CSS transition)
+            parentButton.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('positioned-top', 'positioned-bottom');
+                tooltip.style.transform = `translateX(-50%)`; // Reseta para o próximo hover
+                tooltip.style.left = '50%';
+                tooltip.style.right = 'auto';
+            });
+        });
+    });
 </script>
 </body>
 </html>
