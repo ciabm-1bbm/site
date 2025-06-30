@@ -95,7 +95,7 @@
             border-radius: 0.5rem;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             width: max-content; /* Ajusta a largura ao conteúdo */
-            max-width: 300px; /* Limite a largura */
+            max-width: 350px; /* Aumentei o limite da largura */
             z-index: 100;
             opacity: 0;
             visibility: hidden;
@@ -136,7 +136,8 @@
         /* Nova estrutura de grid para organizar por quartel */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Adapta para caber mais ou menos colunas */
+            /* Tentativa de manter 9 colunas em telas grandes, com responsividade */
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
             gap: 1.5rem; /* Espaço entre as "colunas" de quartéis */
             justify-content: center;
         }
@@ -147,32 +148,41 @@
             gap: 0.5rem; /* Espaço entre os botões dentro de uma mesma coluna de quartel */
             align-items: center; /* Centraliza os botões na coluna */
         }
-
-        /* Ajustes para telas maiores */
-        @media (min-width: 640px) { /* sm */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+        
+        /* Ajustes para telas maiores para acomodar mais colunas */
         @media (min-width: 768px) { /* md */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(5, 1fr); /* 5 colunas no médio */
             }
         }
         @media (min-width: 1024px) { /* lg */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(7, 1fr); /* 7 colunas no grande */
             }
         }
         @media (min-width: 1280px) { /* xl */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(9, 1fr); /* 9 colunas no extra grande */
             }
         }
-        @media (min-width: 1536px) { /* 2xl */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(7, 1fr); /* Tentar 7 colunas em telas muito largas */
-            }
+        /* O main container é max-w-full para dar o máximo de espaço possível */
+        .main-container-fluid {
+            max-width: 100%; /* Permite que o container ocupe a largura total */
+            padding-left: 1rem;
+            padding-right: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Ajuste para o botão da Força de Resposta Rápida ficar como um pelotão */
+        .frr-button-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .frr-button-wrapper .guarnicao-button {
+            width: 140px; /* Largura fixa para se assemelhar a um único item da grid */
+            flex-shrink: 0; /* Evita que o botão encolha em telas pequenas */
         }
     </style>
 </head>
@@ -198,24 +208,22 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 00:40**
+                **Atualizado em: 30/06/2025 às 00:50**
             </p>
         </div>
     </header>
 
     <main class="flex-grow py-6 px-4">
-        <div class="container mx-auto max-w-6xl">
-
-            <div class="mb-8">
+        <div class="main-container-fluid"> <div class="mb-8">
                 <h2 class="text-xl font-bold text-bombeiros-yellow mb-4 text-center">
                     <i class="fas fa-bolt mr-2"></i> Força de Resposta Rápida
                 </h2>
                 <p class="text-gray-300 text-center mb-6 text-sm">
                     (CÓDIGO BRANCO - 30/06 - 08:00 às 08:00 de 01/07)
                 </p>
-                <div class="guarnicao-grid mb-8">
-                    <div class="guarnicao-button">
-                        <i class="fas fa-shield-alt guarnicao-icon"></i> <span class="guarnicao-text">FORÇA DE RESPOSTA RÁPIDA</span>
+                <div class="frr-button-wrapper"> <div class="guarnicao-button">
+                        <i class="fas fa-shield-alt guarnicao-icon"></i> 
+                        <span class="guarnicao-text">FORÇA DE RESPOSTA RÁPIDA</span>
                         <div class="guarnicao-details-tooltip">
                             <h3>Força de Resposta Rápida</h3>
                             <h4>Período: 30/06 08:00 - 01/07 08:00</h4>
@@ -412,7 +420,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
