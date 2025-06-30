@@ -47,65 +47,145 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
-        .accordion-header {
-            background-color: #2D3748; /* Darker blue for headers */
-            padding: 0.75rem 1.25rem; /* Reduced vertical padding */
+        .guarnicao-button {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: #FF8C00; /* Cor laranja dos botões */
             border-radius: 0.5rem;
-            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            transition: background-color 0.3s ease;
-            margin-bottom: 0.3rem; /* Reduced bottom margin */
-            min-height: 3.75rem; /* Approx. 5 cm */
+            justify-content: center;
+            text-align: center;
+            padding: 0.5rem;
+            min-height: 100px; /* Altura similar aos botões da home */
+            position: relative; /* Para posicionar o conteúdo expandido */
+            cursor: pointer;
+            overflow: hidden; /* Garante que o conteúdo só apareça ao expandir */
         }
-        .accordion-header:hover {
-            background-color: #3d4a5c; /* Slightly lighter on hover */
+        .guarnicao-button:hover {
+            background-color: rgba(255, 140, 0, 0.95);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
         }
-        .accordion-content {
-            background-color: #1F2937; /* Even darker for content */
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            margin-top: -0.3rem; /* Adjust top margin to compensate */
-            margin-bottom: 0.75rem; /* Reduced bottom margin */
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        .guarnicao-text {
+            font-size: 0.8rem; /* Texto do nome do quartel */
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            word-break: break-word;
+            hyphens: auto;
+            margin-top: 0.5rem;
         }
-        .accordion-content.active {
-            max-height: 500px; /* Adjust based on max content height */
-            padding-top: 1rem;
-            padding-bottom: 1rem;
+        .guarnicao-icon {
+            color: #FFD700; /* Ícone amarelo */
+            font-size: 2rem; /* Tamanho do ícone */
         }
-        .accordion-content .accordion-item {
-            margin-bottom: 0.75rem; /* Reduced bottom margin for items */
-            border-left: 4px solid #b74f00; /* Bombeiros orange highlight */
-            padding-left: 1rem;
+
+        /* Estilo para o conteúdo da guarnição ao expandir */
+        .guarnicao-details-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .accordion-content .accordion-item:last-child {
-            margin-bottom: 0;
+        .guarnicao-details-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
-        .accordion-content .accordion-item h4 {
-            color: #FFD700; /* Yellow for viatura */
-            font-weight: bold;
-            margin-bottom: 0.3rem; /* Reduced bottom margin for viatura title */
-            font-size: 1rem; /* Slightly reduced font size for viatura title */
-        }
-        .accordion-content .accordion-item p {
-            color: #E5E7EB; /* Light gray for text */
-            margin-bottom: 0.1rem; /* Reduced bottom margin for paragraphs */
-            font-size: 0.9rem; /* Slightly reduced font size for paragraphs */
-            line-height: 1.2; /* Adjusted line height */
-        }
-        .accordion-icon {
+        .guarnicao-details-box {
+            background-color: #1F2937; /* Fundo escuro similar ao accordion-content anterior */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            transform: translateY(20px);
             transition: transform 0.3s ease;
-            font-size: 1rem; /* Reduced icon size */
         }
-        .accordion-header.active .accordion-icon {
-            transform: rotate(90deg);
+        .guarnicao-details-overlay.active .guarnicao-details-box {
+            transform: translateY(0);
         }
-        .accordion-header h3 {
-            font-size: 1rem; /* Reduced font size for section header */
+        .guarnicao-details-box h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #bombeiros-orange;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .guarnicao-details-box h4 {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3); /* Linha divisória */
+            padding-bottom: 0.25rem;
+        }
+        .guarnicao-details-box p {
+            font-size: 0.95rem;
+            color: #E5E7EB;
+            margin-bottom: 0.25rem;
+        }
+        .guarnicao-details-box .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #E5E7EB;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .guarnicao-details-box .close-button:hover {
+            color: #fire-red;
+        }
+
+        /* Estilos responsivos para a grade */
+        .guarnicao-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Ajusta automaticamente as colunas */
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Ajustes para telas maiores para atingir 7 colunas */
+        @media (min-width: 640px) { /* sm */
+            .guarnicao-grid {
+                grid-template-columns: repeat(3, minmax(120px, 1fr));
+            }
+        }
+        @media (min-width: 768px) { /* md */
+            .guarnicao-grid {
+                grid-template-columns: repeat(4, minmax(120px, 1fr));
+            }
+        }
+        @media (min-width: 1024px) { /* lg */
+            .guarnicao-grid {
+                grid-template-columns: repeat(5, minmax(120px, 1fr));
+            }
+        }
+        @media (min-width: 1280px) { /* xl */
+            .guarnicao-grid {
+                grid-template-columns: repeat(6, minmax(120px, 1fr));
+            }
+        }
+        @media (min-width: 1536px) { /* 2xl */
+            .guarnicao-grid {
+                grid-template-columns: repeat(7, minmax(120px, 1fr));
+            }
         }
     </style>
 </head>
@@ -137,243 +217,196 @@
     </header>
 
     <main class="flex-grow py-6 px-4">
-        <div class="container mx-auto max-w-4xl">
-
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-bombeiros-orange mb-3 text-center">
+        <div class="container mx-auto max-w-6xl">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
                     <i class="fas fa-person-digging mr-2"></i> Quem Está de Serviço Agora
                 </h2>
-                <p class="text-gray-300 text-center mb-4 text-sm">
+                <p class="text-gray-300 text-center mb-6 text-sm">
                     Equipes que assumiram o serviço às 20:00 de 29/06/2025 e estão ativas até 08:00 de 30/06/2025.
                 </p>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                <div class="guarnicao-grid">
+                    <div class="guarnicao-button" data-guarnicao-id="Acorianos1">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
                             <h4>Viatura: ABT-0595</h4>
                             <p><strong>Comandante de Guarnição:</strong> 2º SGT KANOFRE</p>
                             <p><strong>Chefe de Linha Direita:</strong> SD PIRES</p>
                             <p><strong>COV / Operador / Condutor:</strong> SD TEMP PAULINO</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="BBSTerrestre1">
+                        <i class="fas fa-dog guarnicao-icon"></i>
+                        <span class="guarnicao-text">BBS / 1ª CIA / 1º PEL / TERRESTRE</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
                             <h4>Viatura: ABTS-866</h4>
                             <p><strong>Comandante de Guarnição:</strong> 1º SGT ZANINI</p>
                             <p><strong>Resgatista 2:</strong> AL SD JOSÉ</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Canil1">
+                        <i class="fas fa-paw guarnicao-icon"></i>
+                        <span class="guarnicao-text">BBS / 1ª CIA / 2º PEL / CANIL</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>BBS / 1ª CIA / 2º PEL / CANIL</h3>
                             <h4>Viatura: ABC-793</h4>
                             <p><strong>Cinotécnico:</strong> 2º SGT CESAR ZANFONATO</p>
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <hr class="border-gray-600 my-4">
+            <hr class="border-gray-600 my-8">
 
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-bombeiros-orange mb-3 text-center">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
                     <i class="fas fa-stopwatch mr-2"></i> Quem Ainda Está no Turno de 24 Horas
                 </h2>
-                <p class="text-gray-300 text-center mb-4 text-sm">
+                <p class="text-gray-300 text-center mb-6 text-sm">
                     Estas guarnições iniciaram o serviço às 08:00 de 29/06/2025 e continuam ativas até 08:00 de 30/06/2025.
                 </p>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                <div class="guarnicao-grid">
+                    <div class="guarnicao-button" data-guarnicao-id="Teresopolis">
+                        <i class="fas fa-car-side guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
                             <h4>Viatura: ABT-0594</h4>
                             <p><strong>Comandante de Guarnição:</strong> 2º SGT PME CARGNELUTTI</p>
                             <p><strong>Chefe de Linha Direita:</strong> SD TEMP CARDOSO</p>
                             <p><strong>COV / Operador / Condutor:</strong> SD ZEMPERCOV</p>
-                        </div>
-                        <div class="accordion-item">
                             <h4>Viatura: AR-0766</h4>
                             <p><strong>COV / Operador / Condutor:</strong> SD ARAUJO</p>
                             <p><strong>Comandante de Guarnição:</strong> SD BRUM</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Assuncao">
+                        <i class="fas fa-fire-extinguisher guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</h3>
                             <h4>Viatura: ABT-0596</h4>
                             <p><strong>Chefe de Linha Direita:</strong> SD BAIGORRA</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 2ª CIA / 1º PEL / FLORESTA</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Floresta">
+                        <i class="fas fa-city guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 2ª CIA / 1º PEL / FLORESTA</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 2ª CIA / 1º PEL / FLORESTA</h3>
                             <h4>Viatura: ABT-0597</h4>
                             <p><strong>Comandante de Guarnição:</strong> 2º SGT CASTRO</p>
                             <p><strong>Chefe de Linha Direita:</strong> SD DA SILVA</p>
                             <p><strong>COV / Operador / Condutor:</strong> SD TEMP WESLEY</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Restinga">
+                        <i class="fas fa-tree guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 1ª CIA / 4º PEL / RESTINGA</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
                             <h4>Viatura: ABT-0598</h4>
                             <p><strong>COV / Operador / Condutor:</strong> 1º SGT RONALDO</p>
                             <p><strong>Comandante de Guarnição:</strong> SD DAYKER</p>
                             <p><strong>Chefe de Linha Direita:</strong> SD THIAGO</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="BelemNovo">
+                        <i class="fas fa-home guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
                             <h4>Viatura: ABT-0599</h4>
                             <p><strong>Chefe de Linha Esquerda:</strong> SD COSME</p>
                             <p><strong>COV / Operador / Condutor:</strong> SD FERREIRA</p>
                             <p><strong>Comandante de Socorro:</strong> SD MARTINEZ</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="PassoDareia">
+                        <i class="fas fa-road guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
                             <h4>Viatura: ABT-0600</h4>
                             <p><strong>Comandante de Guarnição:</strong> SD DREYER</p>
                             <p><strong>COV / Operador / Condutor:</strong> SD ISMAEL</p>
                             <p><strong>Chefe de Linha Direita:</strong> SD TEMP SOARES</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Partenon">
+                        <i class="fas fa-landmark guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 2ª CIA / 3º PEL / PARTENON</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
                             <h4>Viatura: ABT-327</h4>
                             <p><strong>COV / Operador / Condutor:</strong> SD BERNARDES</p>
                             <p><strong>Comandante de Guarnição:</strong> SD PATRICK</p>
                             <p><strong>Auxiliar de Linha Direita:</strong> SD TEMP ZANETTI</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="BBSTerrestre24h">
+                        <i class="fas fa-truck-pickup guarnicao-icon"></i>
+                        <span class="guarnicao-text">BBS / 1ª CIA / 1º PEL / TERRESTRE (24h)</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
                             <h4>Viatura: ABTS-866</h4>
                             <p><strong>Resgatista 1:</strong> SD MONTEIRO</p>
                             <p><strong>COV / Operador / Condutor:</strong> SD NAIANY</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">BBS / 1ª CIA / 2º PEL / CANIL</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Canil24h">
+                        <i class="fas fa-dog-leashed guarnicao-icon"></i>
+                        <span class="guarnicao-text">BBS / 1ª CIA / 2º PEL / CANIL (24h)</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>BBS / 1ª CIA / 2º PEL / CANIL</h3>
                             <h4>Viatura: ABC-793</h4>
                             <p><strong>Cinotécnico:</strong> SD LOPES</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="AcorianosApoio">
+                        <i class="fas fa-handshake guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
                             <h4>Viatura: AEM-0482</h4>
                             <p><strong>COV / Operador / Condutor:</strong> SD NATHAN</p>
-                        </div>
-                        <div class="accordion-item">
                             <h4>Viatura: AT-0672</h4>
                             <p><strong>COV / Operador / Condutor:</strong> SD NATHAN</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">AODC (Centro de Comando e Controle)</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="AODC">
+                        <i class="fas fa-headset guarnicao-icon"></i>
+                        <span class="guarnicao-text">AODC (Centro de Comando e Controle)</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>AODC (Centro de Comando e Controle)</h3>
                             <h4>Viatura: AODC-CCOB</h4>
                             <p><strong>Oficial Supervisor:</strong> CAP VIEIRA</p>
                             <p><strong>Operador CCOB:</strong> SD NATASCHA</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">BBS / 2ª CIA / 2º PEL / MERGULHO</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="Mergulho">
+                        <i class="fas fa-water guarnicao-icon"></i>
+                        <span class="guarnicao-text">BBS / 2ª CIA / 2º PEL / MERGULHO</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>BBS / 2ª CIA / 2º PEL / MERGULHO</h3>
                             <h4>Viatura: ATP-0555</h4>
                             <p><strong>Comandante de Guarnição:</strong> 2º SGT SPOHN</p>
                             <p><strong>Mergulhador:</strong> SD DAMIEL</p>
@@ -381,28 +414,22 @@
                             <p><strong>Mergulhador:</strong> SD MAURO</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / ESTADO MAIOR</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="EstadoMaior">
+                        <i class="fas fa-user-secret guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / ESTADO MAIOR</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / ESTADO MAIOR</h3>
                             <h4>Viatura: ATP-201</h4>
                             <p><strong>Motorista de Dia:</strong> 2º SGT FABRICIO</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">BBS / 2ª CIA / 1º PEL / AQUÁTICA</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                    <div class="guarnicao-button" data-guarnicao-id="AQUATICA">
+                        <i class="fas fa-ship guarnicao-icon"></i>
+                        <span class="guarnicao-text">BBS / 2ª CIA / 1º PEL / AQUÁTICA</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>BBS / 2ª CIA / 1º PEL / AQUÁTICA</h3>
                             <h4>Viaturas: EAL-716, EIN-713, EIN-714, EMN-943, EMN-948</h4>
                             <p><strong>Comandante de Guarnição:</strong> SD PETERSEN</p>
                             <p><strong>Condutor Naval:</strong> SD ADRIANO</p>
@@ -411,35 +438,31 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <hr class="border-gray-600 my-4">
+            <hr class="border-gray-600 my-8">
 
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-bombeiros-orange mb-3 text-center">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
                     <i class="fas fa-hourglass-start mr-2"></i> Próximos a Assumir
                 </h2>
-                <p class="text-gray-300 text-center mb-4 text-sm">
+                <p class="text-gray-300 text-center mb-6 text-sm">
                     Esta equipe se prepara para iniciar o turno da manhã (07:00 de 30/06/2025).
                 </p>
 
-                <div class="accordion-section mb-3">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
-                        <h3 class="text-sm font-semibold text-white">1º BBM / COBOM-DCCI</h3>
-                        <i class="fas fa-chevron-right text-bombeiros-yellow accordion-icon"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-item">
+                <div class="guarnicao-grid">
+                    <div class="guarnicao-button" data-guarnicao-id="COBOM">
+                        <i class="fas fa-phone-volume guarnicao-icon"></i>
+                        <span class="guarnicao-text">1º BBM / COBOM-DCCI</span>
+                        <div class="guarnicao-details hidden">
+                            <h3>1º BBM / COBOM-DCCI</h3>
                             <h4>Viatura: COBOM-DCCI</h4>
                             <p><strong>Operador COBOM:</strong> 1º SGT RIBEIRO</p>
                             <p><strong>Operador COBOM:</strong> 2º SGT BARBARA</p>
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
     </main>
 </div>
@@ -454,27 +477,31 @@
     </div>
 </footer>
 
+<div id="guarnicao-details-overlay" class="guarnicao-details-overlay">
+    <div class="guarnicao-details-box">
+        <button class="close-button" onclick="closeDetailsOverlay()">&times;</button>
+        <div id="overlay-content">
+            </div>
+    </div>
+</div>
+
 <script>
-    function toggleAccordion(element) {
-        const content = element.nextElementSibling;
-        const icon = element.querySelector('.accordion-icon');
+    document.addEventListener('DOMContentLoaded', () => {
+        const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
+        const overlay = document.getElementById('guarnicao-details-overlay');
+        const overlayContent = document.getElementById('overlay-content');
 
-        element.classList.toggle('active');
-        icon.classList.toggle('active');
+        guarnicaoButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const detailsHtml = button.querySelector('.guarnicao-details').innerHTML;
+                overlayContent.innerHTML = detailsHtml;
+                overlay.classList.add('active');
+            });
+        });
+    });
 
-        if (content.style.maxHeight) {
-            content.style.maxHeight = null;
-            content.style.paddingTop = '0';
-            content.style.paddingBottom = '0';
-            content.style.marginTop = '-0.3rem'; // Ensure it snaps back correctly
-            content.style.marginBottom = '0.75rem'; // Ensure it snaps back correctly
-        } else {
-            content.style.maxHeight = content.scrollHeight + "px";
-            content.style.paddingTop = '1rem';
-            content.style.paddingBottom = '1rem';
-            content.style.marginTop = '0'; // Adjust for expanded state
-            content.style.marginBottom = '1rem'; // Adjust for expanded state
-        }
+    function closeDetailsOverlay() {
+        document.getElementById('guarnicao-details-overlay').classList.remove('active');
     }
 </script>
 </body>
