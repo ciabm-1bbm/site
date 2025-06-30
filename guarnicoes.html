@@ -59,7 +59,7 @@
             justify-content: center;
             text-align: center;
             padding: 0.5rem;
-            min-height: 100px; /* Altura similar aos botões da home */
+            min-height: 140px; /* Definido como 140px para torná-lo quadrado, combinando com a largura mínima da grid */
             position: relative; /* Para posicionar o tooltip */
             cursor: default; /* Não é mais clicável para abrir um menu */
             overflow: visible; /* Permite que o tooltip "escape" os limites do botão */
@@ -86,7 +86,7 @@
         /* Estilo para o Tooltip (guarnicao-details-tooltip) */
         .guarnicao-details-tooltip {
             position: absolute;
-            top: 100%; /* AGORA APARECE ABAIXO do botão */
+            top: 100%; /* APARECE ABAIXO do botão */
             left: 50%;
             transform: translateX(-50%);
             background-color: #1F2937; /* Fundo escuro */
@@ -136,7 +136,7 @@
         /* Nova estrutura de grid para organizar por quartel */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            /* Tentativa de manter 9 colunas em telas grandes, com responsividade */
+            /* Garante que haja pelo menos 140px por coluna, e as colunas se expandam */
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
             gap: 1.5rem; /* Espaço entre as "colunas" de quartéis */
             justify-content: center;
@@ -149,20 +149,25 @@
             align-items: center; /* Centraliza os botões na coluna */
         }
         
-        /* Ajustes para telas maiores para acomodar mais colunas */
+        /* Ajustes responsivos para o número de colunas (8 pelotões desejados) */
+        @media (min-width: 640px) { /* sm */
+            .guarnicoes-por-quartel-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 colunas em telas menores */
+            }
+        }
         @media (min-width: 768px) { /* md */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(5, 1fr); /* 5 colunas no médio */
+                grid-template-columns: repeat(4, 1fr); /* 4 colunas no médio */
             }
         }
         @media (min-width: 1024px) { /* lg */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(7, 1fr); /* 7 colunas no grande */
+                grid-template-columns: repeat(6, 1fr); /* 6 colunas no grande */
             }
         }
         @media (min-width: 1280px) { /* xl */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(9, 1fr); /* 9 colunas no extra grande */
+                grid-template-columns: repeat(8, 1fr); /* 8 colunas para os 8 pelotões no extra grande */
             }
         }
         /* O main container é max-w-full para dar o máximo de espaço possível */
@@ -208,7 +213,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 00:50**
+                **Atualizado em: 30/06/2025 às 01:31**
             </p>
         </div>
     </header>
@@ -420,6 +425,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
