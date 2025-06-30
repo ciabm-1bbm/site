@@ -62,7 +62,7 @@
             min-height: 100px; /* Altura similar aos botões da home */
             position: relative; /* Para posicionar o tooltip */
             cursor: default; /* Não é mais clicável para abrir um menu */
-            overflow: hidden; /* Garante que o conteúdo só apareça ao expandir */
+            overflow: visible; /* IMPORTANTE: Permite que o tooltip (conteúdo filho) "escape" os limites do botão */
         }
         .guarnicao-button:hover {
             background-color: rgba(255, 140, 0, 0.95);
@@ -191,7 +191,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado às: 22:28 de 29/06/2025**
+                **Atualizado às: 23:58 de 29/06/2025**
             </p>
         </div>
     </header>
@@ -369,8 +369,8 @@
 </footer>
 
 <script>
-    // Não precisamos de JavaScript para o hover, apenas para a estrutura da página
-    // O overlay e as funções de clique/fechar foram removidos, pois não são mais necessários para a interação de hover.
+    // Não há necessidade de JavaScript para esta funcionalidade de hover,
+    // pois tudo é controlado via CSS. O código JS anterior do overlay foi removido.
 </script>
 </body>
 </html>
