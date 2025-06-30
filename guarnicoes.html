@@ -145,9 +145,9 @@
         /* Nova estrutura de grid para organizar por quartel */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            /* Fixa as 8 colunas para 140px, evitando alongamento e mantendo o mesmo tamanho */
+            /* Garante que haja 8 colunas de 140px fixas */
             grid-template-columns: repeat(8, 140px); 
-            gap: 1rem; /* Diminuído para 1rem para menos espaçamento */
+            gap: 1rem; /* Espaço entre as "colunas" de quartéis */
             justify-content: center; /* Centraliza o grid completo na tela */
             max-width: 1232px; /* Largura total: 8*140px (colunas) + 7*16px (gaps) = 1120 + 112 = 1232px */
             margin: 0 auto; /* Centraliza o grid em relação ao seu container */
@@ -196,13 +196,13 @@
             margin-right: auto;
         }
 
-        /* Ajuste para o botão da Força de Resposta Rápida ficar como um pelotão */
-        .frr-button-wrapper {
+        /* Removido o wrapper da FRR para centralizar o botão diretamente */
+        .frr-button-single {
             display: flex;
             justify-content: center;
             margin-bottom: 2rem;
         }
-        .frr-button-wrapper .guarnicao-button {
+        .frr-button-single .guarnicao-button {
             width: 140px; /* Largura fixa para se assemelhar a um único item da grid */
             flex-shrink: 0; /* Evita que o botão encolha em telas pequenas */
         }
@@ -230,37 +230,13 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 10:55**
+                **Atualizado em: 30/06/2025 às 12:37**
             </p>
         </div>
     </header>
 
     <main class="flex-grow py-6 px-4">
-        <div class="main-container-fluid"> <div class="mb-8">
-                <h2 class="text-xl font-bold text-bombeiros-yellow mb-4 text-center">
-                    <i class="fas fa-bolt mr-2"></i> Força de Resposta Rápida
-                </h2>
-                <p class="text-gray-300 text-center mb-6 text-sm">
-                    (CÓDIGO BRANCO - 30/06 - 08:00 às 08:00 de 01/07)
-                </p>
-                <div class="frr-button-wrapper"> <div class="guarnicao-button">
-                        <i class="fas fa-shield-alt guarnicao-icon"></i> 
-                        <span class="guarnicao-text">FORÇA DE RESPOSTA RÁPIDA</span>
-                        <div class="guarnicao-details-tooltip">
-                            <h3>Força de Resposta Rápida</h3>
-                            <h4>Período: 30/06 08:00 - 01/07 08:00</h4>
-                            <p><strong>Comandante:</strong> 1º SGT FERNANDO</p>
-                            <p><strong>Militar 2:</strong> 1º SGT PAIM</p>
-                            <p><strong>Militar 3:</strong> SD ALISSON</p>
-                            <p><strong>Militar 4:</strong> SD CRISTIANO</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <hr class="border-gray-600 my-8">
-
-            <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
+        <div class="main-container-fluid"> <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
                 <i class="fas fa-fire-extinguisher mr-2"></i> Guarnições de Serviço Ativas (30/06/2025)
             </h2>
             <p class="text-gray-300 text-center mb-6 text-sm">
@@ -276,9 +252,9 @@
                         <div class="guarnicao-details-tooltip">
                             <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
                             <h4>Viatura: AEM-0482 (30/06 08:00 - 01/07 08:00)</h4>
-                            <p><strong>COV / Operador / Condutor:</strong> SD NATHAN</p>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT BECKER</p>
                             <h4>Viatura: AT-0672 (30/06 08:00 - 01/07 08:00)</h4>
-                            <p><strong>COV / Operador / Condutor:</strong> SD NATHAN</p>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT BECKER</p>
                         </div>
                     </div>
                     <div class="guarnicao-button">
@@ -345,12 +321,26 @@
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button opacity-50 cursor-not-allowed" title="Sem informações de guarnição para 30/06/2025">
+                    <div class="guarnicao-button">
                         <i class="fas fa-building guarnicao-icon"></i>
-                        <span class="guarnicao-text">RESTINGA</span>
+                        <span class="guarnicao-text">RESTINGA (Diurno)</span>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
-                            <p>Sem informações de guarnição para o dia 30/06/2025.</p>
+                            <h3>1º BBM / 1ª CIA / 4º PEL / RESTINGA (Diurno)</h3>
+                            <h4>Viatura: ABT-0598 (30/06 08:00 - 20:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD BRUNO</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD BARRETO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD MAURÍCIO</p>
+                        </div>
+                    </div>
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">RESTINGA (Noturno)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 4º PEL / RESTINGA (Noturno)</h3>
+                            <h4>Viatura: ABT-0598 (30/06 20:00 - 01/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD BARRETO</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD TEMP VOLZ</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD MAURÍCIO</p>
                         </div>
                     </div>
                 </div>
@@ -433,15 +423,31 @@
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button opacity-50 cursor-not-allowed" title="Sem informações de guarnição para hoje">
+                    <div class="guarnicao-button">
                         <i class="fas fa-building guarnicao-icon"></i>
-                        <span class="guarnicao-text">PARTENON</span>
+                        <span class="guarnicao-text">PARTENON (Manhã)</span>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
-                            <p>Sem informações de guarnição para o dia 30/06/2025.</p>
+                            <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON (Manhã)</h3>
+                            <h4>Viatura: ABT-327 (30/06 08:00 - 17:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD BATISTA</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD BELOMO</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD CABRAL</p>
+                        </div>
+                    </div>
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">PARTENON (Tarde)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON (Tarde)</h3>
+                            <h4>Viatura: ABT-327 (30/06 17:00 - 01/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 1º SGT FERNANDO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD BELOMO</p>
+                            <p><strong>Auxiliar de Linha Direita:</strong> SD BATISTA</p>
+                            <p><strong>Chefe de Linha Direita (Apoio):</strong> SD CABRAL</p>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
@@ -481,13 +487,15 @@
                 const viewportHeight = window.innerHeight;
 
                 // --- Posicionamento Vertical ---
-                // Tenta posicionar abaixo por padrão
-                if (buttonRect.bottom + tooltipRect.height + 10 > viewportHeight && buttonRect.top - tooltipRect.height - 10 > 0) {
-                    // Se não há espaço abaixo, mas há acima, posiciona acima
-                    tooltip.classList.add('positioned-top');
-                } else {
-                    // Senão, posiciona abaixo (padrão)
+                // Verifica se há espaço para posicionar ABAIXO (preferencial)
+                const spaceBelow = viewportHeight - (buttonRect.bottom + tooltipRect.height + 10);
+                const spaceAbove = buttonRect.top - tooltipRect.height - 10;
+
+                if (spaceBelow >= 0 || spaceBelow > spaceAbove) { // Há espaço abaixo ou mais espaço abaixo do que acima
                     tooltip.classList.add('positioned-bottom');
+                } else {
+                    // Posiciona acima
+                    tooltip.classList.add('positioned-top');
                 }
 
                 // --- Posicionamento Horizontal ---
@@ -499,7 +507,7 @@
                     tooltip.style.left = '5px'; // Distância da borda
                 } else if (finalTooltipRect.right > viewportWidth - 5) { // Quase na borda direita (5px de margem)
                     tooltip.style.transform = `translateX(-100%)`; // Alinha à direita
-                    tooltip.style.left = 'auto'; // Remove 'left' para usar 'right'
+                    tooltip.style.left = 'auto'; // Reseta left para usar right
                     tooltip.style.right = '5px'; // Distância da borda
                 } else {
                     // Centraliza normalmente se houver espaço
