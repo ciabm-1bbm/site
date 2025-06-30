@@ -86,7 +86,7 @@
         /* Estilo para o Tooltip (guarnicao-details-tooltip) */
         .guarnicao-details-tooltip {
             position: absolute;
-            bottom: 100%; /* Acima do botão */
+            top: 100%; /* AGORA APARECE ABAIXO do botão */
             left: 50%;
             transform: translateX(-50%);
             background-color: #1F2937; /* Fundo escuro */
@@ -99,15 +99,15 @@
             z-index: 100;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, bottom 0.3s ease;
-            margin-bottom: 0.5rem; /* Espaço entre o botão e o tooltip */
+            transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease; /* Transição para 'top' */
+            margin-top: 0.5rem; /* Espaço entre o botão e o tooltip */
             text-align: left; /* Alinhar texto do tooltip à esquerda */
             pointer-events: none; /* Permite que o mouse passe por cima sem sumir imediatamente */
         }
         .guarnicao-button:hover .guarnicao-details-tooltip {
             opacity: 1;
             visibility: visible;
-            bottom: calc(100% + 0.5rem); /* Posição final ao aparecer */
+            top: calc(100% + 0.5rem); /* Posição final ao aparecer */
         }
 
         .guarnicao-details-tooltip h3 {
@@ -198,7 +198,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 00:30**
+                **Atualizado em: 30/06/2025 às 00:40**
             </p>
         </div>
     </header>
@@ -409,50 +409,6 @@
                         <div class="guarnicao-details-tooltip">
                             <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
                             <p>Sem informações de guarnição para o dia 30/06/2025.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quartel-column">
-                    <div class="guarnicao-button">
-                        <i class="fas fa-building guarnicao-icon"></i>
-                        <span class="guarnicao-text">BBS TERRESTRE</span>
-                        <div class="guarnicao-details-tooltip">
-                            <h3>BBS / 1ª CIA / 1º PEL / TERRESTRE</h3>
-                            <h4>Viatura: ABTS-866 (30/06 08:00 - 01/07 08:00)</h4>
-                            <p><strong>Comandante de Guarnição:</strong> 2º SGT ELIAS</p>
-                            <p><strong>COV / Operador / Condutor:</strong> SD EDUARDO AUGUSTO</p>
-                            <p><strong>Resgatista 1:</strong> SD GREGORY</p>
-                            <p><strong>Resgatista 2:</strong> SD GUIMARÃES</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quartel-column">
-                    <div class="guarnicao-button">
-                        <i class="fas fa-building guarnicao-icon"></i>
-                        <span class="guarnicao-text">BBS AQUÁTICA</span>
-                        <div class="guarnicao-details-tooltip">
-                            <h3>BBS / 2ª CIA / 1º PEL / AQUÁTICA</h3>
-                            <h4>Viaturas: EAL-716, EIN-713, EIN-714, EMN-943, EMN-948 (30/06 08:00 - 01/07 08:00)</h4>
-                            <p><strong>Comandante de Guarnição:</strong> 1º SGT MARCELO</p>
-                            <p><strong>Condutor Naval:</strong> SD BONAZZA</p>
-                            <p><strong>Auxiliar de Condutor Naval 1:</strong> SD ROBERTO</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quartel-column">
-                    <div class="guarnicao-button">
-                        <i class="fas fa-building guarnicao-icon"></i>
-                        <span class="guarnicao-text">COBOM-DCCI</span>
-                        <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / COBOM-DCCI</h3>
-                            <h4>Viatura: COBOM-DCCI (30/06 07:00 - 07:00 de 01/07)</h4>
-                            <p><strong>Operador COBOM (Diurno):</strong> SD ALANA</p>
-                            <p><strong>Operador COBOM (Diurno):</strong> SD BRUNA</p>
-                            <p><strong>Operador COBOM (Noturno):</strong> 1º SGT RIBEIRO</p>
-                            <p><strong>Operador COBOM (Noturno):</strong> 2º SGT BARBARA</p>
                         </div>
                     </div>
                 </div>
