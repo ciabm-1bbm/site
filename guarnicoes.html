@@ -67,7 +67,9 @@
         .guarnicao-button:hover {
             background-color: rgba(255, 140, 0, 0.95);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
+            position: relative; /* Mantém a posição relativa */
+            top: -3px; /* Move para cima 3px no hover */
+            z-index: 10; /* Garante que o botão hover fique acima dos vizinhos */
         }
         .guarnicao-text {
             font-size: 0.8rem; /* Texto do nome do quartel */
@@ -96,7 +98,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             width: max-content; /* Ajusta a largura ao conteúdo */
             max-width: 350px; /* Aumentei o limite da largura */
-            z-index: 100;
+            z-index: 9999; /* Z-index MUITO ALTO para garantir que fique na frente de tudo */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease; /* Transição para 'top' */
@@ -213,7 +215,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 30/06/2025 às 01:31**
+                **Atualizado em: 30/06/2025 às 01:45**
             </p>
         </div>
     </header>
@@ -425,7 +427,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
