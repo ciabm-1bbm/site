@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições de Serviço do 1º BBM - Porto Alegre</title>
+    <title>Guarnições de Serviço - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,59 +24,445 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css"> <link rel="icon" type="image/png" href="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png">
-</head>
-<body class="text-white min-h-screen flex flex-col bg-gray-900">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Fallback bg-color */
+        }
+        .hero-background {
+            background-image: url('images/background.jpg'); /* Certifique-se de que esta imagem exista ou remova */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            z-index: 0;
+        }
+        .hero-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+        .guarnicao-button {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: #FF8C00; /* Cor laranja dos botões */
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.5rem;
+            min-height: 140px; /* Definido como 140px para torná-lo quadrado, combinando com a largura mínima da grid */
+            position: relative; /* Para posicionar o tooltip */
+            cursor: default; /* Não é mais clicável para abrir um menu */
+            overflow: visible; /* Permite que o tooltip "escape" os limites do botão */
+        }
+        .guarnicao-button:hover {
+            background-color: rgba(255, 140, 0, 0.95);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            position: relative; /* Mantém a posição relativa */
+            top: -3px; /* Move para cima 3px no hover */
+            z-index: 10; /* Garante que o botão hover fique acima dos vizinhos */
+        }
+        .guarnicao-text {
+            font-size: 0.8rem; /* Texto do nome do quartel */
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            word-break: break-word;
+            hyphens: auto;
+            margin-top: 0.5rem;
+        }
+        .guarnicao-icon {
+            color: #FFD700; /* Ícone amarelo */
+            font-size: 2rem; /* Tamanho do ícone */
+        }
 
-    <header class="py-4 shadow-lg bg-gray-800">
+        /* Estilo para o Tooltip (guarnicao-details-tooltip) */
+        .guarnicao-details-tooltip {
+            position: absolute;
+            top: auto; /* Posicionamento será definido por JS */
+            bottom: auto; /* Posicionamento será definido por JS */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1F2937; /* Fundo escuro */
+            color: #E5E7EB;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            width: max-content; /* Ajusta a largura ao conteúdo */
+            max-width: min(calc(100vw - 2rem), 350px); /* Max 350px ou 100vw menos padding */
+            z-index: 9999; /* Z-index MUITO ALTO para garantir que fique na frente de tudo */
+            opacity: 0;
+            visibility: hidden;
+            /* Animação mais suave para opacidade, visibilidade E posição */
+            transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease, bottom 0.3s ease; 
+            text-align: left; /* Alinhar texto do tooltip à esquerda */
+            pointer-events: none; /* Permite que o mouse passe por cima sem sumir imediatamente */
+        }
+        .guarnicao-button:hover .guarnicao-details-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Classes para o posicionamento dinâmico do tooltip */
+        .guarnicao-details-tooltip.positioned-top {
+            bottom: calc(100% + 0.5rem);
+        }
+        .guarnicao-details-tooltip.positioned-bottom {
+            top: calc(100% + 0.5rem);
+        }
+
+        .guarnicao-details-tooltip h3 {
+            font-size: 1rem; /* Diminuído para 1rem */
+            font-weight: bold;
+            color: #bombeiros-orange;
+            margin-bottom: 0.4rem; /* Ajustado */
+            text-align: left;
+        }
+        .guarnicao-details-tooltip h4 {
+            font-size: 0.85rem; /* Diminuído para 0.85rem */
+            font-weight: bold;
+            color: #FFD700;
+            margin-top: 0.6rem; /* Ajustado */
+            margin-bottom: 0.2rem; /* Ajustado */
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding-bottom: 0.2rem; /* Ajustado */
+        }
+        .guarnicao-details-tooltip p {
+            font-size: 0.75rem; /* Diminuído para 0.75rem */
+            color: #E5E7EB;
+            margin-bottom: 0.1rem;
+            line-height: 1.1; /* Ajustado para mais compacto */
+        }
+
+        /* Nova estrutura de grid para organizar por quartel */
+        .guarnicoes-por-quartel-grid {
+            display: grid;
+            /* Garante que haja 8 colunas de 140px fixas */
+            grid-template-columns: repeat(8, 140px); 
+            gap: 1rem; /* Espaço entre as "colunas" de quartéis */
+            justify-content: center; /* Centraliza o grid completo na tela */
+            max-width: 1232px; /* Largura total: 8*140px (colunas) + 7*16px (gaps) = 1120 + 112 = 1232px */
+            margin: 0 auto; /* Centraliza o grid em relação ao seu container */
+        }
+
+        .quartel-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; /* Espaço entre os botões dentro de uma mesma coluna de quartel */
+            align-items: center; /* Centraliza os botões na coluna */
+            width: 100%; /* Garante que a coluna ocupe sua largura de grid */
+        }
+        
+        /* Ajustes responsivos: A grade muda para menos colunas em telas menores */
+        @media (max-width: 1279px) { /* xl breakpoint - 1px para baixo */
+            .guarnicoes-por-quartel-grid {
+                grid-template-columns: repeat(6, 140px); /* 6 colunas */
+                max-width: calc(6 * 140px + 5 * 1rem); /* Nova max-width */
+            }
+        }
+        @media (max-width: 1023px) { /* lg breakpoint - 1px para baixo */
+            .guarnicoes-por-quartel-grid {
+                grid-template-columns: repeat(4, 140px); /* 4 colunas */
+                max-width: calc(4 * 140px + 3 * 1rem); /* Nova max-width */
+            }
+        }
+        @media (max-width: 767px) { /* md breakpoint - 1px para baixo */
+            .guarnicoes-por-quartel-grid {
+                grid-template-columns: repeat(3, 140px); /* 3 colunas */
+                max-width: calc(3 * 140px + 2 * 1rem); /* Nova max-width */
+            }
+        }
+        @media (max-width: 639px) { /* sm breakpoint - 1px para baixo */
+            .guarnicoes-por-quartel-grid {
+                grid-template-columns: repeat(2, 140px); /* 2 colunas em telas muito pequenas */
+                max-width: calc(2 * 140px + 1 * 1rem); /* Nova max-width */
+            }
+        }
+
+        /* O main container é max-w-full para dar o máximo de espaço possível */
+        .main-container-fluid {
+            max-width: 100%; /* Permite que o container ocupe a largura total */
+            padding-left: 1rem;
+            padding-right: 1rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col">
+
+<div class="flex-grow hero-background">
+    <header class="py-4 shadow-lg z-10">
         <div class="container mx-auto px-4 text-center">
-            <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
-                <div class="p-2 rounded-lg">
-                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 md:h-20 w-auto">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-12 md:h-16 w-auto">
                 </div>
-                <div class="text-center">
-                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
-                        GUARNIÇÕES DE SERVIÇO DO 1º BBM
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold text-bombeiros-yellow">
+                        Guarnições de Serviço do 1º BBM
                     </h1>
-                    <p id="guarnicoes-data" class="text-lg md:text-xl font-bold text-white mt-1">CARREGANDO DATA...</p>
                 </div>
-                <div class="p-2 rounded-lg">
-                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-16 md:h-20 w-auto">
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-12 md:h-16 w-auto">
                 </div>
             </div>
-            <a href="index.html" class="text-cbmrs-light-blue hover:underline text-sm md:text-base">
-                &larr; Voltar para a Página Inicial
-            </a>
+            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-2">
+                Informações atualizadas sobre as equipes em serviço em Porto Alegre.
+            </p>
+            <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
+                **Atualizado em: 04/07/2025 às 09:43**
+            </p>
         </div>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="companhia-section bg-cbmrs-blue p-6 rounded-lg shadow-xl">
-                <h2 class="text-2xl font-bold text-center text-bombeiros-yellow mb-6">1ª COMPANHIA</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="cia1-quartels">
-                    </div>
-            </div>
+    <main class="flex-grow py-6 px-4">
+        <div class="main-container-fluid"> <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
+                <i class="fas fa-fire-extinguisher mr-2"></i> Guarnições de Serviço Ativas (04/07/2025)
+            </h2>
+            <p class="text-gray-300 text-center mb-6 text-sm">
+                Organizadas por quartel, com turnos específicos e detalhes ao passar o mouse.
+            </p>
 
-            <div class="companhia-section bg-fire-red p-6 rounded-lg shadow-xl">
-                <h2 class="text-2xl font-bold text-center text-bombeiros-yellow mb-6">2ª COMPANHIA</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="cia2-quartels">
+            <div class="guarnicoes-por-quartel-grid">
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">AÇORIANOS (ABT-0595)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
+                            <h4>Viatura: ABT-0595 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 1º SGT DELAVECHIA</p>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT GUIMARÃES</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD JULIAN</p>
+                        </div>
                     </div>
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">AÇORIANOS (Apoio)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
+                            <h4>Viatura: AEM-0482 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT VIANEI</p>
+                            <h4>Viatura: AT-0672 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT VIANEI</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">TERESÓPOLIS (ABT-1365)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
+                            <h4>Viatura: ABT-1365 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 1º SGT LUCIANO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT BEN-HUR</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD CASSIANO</p>
+                        </div>
+                    </div>
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">TERESÓPOLIS (AR-0766)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
+                            <h4>Viatura: AR-0766 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD BRUM</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD AZEREDO</p>
+                            <p><strong>Resgatista 2:</strong> SD ROSEANNE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">ASSUNÇÃO</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO</h3>
+                            <h4>Viatura: ABT-0596 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD DIEIQUE</p>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT PANAZZOLO</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD TEMP MAIA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">RESTINGA</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
+                            <h4>Viatura: ABT-0598 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD FABIO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD FINGER</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD BRUNO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">BELÉM NOVO</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
+                            <h4>Viatura: ABT-0599 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 1º SGT PME JULIANO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> 2º SGT CHIEZA</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD RAFAEL</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">FLORESTA (Diurno)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 2ª CIA / 1º PEL / FLORESTA (Diurno)</h3>
+                            <h4>Viatura: ABT-0597 (04/07 08:00 - 04/07 20:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD DANILO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD FARIAS</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD DA SILVA</p>
+                        </div>
+                    </div>
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">FLORESTA (Noturno)</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 2ª CIA / 1º PEL / FLORESTA (Noturno)</h3>
+                            <h4>Viatura: ABT-0597 (04/07 20:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD DANILO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD FARIAS</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD FRANCIS</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">PASSO D'AREIA</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
+                            <h4>Viatura: ABT-0600 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> SD DREYER</p>
+                            <p><strong>Chefe de Linha Direita:</strong> SD ADAM</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD BARBOSA</p>
+                            <p><strong>Auxiliar de Linha Direita:</strong> SD BUENO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button">
+                        <i class="fas fa-building guarnicao-icon"></i>
+                        <span class="guarnicao-text">PARTENON</span>
+                        <div class="guarnicao-details-tooltip">
+                            <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
+                            <h4>Viatura: ABT-327 (04/07 08:00 - 05/07 08:00)</h4>
+                            <p><strong>Comandante de Guarnição:</strong> 1º SGT FERNANDO</p>
+                            <p><strong>COV / Operador / Condutor:</strong> SD BRUNO EDUARDO</p>
+                            <p><strong>Auxiliar de Linha Direita:</strong> SD TEMP RENAN</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
+</div>
 
-    <footer class="bg-gray-800 text-gray-400 py-3 z-10">
-        <div class="container mx-auto px-4 text-center text-xs">
-            <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
-            <p class="mt-1">
-                Para demais assuntos acesse a
-                <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
-            </p>
-        </div>
-    </footer>
+<footer class="bg-gray-800 text-gray-400 py-3 z-10">
+    <div class="container mx-auto px-4 text-center text-xs">
+        <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+        <p class="mt-1">
+            Para demais assuntos acesse a
+            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
+        </p>
+    </div>
+</footer>
 
-    <script src="guarnicoes-data.js"></script>
-    <script src="guarnicoes-script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tooltipElements = document.querySelectorAll('.guarnicao-details-tooltip');
+
+        tooltipElements.forEach(tooltip => {
+            const parentButton = tooltip.closest('.guarnicao-button');
+
+            // Adiciona listeners para hover in/out no botão pai
+            parentButton.addEventListener('mouseenter', () => {
+                // Remove classes de posicionamento antigas
+                tooltip.classList.remove('positioned-top', 'positioned-bottom');
+                
+                // Temporariamente mostra o tooltip para medir
+                tooltip.style.opacity = '1';
+                tooltip.style.visibility = 'visible';
+                tooltip.style.left = '50%'; // Garante que a medição seja do centro
+                tooltip.style.transform = 'translateX(-50%)'; // Garante que a medição seja do centro
+                
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const buttonRect = parentButton.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                // --- Posicionamento Vertical ---
+                // Verifica se há espaço para posicionar ABAIXO (preferencial)
+                const spaceBelow = viewportHeight - (buttonRect.bottom + tooltipRect.height + 10);
+                const spaceAbove = buttonRect.top - tooltipRect.height - 10;
+
+                if (spaceBelow >= 0 || spaceBelow > spaceAbove) { // Há espaço abaixo ou mais espaço abaixo do que acima
+                    tooltip.classList.add('positioned-bottom');
+                } else {
+                    // Posiciona acima
+                    tooltip.classList.add('positioned-top');
+                }
+
+                // --- Posicionamento Horizontal ---
+                // Re-medir após posicionamento vertical, pois a altura pode mudar e influenciar a largura se houver quebra de linha
+                const finalTooltipRect = tooltip.getBoundingClientRect(); 
+
+                if (finalTooltipRect.left < 5) { // Quase na borda esquerda (5px de margem)
+                    tooltip.style.transform = `translateX(0)`; // Alinha à esquerda
+                    tooltip.style.left = '5px'; // Distância da borda
+                } else if (finalTooltipRect.right > viewportWidth - 5) { // Quase na borda direita (5px de margem)
+                    tooltip.style.transform = `translateX(-100%)`; // Alinha à direita
+                    tooltip.style.left = 'auto'; // Reseta left para usar right
+                    tooltip.style.right = '5px'; // Distância da borda
+                } else {
+                    // Centraliza normalmente se houver espaço
+                    tooltip.style.transform = `translateX(-50%)`;
+                    tooltip.style.left = '50%';
+                    tooltip.style.right = 'auto';
+                }
+                
+                // Restaura a opacidade e visibilidade para a transição
+                tooltip.style.opacity = '';
+                tooltip.style.visibility = '';
+            });
+
+            // Oculta o tooltip ao sair do hover
+            parentButton.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('positioned-top', 'positioned-bottom');
+                // Resetar a posição horizontal para o estado padrão de centralização
+                tooltip.style.transform = `translateX(-50%)`;
+                tooltip.style.left = '50%';
+                tooltip.style.right = 'auto';
+            });
+        });
+    });
+</script>
 </body>
 </html>
