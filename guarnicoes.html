@@ -50,7 +50,7 @@
         .guarnicao-button {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: #FFD700; /* Cor alterada para amarelo (bombeiros-yellow) */
+            background-color: #FFD700; /* Cor padrão: amarelo (bombeiros-yellow) */
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -70,6 +70,13 @@
             position: relative; /* Mantém a posição relativa */
             top: -3px; /* Move para cima 3px no hover */
             z-index: 10; /* Garante que o botão hover fique acima dos vizinhos */
+        }
+        /* Estilo específico para o quadro de apoio dos Açorianos (laranja) */
+        .guarnicao-apoio-orange {
+            background-color: #FF8C00; /* Laranja */
+        }
+        .guarnicao-apoio-orange:hover {
+            background-color: #cc7000; /* Laranja mais escuro no hover */
         }
 
         /* Títulos de Quartel e Viatura dentro do botão */
@@ -127,7 +134,7 @@
         }
 
 
-        /* Estilo para o Tooltip (AGORA SOMENTE COM INFORMAÇÕES DE TURNO E HORÁRIO) */
+        /* Estilo para o Tooltip (AGORA SOMENTE COM INFORMAÇÕES DE TURNO E HORÁRIO DETALHADAS) */
         .guarnicao-details-tooltip {
             position: absolute;
             top: auto; /* Posicionamento será definido por JS */
@@ -140,14 +147,17 @@
             border-radius: 0.5rem;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             width: max-content; /* Ajusta a largura ao conteúdo */
-            max-width: min(calc(100vw - 2rem), 180px); /* Ajustado para ser mais compacto */
+            max-width: min(calc(100vw - 2rem), 220px); /* Ajustado para caber o texto detalhado */
             z-index: 9999; /* Z-index MUITO ALTO para garantir que fique na frente de tudo */
             opacity: 0;
             visibility: hidden;
             /* Animação mais suave para opacidade, visibilidade E posição */
             transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease, bottom 0.3s ease; 
-            text-align: center; /* Horário centralizado no tooltip */
+            text-align: left; /* Texto alinhado à esquerda dentro do tooltip */
             pointer-events: none; /* Permite que o mouse passe por cima sem sumir imediatamente */
+            display: flex; /* Para organizar os detalhes do turno */
+            flex-direction: column; /* Detalhes um abaixo do outro */
+            gap: 0.1rem; /* Espaçamento entre as linhas de detalhe */
         }
         .guarnicao-button:hover .guarnicao-details-tooltip {
             opacity: 1;
@@ -161,14 +171,14 @@
             top: calc(100% + 0.5rem);
         }
 
-        .guarnicao-details-tooltip .turn-label { /* Label do turno (Diurno, Noturno, 24h) */
+        .guarnicao-details-tooltip .turn-type-label { /* Ex: Turno: 24h */
             font-size: 0.75rem; /* Um pouco maior e em negrito */
             font-weight: bold;
             color: #FFD700; /* Amarelo para destacar o tipo de turno */
-            margin-bottom: 0.2rem;
-            line-height: 1.1;
+            margin-bottom: 0.2rem; /* Espaçamento com os detalhes abaixo */
+            text-align: center; /* Centraliza o tipo de turno */
         }
-        .guarnicao-details-tooltip .duty-time-text { /* Horário do turno */
+        .guarnicao-details-tooltip .duty-detail { /* Ex: Dia Início: 09/07 */
             font-size: 0.55rem; /* Metade do tamanho do nome do militar (0.6rem), ajustado para legibilidade */
             color: #A0AEC0; /* Cinza */
             font-weight: normal; /* Não negrito */
@@ -253,7 +263,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 09/07/2025 às 17:05**
+                **Atualizado em: 09/07/2025 às 17:15**
             </p>
         </div>
     </header>
@@ -278,8 +288,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD TEIXEIRA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Diurno</span>
-                            <span class="duty-time-text">09/07 08:00 - 09/07 20:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 09/07</span>
+                            <span class="duty-detail">Horário: 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
@@ -291,52 +304,63 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD ALISSON</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Noturno</span>
-                            <span class="duty-time-text">09/07 20:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 20:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
-                    <div class="guarnicao-button">
-                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                    <div class="guarnicao-button guarnicao-apoio-orange"> <div class="quartel-title">AÇORIANOS (Apoio)</div>
                         <div class="viatura-subtitle">AEM-0482</div>
                         <div class="guarnicao-personnel-visible">
                             <div class="person-role"><strong>COV:</strong> <span>SD MUNDEL</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Diurno</span>
-                            <span class="duty-time-text">09/07 08:00 - 09/07 20:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 09/07</span>
+                            <span class="duty-detail">Horário: 20:00</span>
                         </div>
                     </div>
-                    <div class="guarnicao-button">
-                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                    <div class="guarnicao-button guarnicao-apoio-orange"> <div class="quartel-title">AÇORIANOS (Apoio)</div>
                         <div class="viatura-subtitle">AEM-0482</div>
                         <div class="guarnicao-personnel-visible">
                             <div class="person-role"><strong>COV:</strong> <span>SD VILELA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Noturno</span>
-                            <span class="duty-time-text">09/07 20:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 20:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
-                    <div class="guarnicao-button">
-                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                    <div class="guarnicao-button guarnicao-apoio-orange"> <div class="quartel-title">AÇORIANOS (Apoio)</div>
                         <div class="viatura-subtitle">AT-0672</div>
                         <div class="guarnicao-personnel-visible">
                             <div class="person-role"><strong>COV:</strong> <span>SD MUNDEL</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Diurno</span>
-                            <span class="duty-time-text">09/07 08:00 - 09/07 20:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 09/07</span>
+                            <span class="duty-detail">Horário: 20:00</span>
                         </div>
                     </div>
-                    <div class="guarnicao-button">
-                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                    <div class="guarnicao-button guarnicao-apoio-orange"> <div class="quartel-title">AÇORIANOS (Apoio)</div>
                         <div class="viatura-subtitle">AT-0672</div>
                         <div class="guarnicao-personnel-visible">
                             <div class="person-role"><strong>COV:</strong> <span>SD VILELA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Noturno</span>
-                            <span class="duty-time-text">09/07 20:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 20:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -351,8 +375,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD JORDAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">24 Horas</span>
-                            <span class="duty-time-text">09/07 08:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 24h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
@@ -364,8 +391,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD ROSEANNE</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">24 Horas</span>
-                            <span class="duty-time-text">09/07 08:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 24h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -380,8 +410,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD BAIGORRA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Diurno</span>
-                            <span class="duty-time-text">09/07 08:00 - 09/07 20:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 09/07</span>
+                            <span class="duty-detail">Horário: 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
@@ -393,8 +426,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD BAIGORRA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Noturno</span>
-                            <span class="duty-time-text">09/07 20:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 20:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -409,8 +445,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD CATELAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">24 Horas</span>
-                            <span class="duty-time-text">09/07 08:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 24h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -425,8 +464,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD CATELAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">24 Horas</span>
-                            <span class="duty-time-text">09/07 08:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 24h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -441,8 +483,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD KINGESKI</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Diurno</span>
-                            <span class="duty-time-text">09/07 08:00 - 09/07 20:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 09/07</span>
+                            <span class="duty-detail">Horário: 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
@@ -454,8 +499,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD KINGESKI</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">Noturno</span>
-                            <span class="duty-time-text">09/07 20:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 12h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 20:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -470,8 +518,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD THIAGO</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">24 Horas</span>
-                            <span class="duty-time-text">09/07 08:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 24h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
@@ -486,8 +537,11 @@
                             <div class="person-role"><strong>LINHA:</strong> <span>SD TEMP RENAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <span class="turn-label">24 Horas</span>
-                            <span class="duty-time-text">09/07 08:00 - 10/07 08:00</span>
+                            <span class="turn-type-label">Turno: 24h</span>
+                            <span class="duty-detail">Dia Início: 09/07</span>
+                            <span class="duty-detail">Hora: 08:00</span>
+                            <span class="duty-detail">Dia Término: 10/07</span>
+                            <span class="duty-detail">Horário: 08:00</span>
                         </div>
                     </div>
                 </div>
