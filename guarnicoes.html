@@ -54,12 +54,12 @@
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
-            flex-direction: column; /* Conteúdo em coluna: nome, depois resumo */
-            align-items: center;
+            flex-direction: column; /* Conteúdo em coluna: nome quartel, viatura, pessoal */
+            align-items: center; /* Centraliza horizontalmente */
             justify-content: center;
-            text-align: center;
+            text-align: center; /* Centraliza texto por padrão */
             padding: 0.5rem; /* Ajustado para caber o conteúdo */
-            min-height: 80px; /* Reduzido para 80px para formato retangular menor */
+            min-height: 140px; /* Mantido em 140px para o formato quadrado */
             position: relative; /* Para posicionar o tooltip */
             cursor: default; /* Não é mais clicável para abrir um menu */
             overflow: visible; /* Permite que o tooltip "escape" os limites do botão */
@@ -71,26 +71,63 @@
             top: -3px; /* Move para cima 3px no hover */
             z-index: 10; /* Garante que o botão hover fique acima dos vizinhos */
         }
-        .guarnicao-label { /* Novo nome para o texto principal do quartel */
-            font-size: 0.75rem; /* Reduzido para caber melhor */
+
+        /* Títulos de Quartel e Viatura dentro do botão */
+        .quartel-title { /* Nome principal do Quartel */
+            font-size: 0.8rem; /* Um pouco maior */
+            font-weight: 800; /* Mais negrito */
+            color: #1A5276; /* Azul escuro forte */
+            line-height: 1.1;
+            margin-bottom: 0.1rem; /* Espaçamento entre quartel e viatura */
+        }
+        .viatura-subtitle { /* Nome da Viatura ou Turno específico */
+            font-size: 0.7rem; /* Menor que o título do quartel */
             font-weight: 700;
-            color: #1A5276; /* Cor azul escura para contraste no amarelo */
-            line-height: 1.1; /* Mais compacto */
-            word-break: break-word;
-            hyphens: auto;
-            margin-bottom: 0.2rem; /* Espaçamento entre o label e o resumo */
+            color: #4A90E2; /* Azul claro */
+            line-height: 1.1;
+            margin-bottom: 0.4rem; /* Espaçamento antes do pessoal */
         }
-        .guarnicao-summary { /* Estilo para o resumo da guarnição visível */
-            font-size: 0.65rem; /* Menor para o resumo */
-            color: #333; /* Cor escura para contraste no amarelo */
-            line-height: 1.1; /* Mais compacto */
-        }
+
         /* Ícone foi removido do HTML, mas a classe pode ficar sem uso */
         .guarnicao-icon { 
             display: none;
         }
 
-        /* Estilo para o Tooltip (guarnicao-details-tooltip) */
+        /* Estilo para o conteúdo de pessoal SEMPRE VISÍVEL dentro do botão */
+        .guarnicao-personnel-visible {
+            display: flex;
+            flex-direction: column; /* Linhas de função uma abaixo da outra */
+            align-items: center; /* Centraliza as linhas */
+            width: 100%;
+            padding: 0 0.2rem; /* Pequeno padding lateral para não colar na borda */
+            box-sizing: border-box; /* Garante que padding não aumente a largura */
+        }
+        .guarnicao-personnel-visible .person-role {
+            font-size: 0.6rem; /* Fonte ainda menor para caber tudo */
+            line-height: 1.1;
+            color: #333; /* Cor escura para contraste */
+            margin-bottom: 0.02rem; /* Espaço mínimo entre as linhas de função */
+            text-align: center;
+            white-space: nowrap; /* Tenta manter em uma linha */
+            overflow: hidden; /* Corta o texto se for muito longo */
+            text-overflow: ellipsis; /* Adiciona "..." se o texto for cortado */
+            width: 100%; /* Ocupa a largura disponível */
+            display: flex; /* Para alinhar label e nome */
+            justify-content: center; /* Centraliza o conteúdo da linha de função */
+            gap: 0.1rem; /* Espaço mínimo entre o strong e o span */
+        }
+        .guarnicao-personnel-visible .person-role strong {
+            font-weight: bold; /* Funções em negrito */
+            color: #1A5276; /* Cor azul para abreviação da função */
+        }
+        .guarnicao-personnel-visible .person-role span {
+            font-weight: normal; /* Nomes em fonte comum (não negrito) */
+            color: #333;
+            flex-shrink: 1; /* Permite que o nome encolha */
+        }
+
+
+        /* Estilo para o Tooltip (AGORA SOMENTE COM HORÁRIOS) */
         .guarnicao-details-tooltip {
             position: absolute;
             top: auto; /* Posicionamento será definido por JS */
@@ -99,17 +136,17 @@
             transform: translateX(-50%);
             background-color: #1F2937; /* Fundo escuro */
             color: #E5E7EB;
-            padding: 1rem;
+            padding: 0.7rem 1rem; /* Reduzido padding do tooltip */
             border-radius: 0.5rem;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             width: max-content; /* Ajusta a largura ao conteúdo */
-            max-width: min(calc(100vw - 2rem), 350px); /* Max 350px ou 100vw menos padding */
+            max-width: min(calc(100vw - 2rem), 180px); /* Ajustado para ser mais compacto */
             z-index: 9999; /* Z-index MUITO ALTO para garantir que fique na frente de tudo */
             opacity: 0;
             visibility: hidden;
             /* Animação mais suave para opacidade, visibilidade E posição */
             transition: opacity 0.3s ease, visibility 0.3s ease, top 0.3s ease, bottom 0.3s ease; 
-            text-align: left; /* Alinhar texto do tooltip à esquerda */
+            text-align: center; /* Horário centralizado no tooltip */
             pointer-events: none; /* Permite que o mouse passe por cima sem sumir imediatamente */
         }
         .guarnicao-button:hover .guarnicao-details-tooltip {
@@ -124,45 +161,13 @@
             top: calc(100% + 0.5rem);
         }
 
-        .guarnicao-details-tooltip h3 {
-            font-size: 0.95rem; /* Levemente menor */
+        .guarnicao-details-tooltip .duty-time { /* Horário no tooltip */
+            font-size: 0.75rem; /* Tamanho do horário no tooltip */
+            color: #FFD700; /* Amarelo para o horário */
             font-weight: bold;
-            color: #bombeiros-orange;
-            margin-bottom: 0.3rem; /* Ajustado */
-            text-align: left;
+            line-height: 1.1;
         }
-        .guarnicao-details-tooltip h4 {
-            font-size: 0.8rem; /* Levemente menor */
-            font-weight: bold;
-            color: #FFD700;
-            margin-top: 0.5rem; /* Ajustado */
-            margin-bottom: 0.15rem; /* Ajustado */
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-            padding-bottom: 0.15rem; /* Ajustado */
-        }
-        /* Estilo para as linhas de função dentro do tooltip (agora mais flexíveis) */
-        .guarnicao-details-tooltip .role-line {
-            display: flex;
-            flex-wrap: wrap; /* Permite que os itens quebrem linha se necessário */
-            gap: 0.2rem 0.4rem; /* Espaçamento reduzido entre os itens de função */
-            margin-bottom: 0.05rem; /* Espaçamento reduzido entre as linhas de função */
-            font-size: 0.7rem; /* Reduzido para 0.7rem */
-            line-height: 1.1; /* Ajustado para mais compacto */
-        }
-        .guarnicao-details-tooltip .role-line strong {
-            color: #FFD700;
-            white-space: nowrap; /* Evita que a abreviação da função quebre linha */
-        }
-        .guarnicao-details-tooltip .role-line span {
-            color: #E5E7EB;
-            white-space: nowrap; /* Evita que o nome do militar quebre linha indevidamente */
-        }
-        .guarnicao-details-tooltip .duty-time {
-            font-size: 0.65rem; /* Reduzido para 0.65rem */
-            color: #A0AEC0;
-            margin-top: 0.4rem;
-            text-align: center;
-        }
+        /* Removidos estilos de h3, h4, p, role-line do tooltip pois não contêm mais nomes de pessoal */
 
 
         /* Nova estrutura de grid para organizar por quartel */
@@ -181,7 +186,7 @@
             flex-direction: column;
             gap: 0.5rem; /* Espaço entre os botões dentro de uma mesma coluna de quartel */
             align-items: center; /* Centraliza os botões na coluna */
-            width: 100%; /* Garante que a coluna ocupe sua largura de grid */
+            width: 100%; /* Ocupa a largura da coluna do grid */
         }
         
         /* Ajustes responsivos: A grade muda para menos colunas em telas menores */
@@ -242,7 +247,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 09/07/2025 às 16:00**
+                **Atualizado em: 09/07/2025 às 16:55**
             </p>
         </div>
     </header>
@@ -259,235 +264,208 @@
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AÇORIANOS (ABT-1365 Diurno)</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: SD ALISSON</span><br>
-                            <span>COV: SD LAGO</span>
+                        <div class="quartel-title">AÇORIANOS</div>
+                        <div class="viatura-subtitle">ABT-1365 Diurno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD ALISSON</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD LAGO</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD TEIXEIRA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
-                            <h4>Viatura: ABT-1365 (09/07 08:00 - 09/07 20:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD ALISSON</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD LAGO</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD TEIXEIRA</span></div>
-                            <span class="duty-time">Horário: 08:00 - 20:00</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 09/07 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AÇORIANOS (ABT-1365 Noturno)</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: 1º SGT FLÁVIO</span><br>
-                            <span>COV: SD LAGO</span>
+                        <div class="quartel-title">AÇORIANOS</div>
+                        <div class="viatura-subtitle">ABT-1365 Noturno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>1º SGT FLÁVIO</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD LAGO</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD ALISSON</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS</h3>
-                            <h4>Viatura: ABT-1365 (09/07 20:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>1º SGT FLÁVIO</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD LAGO</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD ALISSON</span></div>
-                            <span class="duty-time">Horário: 20:00 - 08:00</span>
+                            <span class="duty-time">Horário: 09/07 20:00 - 10/07 08:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AÇORIANOS (Apoio AEM-0482 Diurno)</span>
-                        <div class="guarnicao-summary">
-                            <span>COV: SD MUNDEL</span>
+                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                        <div class="viatura-subtitle">AEM-0482 Diurno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>COV:</strong> <span>SD MUNDEL</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
-                            <h4>Viatura: AEM-0482 (09/07 08:00 - 09/07 20:00)</h4>
-                            <div class="role-line"><strong>COV:</strong><span>SD MUNDEL</span></div>
-                            <span class="duty-time">Horário: 08:00 - 20:00</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 09/07 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AÇORIANOS (Apoio AEM-0482 Noturno)</span>
+                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                        <div class="viatura-subtitle">AEM-0482 Noturno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>COV:</strong> <span>SD VILELA</span></div>
+                        </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
-                            <h4>Viatura: AEM-0482 (09/07 20:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>COV:</strong><span>SD VILELA</span></div>
-                            <span class="duty-time">Horário: 20:00 - 08:00</span>
+                            <span class="duty-time">Horário: 09/07 20:00 - 10/07 08:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AÇORIANOS (Apoio AT-0672 Diurno)</span>
+                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                        <div class="viatura-subtitle">AT-0672 Diurno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>COV:</strong> <span>SD MUNDEL</span></div>
+                        </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
-                            <h4>Viatura: AT-0672 (09/07 08:00 - 09/07 20:00)</h4>
-                            <div class="role-line"><strong>COV:</strong><span>SD MUNDEL</span></div>
-                            <span class="duty-time">Horário: 08:00 - 20:00</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 09/07 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AÇORIANOS (Apoio AT-0672 Noturno)</span>
+                        <div class="quartel-title">AÇORIANOS (Apoio)</div>
+                        <div class="viatura-subtitle">AT-0672 Noturno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>COV:</strong> <span>SD VILELA</span></div>
+                        </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 1º PEL / AÇORIANOS (Apoio)</h3>
-                            <h4>Viatura: AT-0672 (09/07 20:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>COV:</strong><span>SD VILELA</span></div>
-                            <span class="duty-time">Horário: 20:00 - 08:00</span>
+                            <span class="duty-time">Horário: 09/07 20:00 - 10/07 08:00</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">TERESÓPOLIS (ABT-0594)</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: 1º SGT ALBUQUERQUE</span><br>
-                            <span>COV: SD GONÇALVES</span>
+                        <div class="quartel-title">TERESÓPOLIS</div>
+                        <div class="viatura-subtitle">ABT-0594</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>1º SGT ALBUQUERQUE</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD GONÇALVES</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD JORDAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
-                            <h4>Viatura: ABT-0594 (09/07 08:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>1º SGT ALBUQUERQUE</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD GONÇALVES</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD JORDAN</span></div>
-                            <span class="duty-time">Horário: 08:00 - 08:00 (24h)</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 10/07 08:00 (24h)</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">AUTO RESGATE (AR-0455)</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: SD BRUM</span><br>
-                            <span>COV: SD VINÍCIUS</span>
+                        <div class="quartel-title">TERESÓPOLIS</div>
+                        <div class="viatura-subtitle">AUTO RESGATE (AR-0455)</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD BRUM</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD VINÍCIUS</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD ROSEANNE</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 2º PEL / TERESÓPOLIS</h3>
-                            <h4>Viatura: AR-0455 (09/07 08:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD BRUM</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD VINÍCIUS</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD ROSEANNE</span></div>
-                            <span class="duty-time">Horário: 08:00 - 08:00 (24h)</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 10/07 08:00 (24h)</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">ASSUNÇÃO (Diurno)</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: SD CRISTIANO</span><br>
-                            <span>COV: SD PETER</span>
+                        <div class="quartel-title">ASSUNÇÃO</div>
+                        <div class="viatura-subtitle">Diurno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD CRISTIANO</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD PETER</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD BAIGORRA</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO (Diurno)</h3>
-                            <h4>Viatura: ABT-0596 (09/07 08:00 - 09/07 20:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD CRISTIANO</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD PETER</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD BAIGORRA</span></div>
-                            <span class="duty-time">Horário: 08:00 - 20:00</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 09/07 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">ASSUNÇÃO (Noturno)</span>
+                        <div class="quartel-title">ASSUNÇÃO</div>
+                        <div class="viatura-subtitle">Noturno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD BRUM</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD PETER</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD BAIGORRA</span></div>
+                        </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 3º PEL / ASSUNÇÃO (Noturno)</h3>
-                            <h4>Viatura: ABT-0596 (09/07 20:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD BRUM</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD PETER</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD BAIGORRA</span></div>
-                            <span class="duty-time">Horário: 20:00 - 08:00</span>
+                            <span class="duty-time">Horário: 09/07 20:00 - 10/07 08:00</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">RESTINGA</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: SD BARRETO</span><br>
-                            <span>COV: 1º SGT RONALDO</span>
+                        <div class="quartel-title">RESTINGA</div>
+                        <div class="viatura-subtitle">ABT-0598</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD BARRETO</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>1º SGT RONALDO</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD CATELAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 4º PEL / RESTINGA</h3>
-                            <h4>Viatura: ABT-0598 (09/07 08:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD BARRETO</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>1º SGT RONALDO</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD CATELAN</span></div>
-                            <span class="duty-time">Horário: 08:00 - 08:00 (24h)</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 10/07 08:00 (24h)</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">BELÉM NOVO</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: 1º SGT ASSIS</span><br>
-                            <span>COV: 2º SGT CHIEZA</span>
+                        <div class="quartel-title">BELÉM NOVO</div>
+                        <div class="viatura-subtitle">ABT-0599</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>1º SGT ASSIS</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>2º SGT CHIEZA</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD CATELAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 1ª CIA / 5º PEL / BELÉM NOVO</h3>
-                            <h4>Viatura: ABT-0599 (09/07 08:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>1º SGT ASSIS</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>2º SGT CHIEZA</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD CATELAN</span></div>
-                            <span class="duty-time">Horário: 08:00 - 08:00 (24h)</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 10/07 08:00 (24h)</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">FLORESTA (Diurno)</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: SD FRANCIS</span><br>
-                            <span>COV: SD TEMP WESLEY</span>
+                        <div class="quartel-title">FLORESTA</div>
+                        <div class="viatura-subtitle">Diurno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD FRANCIS</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD TEMP WESLEY</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD KINGESKI</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 2ª CIA / 1º PEL / FLORESTA (Diurno)</h3>
-                            <h4>Viatura: ABT-0597 (09/07 08:00 - 09/07 20:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD FRANCIS</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD TEMP WESLEY</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD KINGESKI</span></div>
-                            <span class="duty-time">Horário: 08:00 - 20:00</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 09/07 20:00</span>
                         </div>
                     </div>
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">FLORESTA (Noturno)</span>
+                        <div class="quartel-title">FLORESTA</div>
+                        <div class="viatura-subtitle">Noturno</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>2º SGT CASTRO</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD TEMP WESLEY</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD KINGESKI</span></div>
+                        </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 2ª CIA / 1º PEL / FLORESTA (Noturno)</h3>
-                            <h4>Viatura: ABT-0597 (09/07 20:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>2º SGT CASTRO</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD TEMP WESLEY</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD KINGESKI</span></div>
-                            <span class="duty-time">Horário: 20:00 - 08:00</span>
+                            <span class="duty-time">Horário: 09/07 20:00 - 10/07 08:00</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">PASSO D'AREIA</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: SD DREYER</span><br>
-                            <span>COV: 2º SGT FABRICIO</span>
+                        <div class="quartel-title">PASSO D'AREIA</div>
+                        <div class="viatura-subtitle">ABT-0600</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>SD DREYER</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>2º SGT FABRICIO</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD THIAGO</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 2ª CIA / 2º PEL / PASSO D`AREIA</h3>
-                            <h4>Viatura: ABT-0600 (09/07 08:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>SD DREYER</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>2º SGT FABRICIO</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD THIAGO</span></div>
-                            <span class="duty-time">Horário: 08:00 - 08:00 (24h)</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 10/07 08:00 (24h)</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
                     <div class="guarnicao-button">
-                        <span class="guarnicao-label">PARTENON</span>
-                        <div class="guarnicao-summary">
-                            <span>CMT GU: 1º SGT FERNANDO</span><br>
-                            <span>COV: SD BERNARDES</span>
+                        <div class="quartel-title">PARTENON</div>
+                        <div class="viatura-subtitle">ABT-327</div>
+                        <div class="guarnicao-personnel-visible">
+                            <div class="person-role"><strong>CMT GU:</strong> <span>1º SGT FERNANDO</span></div>
+                            <div class="person-role"><strong>COV:</strong> <span>SD BERNARDES</span></div>
+                            <div class="person-role"><strong>LINHA:</strong> <span>SD TEMP RENAN</span></div>
                         </div>
                         <div class="guarnicao-details-tooltip">
-                            <h3>1º BBM / 2ª CIA / 3º PEL / PARTENON</h3>
-                            <h4>Viatura: ABT-327 (09/07 08:00 - 10/07 08:00)</h4>
-                            <div class="role-line"><strong>CMT GU:</strong><span>1º SGT FERNANDO</span></div>
-                            <div class="role-line"><strong>COV:</strong><span>SD BERNARDES</span></div>
-                            <div class="role-line"><strong>LINHA:</strong><span>SD TEMP RENAN</span></div>
-                            <span class="duty-time">Horário: 08:00 - 08:00 (24h)</span>
+                            <span class="duty-time">Horário: 09/07 08:00 - 10/07 08:00 (24h)</span>
                         </div>
                     </div>
                 </div>
