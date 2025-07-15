@@ -48,7 +48,7 @@
             z-index: -1;
         }
 
-        /* --- Novo Estilo para os Botões de Atalho Superiores (Vermelhos) --- */
+        /* --- Estilo para os Botões de Atalho Superiores (Vermelhos) --- */
         .shortcut-button-red {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -68,7 +68,7 @@
             line-height: 1.2;
             word-break: break-word;
             hyphens: auto;
-            text-decoration: none; /* Remover sublinhado de links */
+            text-decoration: none;
         }
         .shortcut-button-red:hover {
             background-color: #B91C1C; /* Darker Red on hover */
@@ -98,7 +98,7 @@
             min-height: 140px; /* Mantido em 140px para o formato quadrado */
             position: relative;
             cursor: pointer; /* Agora é clicável */
-            overflow: visible;
+            overflow: hidden; /* Conteúdo interno não vaza */
         }
         .guarnicao-button:hover {
             background-color: #FFC000; /* Um pouco mais escuro no hover para o amarelo */
@@ -139,7 +139,7 @@
         .guarnicao-button.active .guarnicao-arrow { /* Gira a seta ao abrir o modal (opcional) */
             transform: rotate(180deg);
         }
-        /* Removidos .quartel-title, .viatura-subtitle, .guarnicao-personnel-visible, .person-role de visibilidade padrão */
+        /* Ícone de prédio (guarnicao-icon-small) foi removido do HTML. */
 
 
         /* --- Estilo para o Modal/Overlay de Detalhes da Guarnição --- */
@@ -193,7 +193,7 @@
             font-size: 1.3rem;
             font-weight: bold;
             color: #bombeiros-orange;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             text-align: center;
         }
         .modal-viatura-subtitle {
@@ -360,8 +360,8 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-target="acorianos-abt0595-diurno">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">AÇORIANOS</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-header-content">
@@ -384,8 +384,8 @@
                     </div>
                     <div class="guarnicao-button" data-modal-target="acorianos-abt0595-noturno">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">AÇORIANOS</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-header-content">
@@ -408,8 +408,8 @@
                     </div>
                     <div class="guarnicao-button guarnicao-apoio-orange" data-modal-target="acorianos-apoio-aem0482">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">AÇORIANOS (AEM-0482)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-header-content">
@@ -430,8 +430,8 @@
                     </div>
                     <div class="guarnicao-button guarnicao-apoio-orange" data-modal-target="acorianos-apoio-at0672">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">AÇORIANOS (AT-0672)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-personnel-section">
@@ -451,8 +451,8 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-target="teresopolis-abt0594">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">TERESÓPOLIS (ABT-0594)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-personnel-section">
@@ -471,8 +471,8 @@
                     </div>
                     <div class="guarnicao-button" data-modal-target="teresopolis-ar0455">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">TERESÓPOLIS (AUTO RESGATE AR-0455)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-personnel-section">
@@ -494,8 +494,8 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-target="assuncao-abt0596">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">ASSUNÇÃO (ABT-0596)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-personnel-section">
@@ -517,8 +517,8 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-target="restinga-abt0598-diurno">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">RESTINGA (ABT-0598 Diurno)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-personnel-section">
@@ -538,8 +538,8 @@
                     </div>
                     <div class="guarnicao-button" data-modal-target="restinga-abt0598-noturno">
                         <div class="button-visible-content">
-                            <i class="fas fa-building guarnicao-icon-small"></i>
                             <span class="guarnicao-name-only">RESTINGA (ABT-0598 Noturno)</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data">
                             <div class="modal-personnel-section">
@@ -725,8 +725,12 @@
 
         guarnicaoButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Pega o ID do alvo no atributo data-modal-target (não usado diretamente, mas pode ser útil)
-                const targetId = button.getAttribute('data-modal-target');
+                // Remove a classe 'active' de todos os botões para resetar a seta
+                document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
+                
+                // Adiciona a classe 'active' ao botão clicado para girar a seta
+                button.classList.add('active');
+
                 const modalSourceData = button.querySelector('.modal-source-data');
                 
                 if (modalSourceData) {
@@ -748,6 +752,8 @@
         function closeModal() {
             modalOverlay.classList.remove('active');
             modalContentDiv.innerHTML = ''; // Limpa o conteúdo ao fechar
+            // Remove a classe 'active' do botão quando o modal é fechado
+            document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
         }
 
         // Adiciona a função closeModal ao escopo global para que o onclick no HTML funcione
