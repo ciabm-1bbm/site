@@ -15,6 +15,8 @@
                         'cbmrs-blue': '#1A5276',
                         'cbmrs-light-blue': '#4A90E2',
                         'fire-red': '#DC2626',
+                        'dark-red-opaque': '#8B0000', /* Vermelho mais opaco */
+                        'pure-white': '#FFFFFF', /* Branco puro */
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -59,10 +61,18 @@
             padding: 8px;
         }
         .shortcut-button:hover {
-            background-color: rgba(255, 140, 0, 0.95);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
+        /* Estilos para botões laranja */
+        .shortcut-button.bg-bombeiros-orange:hover {
+            background-color: rgba(255, 140, 0, 0.95);
+        }
+        /* Estilos para botões vermelho-opaco */
+        .shortcut-button.bg-dark-red-opaque:hover {
+            background-color: #A52A2A; /* Um tom um pouco mais claro no hover */
+        }
+
         .button-text {
             font-size: 11px;
             font-weight: 700;
@@ -159,26 +169,39 @@
         <div class="container mx-auto px-4 text-center">
             <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
                 
-                <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FORMULÁRIO</span>
-                </a>
-
-                <a href="https://docs.google.com/spreadsheets/d/1Uxux2XoG99jfU3_guPLJFrTWu9EzGFK4_q9_xbL5gY4/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESCALA ÚNICA JULHO</span>
-                </a>
-                
                 <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i> <span class="button-text">MAPA MENSAL (RH)</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PREVISÃO AGOSTO</span>
+                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">MAPA DE ETAPA E HE</span>
                 </a>
                 <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
                     <i class="fas fa-calendar-times text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">INDISPONIBILIDADE MENSAL</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                    <i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">CONFIRMAÇÃO de FÉRIAS</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                    <i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">DISP. MERGULHADOR /<br>CINOTECNIA</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                    <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">FUNÇÕES CIA</span>
+                </a>
+
+
+                <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
+                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">FORMULÁRIO</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1Uxux2XoG99jfU3_guPLJFrTWu9EzGFK4_q9_xbL5gY4/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">ESCALA ÚNICA JULHO</span>
+                </a>
+                <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">PREVISÃO AGOSTO</span>
                 </a>
                 <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -188,10 +211,6 @@
                     <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">PLANO de FÉRIAS</span>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONFIRMAÇÃO de FÉRIAS</span>
-                </a>
                 <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">PARTES SLOG</span>
@@ -200,9 +219,9 @@
                     <i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">AFASTAMENTOS</span>
                 </a>
-                
                 <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i> <span class="button-text">VALIDADE CCVTE</span>
+                    <i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">VALIDADE CCVTE</span>
                 </a>
                 <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -211,14 +230,6 @@
                 <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">ESTATÍSTICAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">DISP. MERGULHADOR /<br>CINOTECNIA</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FUNÇÕES CIA</span>
                 </a>
                 <a href="https://docs.google.com/spreadsheets/d/1tO5BvhpvN3z0U8v2V7ZGiVA9tm054k1QdX2dnvMtLAM/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -252,14 +263,6 @@
                     <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">MODELOS DOCS</span>
                 </a>
-                <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-phone-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">E-193</span>
-                </a>
-                <a href="https://intranet.cbm.rs.gov.br/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-globe text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">INTRANET CBM</span>
-                </a>
                 <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-envelope-open-text text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">E-MAIL CIA</span>
@@ -268,19 +271,23 @@
                     <i class="fab fa-whatsapp text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">WHATSAPP CIA</span>
                 </a>
-                <a href="guarnicoes.html" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-users-cog text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+
+                <a href="guarnicoes.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
+                    <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
                     <span class="button-text">GUARNIÇÕES DE SERVIÇO</span>
                 </a>
-
-                <a href="link-para-pops.html" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-invoice text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i> <span class="button-text">POP's</span>
+                <a href="link-para-instrucao-diaria.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
+                    <i class="fas fa-file-invoice text-2xl md:text-4xl text-pure-white mb-2"></i>
+                    <span class="button-text">INSTRUÇÃO DIÁRIA</span>
                 </a>
-
-                <a href="operacional.html" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-siren text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i> <span class="button-text">OPERACIONAL</span>
+                <a href="operacional.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
+                    <i class="fas fa-siren text-2xl md:text-4xl text-pure-white mb-2"></i>
+                    <span class="button-text">OPERACIONAL</span>
                 </a>
-
+                <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
+                    <i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i>
+                    <span class="button-text">E-193</span>
+                </a>
             </div>
         </div>
     </main>
@@ -316,7 +323,8 @@
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const loginError = document.getElementById('login-error');
-        const protectedLinks = document.querySelectorAll('.shortcut-button[data-role="admin"]'); // Agora só protege links "admin"
+        // Seleciona todos os links para gerenciar o clique e possível exibição do login
+        const allShortcutButtons = document.querySelectorAll('.shortcut-button');
 
         const efetivo = {
             "2685582": { role: "admin", nomeGuerra: "HOMRICH" },
@@ -494,7 +502,7 @@
         let clickedLinkHref = null;
 
         function atualizarInterface(userRole) {
-            protectedLinks.forEach(link => {
+            allShortcutButtons.forEach(link => {
                 const requiredRole = link.dataset.role;
                 if (requiredRole === 'admin' && userRole !== 'admin') {
                     link.classList.add('link-bloqueado');
@@ -529,7 +537,7 @@
                     atualizarInterface(userData.role);
 
                     if (clickedLinkHref) {
-                        const clickedLinkElement = Array.from(document.querySelectorAll('.shortcut-button')).find(l => l.href === clickedLinkHref); // Procura em todos os links
+                        const clickedLinkElement = Array.from(allShortcutButtons).find(l => l.href === clickedLinkHref);
                         if (clickedLinkElement && !clickedLinkElement.classList.contains('link-bloqueado')) {
                             window.open(clickedLinkHref, '_blank');
                         }
@@ -543,21 +551,19 @@
             passwordInput.focus();
         }
 
+        // Verifica a autenticação na carga da página para ajustar a interface
         const isAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
         const userRole = sessionStorage.getItem('bbmUserRole');
-
         if (isAuthenticated && userRole) {
-            loginOverlay.style.display = 'none';
             atualizarInterface(userRole);
         } else {
-            atualizarInterface('none'); 
-            // Não exibe o overlay de login automaticamente na carga se não autenticado
-            // O overlay só aparece quando tentar acessar um link protegido
+            atualizarInterface('none'); // Assume que não há autenticação, bloqueia os links restritos
         }
 
-        document.querySelectorAll('.shortcut-button').forEach(link => { // Percorre todos os links
+        // Adiciona o listener de clique para todos os botões
+        allShortcutButtons.forEach(link => {
             if (link.href.startsWith('mailto:')) {
-                return;
+                return; // Ignora links de e-mail
             }
 
             link.addEventListener('click', (event) => {
@@ -565,13 +571,14 @@
                 const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
                 const currentUserRole = sessionStorage.getItem('bbmUserRole');
 
-                // Se o link tem um data-role e o usuário não está autenticado ou não tem o papel necessário
-                if (requiredRole && (!userIsAuthenticated || (requiredRole === 'admin' && currentUserRole !== 'admin'))) {
-                    event.preventDefault();
-                    clickedLinkHref = link.href;
-                    loginOverlay.style.display = 'flex';
+                // Se o link tem um data-role e o usuário não está autenticado ou não tem o papel necessário (admin)
+                if (requiredRole === 'admin' && (!userIsAuthenticated || currentUserRole !== 'admin')) {
+                    event.preventDefault(); // Impede a navegação imediata
+                    clickedLinkHref = link.href; // Armazena o href para abrir após o login
+                    loginOverlay.style.display = 'flex'; // Exibe o overlay de login
                     usernameInput.focus();
                 }
+                // Se o link não tem data-role="admin" ou o usuário é admin, a navegação ocorre normalmente (padrão do navegador)
             });
         });
 
