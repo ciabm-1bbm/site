@@ -1,22 +1,3 @@
-Com certeza\! Peço desculpas pela supervisão nos detalhes anteriores. Você está absolutamente correto, e a precisão é fundamental.
-
-Revisei o código meticulosamente para aplicar todas as suas novas instruções:
-
-1.  **Restinga:** O **SD Bruno** agora está corretamente indicado como **CMT GU das 03h às 08h** no turno noturno de Restinga ABT-0598.
-2.  **Oficial de Serviço:** O nome "ESTADO MAIOR" foi trocado por "**OFICIAL DE SERVIÇO**" em todos os lugares, tanto no quadro visível quanto no modal.
-3.  **AEM/AT Combinadas:** As viaturas AEM-0482 e AT-0672 dos Açorianos foram combinadas em um único quadro (Diurno e Noturno), usando o título "**AEM/AT**" e listando o mesmo COV, já que o motorista é o mesmo.
-
-Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`, com a escala do dia **15/07/2025**, e com todas as correções e adaptações aplicadas:
-
------
-
-## Guarnições de Serviço - 1º BBM - 15/07/2025
-
------
-
-### Código HTML/CSS/JS Atualizado para `guarnicoes.html`
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -74,10 +55,10 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
             align-items: center;
             justify-content: center;
             text-align: center;
-            height: 100px;
-            padding: 8px;
+            height: 50px; /* Reduzido para 50px */
+            padding: 4px; /* Reduzido padding */
             color: white;
-            font-size: 11px;
+            font-size: 9px; /* Fonte menor */
             font-weight: 700;
             line-height: 1.2;
             word-break: break-word;
@@ -91,8 +72,8 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
         }
         .shortcut-button-red i {
             color: white;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.2rem; /* Ícone menor */
+            margin-bottom: 0.2rem; /* Espaçamento ajustado */
         }
 
 
@@ -108,11 +89,11 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 0.5rem;
-            min-height: 140px; /* Quadrado 140x140px */
+            padding: 0.4rem; /* Reduzido padding para menor altura */
+            min-height: 70px; /* Reduzido para 70px de altura */
             position: relative;
             cursor: pointer;
-            overflow: hidden; /* Conteúdo interno não vaza */
+            overflow: hidden;
         }
         .guarnicao-button:hover {
             background-color: rgba(255, 215, 0, 0.5); /* Amarelo mais visível no hover */
@@ -138,15 +119,15 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
             width: 100%;
         }
         .guarnicao-name-only { /* Nome do quartel visível no quadro */
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Ajustado para caber no novo tamanho */
             font-weight: 700;
-            color: white; /* Cor branca para o texto */
-            line-height: 1.2;
-            margin-bottom: 0.3rem;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 0.2rem; /* Espaçamento ajustado */
         }
-        .guarnicao-arrow { /* Seta abaixo do nome */
-            color: white; /* Cor branca para a seta */
-            font-size: 1.2rem;
+        .guarnicao-arrow {
+            color: white;
+            font-size: 1rem; /* Seta um pouco menor */
             transition: transform 0.3s ease;
         }
         .guarnicao-button.active .guarnicao-arrow {
@@ -330,7 +311,7 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 16/07/2025 às 10:25**
+                **Atualizado em: 15/07/2025 às 13:05**
             </p>
         </div>
     </header>
@@ -370,7 +351,7 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="acorianos-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">AÇORIANOS</span>
+                            <span class="guarnicao-name-only">AÇORIANOS</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -408,22 +389,7 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                             
                             <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
 
-                            <h4 class="modal-viatura-subtitle">AEM-0482 (Apoio)</h4>
-                            <div class="modal-personnel-section">
-                                <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
-                            </div>
-
-                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
-
-                            <h4 class="modal-viatura-subtitle">AT-0672 (Apoio)</h4>
-                            <div class="modal-personnel-section">
+                            <h4 class="modal-viatura-subtitle">AEM-0482 / AT-0672 (Apoio)</h4> <div class="modal-personnel-section">
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
                             </div>
                             <div class="modal-turn-details-section">
@@ -443,7 +409,7 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                             <span class="guarnicao-name-only">TERESÓPOLIS</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data" style="display:none;">
+                        <div class="modal-source-data">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">TERESÓPOLIS</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -656,7 +622,7 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                             <span class="guarnicao-name-only">PARTENON</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data" style="display:none;">
+                        <div class="modal-source-data">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">PARTENON</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -684,7 +650,7 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                             <span class="guarnicao-name-only">OFICIAL DE SERVIÇO</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data" style="display:none;">
+                        <div class="modal-source-data">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">OFICIAL DE SERVIÇO</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -774,8 +740,8 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
                     modalContentDiv.innerHTML = '';
 
                     // Clona todo o conteúdo da fonte de dados oculta para o modal
+                    // Clona apenas elementos (tipo 1) para evitar clonar espaços em branco extras que podem causar problemas de layout
                     modalSourceData.childNodes.forEach(node => {
-                        // Certifique-se de que estamos clonando elementos, não apenas nós de texto, para que os eventos/estilos sejam mantidos
                         if (node.nodeType === 1) { // Node.ELEMENT_NODE
                             modalContentDiv.appendChild(node.cloneNode(true));
                         }
@@ -808,4 +774,3 @@ Aqui está o código HTML/CSS/JS atualizado para a sua página `guarnicoes.html`
 </script>
 </body>
 </html>
-```
