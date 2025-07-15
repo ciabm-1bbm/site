@@ -89,7 +89,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 0.4rem; /* Ajustado para caber o conteúdo */
+            padding: 0.5rem; /* Ajustado para caber o conteúdo */
             min-height: 140px; /* Quadrado 140x140px */
             position: relative;
             cursor: pointer;
@@ -98,10 +98,11 @@
         .guarnicao-button:hover {
             background-color: rgba(255, 215, 0, 0.5); /* Amarelo mais visível no hover */
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
-            z-index: 10;
+            position: relative;
+            top: -3px; /* Move para cima 3px no hover */
+            z-index: 10; /* Garante que o botão hover fique acima dos vizinhos */
         }
-        /* Estilo específico para o quadro de apoio dos Açorianos (laranja translúcido) */
+        /* Cor específica para o quadro de apoio dos Açorianos (laranja translúcido) */
         .guarnicao-apoio-orange {
             background-color: rgba(255, 140, 0, 0.3); /* Laranja translúcido */
         }
@@ -118,7 +119,7 @@
             height: 100%;
             width: 100%;
         }
-        .guarnicao-letter-label { /* Nome do quartel visível no quadro */
+        .guarnicao-name-only { /* Nome do quartel visível no quadro */
             font-size: 0.9rem;
             font-weight: 700;
             color: white; /* Cor branca para o texto */
@@ -151,7 +152,7 @@
         .guarnicao-details-box {
             background-color: #1F2937; /* Fundo escuro do modal */
             color: #E5E7EB;
-            padding: 1rem; /* Reduzido padding */
+            padding: 1rem;
             border-radius: 0.75rem;
             max-width: 320px; /* Reduzido para melhor visualização em celular */
             width: 90%;
@@ -178,28 +179,26 @@
 
         /* Títulos e detalhes dentro do Modal */
         .modal-quartel-title {
-            font-size: 1.2rem; /* Levemente menor */
-            font-weight: bold;
+            font-size: 1.2rem; font-weight: bold;
             color: #bombeiros-orange;
-            margin-bottom: 0.2rem; /* Reduzido */
+            margin-bottom: 0.3rem;
             text-align: center;
         }
         .modal-viatura-subtitle {
-            font-size: 0.9rem; /* Levemente menor */
-            font-weight: bold;
+            font-size: 0.9rem; font-weight: bold; /* Reduzido levemente */
             color: #FFD700;
             margin-bottom: 0.8rem; /* Reduzido */
             text-align: center;
         }
         .modal-personnel-section {
-            margin-bottom: 1rem; /* Reduzido */
+            margin-bottom: 1rem;
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 0.8rem; /* Reduzido */
+            padding-top: 0.8rem;
         }
         .modal-personnel-section .person-role-modal {
             font-size: 0.8rem; /* Reduzido */
-            line-height: 1.2; /* Reduzido */
-            margin-bottom: 0.1rem; /* Reduzido */
+            line-height: 1.2;
+            margin-bottom: 0.1rem;
             display: flex; justify-content: space-between;
             flex-wrap: wrap;
         }
@@ -217,18 +216,18 @@
 
         .modal-turn-details-section {
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 0.8rem; /* Reduzido */
+            padding-top: 0.8rem;
             text-align: center;
         }
         .modal-turn-details-section .turn-type-label-modal {
-            font-size: 0.8rem; font-weight: bold; /* Reduzido */
+            font-size: 0.8rem; font-weight: bold;
             color: #FFD700;
-            margin-bottom: 0.4rem; /* Reduzido */
+            margin-bottom: 0.4rem;
         }
         .modal-turn-details-section .duty-detail-modal {
             font-size: 0.7rem; /* Reduzido */
             color: #A0AEC0;
-            margin-bottom: 0.1rem; /* Reduzido */
+            margin-bottom: 0.1rem;
         }
 
 
@@ -313,7 +312,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 16/07/2025 às 19:40**
+                **Atualizado em: 16/07/2025 às 19:55**
             </p>
         </div>
     </header>
@@ -353,7 +352,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="acorianos-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">AÇORIANOS</span>
+                            <span class="guarnicao-letter-label">AÇORIANOS</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -412,7 +411,7 @@
                             <span class="guarnicao-name-only">TERESÓPOLIS</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">TERESÓPOLIS</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -454,7 +453,7 @@
                             <span class="guarnicao-name-only">ASSUNÇÃO</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">ASSUNÇÃO</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -482,7 +481,7 @@
                             <span class="guarnicao-name-only">RESTINGA</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">RESTINGA</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -595,7 +594,7 @@
                             <span class="guarnicao-name-only">PASSO D'AREIA</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">PASSO D'AREIA</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
@@ -603,6 +602,7 @@
                             <div class="modal-personnel-section">
                                 <h4 class="modal-viatura-subtitle">ABT-0600</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD THALIN (08h-03h)</span></div>
+                                <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD BRUNO (03h-08h)</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD ISMAEL</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEMP SOARES</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD DREYER (13h-08h)</span></div>
