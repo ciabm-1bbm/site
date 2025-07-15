@@ -47,7 +47,7 @@
         .shortcut-button-red {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: #DC2626;
+            background-color: rgba(220, 38, 38, 0.3); /* Fire Red translúcido */
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -66,7 +66,7 @@
             text-decoration: none;
         }
         .shortcut-button-red:hover {
-            background-color: #B91C1C;
+            background-color: rgba(220, 38, 38, 0.5); /* Fire Red mais visível no hover */
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
@@ -109,7 +109,7 @@
             background-color: rgba(255, 140, 0, 0.5); /* Laranja mais visível no hover */
         }
 
-        /* Conteúdo visível no botão (Letra + Seta) */
+        /* Conteúdo visível no botão (Nome Quartel + Seta) */
         .button-visible-content {
             display: flex;
             flex-direction: column;
@@ -118,14 +118,14 @@
             height: 100%;
             width: 100%;
         }
-        .guarnicao-letter-label { /* Letra de identificação do pelotão */
-            font-size: 2.5rem; /* Tamanho grande para a letra */
-            font-weight: 800;
-            color: white; /* Cor branca para a letra */
-            line-height: 1.1;
-            margin-bottom: 0.5rem;
+        .guarnicao-name-only { /* Nome do quartel visível no quadro */
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white; /* Cor branca para o texto */
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
         }
-        .guarnicao-arrow { /* Seta abaixo da letra */
+        .guarnicao-arrow { /* Seta abaixo do nome */
             color: white; /* Cor branca para a seta */
             font-size: 1.2rem;
             transition: transform 0.3s ease;
@@ -234,9 +234,9 @@
         .guarnicoes-por-quartel-grid {
             display: grid;
             grid-template-columns: repeat(10, 140px); /* 10 colunas de 140px fixas para telas grandes */
-            gap: 1rem; /* Espaçamento entre colunas e linhas */
-            justify-content: center; /* Centraliza o grid */
-            max-width: calc(10 * 140px + 9 * 1rem); /* 10*140px + 9*16px = 1400 + 144 = 1544px */
+            gap: 1rem;
+            justify-content: center;
+            max-width: calc(10 * 140px + 9 * 1rem); /* Largura total da grid */
             margin: 0 auto;
         }
 
@@ -311,7 +311,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 16/07/2025 às 10:00**
+                **Atualizado em: 16/07/2025 às 10:25**
             </p>
         </div>
     </header>
@@ -323,7 +323,7 @@
                 <h2 class="text-xl font-bold text-fire-red mb-4 text-center">
                     <i class="fas fa-external-link-alt mr-2"></i> Atalhos Úteis
                 </h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 gap-4 justify-center">
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 gap-4 justify-content-center">
                     <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>1</span></a>
                     <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>2</span></a>
                     <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>3</span></a>
@@ -351,61 +351,68 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="acorianos-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">A</span>
+                            <span class="guarnicao-letter-label">AÇORIANOS</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">AÇORIANOS</h3>
-                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                                <h4 class="modal-viatura-subtitle">ABT-0595 Diurno</h4>
                             </div>
                             <div class="modal-personnel-section">
-                                <h4 class="modal-viatura-subtitle">ABT-0595 Diurno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>2º SGT KANOFRE</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD TEMP PAULINO</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEIXEIRA</span></div>
-                                <div class="modal-turn-details-section">
-                                    <span class="turn-type-label-modal">Turno: 12h</span>
-                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                    <span class="duty-detail-modal">Hora: 08:00</span>
-                                    <span class="duty-detail-modal">Dia Término: 15/07</span>
-                                    <span class="duty-detail-modal">Horário: 20:00</span>
-                                </div>
                             </div>
+                            <div class="modal-turn-details-section">
+                                <span class="turn-type-label-modal">Turno: 12h</span>
+                                <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                <span class="duty-detail-modal">Hora: 08:00</span>
+                                <span class="duty-detail-modal">Dia Término: 15/07</span>
+                                <span class="duty-detail-modal">Horário: 20:00</span>
+                            </div>
+                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
+                            
+                            <h4 class="modal-viatura-subtitle">ABT-0595 Noturno</h4>
                             <div class="modal-personnel-section">
-                                <h4 class="modal-viatura-subtitle">ABT-0595 Noturno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>2º SGT KANOFRE</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD TEMP PAULINO</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD PIRES</span></div>
-                                <div class="modal-turn-details-section">
-                                    <span class="turn-type-label-modal">Turno: 12h</span>
-                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                    <span class="duty-detail-modal">Hora: 20:00</span>
-                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                    <span class="duty-detail-modal">Horário: 08:00</span>
-                                </div>
                             </div>
-                            <div class="modal-personnel-section">
-                                <h4 class="modal-viatura-subtitle">AEM-0482 (Apoio)</h4>
-                                <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
-                                <div class="modal-turn-details-section">
-                                    <span class="turn-type-label-modal">Turno: 24h</span>
-                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                    <span class="duty-detail-modal">Hora: 08:00</span>
-                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                    <span class="duty-detail-modal">Horário: 08:00</span>
-                                </div>
+                            <div class="modal-turn-details-section">
+                                <span class="turn-type-label-modal">Turno: 12h</span>
+                                <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                <span class="duty-detail-modal">Hora: 20:00</span>
+                                <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                <span class="duty-detail-modal">Horário: 08:00</span>
                             </div>
+                            
+                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
+
+                            <h4 class="modal-viatura-subtitle">AEM-0482 (Apoio)</h4>
                             <div class="modal-personnel-section">
-                                <h4 class="modal-viatura-subtitle">AT-0672 (Apoio)</h4>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
-                                <div class="modal-turn-details-section">
-                                    <span class="turn-type-label-modal">Turno: 24h</span>
-                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                    <span class="duty-detail-modal">Hora: 08:00</span>
-                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                    <span class="duty-detail-modal">Horário: 08:00</span>
-                                </div>
+                            </div>
+                            <div class="modal-turn-details-section">
+                                <span class="turn-type-label-modal">Turno: 24h</span>
+                                <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                <span class="duty-detail-modal">Hora: 08:00</span>
+                                <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                <span class="duty-detail-modal">Horário: 08:00</span>
+                            </div>
+
+                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
+
+                            <h4 class="modal-viatura-subtitle">AT-0672 (Apoio)</h4>
+                            <div class="modal-personnel-section">
+                                <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
+                            </div>
+                            <div class="modal-turn-details-section">
+                                <span class="turn-type-label-modal">Turno: 24h</span>
+                                <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                <span class="duty-detail-modal">Hora: 08:00</span>
+                                <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                <span class="duty-detail-modal">Horário: 08:00</span>
                             </div>
                         </div>
                     </div>
@@ -414,7 +421,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="teresopolis-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">B</span>
+                            <span class="guarnicao-name-only">TERESÓPOLIS</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -435,6 +442,7 @@
                                     <span class="duty-detail-modal">Horário: 08:00</span>
                                 </div>
                             </div>
+                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
                             <div class="modal-personnel-section">
                                 <h4 class="modal-viatura-subtitle">AUTO RESGATE (AR-0455)</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>1º SGT LAMADRIL</span></div>
@@ -455,7 +463,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="assuncao-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">C</span>
+                            <span class="guarnicao-name-only">ASSUNÇÃO</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -483,7 +491,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="restinga-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">D</span>
+                            <span class="guarnicao-name-only">RESTINGA</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -505,6 +513,7 @@
                                     <span class="duty-detail-modal">Horário: 03:00</span>
                                 </div>
                             </div>
+                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
                             <div class="modal-personnel-section">
                                 <h4 class="modal-viatura-subtitle">ABT-0598 Noturno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>N/D</span></div>
@@ -525,7 +534,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="belem-novo-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">E</span>
+                            <span class="guarnicao-name-only">BELÉM NOVO</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -553,7 +562,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="floresta-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">F</span>
+                            <span class="guarnicao-name-only">FLORESTA</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -574,6 +583,7 @@
                                     <span class="duty-detail-modal">Horário: 20:00</span>
                                 </div>
                             </div>
+                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
                             <div class="modal-personnel-section">
                                 <h4 class="modal-viatura-subtitle">ABT-1365 Noturno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD DA SILVA</span></div>
@@ -594,7 +604,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="passo-dareia-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">G</span>
+                            <span class="guarnicao-name-only">PASSO D'AREIA</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -624,7 +634,7 @@
                 <div class="quartel-column">
                     <div class="guarnicao-button" data-modal-id="partenon-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">H</span>
+                            <span class="guarnicao-name-only">PARTENON</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
@@ -650,14 +660,14 @@
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-id="estado-maior-group">
+                    <div class="guarnicao-button" data-modal-id="oficial-sv-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">I</span>
+                            <span class="guarnicao-name-only">OFICIAL DE SERVIÇO</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
-                                <h3 class="modal-quartel-title">ESTADO MAIOR</h3>
+                                <h3 class="modal-quartel-title">OFICIAL DE SERVIÇO</h3>
                                 <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
                             </div>
                             <div class="modal-personnel-section">
@@ -677,18 +687,18 @@
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-id="placeholder-group">
+                    <div class="guarnicao-button" data-modal-id="vago-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">J</span>
+                            <span class="guarnicao-name-only">VAGO</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
                         <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
-                                <h3 class="modal-quartel-title">PELOTÃO J</h3>
-                                <h4 class="modal-viatura-subtitle">Informações não disponíveis</h4>
+                                <h3 class="modal-quartel-title">PELOTÃO VAGO</h3>
+                                <h4 class="modal-viatura-subtitle">Nenhuma guarnição escalada</h4>
                             </div>
                             <div class="modal-personnel-section">
-                                <div class="person-role-modal"><span>Nenhum efetivo escalado.</span></div>
+                                <div class="person-role-modal"><span>Sem efetivo.</span></div>
                             </div>
                             <div class="modal-turn-details-section">
                                 <span class="turn-type-label-modal">Turno: N/D</span>
@@ -746,7 +756,10 @@
 
                     // Clona todo o conteúdo da fonte de dados oculta para o modal
                     modalSourceData.childNodes.forEach(node => {
-                        modalContentDiv.appendChild(node.cloneNode(true));
+                        // Certifique-se de que estamos clonando elementos, não apenas nós de texto, para que os eventos/estilos sejam mantidos
+                        if (node.nodeType === 1) { // Node.ELEMENT_NODE
+                            modalContentDiv.appendChild(node.cloneNode(true));
+                        }
                     });
 
                     // Exibe o modal
