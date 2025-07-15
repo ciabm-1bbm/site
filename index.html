@@ -190,7 +190,6 @@
                     <span class="button-text">FUNÇÕES CIA</span>
                 </a>
 
-
                 <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
                     <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">FORMULÁRIO</span>
@@ -272,21 +271,17 @@
                     <span class="button-text">WHATSAPP CIA</span>
                 </a>
 
-                <a href="guarnicoes.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">GUARNIÇÕES DE SERVIÇO</span>
-                </a>
                 <a href="link-para-instrucao-diaria.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
                     <i class="fas fa-file-invoice text-2xl md:text-4xl text-pure-white mb-2"></i>
                     <span class="button-text">INSTRUÇÃO DIÁRIA</span>
                 </a>
-                <a href="operacional.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-siren text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">OPERACIONAL</span>
-                </a>
                 <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
                     <i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i>
                     <span class="button-text">E-193</span>
+                </a>
+                <a href="guarnicoes.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
+                    <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
+                    <span class="button-text">GUARNIÇÕES DE SERVIÇO</span>
                 </a>
             </div>
         </div>
@@ -504,6 +499,7 @@
         function atualizarInterface(userRole) {
             allShortcutButtons.forEach(link => {
                 const requiredRole = link.dataset.role;
+                // Um link está "bloqueado visualmente" se ele requer admin e o usuário NÃO é admin
                 if (requiredRole === 'admin' && userRole !== 'admin') {
                     link.classList.add('link-bloqueado');
                     link.title = "Acesso restrito ao comando.";
@@ -536,8 +532,10 @@
                     loginOverlay.style.display = 'none';
                     atualizarInterface(userData.role);
 
+                    // Verifica se o link clicado existe e não está visualmente bloqueado
                     if (clickedLinkHref) {
                         const clickedLinkElement = Array.from(allShortcutButtons).find(l => l.href === clickedLinkHref);
+                        // Se o link NÃO está bloqueado visualmente (ou seja, é um link geral ou o usuário é admin)
                         if (clickedLinkElement && !clickedLinkElement.classList.contains('link-bloqueado')) {
                             window.open(clickedLinkHref, '_blank');
                         }
@@ -551,34 +549,42 @@
             passwordInput.focus();
         }
 
-        // Verifica a autenticação na carga da página para ajustar a interface
+        // Verifica a autenticação na carga da página
         const isAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
         const userRole = sessionStorage.getItem('bbmUserRole');
         if (isAuthenticated && userRole) {
             atualizarInterface(userRole);
         } else {
-            atualizarInterface('none'); // Assume que não há autenticação, bloqueia os links restritos
+            // Se não autenticado, atualiza a interface para bloquear os links de admin.
+            // O overlay de login NÃO é exibido automaticamente ao carregar.
+            atualizarInterface('none'); 
         }
 
-        // Adiciona o listener de clique para todos os botões
+        // Adiciona o listener de clique para TODOS os botões
         allShortcutButtons.forEach(link => {
             if (link.href.startsWith('mailto:')) {
                 return; // Ignora links de e-mail
             }
 
             link.addEventListener('click', (event) => {
-                const requiredRole = link.dataset.role;
+                const requiredRole = link.dataset.role; // Pega o 'role' que o link exige, se houver
                 const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
                 const currentUserRole = sessionStorage.getItem('bbmUserRole');
 
-                // Se o link tem um data-role e o usuário não está autenticado ou não tem o papel necessário (admin)
-                if (requiredRole === 'admin' && (!userIsAuthenticated || currentUserRole !== 'admin')) {
+                // Sempre que um link for clicado, se o usuário NÃO estiver autenticado
+                if (!userIsAuthenticated) {
                     event.preventDefault(); // Impede a navegação imediata
                     clickedLinkHref = link.href; // Armazena o href para abrir após o login
                     loginOverlay.style.display = 'flex'; // Exibe o overlay de login
                     usernameInput.focus();
+                } else {
+                    // Se o usuário está autenticado, verifica se ele tem o role necessário para links de admin
+                    if (requiredRole === 'admin' && currentUserRole !== 'admin') {
+                        event.preventDefault(); // Bloqueia acesso se não for admin
+                        alert("Acesso restrito ao comando. Você não tem permissão para acessar este link."); // Mensagem de alerta
+                    }
+                    // Caso contrário (não exige admin ou é admin), a navegação ocorre normalmente
                 }
-                // Se o link não tem data-role="admin" ou o usuário é admin, a navegação ocorre normalmente (padrão do navegador)
             });
         });
 
