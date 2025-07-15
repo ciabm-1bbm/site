@@ -81,7 +81,7 @@
         .guarnicao-button {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: #FFD700; /* Cor padrão: amarelo */
+            background-color: rgba(255, 215, 0, 0.3); /* Amarelo translúcido */
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -96,20 +96,20 @@
             overflow: hidden; /* Conteúdo interno não vaza */
         }
         .guarnicao-button:hover {
-            background-color: #FFC000;
+            background-color: rgba(255, 215, 0, 0.5); /* Amarelo mais visível no hover */
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-3px);
-            z-index: 10; /* Garante que o botão hover fique acima dos vizinhos */
+            z-index: 10;
         }
-        /* Cor específica para o quadro de apoio dos Açorianos (laranja) */
+        /* Cor específica para o quadro de apoio dos Açorianos (laranja translúcido) */
         .guarnicao-apoio-orange {
-            background-color: #FF8C00; /* Laranja */
+            background-color: rgba(255, 140, 0, 0.3); /* Laranja translúcido */
         }
         .guarnicao-apoio-orange:hover {
-            background-color: #cc7000; /* Laranja mais escuro no hover */
+            background-color: rgba(255, 140, 0, 0.5); /* Laranja mais visível no hover */
         }
 
-        /* Conteúdo visível no botão (Nome Quartel + Seta) */
+        /* Conteúdo visível no botão (Letra + Seta) */
         .button-visible-content {
             display: flex;
             flex-direction: column;
@@ -118,15 +118,15 @@
             height: 100%;
             width: 100%;
         }
-        .guarnicao-name-only {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #1A5276; /* Azul escuro forte */
-            line-height: 1.2;
-            margin-bottom: 0.3rem;
+        .guarnicao-letter-label { /* Letra de identificação do pelotão */
+            font-size: 2.5rem; /* Tamanho grande para a letra */
+            font-weight: 800;
+            color: white; /* Cor branca para a letra */
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
         }
-        .guarnicao-arrow {
-            color: #1A5276; /* Azul escuro */
+        .guarnicao-arrow { /* Seta abaixo da letra */
+            color: white; /* Cor branca para a seta */
             font-size: 1.2rem;
             transition: transform 0.3s ease;
         }
@@ -139,11 +139,11 @@
         .guarnicao-details-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente MAIS LEVE */
+            background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente leve */
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 10000; /* Acima de tudo */
+            z-index: 10000;
         }
         .guarnicao-details-overlay.active {
             display: flex;
@@ -203,7 +203,7 @@
         }
         .modal-personnel-section .person-role-modal strong {
             font-weight: bold;
-            color: #4A90E2; /* Azul para funções no modal */
+            color: #4A90E2;
             flex-shrink: 0;
         }
         .modal-personnel-section .person-role-modal span {
@@ -233,41 +233,47 @@
         /* --- Estrutura de Grid Principal --- */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            grid-template-columns: repeat(8, 140px); /* 8 colunas de 140px fixas para telas grandes */
+            grid-template-columns: repeat(10, 140px); /* 10 colunas de 140px fixas para telas grandes */
             gap: 1rem; /* Espaçamento entre colunas e linhas */
             justify-content: center; /* Centraliza o grid */
-            max-width: 1232px; /* Largura total da grid (8*140 + 7*16) */
-            margin: 0 auto; /* Centraliza o grid dentro do main-container-fluid */
+            max-width: calc(10 * 140px + 9 * 1rem); /* 10*140px + 9*16px = 1400 + 144 = 1544px */
+            margin: 0 auto;
         }
 
         .quartel-column {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem; /* Espaço entre os botões dentro de uma coluna de quartel */
+            gap: 0.5rem;
             align-items: center;
-            width: 100%; /* Ocupa a largura da coluna do grid */
+            width: 100%;
         }
         
         /* Ajustes responsivos para o número de colunas */
-        @media (max-width: 1279px) { /* Reduz para 6 colunas em telas xl-sm */
+        @media (max-width: 1543px) { /* Reduz de 10 colunas para 8 */
+            .guarnicoes-por-quartel-grid {
+                grid-template-columns: repeat(8, 140px);
+                max-width: calc(8 * 140px + 7 * 1rem);
+            }
+        }
+        @media (max-width: 1279px) { /* Reduz para 6 colunas */
             .guarnicoes-por-quartel-grid {
                 grid-template-columns: repeat(6, 140px);
                 max-width: calc(6 * 140px + 5 * 1rem);
             }
         }
-        @media (max-width: 1023px) { /* Reduz para 4 colunas em telas lg-sm */
+        @media (max-width: 1023px) { /* Reduz para 4 colunas */
             .guarnicoes-por-quartel-grid {
                 grid-template-columns: repeat(4, 140px);
                 max-width: calc(4 * 140px + 3 * 1rem);
             }
         }
-        @media (max-width: 767px) { /* Reduz para 3 colunas em telas md-sm */
+        @media (max-width: 767px) { /* Reduz para 3 colunas */
             .guarnicoes-por-quartel-grid {
                 grid-template-columns: repeat(3, 140px);
                 max-width: calc(3 * 140px + 2 * 1rem);
             }
         }
-        @media (max-width: 639px) { /* Reduz para 2 colunas em telas sm-xs */
+        @media (max-width: 639px) { /* Reduz para 2 colunas */
             .guarnicoes-por-quartel-grid {
                 grid-template-columns: repeat(2, 140px);
                 max-width: calc(2 * 140px + 1 * 1rem);
@@ -305,7 +311,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 16/07/2025 às 10:25**
+                **Atualizado em: 16/07/2025 às 10:00**
             </p>
         </div>
     </header>
@@ -337,343 +343,359 @@
                 <i class="fas fa-fire-extinguisher mr-2"></i> Guarnições de Serviço Ativas (15/07/2025)
             </h2>
             <p class="text-gray-300 text-center mb-6 text-sm">
-                Organizadas por quartel, com turnos específicos e detalhes ao clicar.
+                Organizadas por pelotão, clique para ver detalhes.
             </p>
 
             <div class="guarnicoes-por-quartel-grid">
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="acorianos-abt0595-diurno">
+                    <div class="guarnicao-button" data-modal-id="acorianos-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">AÇORIANOS</span>
+                            <span class="guarnicao-letter-label">A</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
                             <div class="modal-header-content">
                                 <h3 class="modal-quartel-title">AÇORIANOS</h3>
-                                <h4 class="modal-viatura-subtitle">ABT-0595 Diurno</h4>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
                             </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0595 Diurno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>2º SGT KANOFRE</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD TEMP PAULINO</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEIXEIRA</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 12h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 15/07</span>
-                                <span class="duty-detail-modal">Horário: 20:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guarnicao-button" data-modal-target="acorianos-abt0595-noturno">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-name-only">AÇORIANOS</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data">
-                            <div class="modal-header-content">
-                                <h3 class="modal-quartel-title">AÇORIANOS</h3>
-                                <h4 class="modal-viatura-subtitle">ABT-0595 Noturno</h4>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 12h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 15/07</span>
+                                    <span class="duty-detail-modal">Horário: 20:00</span>
+                                </div>
                             </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0595 Noturno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>2º SGT KANOFRE</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD TEMP PAULINO</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD PIRES</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 12h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 20:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guarnicao-button guarnicao-apoio-orange" data-modal-target="acorianos-apoio-aem0482">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-name-only">AÇORIANOS (AEM-0482)</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data">
-                            <div class="modal-header-content">
-                                <h3 class="modal-quartel-title">AÇORIANOS (Apoio)</h3>
-                                <h4 class="modal-viatura-subtitle">AEM-0482</h4>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 12h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 20:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">AEM-0482 (Apoio)</h4>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guarnicao-button guarnicao-apoio-orange" data-modal-target="acorianos-apoio-at0672">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-name-only">AÇORIANOS (AT-0672)</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data">
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">AT-0672 (Apoio)</h4>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD PESSOTA</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="teresopolis-abt0594">
+                    <div class="guarnicao-button" data-modal-id="teresopolis-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">TERESÓPOLIS (ABT-0594)</span>
+                            <span class="guarnicao-letter-label">B</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">TERESÓPOLIS</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0594</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>1º SGT LUCIANO</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD ZEMPER</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEMP CARDOSO</span></div>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guarnicao-button" data-modal-target="teresopolis-ar0455">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-name-only">TERESÓPOLIS (AUTO RESGATE AR-0455)</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data">
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">AUTO RESGATE (AR-0455)</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>1º SGT LAMADRIL</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD GUTERRES</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD SANTOS</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="assuncao-abt0596">
+                    <div class="guarnicao-button" data-modal-id="assuncao-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">ASSUNÇÃO (ABT-0596)</span>
+                            <span class="guarnicao-letter-label">C</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">ASSUNÇÃO</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0596</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>1º SGT LINCOLN</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD PETER</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD CECCON</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="restinga-abt0598-diurno">
+                    <div class="guarnicao-button" data-modal-id="restinga-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">RESTINGA (ABT-0598 Diurno)</span>
+                            <span class="guarnicao-letter-label">D</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">RESTINGA</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0598 Diurno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>2º SGT PME SALDANHA (08h-03h)</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>2º SGT PRADIER</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD MARTINS</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD BRUNO (08h-03h)</span></div>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 19h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 03:00</span>
+                                </div>
                             </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 19h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 03:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guarnicao-button" data-modal-target="restinga-abt0598-noturno">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-name-only">RESTINGA (ABT-0598 Noturno)</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data">
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0598 Noturno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>N/D</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>2º SGT PRADIER</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD MARTINS</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="belem-novo-abt0599">
+                    <div class="guarnicao-button" data-modal-id="belem-novo-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">BELÉM NOVO (ABT-0599)</span>
+                            <span class="guarnicao-letter-label">E</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">BELÉM NOVO</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0599</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD MARTINEZ</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD FERREIRA</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEMP EVERTON</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="floresta-abt1365-diurno">
+                    <div class="guarnicao-button" data-modal-id="floresta-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">FLORESTA (ABT-1365 Diurno)</span>
+                            <span class="guarnicao-letter-label">F</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">FLORESTA</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-1365 Diurno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>1º SGT PAIM</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD SIQUEIRA</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD CAMPOS</span></div>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 12h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 15/07</span>
+                                    <span class="duty-detail-modal">Horário: 20:00</span>
+                                </div>
                             </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 12h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 15/07</span>
-                                <span class="duty-detail-modal">Horário: 20:00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="guarnicao-button" data-modal-target="floresta-abt1365-noturno">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-name-only">FLORESTA (ABT-1365 Noturno)</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data">
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-1365 Noturno</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD DA SILVA</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD SIQUEIRA</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD CAMPOS</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 12h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 20:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 12h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 20:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="passo-dareia-abt0600">
+                    <div class="guarnicao-button" data-modal-id="passo-dareia-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">PASSO D'AREIA (ABT-0600)</span>
+                            <span class="guarnicao-letter-label">G</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">PASSO D'AREIA</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-0600</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD THALIN (08h-03h)</span></div>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD BRUNO (03h-08h)</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD ISMAEL</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEMP SOARES</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD DREYER (13h-08h)</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="partenon-abt327">
+                    <div class="guarnicao-button" data-modal-id="partenon-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">PARTENON (ABT-327)</span>
+                            <span class="guarnicao-letter-label">H</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">PARTENON</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ABT-327</h4>
                                 <div class="person-role-modal"><strong>CMT GU:</strong> <span>SD JUSSIE</span></div>
                                 <div class="person-role-modal"><strong>COV:</strong> <span>SD BERNARDES</span></div>
                                 <div class="person-role-modal"><strong>LINHA:</strong> <span>SD TEMP ZANETTI</span></div>
-                            </div>
-                            <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-target="estado-maior-atp201">
+                    <div class="guarnicao-button" data-modal-id="estado-maior-group">
                         <div class="button-visible-content">
-                            <span class="guarnicao-name-only">ESTADO MAIOR (ATP-201)</span>
+                            <span class="guarnicao-letter-label">I</span>
                             <i class="fas fa-chevron-down guarnicao-arrow"></i>
                         </div>
-                        <div class="modal-source-data">
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">ESTADO MAIOR</h3>
+                                <h4 class="modal-viatura-subtitle">Guarnições e Turnos</h4>
+                            </div>
                             <div class="modal-personnel-section">
+                                <h4 class="modal-viatura-subtitle">ATP-201</h4>
                                 <div class="person-role-modal"><strong>OFICIAL SV:</strong> <span>1º TEN FERNANDO</span></div>
                                 <div class="person-role-modal"><strong>MOTORISTA:</strong> <span>SD BARBOSA</span></div>
+                                <div class="modal-turn-details-section">
+                                    <span class="turn-type-label-modal">Turno: 24h</span>
+                                    <span class="duty-detail-modal">Dia Início: 15/07</span>
+                                    <span class="duty-detail-modal">Hora: 08:00</span>
+                                    <span class="duty-detail-modal">Dia Término: 16/07</span>
+                                    <span class="duty-detail-modal">Horário: 08:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quartel-column">
+                    <div class="guarnicao-button" data-modal-id="placeholder-group">
+                        <div class="button-visible-content">
+                            <span class="guarnicao-letter-label">J</span>
+                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
+                        </div>
+                        <div class="modal-source-data" style="display:none;">
+                            <div class="modal-header-content">
+                                <h3 class="modal-quartel-title">PELOTÃO J</h3>
+                                <h4 class="modal-viatura-subtitle">Informações não disponíveis</h4>
+                            </div>
+                            <div class="modal-personnel-section">
+                                <div class="person-role-modal"><span>Nenhum efetivo escalado.</span></div>
                             </div>
                             <div class="modal-turn-details-section">
-                                <span class="turn-type-label-modal">Turno: 24h</span>
-                                <span class="duty-detail-modal">Dia Início: 15/07</span>
-                                <span class="duty-detail-modal">Hora: 08:00</span>
-                                <span class="duty-detail-modal">Dia Término: 16/07</span>
-                                <span class="duty-detail-modal">Horário: 08:00</span>
+                                <span class="turn-type-label-modal">Turno: N/D</span>
+                                <span class="duty-detail-modal">Dia Início: N/D</span>
+                                <span class="duty-detail-modal">Hora: N/D</span>
+                                <span class="duty-detail-modal">Dia Término: N/D</span>
+                                <span class="duty-detail-modal">Horário: N/D</span>
                             </div>
                         </div>
                     </div>
