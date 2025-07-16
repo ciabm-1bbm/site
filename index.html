@@ -64,13 +64,19 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
-        /* Estilos para botões laranja */
-        .shortcut-button.bg-bombeiros-orange:hover {
-            background-color: rgba(255, 140, 0, 0.95);
+        /* Estilos para botões laranja com 50% de transparência */
+        .shortcut-button.bg-bombeiros-orange {
+            background-color: rgba(255, 140, 0, 0.5); /* 50% de transparência */
         }
-        /* Estilos para botões vermelho-opaco */
+        .shortcut-button.bg-bombeiros-orange:hover {
+            background-color: rgba(255, 140, 0, 0.75); /* Aumenta a opacidade no hover */
+        }
+        /* Estilos para botões vermelho-opaco com 50% de transparência */
+        .shortcut-button.bg-dark-red-opaque {
+            background-color: rgba(139, 0, 0, 0.5); /* 50% de transparência */
+        }
         .shortcut-button.bg-dark-red-opaque:hover {
-            background-color: #A52A2A; /* Um tom um pouco mais claro no hover */
+            background-color: rgba(139, 0, 0, 0.75); /* Aumenta a opacidade no hover */
         }
 
         .button-text {
@@ -168,6 +174,11 @@
     <main class="flex items-center justify-center py-6">
         <div class="container mx-auto px-4 text-center">
             <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
+
+                <a href="https://docs.google.com/spreadsheets/d/1Uxux2XoG99jfU3_guPLJFrTWu9EzGFK4_q9_xbL5gY4/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">ESCALA ÚNICA JULHO</span>
+                </a>
                 
                 <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
                     <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -189,14 +200,10 @@
                     <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">FUNÇÕES CIA</span>
                 </a>
-
+                
                 <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
                     <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">FORMULÁRIO</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1Uxux2XoG99jfU3_guPLJFrTWu9EzGFK4_q9_xbL5gY4/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESCALA ÚNICA JULHO</span>
                 </a>
                 <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -210,10 +217,6 @@
                     <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">PLANO de FÉRIAS</span>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PARTES SLOG</span>
-                </a>
                 <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">AFASTAMENTOS</span>
@@ -225,6 +228,14 @@
                 <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">TOXICOLÓGICO</span>
+                </a>
+                <a href="https://drive.google.com/drive/u/1/folders/1HR8JO24uWEWSOfeUuzphWUFweMeN0XRX" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">FICHA DE RENOVAÇÃO</span>
+                </a>
+                 <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">PARTES SLOG</span>
                 </a>
                 <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -271,7 +282,7 @@
                     <span class="button-text">WHATSAPP CIA</span>
                 </a>
 
-                <a href="https://drive.google.com/drive/u/1/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
+                <a href="link-para-instrucao-diaria.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
                     <i class="fas fa-file-invoice text-2xl md:text-4xl text-pure-white mb-2"></i>
                     <span class="button-text">INSTRUÇÃO DIÁRIA</span>
                 </a>
@@ -292,7 +303,7 @@
     <div class="container mx-auto px-4 text-center text-xs">
         <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
         <p class="mt-1">
-            Para demais assuntos acesse a 
+            Para demais assuntos acesse a
             <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
         </p>
     </div>
@@ -318,7 +329,6 @@
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const loginError = document.getElementById('login-error');
-        // Seleciona todos os links para gerenciar o clique e possível exibição do login
         const allShortcutButtons = document.querySelectorAll('.shortcut-button');
 
         const efetivo = {
