@@ -174,7 +174,7 @@
             transition: color 0.3s ease;
         }
         .guarnicao-details-box .close-button:hover {
-            color: #fire-red;
+            color: #DC2626; /* fire-red */
         }
 
         /* Títulos e detalhes dentro do Modal */
@@ -204,8 +204,9 @@
         }
         .modal-personnel-section .person-role-modal strong {
             font-weight: bold;
-            color: #4A90E2;
+            color: #4A90E2; /* Um azul para as funções */
             flex-shrink: 0;
+            margin-right: 0.5rem;
         }
         .modal-personnel-section .person-role-modal span {
             font-weight: normal;
@@ -234,10 +235,10 @@
         /* --- Estrutura de Grid Principal --- */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            grid-template-columns: repeat(10, 140px); /* 10 colunas de 140px fixas para telas grandes */
+            grid-template-columns: repeat(9, 140px); /* 9 colunas de 140px fixas para telas grandes */
             gap: 1rem;
             justify-content: center;
-            max-width: calc(10 * 140px + 9 * 1rem); /* Largura total da grid */
+            max-width: calc(9 * 140px + 8 * 1rem); /* Largura total da grid */
             margin: 0 auto;
         }
 
@@ -250,16 +251,16 @@
         }
         
         /* Ajustes responsivos para o número de colunas */
-        @media (max-width: 1543px) { /* Reduz de 10 colunas para 8 */
+        @media (max-width: 1543px) { /* Reduz de 9 colunas para 7 */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(8, 140px);
-                max-width: calc(8 * 140px + 7 * 1rem);
+                grid-template-columns: repeat(7, 140px);
+                max-width: calc(7 * 140px + 6 * 1rem);
             }
         }
-        @media (max-width: 1279px) { /* Reduz para 6 colunas */
+        @media (max-width: 1279px) { /* Reduz para 5 colunas */
             .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(6, 140px);
-                max-width: calc(6 * 140px + 5 * 1rem);
+                grid-template-columns: repeat(5, 140px);
+                max-width: calc(5 * 140px + 4 * 1rem);
             }
         }
         @media (max-width: 1023px) { /* Reduz para 4 colunas */
@@ -311,7 +312,6 @@
             <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-2">
                 Elaborada para acesso do Efetivo Operacional, unificação de links e procedimentos atinentes ao serviço diário.
             </p>
-            </p>
         </div>
     </header>
 
@@ -322,7 +322,7 @@
                 <h2 class="text-xl font-bold text-fire-red mb-4 text-center">
                     <i class="fas fa-external-link-alt mr-2"></i> LINKS RÁPIDOS DE ACESSO:
                 </h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-08 gap-4 justify-center">
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 justify-center">
                     <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-red"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
                     <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-red"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
                     <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
@@ -343,134 +343,298 @@
                 Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
             </p>
 
-            <div class="guarnicoes-por-quartel-grid">
-
-                <div class="quartel-column">
-                    <div class="guarnicao-button" data-modal-id="acorianos-group">
-                        <div class="button-visible-content">
-                            <span class="guarnicao-letter-label">AÇORIANOS</span>
-                            <i class="fas fa-chevron-down guarnicao-arrow"></i>
-                        </div>
-                        <div class="modal-source-data" style="display:none;">
-                            <div class="modal-header-content">
-                                <h3 class="modal-quartel-title">AÇORIANOS</h3>
-                                <h4 class="modal-viatura-subtitle">ABT-0595</h4>
-                            </div>
-                            <div class="modal-personnel-section">
-                                <div class="person-role-modal"><strong>CMT GU:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                                <div class="person-role-modal"><strong>COV:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                                <div class="person-role-modal"><strong>LINHA:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                            </div>
-                           <div class="modal-turn-details-section">
-                                <div class="turn-type-label-modal">Turno: 12h</div>
-                                <div class="duty-detail-modal">Início: 15/Jul - das 08:00</div>
-                                <div class="duty-detail-modal">Fim: 15/Jul - às 20:00</div>
-                                </div>
-                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
-                            
-                            <h4 class="modal-viatura-subtitle">ABT-0595</h4>
-                            <div class="modal-personnel-section">
-                                <div class="person-role-modal"><strong>CMT GU:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                                <div class="person-role-modal"><strong>COV:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                                <div class="person-role-modal"><strong>LINHA:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                            </div>
-                              <div class="modal-turn-details-section">
-                                <div class="turn-type-label-modal">Turno: 12h</div>
-                                <div class="duty-detail-modal">Início: 15/Jul - das 08:00</div>
-                                <div class="duty-detail-modal">Fim: 15/Jul - às 20:00</div>
-                                
-                            </div>
-                            
-                            <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
-
-                            <h4 class="modal-viatura-subtitle">AEM-0482 e AT-0672</h4>
-                            <div class="modal-personnel-section">
-                                <div class="person-role-modal"><strong>COV:</strong> <span>MILITAR ESCALADO NO DIA</span></div>
-                            </div>
-                              <div class="modal-turn-details-section">
-                                <div class="turn-type-label-modal">Turno: 24h</div>
-                                <div class="duty-detail-modal">Início: 15/Jul - das 08:00</div>
-                                <div class="duty-detail-modal">Fim: 16/Jul - às 08:00</div>
-
-
-                           </div>
-                        </div>
-                    </div>
+            <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid">
                 </div>
-
-                </div>
-<p class="text-gray-300 text-center mb-4 text-sm">
+            <p class="text-gray-300 text-center mb-4 text-sm">
                 OBS.: Última atualização: 16/Jul às 11:35, por CIABM.
             </p>
-            </div>
         </div>
     </main>
 </div>
 
 <footer class="bg-gray-800 text-gray-400 py-3 z-10">
     <div class="container mx-auto px-4 text-center text-xs">
-        <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+        <p>© 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
         <p class="mt-1">
             Para demais assuntos acesse a
-            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
+            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-blue hover:underline">Página do CBMRS na Internet.</a>
         </p>
     </div>
 </footer>
 
 <div id="guarnicao-details-overlay" class="guarnicao-details-overlay">
     <div class="guarnicao-details-box">
-        <button class="close-button" onclick="closeModal()">&times;</button>
+        <button class="close-button" onclick="closeModal()">×</button>
         <div id="modal-content">
-            </div>
+        </div>
     </div>
 </div>
 
 <script>
+    const guarnicoesData = {
+        "OFICIAL DE SERVIÇO": {
+            "ATP-765": {
+                "viatura_display": "ATP-765 (Oficial Supervisor)",
+                "militares": [
+                    { "funcao": "OFICIAL SUPERVISOR", "nome": "CAP SILVA" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            },
+            "ATP-201": {
+                "viatura_display": "ATP-201 (Comando de Socorro)",
+                "militares": [
+                    { "funcao": "COMANDANTE DE SOCORRO", "nome": "1º TEN PATRICIO" },
+                    { "funcao": "MOTORISTA DE DIA", "nome": "SD BOTEGA" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "AÇORIANOS": {
+            "ABT-0595": {
+                "viatura_display": "ABT-0595",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD JULIAN" },
+                    { "funcao": "COV", "nome": "SD LAGO (até 20h) / SD TEMP PAULINO (após 20h)" },
+                    { "funcao": "LINHA", "nome": "SD IBALDO" }
+                ],
+                "turno": "12h / 12h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            },
+            "AEM-0482 e AT-0672": {
+                "viatura_display": "AEM-0482 e AT-0672 (Apoio)",
+                "militares": [
+                    { "funcao": "COV", "nome": "2º SGT BECKER" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "TERESÓPOLIS": {
+            "ABT-0594": {
+                "viatura_display": "ABT-0594",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD THIAGO" },
+                    { "funcao": "COV", "nome": "2º SGT BEN-HUR" },
+                    { "funcao": "LINHA", "nome": "SD CASSIANO" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            },
+            "AR-0455": {
+                "viatura_display": "AR-0455 (Apoio)",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD LOPES" },
+                    { "funcao": "COV", "nome": "SD VINÍCIUS" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "ASSUNÇÃO": {
+            "ABT-0596": {
+                "viatura_display": "ABT-0596",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD PORCELIS (até 20h) / SD BRUM (após 20h)" },
+                    { "funcao": "COV", "nome": "2º SGT PANAZZOLO" },
+                    { "funcao": "LINHA", "nome": "SD TEMP MAIA" }
+                ],
+                "turno": "12h / 12h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "RESTINGA": {
+            "ABT-0598": {
+                "viatura_display": "ABT-0598",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD DAYKER (após 08h) / SD BRUNO (até 08h)" },
+                    { "funcao": "COV", "nome": "SD FINGER" },
+                    { "funcao": "LINHA", "nome": "SD TEMP VOLZ" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "BELÉM NOVO": {
+            "ABT-0599": {
+                "viatura_display": "ABT-0599",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD MARTINEZ" },
+                    { "funcao": "COV", "nome": "2º SGT CHIEZA" },
+                    { "funcao": "LINHA", "nome": "SD RAFAEL" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "FLORESTA": {
+            "ABT-1365": {
+                "viatura_display": "ABT-1365",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT CASTRO" },
+                    { "funcao": "COV", "nome": "SD TEMP WESLEY" },
+                    { "funcao": "LINHA", "nome": "SD ACÁCIO (até 20h) / SD DA SILVA (após 20h)" }
+                ],
+                "turno": "12h / 12h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "PARTENON": {
+            "ABT-327": {
+                "viatura_display": "ABT-327",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD JUSSIE" },
+                    { "funcao": "COV", "nome": "SD BRUNO EDUARDO" },
+                    { "funcao": "LINHA", "nome": "SD TEMP ZANETTI" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        },
+        "PASSO D'AREIA": {
+            "ABT-0600": {
+                "viatura_display": "ABT-0600",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD BUENO" },
+                    { "funcao": "COV", "nome": "SD BARBOSA" },
+                    { "funcao": "LINHA", "nome": "SD EIDER" }
+                ],
+                "turno": "24h",
+                "inicio_data": "16/Jul/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "17/Jul/2025",
+                "fim_hora": "08:00"
+            }
+        }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-        const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
+        const guarnicoesGrid = document.getElementById('guarnicoes-grid');
         const modalOverlay = document.getElementById('guarnicao-details-overlay');
         const modalContentDiv = document.getElementById('modal-content');
 
+        const pelotaoOrder = [
+            "OFICIAL DE SERVIÇO",
+            "AÇORIANOS",
+            "TERESÓPOLIS",
+            "ASSUNÇÃO",
+            "RESTINGA",
+            "BELÉM NOVO",
+            "FLORESTA",
+            "PARTENON",
+            "PASSO D'AREIA"
+        ];
+
+        pelotaoOrder.forEach(pelotaoName => {
+            const pelotaoData = guarnicoesData[pelotaoName];
+            if (pelotaoData) {
+                const quartelColumn = document.createElement('div');
+                quartelColumn.classList.add('quartel-column');
+
+                const guarnicaoButton = document.createElement('div');
+                guarnicaoButton.classList.add('guarnicao-button');
+                guarnicaoButton.setAttribute('data-pelotao-name', pelotaoName);
+
+                const buttonVisibleContent = document.createElement('div');
+                buttonVisibleContent.classList.add('button-visible-content');
+                buttonVisibleContent.innerHTML = `
+                    <span class="guarnicao-name-only">${pelotaoName}</span>
+                    <i class="fas fa-chevron-down guarnicao-arrow"></i>
+                `;
+                guarnicaoButton.appendChild(buttonVisibleContent);
+
+                const modalSourceData = document.createElement('div');
+                modalSourceData.classList.add('modal-source-data');
+                modalSourceData.style.display = 'none';
+
+                let modalHtml = `<h3 class="modal-quartel-title">${pelotaoName}</h3>`;
+
+                for (const viaturaKey in pelotaoData) {
+                    const viaturaData = pelotaoData[viaturaKey];
+                    modalHtml += `
+                        <h4 class="modal-viatura-subtitle">${viaturaData.viatura_display}</h4>
+                        <div class="modal-personnel-section">
+                    `;
+                    viaturaData.militares.forEach(militar => {
+                        modalHtml += `<div class="person-role-modal"><strong>${militar.funcao}:</strong> <span>${militar.nome}</span></div>`;
+                    });
+                    modalHtml += `
+                        </div>
+                        <div class="modal-turn-details-section">
+                            <div class="turn-type-label-modal">Turno: ${viaturaData.turno}</div>
+                            <div class="duty-detail-modal">Início: ${viaturaData.inicio_data} - das ${viaturaData.inicio_hora}</div>
+                            <div class="duty-detail-modal">Fim: ${viaturaData.fim_data} - às ${viaturaData.fim_hora}</div>
+                        </div>
+                        <hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">
+                    `;
+                }
+
+                modalSourceData.innerHTML = modalHtml;
+                guarnicaoButton.appendChild(modalSourceData);
+                quartelColumn.appendChild(guarnicaoButton);
+                guarnicoesGrid.appendChild(quartelColumn);
+            }
+        });
+
+        const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
+
         guarnicaoButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Remove a classe 'active' de todos os botões para resetar a seta
                 document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
-                
-                // Adiciona a classe 'active' ao botão clicado para girar a seta
                 button.classList.add('active');
 
                 const modalSourceData = button.querySelector('.modal-source-data');
                 
                 if (modalSourceData) {
-                    // Limpa o conteúdo anterior
                     modalContentDiv.innerHTML = '';
-
-                    // Clona todo o conteúdo da fonte de dados oculta para o modal
-                    // Clona apenas elementos (tipo 1) para evitar clonar espaços em branco extras que podem causar problemas de layout
-                    modalSourceData.childNodes.forEach(node => {
-                        if (node.nodeType === 1) { // Node.ELEMENT_NODE
-                            modalContentDiv.appendChild(node.cloneNode(true));
-                        }
-                    });
-
-                    // Exibe o modal
+                    modalContentDiv.innerHTML = modalSourceData.innerHTML; // Simplesmente copiar o innerHTML
                     modalOverlay.classList.add('active');
                 }
             });
         });
 
-        // Função para fechar o modal
         function closeModal() {
             modalOverlay.classList.remove('active');
             modalContentDiv.innerHTML = ''; // Limpa o conteúdo ao fechar
-            // Remove a classe 'active' do botão quando o modal é fechado
             document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
         }
 
-        // Adiciona a função closeModal ao escopo global para que o onclick no HTML funcione
         window.closeModal = closeModal;
 
-        // Fecha o modal ao clicar fora da caixa de conteúdo
         modalOverlay.addEventListener('click', (event) => {
             if (event.target === modalOverlay) {
                 closeModal();
