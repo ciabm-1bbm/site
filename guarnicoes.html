@@ -70,8 +70,14 @@
             background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             position: relative; top: -3px; z-index: 10;
         }
-        .guarnicao-apoio-orange { background-color: rgba(255, 140, 0, 0.3); }
-        .guarnicao-apoio-orange:hover { background-color: rgba(255, 140, 0, 0.5); }
+        /* NOVO ESTILO PARA O OFICIAL DE SERVIÇO */
+        .guarnicao-oficial {
+            background-color: rgba(255, 140, 0, 0.5); /* Laranja mais forte */
+            border-color: rgba(255, 165, 0, 0.7);
+        }
+        .guarnicao-oficial:hover {
+            background-color: rgba(255, 140, 0, 0.7); /* Laranja ainda mais forte no hover */
+        }
         .button-visible-content {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; height: 100%; width: 100%;
@@ -193,7 +199,7 @@
                     <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
                     <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-red"><i class="fas fa-link"></i><span>E-193</span></a>
                     <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-red"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEiro NA ESCOLA</span></a>
                 </div>
             </div>
 
@@ -251,44 +257,6 @@
                 "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
             }
         },
-        "CANIL": {
-            "ABC-792": {
-                "viatura_display": "ABC-792",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT CESAR ZANFONATO" },
-                    { "funcao": "CINOTÉCNICO", "nome": "SD ARAUJO" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            },
-            "ABC-793": {
-                "viatura_display": "ABC-793",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT CESAR ZANFONATO" },
-                    { "funcao": "CINOTÉCNICO", "nome": "SD ARAUJO" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            }
-        },
-        "TERESÓPOLIS": {
-            "ABT-0594": {
-                "viatura_display": "ABT-0594",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT PME CARGNELUTTI" },
-                    { "funcao": "COV", "nome": "SD DEIVID" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD JORDAN" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            },
-            "AR-0455": {
-                "viatura_display": "AR-0455",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BRUM" },
-                    { "funcao": "COV", "nome": "SD AZEREDO" },
-                    { "funcao": "RESGATISTA 1", "nome": "SD ROSEANNE" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            }
-        },
         "AÇORIANOS": {
             "ABT-0595": {
                 "viatura_display": "ABT-0595",
@@ -310,6 +278,26 @@
                 "viatura_display": "AT-0672",
                 "militares": [
                     { "funcao": "COV", "nome": "SD BITENCOURT" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "TERESÓPOLIS": {
+            "ABT-0594": {
+                "viatura_display": "ABT-0594",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT PME CARGNELUTTI" },
+                    { "funcao": "COV", "nome": "SD DEIVID" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD JORDAN" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            },
+            "AR-0455": {
+                "viatura_display": "AR-0455",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD BRUM" },
+                    { "funcao": "COV", "nome": "SD AZEREDO" },
+                    { "funcao": "RESGATISTA 1", "nome": "SD ROSEANNE" }
                 ],
                 "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
             }
@@ -383,61 +371,6 @@
                 ],
                 "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
             }
-        },
-        "SALVAMENTO": {
-            "ABTS-866": {
-                "viatura_display": "ABTS-866",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT ELIAS" },
-                    { "funcao": "COV", "nome": "SD ORNELAS" },
-                    { "funcao": "RESGATISTA 1", "nome": "SD MARQUES" },
-                    { "funcao": "RESGATISTA 2", "nome": "SD GUIMARÃES" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            }
-        },
-        "CCOB": {
-            "AODC-CCOB": {
-                "viatura_display": "Operador CCOB",
-                "militares": [
-                    { "funcao": "OPERADOR", "nome": "SD DA SILVA" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            }
-        },
-        "MERGULHO": {
-            "ATP-0555": {
-                "viatura_display": "ATP-0555",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT ALVES" },
-                    { "funcao": "COV", "nome": "SD SANTTANNA" },
-                    { "funcao": "MERGULHADOR", "nome": "SD MAURO" },
-                    { "funcao": "MERGULHADOR", "nome": "SD TAINAN" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            }
-        },
-        "COBOM": {
-            "COBOM-DCCI": {
-                "viatura_display": "Operadores COBOM",
-                "militares": [
-                    { "funcao": "OPERADOR (07h-19h)", "nome": "2º SGT CESAR" },
-                    { "funcao": "OPERADOR (07h-19h)", "nome": "2º SGT JÚLIO" },
-                    { "funcao": "OPERADOR (07h-19h)", "nome": "SD BRUNA" }
-                ],
-                "turno": "12h", "inicio_data": "17/Jul/2025", "inicio_hora": "07:00", "fim_data": "17/Jul/2025", "fim_hora": "19:00"
-            }
-        },
-        "AQUÁTICO": {
-            "DIVERSAS": {
-                "viatura_display": "EAL-716, EIN-713, etc.",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD AURÉLIO" },
-                    { "funcao": "CONDUTOR NAVAL", "nome": "SD HALLEY" },
-                    { "funcao": "AUX. CONDUTOR", "nome": "SD BERGMÜLLER" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            }
         }
     };
 
@@ -446,21 +379,32 @@
         const modalOverlay = document.getElementById('guarnicao-details-overlay');
         const modalContentDiv = document.getElementById('modal-content');
 
-        // Nova ordem baseada nos seus dados
+        // ORDEM DE EXIBIÇÃO FIXA CONFORME SOLICITADO
         const pelotaoOrder = [
-            "OFICIAL DE SERVIÇO", "CANIL", "TERESÓPOLIS", "AÇORIANOS", 
-            "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", 
-            "FLORESTA", "PARTENON", "SALVAMENTO", "CCOB", 
-            "MERGULHO", "COBOM", "AQUÁTICO"
+            "OFICIAL DE SERVIÇO",
+            "AÇORIANOS",
+            "TERESÓPOLIS",
+            "ASSUNÇÃO",
+            "RESTINGA",
+            "BELÉM NOVO",
+            "PASSO D'AREIA",
+            "FLORESTA",
+            "PARTENON"
         ];
 
         pelotaoOrder.forEach(pelotaoName => {
             const pelotaoData = guarnicoesData[pelotaoName];
-            if (pelotaoData) {
+            if (pelotaoData) { // Apenas processa se os dados existirem para o pelotão
                 const quartelColumn = document.createElement('div');
                 quartelColumn.classList.add('quartel-column');
                 const guarnicaoButton = document.createElement('div');
                 guarnicaoButton.classList.add('guarnicao-button');
+                
+                // APLICA O ESTILO DE DESTAQUE
+                if (pelotaoName === 'OFICIAL DE SERVIÇO') {
+                    guarnicaoButton.classList.add('guarnicao-oficial');
+                }
+
                 guarnicaoButton.setAttribute('data-pelotao-name', pelotaoName);
                 const buttonVisibleContent = document.createElement('div');
                 buttonVisibleContent.classList.add('button-visible-content');
