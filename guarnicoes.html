@@ -70,7 +70,7 @@
             background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             position: relative; top: -3px; z-index: 10;
         }
-        /* NOVO ESTILO PARA O OFICIAL DE SERVIÇO */
+        /* ESTILO PARA O OFICIAL DE SERVIÇO */
         .guarnicao-oficial {
             background-color: rgba(255, 140, 0, 0.5); /* Laranja mais forte */
             border-color: rgba(255, 165, 0, 0.7);
@@ -199,14 +199,14 @@
                     <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
                     <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-red"><i class="fas fa-link"></i><span>E-193</span></a>
                     <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-red"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEiro NA ESCOLA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
                 </div>
             </div>
 
             <hr class="border-gray-600 my-8">
             
             <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
-                <i class="fas fa-fire-extinguisher mr-2"></i> GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (17/Jul/2025)
+                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (17/Jul/2025)
             </h2>
             <p class="text-gray-300 text-center mb-6 text-sm">
                 Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
@@ -214,7 +214,7 @@
 
             <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid"></div>
             <p class="text-gray-300 text-center mb-4 text-sm">
-                OBS.: Última atualização: 17/Jul às 08:30, por CIABM.
+                OBS.: Última atualização: <span id="data-atualizacao"></span>, por CIABM.
             </p>
         </div>
     </main>
@@ -267,15 +267,8 @@
                 ],
                 "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
             },
-            "AEM-0482": {
-                "viatura_display": "AEM-0482",
-                "militares": [
-                    { "funcao": "COV", "nome": "SD BITENCOURT" }
-                ],
-                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
-            },
-            "AT-0672": {
-                "viatura_display": "AT-0672",
+            "AEM_E_AT": {
+                "viatura_display": "AEM-0482 e AT-0672",
                 "militares": [
                     { "funcao": "COV", "nome": "SD BITENCOURT" }
                 ],
@@ -378,8 +371,24 @@
         const guarnicoesGrid = document.getElementById('guarnicoes-grid');
         const modalOverlay = document.getElementById('guarnicao-details-overlay');
         const modalContentDiv = document.getElementById('modal-content');
+        const dataAtualizacaoSpan = document.getElementById('data-atualizacao');
 
-        // ORDEM DE EXIBIÇÃO FIXA CONFORME SOLICITADO
+        // FUNÇÃO PARA PEGAR DATA E HORA ATUAIS
+        function formatarDataHoraAtual() {
+            const agora = new Date();
+            const dia = String(agora.getDate());
+            const mes = agora.toLocaleString('pt-BR', { month: 'short' }).replace('.', ''); // Remove o ponto de "jul."
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes} às ${horas}:${minutos}`;
+        }
+
+        // ATUALIZA A DATA/HORA NA PÁGINA
+        if(dataAtualizacaoSpan) {
+            dataAtualizacaoSpan.textContent = formatarDataHoraAtual();
+        }
+
+        // ORDEM DE EXIBIÇÃO FIXA
         const pelotaoOrder = [
             "OFICIAL DE SERVIÇO",
             "AÇORIANOS",
@@ -394,13 +403,12 @@
 
         pelotaoOrder.forEach(pelotaoName => {
             const pelotaoData = guarnicoesData[pelotaoName];
-            if (pelotaoData) { // Apenas processa se os dados existirem para o pelotão
+            if (pelotaoData) {
                 const quartelColumn = document.createElement('div');
                 quartelColumn.classList.add('quartel-column');
                 const guarnicaoButton = document.createElement('div');
                 guarnicaoButton.classList.add('guarnicao-button');
                 
-                // APLICA O ESTILO DE DESTAQUE
                 if (pelotaoName === 'OFICIAL DE SERVIÇO') {
                     guarnicaoButton.classList.add('guarnicao-oficial');
                 }
