@@ -42,250 +42,116 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
-
-        /* --- Estilo para os Botões de Atalho Superiores (Vermelhos) --- */
         .shortcut-button-red {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(220, 38, 38, 0.3); /* Fire Red translúcido */
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            height: 50px; /* Reduzido para 50px */
-            padding: 4px; /* Reduzido padding */
-            color: white;
-            font-size: 9px; /* Fonte menor */
-            font-weight: 700;
-            line-height: 1.2;
-            word-break: break-word;
-            hyphens: auto;
-            text-decoration: none;
+            transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(220, 38, 38, 0.3); border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            height: 50px; padding: 4px; color: white;
+            font-size: 9px; font-weight: 700; line-height: 1.2;
+            word-break: break-word; hyphens: auto; text-decoration: none;
         }
         .shortcut-button-red:hover {
-            background-color: rgba(220, 38, 38, 0.5); /* Fire Red mais visível no hover */
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            background-color: rgba(220, 38, 38, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
         .shortcut-button-red i {
-            color: white;
-            font-size: 1.2rem; /* Ícone menor */
-            margin-bottom: 0.2rem; /* Espaçamento ajustado */
+            color: white; font-size: 1.2rem; margin-bottom: 0.2rem;
         }
-
-
-        /* --- Estilo para os Quadros de Guarnição (Pelotões) --- */
         .guarnicao-button {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 215, 0, 0.3); /* Amarelo translúcido */
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0.5rem; /* Ajustado para caber o conteúdo */
-            min-height: 140px; /* Quadrado 140x140px */
-            position: relative;
-            cursor: pointer;
-            overflow: hidden; /* Conteúdo interno não vaza */
+            transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 215, 0, 0.3); border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 0.5rem; min-height: 140px; position: relative;
+            cursor: pointer; overflow: hidden;
         }
         .guarnicao-button:hover {
-            background-color: rgba(255, 215, 0, 0.5); /* Amarelo mais visível no hover */
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(-3px);
-            z-index: 10;
+            background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            position: relative; top: -3px; z-index: 10;
         }
-        /* Cor específica para o quadro de apoio dos Açorianos (laranja translúcido) */
-        .guarnicao-apoio-orange {
-            background-color: rgba(255, 140, 0, 0.3); /* Laranja translúcido */
-        }
-        .guarnicao-apoio-orange:hover {
-            background-color: rgba(255, 140, 0, 0.5); /* Laranja mais visível no hover */
-        }
-
-        /* Conteúdo visível no botão (Nome Quartel + Seta) */
+        .guarnicao-apoio-orange { background-color: rgba(255, 140, 0, 0.3); }
+        .guarnicao-apoio-orange:hover { background-color: rgba(255, 140, 0, 0.5); }
         .button-visible-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100%; width: 100%;
         }
-        .guarnicao-name-only { /* Nome do quartel visível no quadro */
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: white; /* Cor branca para o texto */
-            line-height: 1.2;
-            margin-bottom: 0.3rem;
+        .guarnicao-name-only {
+            font-size: 0.9rem; font-weight: 700; color: white;
+            line-height: 1.2; margin-bottom: 0.3rem;
         }
-        .guarnicao-arrow { /* Seta abaixo do nome */
-            color: white; /* Cor branca para a seta */
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
+        .guarnicao-arrow {
+            color: white; font-size: 1.2rem; transition: transform 0.3s ease;
         }
-        .guarnicao-button.active .guarnicao-arrow {
-            transform: rotate(180deg);
-        }
-
-
-        /* --- Estilo para o Modal/Overlay de Detalhes da Guarnição --- */
+        .guarnicao-button.active .guarnicao-arrow { transform: rotate(180deg); }
         .guarnicao-details-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente leve */
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: none;
+            align-items: center; justify-content: center; z-index: 10000;
         }
-        .guarnicao-details-overlay.active {
-            display: flex;
-        }
+        .guarnicao-details-overlay.active { display: flex; }
         .guarnicao-details-box {
-            background-color: #1F2937; /* Fundo escuro do modal */
-            color: #E5E7EB;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            max-width: 350px; /* Ajustado para melhor visualização em celular */
-            width: 90%;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            position: relative;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
+            background-color: #1F2937; color: #E5E7EB; padding: 1rem;
+            border-radius: 0.75rem; max-width: 320px; width: 90%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease;
         }
-        .guarnicao-details-overlay.active .guarnicao-details-box {
-            transform: translateY(0);
-        }
+        .guarnicao-details-overlay.active .guarnicao-details-box { transform: translateY(0); }
         .guarnicao-details-box .close-button {
-            position: absolute;
-            top: 0.5rem; right: 0.7rem;
-            background: none; border: none;
-            color: #E5E7EB;
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: color 0.3s ease;
+            position: absolute; top: 0.5rem; right: 0.7rem; background: none;
+            border: none; color: #E5E7EB; font-size: 1.8rem;
+            cursor: pointer; transition: color 0.3s ease;
         }
-        .guarnicao-details-box .close-button:hover {
-            color: #fire-red;
-        }
-
-        /* Títulos e detalhes dentro do Modal */
+        .guarnicao-details-box .close-button:hover { color: #DC2626; }
         .modal-quartel-title {
-            font-size: 1.2rem; font-weight: bold;
-            color: #bombeiros-orange;
-            margin-bottom: 0.3rem;
-            text-align: center;
+            font-size: 1.2rem; font-weight: bold; color: #bombeiros-orange;
+            margin-bottom: 0.3rem; text-align: center;
         }
         .modal-viatura-subtitle {
-            font-size: 0.9rem; font-weight: bold; /* Reduzido levemente */
-            color: #FFD700;
-            margin-bottom: 0.8rem;
-            text-align: center;
+            font-size: 0.9rem; font-weight: bold; color: #FFD700;
+            margin-bottom: 0.8rem; text-align: center;
         }
         .modal-personnel-section {
-            margin-bottom: 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 0.8rem;
         }
         .modal-personnel-section .person-role-modal {
-            font-size: 0.8rem;
-            line-height: 1.2;
-            margin-bottom: 0.1rem;
-            display: flex; justify-content: space-between;
-            flex-wrap: wrap;
+            font-size: 0.8rem; line-height: 1.2; margin-bottom: 0.1rem;
+            display: flex; justify-content: space-between; flex-wrap: wrap;
         }
         .modal-personnel-section .person-role-modal strong {
-            font-weight: bold;
-            color: #4A90E2;
-            flex-shrink: 0;
+            font-weight: bold; color: #4A90E2; flex-shrink: 0; margin-right: 0.5rem;
         }
         .modal-personnel-section .person-role-modal span {
-            font-weight: normal;
-            color: #E5E7EB;
-            text-align: right;
-            flex-grow: 1;
+            font-weight: normal; color: #E5E7EB; text-align: right; flex-grow: 1;
         }
-
         .modal-turn-details-section {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.8rem;
             text-align: center;
         }
         .modal-turn-details-section .turn-type-label-modal {
-            font-size: 0.8rem; font-weight: bold;
-            color: #FFD700;
-            margin-bottom: 0.4rem;
+            font-size: 0.8rem; font-weight: bold; color: #FFD700; margin-bottom: 0.4rem;
         }
         .modal-turn-details-section .duty-detail-modal {
-            font-size: 0.7rem;
-            color: #A0AEC0;
-            margin-bottom: 0.1rem;
+            font-size: 0.7rem; color: #A0AEC0; margin-bottom: 0.1rem;
         }
-
-
-        /* --- Estrutura de Grid Principal --- */
         .guarnicoes-por-quartel-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 140px); /* 10 colunas de 140px fixas para telas grandes */
-            gap: 1rem;
-            justify-content: center;
-            max-width: calc(10 * 140px + 9 * 1rem); /* Largura total da grid */
-            margin: 0 auto;
+            display: grid; grid-template-columns: repeat(9, 140px);
+            gap: 1rem; justify-content: center;
+            max-width: calc(9 * 140px + 8 * 1rem); margin: 0 auto;
         }
-
         .quartel-column {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: center;
-            width: 100%;
+            display: flex; flex-direction: column; gap: 0.5rem;
+            align-items: center; width: 100%;
         }
-        
-        /* Ajustes responsivos para o número de colunas */
-        @media (max-width: 1543px) { /* Reduz de 10 colunas para 8 */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(8, 140px);
-                max-width: calc(8 * 140px + 7 * 1rem);
-            }
-        }
-        @media (max-width: 1279px) { /* Reduz para 6 colunas */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(6, 140px);
-                max-width: calc(6 * 140px + 5 * 1rem);
-            }
-        }
-        @media (max-width: 1023px) { /* Reduz para 4 colunas */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(4, 140px);
-                max-width: calc(4 * 140px + 3 * 1rem);
-            }
-        }
-        @media (max-width: 767px) { /* Reduz para 3 colunas */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(3, 140px);
-                max-width: calc(3 * 140px + 2 * 1rem);
-            }
-        }
-        @media (max-width: 639px) { /* Reduz para 2 colunas */
-            .guarnicoes-por-quartel-grid {
-                grid-template-columns: repeat(2, 140px);
-                max-width: calc(2 * 140px + 1 * 1rem);
-            }
-        }
-
+        @media (max-width: 1543px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(7, 140px); max-width: calc(7 * 140px + 6 * 1rem); } }
+        @media (max-width: 1279px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(5, 140px); max-width: calc(5 * 140px + 4 * 1rem); } }
+        @media (max-width: 1023px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(4, 140px); max-width: calc(4 * 140px + 3 * 1rem); } }
+        @media (max-width: 767px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(3, 140px); max-width: calc(3 * 140px + 2 * 1rem); } }
+        @media (max-width: 639px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(2, 140px); max-width: calc(2 * 140px + 1 * 1rem); } }
         .main-container-fluid {
-            max-width: 100%;
-            padding-left: 1rem;
-            padding-right: 1rem;
-            margin-left: auto;
-            margin-right: auto;
+            max-width: 100%; padding-left: 1rem; padding-right: 1rem;
+            margin-left: auto; margin-right: auto;
         }
     </style>
 </head>
@@ -300,7 +166,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-extrabold text-bombeiros-yellow">
-                        Guarnições de Serviço do 1º BBM
+                        Página das Guarnições de Serviço do 1º BBM
                     </h1>
                 </div>
                 <div class="bg-cbmrs-blue p-2 rounded-lg">
@@ -308,6 +174,342 @@
                 </div>
             </div>
             <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-2">
-                Informações atualizadas sobre as equipes em serviço em Porto Alegre.
+                Elaborada para acesso do Efetivo Operacional, unificação de links e procedimentos atinentes ao serviço diário.
             </p>
-            <p
+        </div>
+    </header>
+
+    <main class="flex-grow py-6 px-4">
+        <div class="main-container-fluid">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-fire-red mb-4 text-center">
+                    <i class="fas fa-external-link-alt mr-2"></i> LINKS RÁPIDOS DE ACESSO:
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 justify-center">
+                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-red"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
+                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-red"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-red"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
+                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
+                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-red"><i class="fas fa-link"></i><span>E-193</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-red"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
+                </div>
+            </div>
+
+            <hr class="border-gray-600 my-8">
+            
+            <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
+                <i class="fas fa-fire-extinguisher mr-2"></i> GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (17/Jul/2025)
+            </h2>
+            <p class="text-gray-300 text-center mb-6 text-sm">
+                Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
+            </p>
+
+            <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid"></div>
+            <p class="text-gray-300 text-center mb-4 text-sm">
+                OBS.: Última atualização: 17/Jul às 08:30, por CIABM.
+            </p>
+        </div>
+    </main>
+</div>
+
+<footer class="bg-gray-800 text-gray-400 py-3 z-10">
+    <div class="container mx-auto px-4 text-center text-xs">
+        <p>© 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+        <p class="mt-1">
+            Para demais assuntos acesse a
+            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-blue hover:underline">Página do CBMRS na Internet.</a>
+        </p>
+    </div>
+</footer>
+
+<div id="guarnicao-details-overlay" class="guarnicao-details-overlay">
+    <div class="guarnicao-details-box">
+        <button class="close-button" onclick="closeModal()">×</button>
+        <div id="modal-content"></div>
+    </div>
+</div>
+
+<script>
+    const guarnicoesData = {
+        "OFICIAL DE SERVIÇO": {
+            "ATP-765": {
+                "viatura_display": "ATP-765 (Oficial Supervisor)",
+                "militares": [
+                    { "funcao": "OFICIAL SUPERVISOR", "nome": "CAP BENETTI" },
+                    { "funcao": "MOTORISTA DE DIA", "nome": "1º TEN PME BUENO" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            },
+            "ATP-201": {
+                "viatura_display": "ATP-201 (Comando de Socorro)",
+                "militares": [
+                    { "funcao": "COMANDANTE DE SOCORRO", "nome": "1º TEN FERNANDO" },
+                    { "funcao": "MOTORISTA DE DIA", "nome": "SD PESSOTA" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "CANIL": {
+            "ABC-792": {
+                "viatura_display": "ABC-792",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT CESAR ZANFONATO" },
+                    { "funcao": "CINOTÉCNICO", "nome": "SD ARAUJO" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            },
+            "ABC-793": {
+                "viatura_display": "ABC-793",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT CESAR ZANFONATO" },
+                    { "funcao": "CINOTÉCNICO", "nome": "SD ARAUJO" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "TERESÓPOLIS": {
+            "ABT-0594": {
+                "viatura_display": "ABT-0594",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT PME CARGNELUTTI" },
+                    { "funcao": "COV", "nome": "SD DEIVID" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD JORDAN" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            },
+            "AR-0455": {
+                "viatura_display": "AR-0455",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD BRUM" },
+                    { "funcao": "COV", "nome": "SD AZEREDO" },
+                    { "funcao": "RESGATISTA 1", "nome": "SD ROSEANNE" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "AÇORIANOS": {
+            "ABT-0595": {
+                "viatura_display": "ABT-0595",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD ALISSON" },
+                    { "funcao": "COV", "nome": "SD LAGO" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD TEIXEIRA" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            },
+            "AEM-0482": {
+                "viatura_display": "AEM-0482",
+                "militares": [
+                    { "funcao": "COV", "nome": "SD BITENCOURT" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            },
+            "AT-0672": {
+                "viatura_display": "AT-0672",
+                "militares": [
+                    { "funcao": "COV", "nome": "SD BITENCOURT" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "ASSUNÇÃO": {
+            "ABT-0596": {
+                "viatura_display": "ABT-0596",
+                "militares": [
+                    { "funcao": "CMT GU (até 20h)", "nome": "SD BRUM" },
+                    { "funcao": "CMT GU (após 20h)", "nome": "SD PORCELIS" },
+                    { "funcao": "COV", "nome": "SD TEMP PINTO" },
+                    { "funcao": "CHEFE DE LINHA (até 20h)", "nome": "SD KINGESKI" },
+                    { "funcao": "CHEFE DE LINHA (após 20h)", "nome": "SD BAIGORRA" }
+                ],
+                "turno": "12h / 12h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "RESTINGA": {
+            "ABT-0598": {
+                "viatura_display": "ABT-0598",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD BERGHAHN" },
+                    { "funcao": "COV", "nome": "SD ROGER" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD CATELAN" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "BELÉM NOVO": {
+            "ABT-0599": {
+                "viatura_display": "ABT-0599",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT MENDES" },
+                    { "funcao": "COV", "nome": "SD MAURÍCIO" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD COSME" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "PASSO D'AREIA": {
+            "ABT-0600": {
+                "viatura_display": "ABT-0600",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "1º SGT MATHEUS" },
+                    { "funcao": "COV", "nome": "SD MONTEIRO" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD THIAGO" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "FLORESTA": {
+            "ABT-1365": {
+                "viatura_display": "ABT-1365",
+                "militares": [
+                    { "funcao": "CMT GU (até 20h)", "nome": "SD CRISTIANO" },
+                    { "funcao": "CMT GU (após 20h)", "nome": "2º SGT CASTRO" },
+                    { "funcao": "COV", "nome": "SD TEMP SIQUEIRA" },
+                    { "funcao": "CHEFE DE LINHA (até 20h)", "nome": "SD DA SILVA" },
+                    { "funcao": "CHEFE DE LINHA (após 20h)", "nome": "SD CRISTIANO" }
+                ],
+                "turno": "12h / 12h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "PARTENON": {
+            "ABT-327": {
+                "viatura_display": "ABT-327",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD BATISTA" },
+                    { "funcao": "COV", "nome": "SD BERNARDES" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD JONATHAN" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "SALVAMENTO": {
+            "ABTS-866": {
+                "viatura_display": "ABTS-866",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT ELIAS" },
+                    { "funcao": "COV", "nome": "SD ORNELAS" },
+                    { "funcao": "RESGATISTA 1", "nome": "SD MARQUES" },
+                    { "funcao": "RESGATISTA 2", "nome": "SD GUIMARÃES" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "CCOB": {
+            "AODC-CCOB": {
+                "viatura_display": "Operador CCOB",
+                "militares": [
+                    { "funcao": "OPERADOR", "nome": "SD DA SILVA" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "MERGULHO": {
+            "ATP-0555": {
+                "viatura_display": "ATP-0555",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT ALVES" },
+                    { "funcao": "COV", "nome": "SD SANTTANNA" },
+                    { "funcao": "MERGULHADOR", "nome": "SD MAURO" },
+                    { "funcao": "MERGULHADOR", "nome": "SD TAINAN" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "COBOM": {
+            "COBOM-DCCI": {
+                "viatura_display": "Operadores COBOM",
+                "militares": [
+                    { "funcao": "OPERADOR (07h-19h)", "nome": "2º SGT CESAR" },
+                    { "funcao": "OPERADOR (07h-19h)", "nome": "2º SGT JÚLIO" },
+                    { "funcao": "OPERADOR (07h-19h)", "nome": "SD BRUNA" }
+                ],
+                "turno": "12h", "inicio_data": "17/Jul/2025", "inicio_hora": "07:00", "fim_data": "17/Jul/2025", "fim_hora": "19:00"
+            }
+        },
+        "AQUÁTICO": {
+            "DIVERSAS": {
+                "viatura_display": "EAL-716, EIN-713, etc.",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD AURÉLIO" },
+                    { "funcao": "CONDUTOR NAVAL", "nome": "SD HALLEY" },
+                    { "funcao": "AUX. CONDUTOR", "nome": "SD BERGMÜLLER" }
+                ],
+                "turno": "24h", "inicio_data": "17/Jul/2025", "inicio_hora": "08:00", "fim_data": "18/Jul/2025", "fim_hora": "08:00"
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const guarnicoesGrid = document.getElementById('guarnicoes-grid');
+        const modalOverlay = document.getElementById('guarnicao-details-overlay');
+        const modalContentDiv = document.getElementById('modal-content');
+
+        // Nova ordem baseada nos seus dados
+        const pelotaoOrder = [
+            "OFICIAL DE SERVIÇO", "CANIL", "TERESÓPOLIS", "AÇORIANOS", 
+            "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", 
+            "FLORESTA", "PARTENON", "SALVAMENTO", "CCOB", 
+            "MERGULHO", "COBOM", "AQUÁTICO"
+        ];
+
+        pelotaoOrder.forEach(pelotaoName => {
+            const pelotaoData = guarnicoesData[pelotaoName];
+            if (pelotaoData) {
+                const quartelColumn = document.createElement('div');
+                quartelColumn.classList.add('quartel-column');
+                const guarnicaoButton = document.createElement('div');
+                guarnicaoButton.classList.add('guarnicao-button');
+                guarnicaoButton.setAttribute('data-pelotao-name', pelotaoName);
+                const buttonVisibleContent = document.createElement('div');
+                buttonVisibleContent.classList.add('button-visible-content');
+                buttonVisibleContent.innerHTML = `<span class="guarnicao-name-only">${pelotaoName}</span><i class="fas fa-chevron-down guarnicao-arrow"></i>`;
+                guarnicaoButton.appendChild(buttonVisibleContent);
+                const modalSourceData = document.createElement('div');
+                modalSourceData.classList.add('modal-source-data');
+                modalSourceData.style.display = 'none';
+                let modalHtml = `<h3 class="modal-quartel-title">${pelotaoName}</h3>`;
+                for (const viaturaKey in pelotaoData) {
+                    const viaturaData = pelotaoData[viaturaKey];
+                    modalHtml += `<h4 class="modal-viatura-subtitle">${viaturaData.viatura_display}</h4><div class="modal-personnel-section">`;
+                    viaturaData.militares.forEach(militar => {
+                        modalHtml += `<div class="person-role-modal"><strong>${militar.funcao}:</strong> <span>${militar.nome}</span></div>`;
+                    });
+                    modalHtml += `</div><div class="modal-turn-details-section"><div class="turn-type-label-modal">Turno: ${viaturaData.turno}</div><div class="duty-detail-modal">Início: ${viaturaData.inicio_data} - das ${viaturaData.inicio_hora}</div><div class="duty-detail-modal">Fim: ${viaturaData.fim_data} - às ${viaturaData.fim_hora}</div></div><hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">`;
+                }
+                modalSourceData.innerHTML = modalHtml;
+                guarnicaoButton.appendChild(modalSourceData);
+                quartelColumn.appendChild(guarnicaoButton);
+                guarnicoesGrid.appendChild(quartelColumn);
+            }
+        });
+
+        const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
+        guarnicaoButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const modalSourceData = button.querySelector('.modal-source-data');
+                if (modalSourceData) {
+                    modalContentDiv.innerHTML = modalSourceData.innerHTML;
+                    modalOverlay.classList.add('active');
+                }
+            });
+        });
+
+        window.closeModal = () => {
+            modalOverlay.classList.remove('active');
+            modalContentDiv.innerHTML = '';
+            document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
+        };
+
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target === modalOverlay) {
+                window.closeModal();
+            }
+        });
+    });
+</script>
+</body>
+</html>
