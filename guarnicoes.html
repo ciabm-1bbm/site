@@ -153,7 +153,7 @@
             color: #E5E7EB;
             padding: 1.5rem;
             border-radius: 0.75rem;
-            max-width: 350px; /* Reduzido para melhor visualização em celular */
+            max-width: 350px; /* Ajustado para melhor visualização em celular */
             width: 90%;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             position: relative;
@@ -190,7 +190,7 @@
             text-align: center;
         }
         .modal-personnel-section {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 0.8rem;
         }
@@ -203,7 +203,7 @@
         }
         .modal-personnel-section .person-role-modal strong {
             font-weight: bold;
-            color: #4A90E2; /* Azul para funções no modal */
+            color: #4A90E2;
             flex-shrink: 0;
         }
         .modal-personnel-section .person-role-modal span {
@@ -233,10 +233,10 @@
         /* --- Estrutura de Grid Principal --- */
         .guarnicoes-por-quartel-grid {
             display: grid;
-            grid-template-columns: repeat(9, 140px); /* 9 colunas fixas para telas muito grandes (8 pelotões + 1 Oficial SV) */
+            grid-template-columns: repeat(10, 140px); /* 10 colunas de 140px fixas para telas grandes */
             gap: 1rem;
             justify-content: center;
-            max-width: calc(9 * 140px + 8 * 1rem); /* Largura total da grid */
+            max-width: calc(10 * 140px + 9 * 1rem); /* Largura total da grid */
             margin: 0 auto;
         }
 
@@ -249,8 +249,8 @@
         }
         
         /* Ajustes responsivos para o número de colunas */
-        @media (max-width: 1400px) { /* Reduz de 9 colunas para 8 */
-             .guarnicoes-por-quartel-grid {
+        @media (max-width: 1543px) { /* Reduz de 10 colunas para 8 */
+            .guarnicoes-por-quartel-grid {
                 grid-template-columns: repeat(8, 140px);
                 max-width: calc(8 * 140px + 7 * 1rem);
             }
@@ -311,7 +311,7 @@
                 Informações atualizadas sobre as equipes em serviço em Porto Alegre.
             </p>
             <p class="text-xs text-gray-300 max-w-2xl mx-auto mt-0.5">
-                **Atualizado em: 17/07/2025 às 11:15**
+                **Atualizado em: 16/07/2025 às 19:55**
             </p>
         </div>
     </header>
@@ -324,16 +324,16 @@
                     <i class="fas fa-external-link-alt mr-2"></i> Atalhos Úteis
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 gap-4 justify-center">
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>1</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>2</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>3</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>4</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>5</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>6</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>7</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>8</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>9</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>10</span></a>
+                    <a href="https://forms.gle/L4KsYnat3rCkoZwV8" class="shortcut-button-red"><i class="fas fa-clipboard-list"></i><span>FORMULÁRIO</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1LC76nOlcZO-yg5oRMTslHYmVmpFvfRNIN4-pimNMGqo/edit?gid=543709939#gid=543709939" class="shortcut-button-red"><i class="fas fa-calendar-alt"></i><span>ESCALA ÚNICA</span></a>
+                    <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" class="shortcut-button-red"><i class="fas fa-map-marked-alt"></i><span>MAPA MENSAL</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" class="shortcut-button-red"><i class="fas fa-clock"></i><span>PREVISÃO JULHO</span></a>
+                    <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" class="shortcut-button-red"><i class="fas fa-calendar-times"></i><span>INDISPONIBILIDADE MENSAL</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" class="shortcut-button-red"><i class="fas fa-users"></i><span>EFETIVO</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/144g1qOiO44steK7mbICkFt-pXF_vebDqDyPmzgd22hM/edit?gid=1128532433#gid=1128532433" class="shortcut-button-red"><i class="fas fa-plane-departure"></i><span>PLANO de FÉRIAS</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" class="shortcut-button-red"><i class="fas fa-calendar-check"></i><span>CONFIRMAÇÃO de FÉRIAS</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" class="shortcut-button-red"><i class="fas fa-clipboard-list"></i><span>PARTES SLOG</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" class="shortcut-button-red"><i class="fas fa-hospital-alt"></i><span>AFASTAMENTOS</span></a>
                 </div>
             </div>
 
