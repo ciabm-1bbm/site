@@ -3,452 +3,462 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições de Serviço</title>
+    <title>Guarnições de Serviço - 1º BBM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'cbmrs-blue': '#1A5276',
+                        'fire-red': '#DC2626',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --cor-fundo: #f0f2f5;
-            --cor-cartao: #ffffff;
-            --cor-texto-principal: #333333;
-            --cor-texto-secundario: #666666;
-            --cor-titulo: #d32f2f;
-            --cor-sombra: rgba(0, 0, 0, 0.1);
-            --cor-borda: #dddddd;
-            --cor-destaque: #fff3e0;
-            --cor-destaque-borda: #ffb74d;
-            --cor-modal-fundo: rgba(0, 0, 0, 0.6);
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--cor-fundo);
-            color: var(--cor-texto-principal);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
+        .hero-background {
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            z-index: 0;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--cor-borda);
-            padding-bottom: 20px;
+        .hero-background::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
         }
-
-        h1 {
-            color: var(--cor-titulo);
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0;
+        .shortcut-button-red {
+            transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(220, 38, 38, 0.3); border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            height: 50px; padding: 4px; color: white;
+            font-size: 9px; font-weight: 700; line-height: 1.2;
+            word-break: break-word; hyphens: auto; text-decoration: none;
         }
-
-        #last-updated {
-            color: var(--cor-texto-secundario);
-            font-size: 0.9rem;
-            margin-top: 5px;
+        .shortcut-button-red:hover {
+            background-color: rgba(220, 38, 38, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
         }
-
-        #guarnicoes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
+        .shortcut-button-red i {
+            color: white; font-size: 1.2rem; margin-bottom: 0.2rem;
         }
-
-        .guarnicao-card {
-            background-color: var(--cor-cartao);
-            border: 1px solid var(--cor-borda);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px var(--cor-sombra);
-            padding: 20px;
-            transition: box-shadow 0.3s ease;
+        .guarnicao-button {
+            transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 215, 0, 0.3); border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 0.5rem; min-height: 140px; position: relative;
+            cursor: pointer; overflow: hidden;
         }
-
-        .guarnicao-card:hover {
-            box-shadow: 0 5px 15px var(--cor-sombra);
+        .guarnicao-button:hover {
+            background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            position: relative; top: -3px; z-index: 10;
         }
-
-        .guarnicao-card h2 {
-            color: var(--cor-titulo);
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--cor-borda);
-        }
-
+        /* ESTILO PARA O OFICIAL DE SERVIÇO */
         .guarnicao-oficial {
-            background-color: var(--cor-destaque);
-            border-color: var(--cor-destaque-borda);
+            background-color: rgba(255, 140, 0, 0.5); /* Laranja mais forte */
+            border-color: rgba(255, 165, 0, 0.7);
         }
-        
-        .guarnicao-oficial h2 {
-            color: #e65100; /* Laranja mais escuro para o título do oficial */
+        .guarnicao-oficial:hover {
+            background-color: rgba(255, 140, 0, 0.7); /* Laranja ainda mais forte no hover */
         }
-
-        .viatura-item {
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+        .button-visible-content {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100%; width: 100%;
         }
-
-        .viatura-item:hover {
-            background-color: #e9e9e9;
-            transform: translateY(-2px);
+        .guarnicao-name-only {
+            font-size: 0.9rem; font-weight: 700; color: white;
+            line-height: 1.2; margin-bottom: 0.3rem;
         }
-
-        /* Estilos do Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: var(--cor-modal-fundo);
-            animation: fadeIn 0.3s;
+        .guarnicao-arrow {
+            color: white; font-size: 1.2rem; transition: transform 0.3s ease;
         }
-
-        .modal-content {
-            background-color: var(--cor-cartao);
-            margin: 10% auto;
-            padding: 25px;
-            border: 1px solid var(--cor-borda);
-            width: 80%;
-            max-width: 600px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s;
+        .guarnicao-button.active .guarnicao-arrow { transform: rotate(180deg); }
+        .guarnicao-details-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: none;
+            align-items: center; justify-content: center; z-index: 10000;
         }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--cor-borda);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+        .guarnicao-details-overlay.active { display: flex; }
+        .guarnicao-details-box {
+            background-color: #1F2937; color: #E5E7EB; padding: 1rem;
+            border-radius: 0.75rem; max-width: 320px; width: 90%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease;
         }
-        
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: var(--cor-titulo);
+        .guarnicao-details-overlay.active .guarnicao-details-box { transform: translateY(0); }
+        .guarnicao-details-box .close-button {
+            position: absolute; top: 0.5rem; right: 0.7rem; background: none;
+            border: none; color: #E5E7EB; font-size: 1.8rem;
+            cursor: pointer; transition: color 0.3s ease;
         }
-
-        .close-button {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
+        .guarnicao-details-box .close-button:hover { color: #DC2626; }
+        .modal-quartel-title {
+            font-size: 1.2rem; font-weight: bold; color: #bombeiros-orange;
+            margin-bottom: 0.3rem; text-align: center;
         }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: var(--cor-texto-principal);
+        .modal-viatura-subtitle {
+            font-size: 0.9rem; font-weight: bold; color: #FFD700;
+            margin-bottom: 0.8rem; text-align: center;
         }
-
-        .crew-table {
-            width: 100%;
-            border-collapse: collapse;
+        .modal-personnel-section {
+            margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 0.8rem;
         }
-
-        .crew-table th, .crew-table td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #eee;
+        .modal-personnel-section .person-role-modal {
+            font-size: 0.8rem; line-height: 1.2; margin-bottom: 0.1rem;
+            display: flex; justify-content: space-between; flex-wrap: wrap;
         }
-
-        .crew-table th {
-            background-color: #f8f8f8;
-            font-weight: 600;
+        .modal-personnel-section .person-role-modal strong {
+            font-weight: bold; color: #4A90E2; flex-shrink: 0; margin-right: 0.5rem;
         }
-        
-        .crew-table tr:last-child td {
-            border-bottom: none;
+        .modal-personnel-section .person-role-modal span {
+            font-weight: normal; color: #E5E7EB; text-align: right; flex-grow: 1;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .modal-turn-details-section {
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.8rem;
+            text-align: center;
         }
-
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .modal-turn-details-section .turn-type-label-modal {
+            font-size: 0.8rem; font-weight: bold; color: #FFD700; margin-bottom: 0.4rem;
         }
-
+        .modal-turn-details-section .duty-detail-modal {
+            font-size: 0.7rem; color: #A0AEC0; margin-bottom: 0.1rem;
+        }
+        .guarnicoes-por-quartel-grid {
+            display: grid; grid-template-columns: repeat(9, 140px);
+            gap: 1rem; justify-content: center;
+            max-width: calc(9 * 140px + 8 * 1rem); margin: 0 auto;
+        }
+        .quartel-column {
+            display: flex; flex-direction: column; gap: 0.5rem;
+            align-items: center; width: 100%;
+        }
+        @media (max-width: 1543px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(7, 140px); max-width: calc(7 * 140px + 6 * 1rem); } }
+        @media (max-width: 1279px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(5, 140px); max-width: calc(5 * 140px + 4 * 1rem); } }
+        @media (max-width: 1023px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(4, 140px); max-width: calc(4 * 140px + 3 * 1rem); } }
+        @media (max-width: 767px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(3, 140px); max-width: calc(3 * 140px + 2 * 1rem); } }
+        @media (max-width: 639px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(2, 140px); max-width: calc(2 * 140px + 1 * 1rem); } }
+        .main-container-fluid {
+            max-width: 100%; padding-left: 1rem; padding-right: 1rem;
+            margin-left: auto; margin-right: auto;
+        }
     </style>
 </head>
-<body>
+<body class="text-white min-h-screen flex flex-col">
 
-    <div class="container">
-        <div class="header">
-            <h1>GUARNIÇÕES DE SERVIÇO</h1>
-            <p id="last-updated"></p>
+<div class="flex-grow hero-background">
+    <header class="py-4 shadow-lg z-10">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-12 md:h-16 w-auto">
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold text-bombeiros-yellow">
+                        Página das Guarnições de Serviço do 1º BBM
+                    </h1>
+                </div>
+                <div class="bg-cbmrs-blue p-2 rounded-lg">
+                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-12 md:h-16 w-auto">
+                </div>
+            </div>
+            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-2">
+                Elaborada para acesso do Efetivo Operacional, unificação de links e procedimentos atinentes ao serviço diário.
+            </p>
         </div>
+    </header>
 
-        <div id="guarnicoes-container">
+    <main class="flex-grow py-6 px-4">
+        <div class="main-container-fluid">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-fire-red mb-4 text-center">
+                    <i class="fas fa-external-link-alt mr-2"></i> LINKS RÁPIDOS DE ACESSO:
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 justify-center">
+                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-red"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
+                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-red"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-red"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
+                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
+                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-red"><i class="fas fa-link"></i><span>E-193</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-red"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
+                </div>
             </div>
-    </div>
 
-    <div id="crew-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">Tripulação da Viatura</h3>
-                <span class="close-button">&times;</span>
-            </div>
-            <div class="modal-body">
-                <table class="crew-table">
-                    <thead>
-                        <tr>
-                            <th>Posto/Grad.</th>
-                            <th>Nome</th>
-                            <th>Função</th>
-                        </tr>
-                    </thead>
-                    <tbody id="crew-list">
-                        </tbody>
-                </table>
-            </div>
+            <hr class="border-gray-600 my-8">
+            
+            <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
+                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (22/Jul/2025)
+            </h2>
+            <p class="text-gray-300 text-center mb-6 text-sm">
+                Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
+            </p>
+
+            <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid"></div>
+            <p class="text-gray-300 text-center mb-4 text-sm">
+                OBS.: Última atualização: <span id="data-atualizacao"></span>, por CIABM.
+            </p>
         </div>
-    </div>
+    </main>
+</div>
 
-    <script>
-        // --- DADOS BRUTOS PARSEADOS ---
-        const guarnicoesData = {
-            "OFICIAL DE SERVIÇO": {
-                destaque: true,
-                viaturas: [
-                    {
-                        nome: "OFICIAL SUPERVISOR",
-                        vtr_id: "ATP-765",
-                        militares: [
-                            { posto: "CAP", nome: "PAULA", funcao: "OFICIAL SUPERVISOR" },
-                            { posto: "1º TEN PME", nome: "MOREIRA", funcao: "COV / OPERADOR / CONDUTOR" }
-                        ]
-                    },
-                    {
-                        nome: "OFICIAL DE SERVIÇO",
-                        vtr_id: "ATP-201",
-                        militares: [
-                            { posto: "1º TEN", nome: "FERNANDO", funcao: "OFICIAL DE SV" },
-                            { posto: "SD", nome: "BOTEGA", funcao: "COV / OPERADOR / CONDUTOR" }
-                        ]
-                    }
-                ]
+<footer class="bg-gray-800 text-gray-400 py-3 z-10">
+    <div class="container mx-auto px-4 text-center text-xs">
+        <p>© 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+        <p class="mt-1">
+            Para demais assuntos acesse a
+            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-blue hover:underline">Página do CBMRS na Internet.</a>
+        </p>
+    </div>
+</footer>
+
+<div id="guarnicao-details-overlay" class="guarnicao-details-overlay">
+    <div class="guarnicao-details-box">
+        <button class="close-button" onclick="closeModal()">×</button>
+        <div id="modal-content"></div>
+    </div>
+</div>
+
+<script>
+    const guarnicoesData = {
+        "OFICIAL DE SERVIÇO": {
+            "ATP-765": {
+                "viatura_display": "ATP-765 (Oficial Supervisor)",
+                "militares": [
+                    { "funcao": "OFICIAL SUPERVISOR", "nome": "CAP PAULA" },
+                    { "funcao": "MOTORISTA DE DIA", "nome": "1º TEN PME MOREIRA" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
             },
-            "AÇORIANOS": {
-                viaturas: [
-                    {
-                        nome: "ABT-0595",
-                        militares: [
-                            { posto: "SD", nome: "ALISSON", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "SD", nome: "IBALDO", funcao: "CHEFE DE LINHA DIREITA" },
-                            { posto: "SD", nome: "VINICIUS", funcao: "COV / OPERADOR / CONDUTOR" }
-                        ]
-                    },
-                    {
-                        nome: "AEM-0482 e AT-0672",
-                        militares: [
-                            { posto: "SD", nome: "BITENCOURT", funcao: "COV / OPERADOR / CONDUTOR" }
-                        ]
-                    }
-                ]
-            },
-            "TERESÓPOLIS": {
-                viaturas: [
-                    {
-                        nome: "ABT-0594",
-                        militares: [
-                            { posto: "1º SGT", nome: "GOMES", funcao: "COMANDANTE DE SOCORRO" },
-                            { posto: "SD", nome: "GONÇALVES", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD", nome: "HIDALGO", funcao: "CHEFE DE LINHA DIREITA" }
-                        ]
-                    },
-                    {
-                        nome: "AR-0455",
-                        militares: [
-                            { posto: "SD", nome: "DORNELES", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "SD", nome: "ARAUJO", funcao: "COV / OPERADOR / CONDUTOR" }
-                        ]
-                    }
-                ]
-            },
-            "ASSUNÇÃO": {
-                viaturas: [
-                    {
-                        nome: "ABT-1364",
-                        militares: [
-                            { posto: "2º SGT", nome: "COAN", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "2º SGT", nome: "PANAZZOLO", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD TEMP", nome: "MAIA", funcao: "CHEFE DE LINHA DIREITA" },
-                            { posto: "SD TEMP", nome: "CORREA", funcao: "CHEFE DE LINHA DIREITA" }
-                        ]
-                    }
-                ]
-            },
-            "RESTINGA": {
-                viaturas: [
-                    {
-                        nome: "ABT-0598",
-                        militares: [
-                            { posto: "SD", nome: "FABIO", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "1º SGT", nome: "POSENATO", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD", nome: "BARRETO", funcao: "CHEFE DE LINHA DIREITA" }
-                        ]
-                    }
-                ]
-            },
-            "BELÉM NOVO": {
-                viaturas: [
-                    {
-                        nome: "ABT-0599",
-                        militares: [
-                            { posto: "SD", nome: "DETONI", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "2º SGT", nome: "CHIEZA", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD TEMP", nome: "EVERTON", funcao: "CHEFE DE LINHA DIREITA" },
-                            { posto: "SD", nome: "RAFAEL", funcao: "CHEFE DE LINHA ESQUERDA" }
-                        ]
-                    }
-                ]
-            },
-            "PASSO D'AREIA": {
-                viaturas: [
-                    {
-                        nome: "ABT-0600",
-                        militares: [
-                            { posto: "SD", nome: "PEDRO", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "SD", nome: "ISMAEL", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD", nome: "GAUTIER", funcao: "AUXILIAR DE LINHA ESQUERDA" }
-                        ]
-                    }
-                ]
-            },
-            "FLORESTA": {
-                viaturas: [
-                    {
-                        nome: "ABT-1365",
-                        militares: [
-                            { posto: "2º SGT", nome: "SAUL", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "SD TEMP", nome: "DOTTA", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD", nome: "FRANCIS", funcao: "CHEFE DE LINHA DIREITA" }
-                        ]
-                    }
-                ]
-            },
-            "PARTENON": {
-                viaturas: [
-                    {
-                        nome: "ABT-327",
-                        militares: [
-                            { posto: "1º SGT", nome: "ARIAS", funcao: "COMANDANTE DE GUARNIÇÃO" },
-                            { posto: "SD", nome: "BRUNO EDUARDO", funcao: "COV / OPERADOR / CONDUTOR" },
-                            { posto: "SD", nome: "PATRICK", funcao: "AUXILIAR DE LINHA DIREITA" }
-                        ]
-                    }
-                ]
+            "ATP-201": {
+                "viatura_display": "ATP-201 (Comando de Socorro)",
+                "militares": [
+                    { "funcao": "COMANDANTE DE SOCORRO", "nome": "1º TEN FERNANDO" },
+                    { "funcao": "MOTORISTA DE DIA", "nome": "SD BOTEGA" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
             }
+        },
+        "AÇORIANOS": {
+            "ABT-0595": {
+                "viatura_display": "ABT-0595",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD ALISSON" },
+                    { "funcao": "COV", "nome": "SD VINICIUS" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD IBALDO" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            },
+            "AEM_E_AT": {
+                "viatura_display": "AEM-0482 e AT-0672",
+                "militares": [
+                    { "funcao": "COV", "nome": "SD BITENCOURT" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "TERESÓPOLIS": {
+            "ABT-0594": {
+                "viatura_display": "ABT-0594",
+                "militares": [
+                    { "funcao": "CMT SOCORRO", "nome": "1º SGT GOMES" },
+                    { "funcao": "COV", "nome": "SD GONÇALVES" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD HIDALGO" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            },
+            "AR-0455": {
+                "viatura_display": "AR-0455",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD DORNELES" },
+                    { "funcao": "COV", "nome": "SD ARAUJO" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "ASSUNÇÃO": {
+            "ABT-1364": {
+                "viatura_display": "ABT-1364",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT COAN" },
+                    { "funcao": "COV", "nome": "2º SGT PANAZZOLO" },
+                    { "funcao": "CHEFE DE LINHA (1ºT)", "nome": "SD TEMP MAIA" },
+                    { "funcao": "CHEFE DE LINHA (2ºT)", "nome": "SD TEMP CORREA" }
+                ],
+                "turno": "12h / 12h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "RESTINGA": {
+            "ABT-0598": {
+                "viatura_display": "ABT-0598",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD FABIO" },
+                    { "funcao": "COV", "nome": "1º SGT POSENATO" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD BARRETO" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "BELÉM NOVO": {
+            "ABT-0599": {
+                "viatura_display": "ABT-0599",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD DETONI" },
+                    { "funcao": "COV", "nome": "2º SGT CHIEZA" },
+                    { "funcao": "CHEFE DE LINHA (1ºT)", "nome": "SD TEMP EVERTON" },
+                    { "funcao": "CHEFE DE LINHA (2ºT)", "nome": "SD RAFAEL" }
+                ],
+                "turno": "12h / 12h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "PASSO D'AREIA": {
+            "ABT-0600": {
+                "viatura_display": "ABT-0600",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD PEDRO" },
+                    { "funcao": "COV", "nome": "SD ISMAEL" },
+                    { "funcao": "AUXILIAR LINHA", "nome": "SD GAUTIER" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "FLORESTA": {
+            "ABT-1365": {
+                "viatura_display": "ABT-1365",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT SAUL" },
+                    { "funcao": "COV", "nome": "SD TEMP DOTTA" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD FRANCIS" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        },
+        "PARTENON": {
+            "ABT-327": {
+                "viatura_display": "ABT-327",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "1º SGT ARIAS" },
+                    { "funcao": "COV", "nome": "SD BRUNO EDUARDO" },
+                    { "funcao": "AUXILIAR LINHA", "nome": "SD PATRICK" }
+                ],
+                "turno": "24h", "inicio_data": "22/Jul/2025", "inicio_hora": "08:00", "fim_data": "23/Jul/2025", "fim_hora": "08:00"
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const guarnicoesGrid = document.getElementById('guarnicoes-grid');
+        const modalOverlay = document.getElementById('guarnicao-details-overlay');
+        const modalContentDiv = document.getElementById('modal-content');
+        const dataAtualizacaoSpan = document.getElementById('data-atualizacao');
+
+        // FUNÇÃO PARA PEGAR DATA E HORA ATUAIS
+        function formatarDataHoraAtual() {
+            const agora = new Date();
+            const dia = String(agora.getDate());
+            const mes = agora.toLocaleString('pt-BR', { month: 'short' }).replace('.', ''); // Remove o ponto de "jul."
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes} às ${horas}:${minutos}`;
+        }
+
+        // ATUALIZA A DATA/HORA NA PÁGINA
+        if(dataAtualizacaoSpan) {
+            dataAtualizacaoSpan.textContent = formatarDataHoraAtual();
+        }
+
+        // ORDEM DE EXIBIÇÃO FIXA
+        const pelotaoOrder = [
+            "OFICIAL DE SERVIÇO",
+            "AÇORIANOS",
+            "TERESÓPOLIS",
+            "ASSUNÇÃO",
+            "RESTINGA",
+            "BELÉM NOVO",
+            "PASSO D'AREIA",
+            "FLORESTA",
+            "PARTENON"
+        ];
+
+        pelotaoOrder.forEach(pelotaoName => {
+            const pelotaoData = guarnicoesData[pelotaoName];
+            if (pelotaoData) {
+                const quartelColumn = document.createElement('div');
+                quartelColumn.classList.add('quartel-column');
+                const guarnicaoButton = document.createElement('div');
+                guarnicaoButton.classList.add('guarnicao-button');
+                
+                if (pelotaoName === 'OFICIAL DE SERVIÇO') {
+                    guarnicaoButton.classList.add('guarnicao-oficial');
+                }
+
+                guarnicaoButton.setAttribute('data-pelotao-name', pelotaoName);
+                const buttonVisibleContent = document.createElement('div');
+                buttonVisibleContent.classList.add('button-visible-content');
+                buttonVisibleContent.innerHTML = `<span class="guarnicao-name-only">${pelotaoName}</span><i class="fas fa-chevron-down guarnicao-arrow"></i>`;
+                guarnicaoButton.appendChild(buttonVisibleContent);
+                const modalSourceData = document.createElement('div');
+                modalSourceData.classList.add('modal-source-data');
+                modalSourceData.style.display = 'none';
+                let modalHtml = `<h3 class="modal-quartel-title">${pelotaoName}</h3>`;
+                for (const viaturaKey in pelotaoData) {
+                    const viaturaData = pelotaoData[viaturaKey];
+                    modalHtml += `<h4 class="modal-viatura-subtitle">${viaturaData.viatura_display}</h4><div class="modal-personnel-section">`;
+                    viaturaData.militares.forEach(militar => {
+                        modalHtml += `<div class="person-role-modal"><strong>${militar.funcao}:</strong> <span>${militar.nome}</span></div>`;
+                    });
+                    modalHtml += `</div><div class="modal-turn-details-section"><div class="turn-type-label-modal">Turno: ${viaturaData.turno}</div><div class="duty-detail-modal">Início: ${viaturaData.inicio_data} - das ${viaturaData.inicio_hora}</div><div class="duty-detail-modal">Fim: ${viaturaData.fim_data} - às ${viaturaData.fim_hora}</div></div><hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">`;
+                }
+                modalSourceData.innerHTML = modalHtml;
+                guarnicaoButton.appendChild(modalSourceData);
+                quartelColumn.appendChild(guarnicaoButton);
+                guarnicoesGrid.appendChild(quartelColumn);
+            }
+        });
+
+        const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
+        guarnicaoButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const modalSourceData = button.querySelector('.modal-source-data');
+                if (modalSourceData) {
+                    modalContentDiv.innerHTML = modalSourceData.innerHTML;
+                    modalOverlay.classList.add('active');
+                }
+            });
+        });
+
+        window.closeModal = () => {
+            modalOverlay.classList.remove('active');
+            modalContentDiv.innerHTML = '';
+            document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- REGRAS DE NEGÓCIO ---
-
-            // 1. Ordem de Exibição Fixa
-            const displayOrder = [
-                "OFICIAL DE SERVIÇO", "AÇORIANOS", "TERESÓPOLIS", "ASSUNÇÃO", 
-                "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", "FLORESTA", "PARTENON"
-            ];
-            
-            // 2. Elementos do DOM
-            const container = document.getElementById('guarnicoes-container');
-            const modal = document.getElementById('crew-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const crewList = document.getElementById('crew-list');
-            const closeButton = document.querySelector('.close-button');
-
-            // 3. Gerar Cards das Guarnições
-            displayOrder.forEach(nomePelotao => {
-                const pelotaoData = guarnicoesData[nomePelotao];
-                if (!pelotaoData) return;
-
-                const card = document.createElement('div');
-                card.className = 'guarnicao-card';
-                // Aplica classe de destaque se necessário
-                if (pelotaoData.destaque) {
-                    card.classList.add('guarnicao-oficial');
-                }
-
-                const title = document.createElement('h2');
-                title.textContent = nomePelotao;
-                card.appendChild(title);
-
-                pelotaoData.viaturas.forEach(viatura => {
-                    const viaturaItem = document.createElement('div');
-                    viaturaItem.className = 'viatura-item';
-                    viaturaItem.textContent = viatura.nome;
-                    viaturaItem.addEventListener('click', () => showCrewModal(viatura, nomePelotao));
-                    card.appendChild(viaturaItem);
-                });
-
-                container.appendChild(card);
-            });
-
-            // 4. Função para exibir o modal
-            function showCrewModal(viatura, nomePelotao) {
-                // Unificar VTRs: O título já vem tratado no objeto de dados
-                modalTitle.textContent = `${viatura.nome} (${nomePelotao})`;
-                
-                crewList.innerHTML = ''; // Limpa a lista anterior
-                viatura.militares.forEach(militar => {
-                    const row = crewList.insertRow();
-                    row.innerHTML = `
-                        <td>${militar.posto}</td>
-                        <td>${militar.nome}</td>
-                        <td>${militar.funcao}</td>
-                    `;
-                });
-                modal.style.display = 'block';
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target === modalOverlay) {
+                window.closeModal();
             }
-
-            // 5. Funções para fechar o modal
-            closeButton.onclick = () => {
-                modal.style.display = 'none';
-            };
-            window.onclick = (event) => {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            };
-
-            // 6. Atualizar Data e Hora
-            function updateDateTime() {
-                const now = new Date();
-                const day = String(now.getDate()).padStart(2, '0');
-                const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-                                    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-                const month = monthNames[now.getMonth()];
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                
-                document.getElementById('last-updated').textContent = `Última atualização: ${day} de ${month} às ${hours}:${minutes}`;
-            }
-
-            updateDateTime();
-            setInterval(updateDateTime, 60000); // Atualiza a cada minuto
         });
-    </script>
-
+    });
+</script>
 </body>
 </html>
