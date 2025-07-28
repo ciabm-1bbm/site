@@ -43,10 +43,9 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
-        /* COR DOS LINKS RÁPIDOS ALTERADA PARA AZUL */
         .shortcut-button-blue {
             transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(59, 130, 246, 0.3); /* Azul translúcido (light-blue) */
+            background-color: rgba(59, 130, 246, 0.3);
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
@@ -55,7 +54,7 @@
             word-break: break-word; hyphens: auto; text-decoration: none;
         }
         .shortcut-button-blue:hover {
-            background-color: rgba(59, 130, 246, 0.5); /* Azul translúcido mais forte no hover */
+            background-color: rgba(59, 130, 246, 0.5);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
@@ -74,13 +73,12 @@
             background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             position: relative; top: -3px; z-index: 10;
         }
-        /* ESTILO PARA O OFICIAL DE SERVIÇO */
         .guarnicao-oficial {
-            background-color: rgba(255, 140, 0, 0.5); /* Laranja mais forte */
+            background-color: rgba(255, 140, 0, 0.5);
             border-color: rgba(255, 165, 0, 0.7);
         }
         .guarnicao-oficial:hover {
-            background-color: rgba(255, 140, 0, 0.7); /* Laranja ainda mais forte no hover */
+            background-color: rgba(255, 140, 0, 0.7);
         }
         .button-visible-content {
             display: flex; flex-direction: column; align-items: center;
@@ -247,8 +245,8 @@
             "ABT-0595": {
                 "viatura_display": "ABT-0595",
                 "militares": [
-                    { "funcao": "CMT GU (1ºT)", "nome": "1º SGT DELAVECHIA" },
-                    { "funcao": "CMT GU (2ºT)", "nome": "2º SGT KANOFRE" },
+                    { "funcao": "CMT GU (08h-20h)", "nome": "1º SGT DELAVECHIA" },
+                    { "funcao": "CMT GU (20h-08h)", "nome": "2º SGT KANOFRE" },
                     { "funcao": "COV", "nome": "SD TEMP PAULINO" },
                     { "funcao": "CHEFE DE LINHA", "nome": "SD ALISSON" }
                 ],
@@ -262,13 +260,32 @@
                 "turno": "24h", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
             }
         },
+        "TERESÓPOLIS": {
+            "ABT-0594": {
+                "viatura_display": "ABT-0594",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "1º SGT LUCIANO" },
+                    { "funcao": "COV", "nome": "2º SGT BEN-HUR" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD CASSIANO" }
+                ],
+                "turno": "24h", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
+            },
+            "AR-0455": {
+                "viatura_display": "AR-0455",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD LOPES" },
+                    { "funcao": "COV", "nome": "SD AZEREDO" }
+                ],
+                "turno": "24h", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
+            }
+        },
         "ASSUNÇÃO": {
             "ABT-0596": {
                 "viatura_display": "ABT-0596",
                 "militares": [
                     { "funcao": "CMT GU", "nome": "SD DIEIQUE" },
-                    { "funcao": "COV (1ºT)", "nome": "SD TEMP PINTO" },
-                    { "funcao": "COV (2ºT)", "nome": "SD PETER" },
+                    { "funcao": "COV (08h-20h)", "nome": "SD TEMP PINTO" },
+                    { "funcao": "COV (20h-08h)", "nome": "SD PETER" },
                     { "funcao": "CHEFE LINHA D.", "nome": "SD PORCELIS" },
                     { "funcao": "CHEFE LINHA E.", "nome": "SD TEMP MAIA" }
                 ],
@@ -291,6 +308,7 @@
                 "viatura_display": "ABT-0599",
                 "militares": [
                     { "funcao": "CMT GU", "nome": "1º SGT PME JULIANO" },
+                    { "funcao": "COV", "nome": "SD TEMP DOTTA" },
                     { "funcao": "CHEFE DE LINHA", "nome": "SD RAFAEL" }
                 ],
                 "turno": "24h", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
@@ -311,10 +329,11 @@
             "ABT-0597": {
                 "viatura_display": "ABT-0597",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD ACÁCIO" },
+                    { "funcao": "CMT GU (08h-20h)", "nome": "SD ACÁCIO" },
+                    { "funcao": "CMT GU (20h-08h)", "nome": "2º SGT SAUL" },
                     { "funcao": "COV", "nome": "SD FARIAS" },
                     { "funcao": "AUXILIAR LINHA D.", "nome": "SD FRANCIS" },
-                    { "funcao": "AUXILIAR LINHA E. (2ºT)", "nome": "SD CAMPOS" }
+                    { "funcao": "AUXILIAR LINHA E. (20h-08h)", "nome": "SD CAMPOS" }
                 ],
                 "turno": "Misto", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
             }
@@ -324,10 +343,10 @@
                 "viatura_display": "ABT-327",
                 "militares": [
                     { "funcao": "CMT GU", "nome": "SD JUSSIE" },
-                    { "funcao": "COV (até 14h)", "nome": "SD BRUNO EDUARDO" },
-                    { "funcao": "COV (após 14h)", "nome": "3º SGT RAMOS" },
-                    { "funcao": "CHEFE LINHA (até 23h)", "nome": "SD TEMP ZANETTI" },
-                    { "funcao": "CHEFE LINHA (após 23h)", "nome": "SD TEMP RENAN" }
+                    { "funcao": "COV (08h-14h)", "nome": "SD BRUNO EDUARDO" },
+                    { "funcao": "COV (14h-08h)", "nome": "3º SGT RAMOS" },
+                    { "funcao": "CHEFE LINHA (08h-23h)", "nome": "SD TEMP ZANETTI" },
+                    { "funcao": "CHEFE LINHA (23h-08h)", "nome": "SD TEMP RENAN" }
                 ],
                 "turno": "Misto", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
             }
