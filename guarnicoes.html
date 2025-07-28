@@ -14,6 +14,7 @@
                         'bombeiros-yellow': '#FFD700',
                         'cbmrs-blue': '#1A5276',
                         'fire-red': '#DC2626',
+                        'light-blue': '#3B82F6',
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -42,20 +43,23 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
-        .shortcut-button-red {
+        /* COR DOS LINKS RÁPIDOS ALTERADA PARA AZUL */
+        .shortcut-button-blue {
             transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(220, 38, 38, 0.3); border-radius: 0.5rem;
+            background-color: rgba(59, 130, 246, 0.3); /* Azul translúcido (light-blue) */
+            border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
             height: 50px; padding: 4px; color: white;
             font-size: 9px; font-weight: 700; line-height: 1.2;
             word-break: break-word; hyphens: auto; text-decoration: none;
         }
-        .shortcut-button-red:hover {
-            background-color: rgba(220, 38, 38, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        .shortcut-button-blue:hover {
+            background-color: rgba(59, 130, 246, 0.5); /* Azul translúcido mais forte no hover */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
-        .shortcut-button-red i {
+        .shortcut-button-blue i {
             color: white; font-size: 1.2rem; margin-bottom: 0.2rem;
         }
         .guarnicao-button {
@@ -188,18 +192,18 @@
     <main class="flex-grow py-6 px-4">
         <div class="main-container-fluid">
             <div class="mb-8">
-                <h2 class="text-xl font-bold text-fire-red mb-4 text-center">
+                <h2 class="text-xl font-bold text-light-blue mb-4 text-center">
                     <i class="fas fa-external-link-alt mr-2"></i> LINKS RÁPIDOS DE ACESSO:
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 justify-center">
-                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-red"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
-                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-red"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-red"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
-                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-red"><i class="fas fa-link"></i><span>E-193</span></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-red"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
+                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-blue"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
+                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-blue"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-blue"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
+                    <a href="#" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
+                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-blue"><i class="fas fa-link"></i><span>E-193</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-blue"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
                 </div>
             </div>
 
