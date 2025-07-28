@@ -63,18 +63,20 @@
         }
         .guarnicao-button {
             transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 215, 0, 0.3); border-radius: 0.5rem;
+            background-color: rgba(255, 215, 0, 0.3); /* Cor Amarela para os cards */
+            border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
             padding: 0.5rem; min-height: 140px; position: relative;
             cursor: pointer; overflow: hidden;
         }
         .guarnicao-button:hover {
-            background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 215, 0, 0.5); /* Amarelo mais forte no hover */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             position: relative; top: -3px; z-index: 10;
         }
         .guarnicao-oficial {
-            background-color: rgba(255, 140, 0, 0.5);
+            background-color: rgba(255, 140, 0, 0.5); /* Cor Laranja para Oficial */
             border-color: rgba(255, 165, 0, 0.7);
         }
         .guarnicao-oficial:hover {
@@ -241,6 +243,16 @@
 
 <script>
     const guarnicoesData = {
+        "OFICIAL DE SERVIÇO": {
+            "ATP-201": {
+                "viatura_display": "ATP-201 (Comando de Socorro)",
+                "militares": [
+                    { "funcao": "COMANDANTE DE SOCORRO (Alfa 5)", "nome": "1º TEN FREITAS" },
+                    { "funcao": "COV DO ALFA 5", "nome": "2º SGT VIANEI" }
+                ],
+                "turno": "24h", "inicio_data": "28/Jul/2025", "inicio_hora": "08:00", "fim_data": "29/Jul/2025", "fim_hora": "08:00"
+            }
+        },
         "AÇORIANOS": {
             "ABT-0595": {
                 "viatura_display": "ABT-0595",
