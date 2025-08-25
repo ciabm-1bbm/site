@@ -14,6 +14,7 @@
                         'bombeiros-yellow': '#FFD700',
                         'cbmrs-blue': '#1A5276',
                         'fire-red': '#DC2626',
+                        'light-blue': '#3B82F6',
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -42,41 +43,44 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
-        .shortcut-button-red {
+        .shortcut-button-blue {
             transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(220, 38, 38, 0.3); border-radius: 0.5rem;
+            background-color: rgba(59, 130, 246, 0.3);
+            border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
             height: 50px; padding: 4px; color: white;
             font-size: 9px; font-weight: 700; line-height: 1.2;
             word-break: break-word; hyphens: auto; text-decoration: none;
         }
-        .shortcut-button-red:hover {
-            background-color: rgba(220, 38, 38, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        .shortcut-button-blue:hover {
+            background-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
-        .shortcut-button-red i {
+        .shortcut-button-blue i {
             color: white; font-size: 1.2rem; margin-bottom: 0.2rem;
         }
         .guarnicao-button {
             transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 215, 0, 0.3); border-radius: 0.5rem;
+            background-color: rgba(255, 215, 0, 0.3);
+            border-radius: 0.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
             padding: 0.5rem; min-height: 140px; position: relative;
             cursor: pointer; overflow: hidden;
         }
         .guarnicao-button:hover {
-            background-color: rgba(255, 215, 0, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             position: relative; top: -3px; z-index: 10;
         }
-        /* ESTILO PARA O OFICIAL DE SERVIÇO */
         .guarnicao-oficial {
-            background-color: rgba(255, 140, 0, 0.5); /* Laranja mais forte */
+            background-color: rgba(255, 140, 0, 0.5);
             border-color: rgba(255, 165, 0, 0.7);
         }
         .guarnicao-oficial:hover {
-            background-color: rgba(255, 140, 0, 0.7); /* Laranja ainda mais forte no hover */
+            background-color: rgba(255, 140, 0, 0.7);
         }
         .button-visible-content {
             display: flex; flex-direction: column; align-items: center;
@@ -188,25 +192,25 @@
     <main class="flex-grow py-6 px-4">
         <div class="main-container-fluid">
             <div class="mb-8">
-                <h2 class="text-xl font-bold text-fire-red mb-4 text-center">
+                <h2 class="text-xl font-bold text-light-blue mb-4 text-center">
                     <i class="fas fa-external-link-alt mr-2"></i> LINKS RÁPIDOS DE ACESSO:
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 justify-center">
-                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-red"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
-                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-red"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-red"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
-                    <a href="#" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
-                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-red"><i class="fas fa-link"></i><span>E-193</span></a>
-                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-red"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
-                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-red"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
+                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-blue"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
+                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-blue"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-blue"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
+                    <a href="#" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
+                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-blue"><i class="fas fa-link"></i><span>E-193</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-blue"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
                 </div>
             </div>
 
             <hr class="border-gray-600 my-8">
             
             <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
-                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (25/Jul/2025)
+                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (25/Ago/2025)
             </h2>
             <p class="text-gray-300 text-center mb-6 text-sm">
                 Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
@@ -243,17 +247,17 @@
             "ATP-765": {
                 "viatura_display": "ATP-765 (Oficial Supervisor)",
                 "militares": [
-                    { "funcao": "OFICIAL SUPERVISOR (Alfa 4)", "nome": "CAP AMIN" },
-                    { "funcao": "COV DO ALFA 4", "nome": "1º TEN PME BUENO" }
+                    { "funcao": "OFICIAL SUPERVISOR (Alfa 4)", "nome": "CAP RODRIGO DA SILVA BORGES" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             },
             "ATP-201": {
                 "viatura_display": "ATP-201 (Comando de Socorro)",
                 "militares": [
-                    { "funcao": "MOTORISTA DE DIA", "nome": "SD BITENCOURT" }
+                    { "funcao": "COMANDANTE DE SOCORRO (Alfa 5)", "nome": "1º TEN PATRICIO" },
+                    { "funcao": "COV DO ALFA 5", "nome": "SD VINICIUS" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "AÇORIANOS": {
@@ -261,105 +265,105 @@
                 "viatura_display": "ABT-0595",
                 "militares": [
                     { "funcao": "CMT GU", "nome": "1º SGT FLÁVIO" },
-                    { "funcao": "COV", "nome": "SD VINICIUS" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD ALISSON" }
+                    { "funcao": "COV (08h-20h)", "nome": "SD TEMP PAULINO" },
+                    { "funcao": "COV (20h-08h)", "nome": "SD LAGO" },
+                    { "funcao": "CHEFE LINHA D. (08h-17h)", "nome": "SD TEMP CORREA" },
+                    { "funcao": "CHEFE LINHA E. (11h-08h)", "nome": "SD IBALDO" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
-            },
-            "AEM_E_AT": {
-                "viatura_display": "AEM-0482 e AT-0671",
-                "militares": [
-                    { "funcao": "COV", "nome": "SD BOTEGA" }
-                ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "TERESÓPOLIS": {
             "ABT-0594": {
                 "viatura_display": "ABT-0594",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT PME CARGNELUTTI" },
+                    { "funcao": "CMT GU (11h-08h)", "nome": "SD THIAGO" },
+                    { "funcao": "CMT GU (08h-11h)", "nome": "1º SGT GOMES" },
                     { "funcao": "COV", "nome": "SD ZEMPER" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD JORDAN" }
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD CASSIANO" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             },
             "AR-0455": {
                 "viatura_display": "AR-0455",
                 "militares": [
                     { "funcao": "CMT GU", "nome": "SD BRUM" },
-                    { "funcao": "COV", "nome": "SD VINÍCIUS" },
+                    { "funcao": "COV", "nome": "SD BARREIRO" },
                     { "funcao": "RESGATISTA", "nome": "SD ROSEANNE" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "ASSUNÇÃO": {
-            "ABT-1364": {
-                "viatura_display": "ABT-1364",
+            "ABT-0596": {
+                "viatura_display": "ABT-0596",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BRUM" },
-                    { "funcao": "COV", "nome": "2º SGT PANAZZOLO" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD BAIGORRA" }
+                    { "funcao": "CMT GU (20h-08h)", "nome": "SD BRUM" },
+                    { "funcao": "CMT GU (08h-20h)", "nome": "SD PORCELIS" },
+                    { "funcao": "COV", "nome": "SD RAUBACH" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD TEMP MAIA" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "RESTINGA": {
             "ABT-0598": {
                 "viatura_display": "ABT-0598",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BERGHAHN" },
-                    { "funcao": "COV", "nome": "SD ROGER" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD BARRETO" }
+                    { "funcao": "CMT GU", "nome": "SD BRUNO" },
+                    { "funcao": "COV", "nome": "SD FINGER" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD DAYKER" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "BELÉM NOVO": {
             "ABT-0599": {
                 "viatura_display": "ABT-0599",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT MENDES" },
-                    { "funcao": "COV", "nome": "SD FERREIRA" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD COSME" }
+                    { "funcao": "CMT GU (20h-08h)", "nome": "1º SGT PME JULIANO" },
+                    { "funcao": "CMT GU (08h-20h)", "nome": "SD RAUBUSTT" },
+                    { "funcao": "COV", "nome": "SD MAURÍCIO" },
+                    { "funcao": "CHEFE LINHA D. (08h-20h)", "nome": "SD COSME" },
+                    { "funcao": "CHEFE LINHA E. (20h-08h)", "nome": "SD RAUBUSTT" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "PASSO D'AREIA": {
             "ABT-0600": {
                 "viatura_display": "ABT-0600",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD PEDRO" },
-                    { "funcao": "COV", "nome": "SD MONTEIRO" },
-                    { "funcao": "CHEFE LINHA D. (12h)", "nome": "SD THIAGO" },
-                    { "funcao": "CHEFE LINHA E.", "nome": "SD JOSÉ" }
+                    { "funcao": "CMT GU (11h-08h)", "nome": "SD BUENO" },
+                    { "funcao": "CMT GU (08h-11h)", "nome": "SD PEDRO" },
+                    { "funcao": "COV", "nome": "1º SGT AIRTON" },
+                    { "funcao": "CHEFE LINHA D. (08h-11h)", "nome": "SD BUENO" },
+                    { "funcao": "CHEFE LINHA E.", "nome": "SD EIDER" }
                 ],
-                "turno": "Misto", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "FLORESTA": {
             "ABT-0597": {
                 "viatura_display": "ABT-0597",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD CRISTIANO" },
+                    { "funcao": "CMT GU", "nome": "2º SGT SAUL" },
                     { "funcao": "COV", "nome": "SD SIQUEIRA" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD KINGESKI" }
+                    { "funcao": "CHEFE DE LINHA", "nome": "2º SGT PME DACHI" }
                 ],
-                "turno": "24h", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         },
         "PARTENON": {
             "ABT-327": {
                 "viatura_display": "ABT-327",
                 "militares": [
-                    { "funcao": "CMT GU (9h)", "nome": "SD BATISTA" },
-                    { "funcao": "COV", "nome": "3º SGT RAMOS" },
-                    { "funcao": "CHEFE LINHA D.", "nome": "SD TEMP ZANETTI" },
-                    { "funcao": "CHEFE LINHA E.", "nome": "SD JONATHAN" }
+                    { "funcao": "CMT GU", "nome": "SD BATISTA" },
+                    { "funcao": "COV", "nome": "SD BELOMO" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD JONATHAN" },
+                    { "funcao": "AUXILIAR LINHA (14h-14h)", "nome": "SD CABRAL" }
                 ],
-                "turno": "Misto", "inicio_data": "25/Jul/2025", "inicio_hora": "08:00", "fim_data": "26/Jul/2025", "fim_hora": "08:00"
+                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
             }
         }
     };
