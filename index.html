@@ -140,19 +140,25 @@
                     Aqui tu poderás acessar as principais ferramentas criadas pelos membros da CIA para facilitar o acesso às demandas administrativas, otimizando teu tempo e o nosso trabalho em prol da sociedade. Avante CBMRS!
                 </p>
                 
-                <div id="widget-aniversarios-dia" class="mt-4 max-w-2xl mx-auto p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg text-center" style="display: none;">
-                    <h3 class="font-bold text-bombeiros-yellow flex items-center justify-center">
-                        <i class="fas fa-birthday-cake mr-2"></i>
-                        Aniversariantes do Dia!
-                    </h3>
-                    <p class="text-sm mt-1 text-white" id="lista-aniversariantes-dia"></p>
-                </div>
-                <div id="widget-aniversarios-semana" class="mt-2 max-w-2xl mx-auto p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg text-center" style="display: none;">
-                    <h3 class="font-bold text-cbmrs-light-blue flex items-center justify-center">
-                        <i class="fas fa-gift mr-2"></i>
-                        Aniversariantes da Semana
-                    </h3>
-                    <div class="text-xs mt-1 text-white" id="lista-aniversariantes-semana"></div>
+                <div class="mt-4 max-w-4xl mx-auto flex flex-col md:flex-row gap-4">
+                    <div id="widget-aniversarios-dia" class="w-full md:w-1/2 p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg" style="display: none;">
+                        <div class="flex justify-between items-center w-full mb-2">
+                             <h3 class="font-bold text-bombeiros-yellow flex items-center">
+                                <i class="fas fa-birthday-cake mr-2"></i>
+                                Aniversariantes do Dia
+                            </h3>
+                            <span id="data-atual" class="text-xs text-gray-400 font-mono"></span>
+                        </div>
+                        <p class="text-sm text-left text-white" id="lista-aniversariantes-dia"></p>
+                    </div>
+
+                    <div id="widget-aniversarios-semana" class="w-full md:w-1/2 p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg" style="display: none;">
+                         <h3 class="font-bold text-cbmrs-light-blue flex items-center mb-2">
+                            <i class="fas fa-gift mr-2"></i>
+                            Aniversariantes da Semana
+                        </h3>
+                        <div class="text-xs text-left text-white" id="lista-aniversariantes-semana"></div>
+                    </div>
                 </div>
                 </div>
         </div>
@@ -541,10 +547,19 @@
         };
 
         // --- 2. DECLARAÇÃO DAS FUNÇÕES ---
-        // Função que controla os widgets de aniversário
         function checarAniversarios() {
             const hoje = new Date();
-            
+            const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+
+            // Formata a data completa para o título do widget do dia
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const mes = meses[hoje.getMonth()];
+            const ano = hoje.getFullYear();
+            const diaSemana = diasSemana[hoje.getDay()];
+            const dataCompletaFormatada = `Dia ${dia}/${mes}/${ano} - ${diaSemana}`;
+            document.getElementById('data-atual').textContent = dataCompletaFormatada;
+
             // --- Lógica para o Widget do Dia ---
             const widgetDia = document.getElementById('widget-aniversarios-dia');
             const listaDia = document.getElementById('lista-aniversariantes-dia');
@@ -566,7 +581,7 @@
             const widgetSemana = document.getElementById('widget-aniversarios-semana');
             const listaSemana = document.getElementById('lista-aniversariantes-semana');
             const aniversariantesDaSemana = [];
-            const hojeSemAno = (hoje.getMonth() * 100) + hoje.getDate(); // Para comparação numérica e ordenação
+            const hojeSemAno = (hoje.getMonth() * 100) + hoje.getDate();
 
             for (let i = -3; i <= 3; i++) {
                 const dataChecagem = new Date();
@@ -606,7 +621,6 @@
             }
         }
 
-        // Funções de Login e Interface
         function atualizarInterface(userRole) {
             allShortcutButtons.forEach(link => {
                 const requiredRole = link.dataset.role;
@@ -668,9 +682,7 @@
 
         // --- 4. ADIÇÃO DOS EVENT LISTENERS ---
         allShortcutButtons.forEach(link => {
-            if (link.href.startsWith('mailto:')) {
-                return;
-            }
+            if (link.href.startsWith('mailto:')) { return; }
             link.addEventListener('click', (event) => {
                 const requiredRole = link.dataset.role;
                 const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
