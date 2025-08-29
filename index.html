@@ -142,22 +142,20 @@
                 
                 <div class="mt-4 max-w-4xl mx-auto flex flex-col md:flex-row gap-4">
                     <div id="widget-aniversarios-dia" class="w-full md:w-1/2 p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg" style="display: none;">
-                        <div class="flex justify-between items-center w-full mb-2">
-                             <h3 class="font-bold text-bombeiros-yellow flex items-center">
-                                <i class="fas fa-birthday-cake mr-2"></i>
-                                Aniversariantes do Dia
-                            </h3>
-                            <span id="data-atual" class="text-xs text-gray-400 font-mono"></span>
-                        </div>
+                        <h3 class="font-bold text-bombeiros-yellow flex items-center">
+                            <i class="fas fa-birthday-cake mr-2"></i>
+                            Aniversariantes do Dia
+                        </h3>
+                        <span id="data-atual" class="block text-xs text-gray-400 font-mono text-left mb-2"></span>
                         <p class="text-sm text-left text-white" id="lista-aniversariantes-dia"></p>
                     </div>
 
-                    <div id="widget-aniversarios-semana" class="w-full md:w-1/2 p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg" style="display: none;">
+                    <div id="widget-aniversarios-mes" class="w-full md:w-1/2 p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg" style="display: none;">
                          <h3 class="font-bold text-cbmrs-light-blue flex items-center mb-2">
-                            <i class="fas fa-gift mr-2"></i>
-                            Aniversariantes da Semana
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            Aniversariantes do Mês de <span id="mes-atual-nome" class="ml-1"></span>
                         </h3>
-                        <div class="text-xs text-left text-white" id="lista-aniversariantes-semana"></div>
+                        <div class="text-xs text-left text-white" id="lista-aniversariantes-mes"></div>
                     </div>
                 </div>
                 </div>
@@ -550,14 +548,13 @@
         function checarAniversarios() {
             const hoje = new Date();
             const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-            const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+            const meses = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
 
-            // Formata a data completa para o título do widget do dia
             const dia = String(hoje.getDate()).padStart(2, '0');
-            const mes = meses[hoje.getMonth()];
+            const mesNome = meses[hoje.getMonth()];
             const ano = hoje.getFullYear();
             const diaSemana = diasSemana[hoje.getDay()];
-            const dataCompletaFormatada = `Dia ${dia}/${mes}/${ano} - ${diaSemana}`;
+            const dataCompletaFormatada = `${dia}/${mesNome}/${ano} - ${diaSemana}`;
             document.getElementById('data-atual').textContent = dataCompletaFormatada;
 
             // --- Lógica para o Widget do Dia ---
@@ -577,50 +574,53 @@
                 widgetDia.style.display = 'block';
             }
 
-            // --- Lógica para o Widget da Semana ---
-            const widgetSemana = document.getElementById('widget-aniversarios-semana');
-            const listaSemana = document.getElementById('lista-aniversariantes-semana');
-            const aniversariantesDaSemana = [];
-            const hojeSemAno = (hoje.getMonth() * 100) + hoje.getDate();
+            // --- Lógica para o Widget do Mês ---
+            const widgetMes = document.getElementById('widget-aniversarios-mes');
+            const listaMes = document.getElementById('lista-aniversariantes-mes');
+            document.getElementById('mes-atual-nome').textContent = mesNome;
 
+            const datasDaSemana = new Set();
             for (let i = -3; i <= 3; i++) {
                 const dataChecagem = new Date();
                 dataChecagem.setDate(hoje.getDate() + i);
-                const dataFormatada = `${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`;
+                datasDaSemana.add(`${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`);
+            }
 
-                for (const id in efetivo) {
-                    const militar = efetivo[id];
-                    if (militar.nascimento === dataFormatada) {
-                        if (!aniversariantesDaSemana.some(a => a.id === id)) {
-                            aniversariantesDaSemana.push({ 
-                                id: id,
-                                nome: militar.nomeGuerra, 
-                                data: militar.nascimento,
-                                sortKey: (dataChecagem.getMonth() * 100) + dataChecagem.getDate()
-                            });
-                        }
+            const aniversariantesDoMes = [];
+            const mesAtual = hoje.getMonth() + 1;
+
+            for (const id in efetivo) {
+                const militar = efetivo[id];
+                if (militar.nascimento) {
+                    const [nascDia, nascMes] = militar.nascimento.split('/').map(Number);
+                    if (nascMes === mesAtual) {
+                        aniversariantesDoMes.push({
+                            nome: militar.nomeGuerra,
+                            data: militar.nascimento,
+                            dia: nascDia
+                        });
                     }
                 }
             }
             
-            aniversariantesDaSemana.sort((a, b) => {
-                let valA = a.sortKey;
-                let valB = b.sortKey;
-                if (Math.abs(valA - hojeSemAno) > 1000 && Math.abs(valB - hojeSemAno) < 1000) valA += 1200;
-                if (Math.abs(valB - hojeSemAno) > 1000 && Math.abs(valA - hojeSemAno) < 1000) valB += 1200;
-                return valA - valB;
-            });
+            aniversariantesDoMes.sort((a, b) => a.dia - b.dia);
 
-            if (aniversariantesDaSemana.length > 0) {
-                const nomesFormatados = aniversariantesDaSemana.map(p => {
+            if (aniversariantesDoMes.length > 0) {
+                const htmlAniversariantes = aniversariantesDoMes.map(p => {
                     const [dia, mes] = p.data.split('/');
-                    return `${p.nome} (${dia}/${mes})`;
-                });
-                listaSemana.innerHTML = nomesFormatados.join(' &bull; ');
-                widgetSemana.style.display = 'block';
+                    const nomeFormatado = `${p.nome} (${dia}/${mes})`;
+                    if (datasDaSemana.has(p.data)) {
+                        return `<span class="bg-yellow-500 text-black rounded px-1 py-0.5">${nomeFormatado}</span>`;
+                    }
+                    return `<span>${nomeFormatado}</span>`;
+                }).join(' &bull; ');
+                
+                listaMes.innerHTML = htmlAniversariantes;
+                widgetMes.style.display = 'block';
             }
         }
 
+        // Funções de Login e Interface (sem alterações)
         function atualizarInterface(userRole) {
             allShortcutButtons.forEach(link => {
                 const requiredRole = link.dataset.role;
@@ -629,16 +629,13 @@
                     link.title = "Acesso restrito ao comando.";
                 } else {
                     link.classList.remove('link-bloqueado');
-                    if (link.title === "Acesso restrito ao comando.") {
-                        link.title = "";
-                    }
+                    if (link.title === "Acesso restrito ao comando.") { link.title = ""; }
                 }
             });
         }
         
         function gerarSenhaEsperada(nome) {
-            let senha = nome.toLowerCase();
-            senha = senha.replace(/\s/g, '');
+            let senha = nome.toLowerCase().replace(/\s/g, '');
             senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             return senha + "193";
         }
