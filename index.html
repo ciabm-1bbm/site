@@ -141,11 +141,17 @@
                 </p>
                 
                 <div id="widget-aniversarios-dia" class="mt-4 max-w-2xl mx-auto p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg text-center" style="display: none;">
-                    <h3 class="font-bold text-bombeiros-yellow">🎂 Aniversariantes do Dia!</h3>
+                    <h3 class="font-bold text-bombeiros-yellow flex items-center justify-center">
+                        <i class="fas fa-birthday-cake mr-2"></i>
+                        Aniversariantes do Dia!
+                    </h3>
                     <p class="text-sm mt-1 text-white" id="lista-aniversariantes-dia"></p>
                 </div>
                 <div id="widget-aniversarios-semana" class="mt-2 max-w-2xl mx-auto p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg text-center" style="display: none;">
-                    <h3 class="font-bold text-cbmrs-light-blue">🎉 Aniversariantes da Semana</h3>
+                    <h3 class="font-bold text-cbmrs-light-blue flex items-center justify-center">
+                        <i class="fas fa-gift mr-2"></i>
+                        Aniversariantes da Semana
+                    </h3>
                     <div class="text-xs mt-1 text-white" id="lista-aniversariantes-semana"></div>
                 </div>
                 </div>
@@ -326,7 +332,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // DECLARAÇÃO DE VARIÁVEIS PRINCIPAIS
+        // --- 1. DECLARAÇÃO DE VARIÁVEIS E CONSTANTES ---
         const loginOverlay = document.getElementById('login-overlay');
         const loginForm = document.getElementById('login-form');
         const usernameInput = document.getElementById('username');
@@ -534,7 +540,73 @@
             "4983793": { role: "padrao", nomeGuerra: "CATELAN", nascimento: "04/09" }
         };
 
-        // DECLARAÇÃO DAS FUNÇÕES
+        // --- 2. DECLARAÇÃO DAS FUNÇÕES ---
+        // Função que controla os widgets de aniversário
+        function checarAniversarios() {
+            const hoje = new Date();
+            
+            // --- Lógica para o Widget do Dia ---
+            const widgetDia = document.getElementById('widget-aniversarios-dia');
+            const listaDia = document.getElementById('lista-aniversariantes-dia');
+            const diaFormatado = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+            
+            const aniversariantesDoDia = [];
+            for (const id in efetivo) {
+                const militar = efetivo[id];
+                if (militar.nascimento === diaFormatado) {
+                    aniversariantesDoDia.push(militar.nomeGuerra);
+                }
+            }
+            if (aniversariantesDoDia.length > 0) {
+                listaDia.innerHTML = `Parabéns: <span class="font-bold">${aniversariantesDoDia.join(', ')}</span>!`;
+                widgetDia.style.display = 'block';
+            }
+
+            // --- Lógica para o Widget da Semana ---
+            const widgetSemana = document.getElementById('widget-aniversarios-semana');
+            const listaSemana = document.getElementById('lista-aniversariantes-semana');
+            const aniversariantesDaSemana = [];
+            const hojeSemAno = (hoje.getMonth() * 100) + hoje.getDate(); // Para comparação numérica e ordenação
+
+            for (let i = -3; i <= 3; i++) {
+                const dataChecagem = new Date();
+                dataChecagem.setDate(hoje.getDate() + i);
+                const dataFormatada = `${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`;
+
+                for (const id in efetivo) {
+                    const militar = efetivo[id];
+                    if (militar.nascimento === dataFormatada) {
+                        if (!aniversariantesDaSemana.some(a => a.id === id)) {
+                            aniversariantesDaSemana.push({ 
+                                id: id,
+                                nome: militar.nomeGuerra, 
+                                data: militar.nascimento,
+                                sortKey: (dataChecagem.getMonth() * 100) + dataChecagem.getDate()
+                            });
+                        }
+                    }
+                }
+            }
+            
+            aniversariantesDaSemana.sort((a, b) => {
+                let valA = a.sortKey;
+                let valB = b.sortKey;
+                if (Math.abs(valA - hojeSemAno) > 1000 && Math.abs(valB - hojeSemAno) < 1000) valA += 1200;
+                if (Math.abs(valB - hojeSemAno) > 1000 && Math.abs(valA - hojeSemAno) < 1000) valB += 1200;
+                return valA - valB;
+            });
+
+            if (aniversariantesDaSemana.length > 0) {
+                const nomesFormatados = aniversariantesDaSemana.map(p => {
+                    const [dia, mes] = p.data.split('/');
+                    return `${p.nome} (${dia}/${mes})`;
+                });
+                listaSemana.innerHTML = nomesFormatados.join(' &bull; ');
+                widgetSemana.style.display = 'block';
+            }
+        }
+
+        // Funções de Login e Interface
         function atualizarInterface(userRole) {
             allShortcutButtons.forEach(link => {
                 const requiredRole = link.dataset.role;
@@ -561,7 +633,6 @@
             const enteredUsername = usernameInput.value.trim();
             const enteredPassword = passwordInput.value.trim();
             const userData = efetivo[enteredUsername];
-
             if (userData) {
                 const expectedPassword = gerarSenhaEsperada(userData.nomeGuerra);
                 if (enteredPassword === expectedPassword) {
@@ -584,10 +655,9 @@
             passwordInput.focus();
         }
 
-        // EXECUÇÃO DO SCRIPT DE ANIVERSÁRIOS
+        // --- 3. EXECUÇÃO DOS SCRIPTS AO CARREGAR A PÁGINA ---
         checarAniversarios();
 
-        // EXECUÇÃO INICIAL DO SCRIPT DE LOGIN/INTERFACE
         const isAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
         const userRole = sessionStorage.getItem('bbmUserRole');
         if (isAuthenticated && userRole) {
@@ -596,7 +666,7 @@
             atualizarInterface('none'); 
         }
 
-        // ADIÇÃO DOS EVENT LISTENERS (OUVINTES DE EVENTOS)
+        // --- 4. ADIÇÃO DOS EVENT LISTENERS ---
         allShortcutButtons.forEach(link => {
             if (link.href.startsWith('mailto:')) {
                 return;
