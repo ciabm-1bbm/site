@@ -64,21 +64,18 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
-        /* Estilos para botões laranja com 50% de transparência */
         .shortcut-button.bg-bombeiros-orange {
-            background-color: rgba(255, 140, 0, 0.5); /* 50% de transparência */
+            background-color: rgba(255, 140, 0, 0.5);
         }
         .shortcut-button.bg-bombeiros-orange:hover {
-            background-color: rgba(255, 140, 0, 0.75); /* Aumenta a opacidade no hover */
+            background-color: rgba(255, 140, 0, 0.75);
         }
-        /* Estilos para botões vermelho-opaco com 50% de transparência */
         .shortcut-button.bg-dark-red-opaque {
-            background-color: rgba(139, 0, 0, 0.5); /* 50% de transparência */
+            background-color: rgba(139, 0, 0, 0.5);
         }
         .shortcut-button.bg-dark-red-opaque:hover {
-            background-color: rgba(139, 0, 0, 0.75); /* Aumenta a opacidade no hover */
+            background-color: rgba(139, 0, 0, 0.75);
         }
-
         .button-text {
             font-size: 11px;
             font-weight: 700;
@@ -88,56 +85,31 @@
             hyphens: auto;
         }
         .login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
-            display: none; /* Initially hidden */
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            display: none; align-items: center; justify-content: center; z-index: 1000;
         }
         .login-box {
-            background-color: #2D3748;
-            padding: 2rem;
-            border-radius: 0.5rem;
+            background-color: #2D3748; padding: 2rem; border-radius: 0.5rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
+            text-align: center; width: 90%; max-width: 400px;
         }
         .login-box input {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border-radius: 0.25rem;
-            background-color: #4A5568;
-            color: white;
-            border: 1px solid #718096;
+            width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 0.25rem;
+            background-color: #4A5568; color: white; border: 1px solid #718096;
         }
         .login-box input::placeholder { color: #A0AEC0; }
         .login-box button {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 0.25rem;
-            background-color: #FF8C00;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            width: 100%; padding: 0.75rem; border-radius: 0.25rem;
+            background-color: #FF8C00; color: white; font-weight: bold;
+            cursor: pointer; transition: background-color 0.3s;
         }
         .login-box button:hover { background-color: #cc7000; }
         .link-bloqueado {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #4A5568 !important;
+            opacity: 0.5; cursor: not-allowed; background-color: #4A5568 !important;
         }
         .link-bloqueado:hover {
-            transform: none;
-            box-shadow: none;
-            background-color: #4A5568 !important;
+            transform: none; box-shadow: none; background-color: #4A5568 !important;
         }
     </style>
 </head>
@@ -167,13 +139,22 @@
                 <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-1">
                     Aqui tu poderás acessar as principais ferramentas criadas pelos membros da CIA para facilitar o acesso às demandas administrativas, otimizando teu tempo e o nosso trabalho em prol da sociedade. Avante CBMRS!
                 </p>
-            </div>
+                
+                <div id="widget-aniversarios-dia" class="mt-4 max-w-2xl mx-auto p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg text-center" style="display: none;">
+                    <h3 class="font-bold text-bombeiros-yellow">🎂 Aniversariantes do Dia!</h3>
+                    <p class="text-sm mt-1 text-white" id="lista-aniversariantes-dia"></p>
+                </div>
+                <div id="widget-aniversarios-semana" class="mt-2 max-w-2xl mx-auto p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg text-center" style="display: none;">
+                    <h3 class="font-bold text-cbmrs-light-blue">🎉 Aniversariantes da Semana</h3>
+                    <div class="text-xs mt-1 text-white" id="lista-aniversariantes-semana"></div>
+                </div>
+                </div>
         </div>
     </header>
 
     <main class="flex items-center justify-center py-6">
         <div class="container mx-auto px-4 text-center">
-            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
+             <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
 
                 <a href="https://docs.google.com/spreadsheets/d/1dbGyE_-L76x2AbuplsA5Us4IKKlGjnohR4Um1FHu798/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
@@ -206,440 +187,4 @@
                     <span class="button-text">FORMULÁRIO</span>
                 </a>
                 <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PREVISÃO (SETEMBRO)</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">EFETIVO</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/144g1qOiO44steK7mbICkFt-pXF_vebDqDyPmzgd22hM/edit?gid=1128532433#gid=1128532433" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PLANO de FÉRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AFASTAMENTOS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">VALIDADE CCVTE</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">TOXICOLÓGICO</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1HR8JO24uWEWSOfeUuzphWUFweMeN0XRX" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FICHA DE RENOVAÇÃO</span>
-                </a>
-                 <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PARTES SLOG</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESTATÍSTICAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1tO5BvhpvN3z0U8v2V7ZGiVA9tm054k1QdX2dnvMtLAM/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">Nº MSG EXPRESSAS</span>
-                </a>
-                <a href="https://drive.google.com/file/d/1QzmPk-RvWS5wl8sR3xPaWpmDAGU1cNET/view?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-route text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">TUTORIAL DIÁRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/17UVmvKgC_bgrtR245o07PThuHrduCUK7rI203q2GbG8/edit#gid=0" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-truck-moving text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">VIATURAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1X2tn-ay7Xc0zOxV9lpJzN24KEelkzzB6JS7ewQzVCwE/edit?gid=926343856#gid=926343856" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-ship text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">EQUIPAMENTOS</span>
-                </a>
-                <a href="https://gestaodefrotas.planejamento.rs.gov.br/frota/gestao/abastecimento/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-invoice-dollar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONSULTA VALORES<br>COMBUSTÍVEL</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1eGyJ9OOvhvVACvd88X2oMfkYi_epj15X6sV9gUDWS8Q/edit?gid=1519715908#gid=1519715908" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-life-ring text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">SITUAÇÃO GUARDA VIDAS<br>2024/25</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/16hXVQaxmRfkn9YPNG1-4yTPgdong0UYm" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-gas-pump text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ABASTECIMENTOS</span>
-                </a>
-                <a href="https://docs.google.com/document/d/1DRnUQCHcH__eoh_gcvJxhUUXp_nvavyguV-lyVkW20g/edit?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-list-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CHECKLIST DOS MAPAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1tlmByosp_RENxiMZVeNJL0bg5BS3yPtCmsW8-N9MC3o/edit?gid=416715601#gid=416715601" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-car-side text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AUTORIZAÇÃO DESLOCAMENTO VTR</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1DJm9aKGiudhPhEFBJ94SXQiMRTdV_xXN?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ORDENS DE SERVIÇO EM VIGOR</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1rDz7ecttIN-z7h--wEdSQQO4cLkINZkk" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MODELOS DOCS</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1enYhn1PD-8nBmNKEWDQNjfAJoC6fKxeC?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-newspaper text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">BOLETIM INTERNO</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1wLuQM7gZMsm5iMw3wOOJd7kA8HRmaHRN?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-newspaper text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">NOTAS PARA BI</span>
-                </a>
-                
-                <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-envelope-open-text text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">E-MAIL CIA</span>
-                </a>
-                <a href="https://wa.me/+5555984423613" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fab fa-whatsapp text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">WHATSAPP CIA</span>
-                </a>
-
-                <a href="https://intranet.cbm.rs.gov.br/" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-building-columns text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">INTRANET CBM</span>
-                </a>
-                <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">E-193</span>
-                </a>
-                <a href="guarnicoes.html" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">GUARNIÇÕES DE SERVIÇO</span>
-                </a>
-            </div>
-        </div>
-    </main>
-</div>
-
-<footer class="bg-gray-800 text-gray-400 py-3 z-10">
-    <div class="container mx-auto px-4 text-center text-xs">
-        <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
-        <p class="mt-1">
-            Para demais assuntos acesse a
-            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
-        </p>
-    </div>
-</footer>
-
-<div id="login-overlay" class="login-overlay">
-    <div class="login-box">
-        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 w-auto mx-auto mb-4">
-        <h2 class="text-xl font-bold text-white mb-4">Acesso Restrito</h2>
-        <form id="login-form">
-            <input type="text" id="username" placeholder="ID Funcional" required>
-            <input type="password" id="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-            <p id="login-error" class="text-red-500 text-sm mt-3" style="display: none;">Dados inválidos. Tente novamente.</p>
-        </form>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginOverlay = document.getElementById('login-overlay');
-        const loginForm = document.getElementById('login-form');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginError = document.getElementById('login-error');
-        const allShortcutButtons = document.querySelectorAll('.shortcut-button');
-
-        const efetivo = {
-            "2237423": { role: "padrao", nomeGuerra: "RAMOS" },
-            "2241951": { role: "padrao", nomeGuerra: "DONATTO" },
-            "2248204": { role: "padrao", nomeGuerra: "CARGNELUTTI" },
-            "2250470": { role: "padrao", nomeGuerra: "SALDANHA" },
-            "2260280": { role: "padrao", nomeGuerra: "MOREIRA" },
-            "2260670": { role: "padrao", nomeGuerra: "DACHI" },
-            "2262070": { role: "padrao", nomeGuerra: "RIBEIRO" },
-            "2262363": { role: "padrao", nomeGuerra: "TERRA" },
-            "2267373": { role: "admin", nomeGuerra: "DILMAR" },
-            "2303876": { role: "admin", nomeGuerra: "EDSON" },
-            "2328674": { role: "padrao", nomeGuerra: "TAIRONE" },
-            "2328798": { role: "padrao", nomeGuerra: "PRADE" },
-            "2328828": { role: "padrao", nomeGuerra: "FRANCO" },
-            "2328925": { role: "admin", nomeGuerra: "DELAVECHIA" },
-            "2414066": { role: "admin", nomeGuerra: "LUCIANO" },
-            "2414155": { role: "admin", nomeGuerra: "FREITAS" },
-            "2414600": { role: "admin", nomeGuerra: "LINCOLN" },
-            "2423154": { role: "padrao", nomeGuerra: "SOBIESKI" },
-            "2423219": { role: "admin", nomeGuerra: "VIEIRA" },
-            "2519720": { role: "padrao", nomeGuerra: "BEN HUR" },
-            "2612887": { role: "admin", nomeGuerra: "JULIANO" },
-            "2615134": { role: "admin", nomeGuerra: "RONALDO" },
-            "2683520": { role: "admin", nomeGuerra: "SITENESKI" },
-            "2684640": { role: "admin", nomeGuerra: "MEDINA" },
-            "2685582": { role: "admin", nomeGuerra: "HOMRICH" },
-            "2686589": { role: "admin", nomeGuerra: "GUEDES" },
-            "2688379": { role: "admin", nomeGuerra: "BECKER" },
-            "2689138": { role: "admin", nomeGuerra: "PATRÍCIO" },
-            "2690721": { role: "admin", nomeGuerra: "FERNANDO" },
-            "2691175": { role: "padrao", nomeGuerra: "LUIZ" },
-            "2810727": { role: "padrao", nomeGuerra: "HOFFMANN" },
-            "2822130": { role: "admin", nomeGuerra: "MEDEIROS" },
-            "2823900": { role: "admin", nomeGuerra: "ALBUQUERQUE" },
-            "2826097": { role: "padrao", nomeGuerra: "MARTINEZ" },
-            "2856476": { role: "admin", nomeGuerra: "PAIM" },
-            "2871980": { role: "padrao", nomeGuerra: "PESSOTA" },
-            "2877015": { role: "padrao", nomeGuerra: "PRADIER" },
-            "2877708": { role: "admin", nomeGuerra: "JUNIOR" },
-            "2878143": { role: "padrao", nomeGuerra: "PANAZZOLO" },
-            "2879620": { role: "admin", nomeGuerra: "FLÁVIO" },
-            "2880601": { role: "admin", nomeGuerra: "CHIEZA" },
-            "2882337": { role: "padrao", nomeGuerra: "THAÍS" },
-            "2885450": { role: "admin", nomeGuerra: "FABRÍCIO" },
-            "2891301": { role: "padrao", nomeGuerra: "FERREIRA" },
-            "2915219": { role: "admin", nomeGuerra: "SAUL" },
-            "2919478": { role: "padrao", nomeGuerra: "FARIAS" },
-            "2919540": { role: "admin", nomeGuerra: "AIRTON" },
-            "2919591": { role: "admin", nomeGuerra: "LAMADRIL" },
-            "2968550": { role: "padrao", nomeGuerra: "DOMINGUES" },
-            "2970031": { role: "padrao", nomeGuerra: "BRUM" },
-            "2971577": { role: "padrao", nomeGuerra: "BARREIRO" },
-            "2985675": { role: "padrao", nomeGuerra: "BOTEGA" },
-            "2987120": { role: "padrao", nomeGuerra: "JUSSIE" },
-            "2993767": { role: "admin", nomeGuerra: "ARIAS" },
-            "2993996": { role: "padrao", nomeGuerra: "ESPINOSA" },
-            "2994500": { role: "padrao", nomeGuerra: "LEANDRO" },
-            "3085120": { role: "admin", nomeGuerra: "ASSIS" },
-            "3136019": { role: "admin", nomeGuerra: "POSENATO" },
-            "3136671": { role: "padrao", nomeGuerra: "FINGER" },
-            "3136728": { role: "padrao", nomeGuerra: "FERREIRA" },
-            "3137473": { role: "padrao", nomeGuerra: "MATHEUS" },
-            "3137600": { role: "padrao", nomeGuerra: "BERGHAHN" },
-            "3139581": { role: "padrao", nomeGuerra: "EUGENIO" },
-            "3139859": { role: "padrao", nomeGuerra: "DANILO" },
-            "3140717": { role: "padrao", nomeGuerra: "VICENTE" },
-            "3142647": { role: "padrao", nomeGuerra: "DIEIQUE" },
-            "3146316": { role: "admin", nomeGuerra: "LOPES" },
-            "3148947": { role: "padrao", nomeGuerra: "GOMES" },
-            "3150631": { role: "padrao", nomeGuerra: "ESEQUIEL" },
-            "3164071": { role: "padrao", nomeGuerra: "VINÍCIUS" },
-            "3169804": { role: "padrao", nomeGuerra: "PATRICK" },
-            "3205614": { role: "admin", nomeGuerra: "HERMENEGILDO" },
-            "3622363": { role: "padrao", nomeGuerra: "BERNARDES" },
-            "3694623": { role: "admin", nomeGuerra: "SCHNEIDER" },
-            "3695034": { role: "padrao", nomeGuerra: "THIAGO COELHO" },
-            "3695212": { role: "padrao", nomeGuerra: "PEDRO" },
-            "3695832": { role: "padrao", nomeGuerra: "CASTRO" },
-            "3696049": { role: "padrao", nomeGuerra: "BATISTA" },
-            "3696111": { role: "padrao", nomeGuerra: "BITENCOURT" },
-            "3696391": { role: "padrao", nomeGuerra: "BOTTINI" },
-            "3696510": { role: "padrao", nomeGuerra: "RAUBUSTT" },
-            "3696570": { role: "padrao", nomeGuerra: "DREYER" },
-            "3696669": { role: "padrao", nomeGuerra: "THALIN" },
-            "3696715": { role: "padrao", nomeGuerra: "KANOFRE" },
-            "3696758": { role: "padrao", nomeGuerra: "BARRETO" },
-            "3696790": { role: "admin", nomeGuerra: "DA COSTA" },
-            "3696847": { role: "padrao", nomeGuerra: "ACÁCIO" },
-            "3696944": { role: "padrao", nomeGuerra: "LAGO" },
-            "3697100": { role: "padrao", nomeGuerra: "GUTERRES" },
-            "3697193": { role: "padrao", nomeGuerra: "BRUM" },
-            "3697290": { role: "padrao", nomeGuerra: "ROGER" },
-            "3697550": { role: "padrao", nomeGuerra: "DA SILVA" },
-            "3697630": { role: "padrao", nomeGuerra: "MENDES" },
-            "3697673": { role: "padrao", nomeGuerra: "BRUNO" },
-            "3698360": { role: "padrao", nomeGuerra: "VILELA" },
-            "3698602": { role: "padrao", nomeGuerra: "FÁBIO" },
-            "3698653": { role: "admin", nomeGuerra: "JÚLIA" },
-            "3698734": { role: "padrao", nomeGuerra: "ROGAN" },
-            "3699145": { role: "padrao", nomeGuerra: "THIAGO RIBEIRO" },
-            "3701638": { role: "padrao", nomeGuerra: "CRISTIANO" },
-            "3718093": { role: "padrao", nomeGuerra: "ZEMPER" },
-            "3718123": { role: "padrao", nomeGuerra: "SCHULTZ" },
-            "3725570": { role: "padrao", nomeGuerra: "BRUNO EDUARDO" },
-            "3726207": { role: "padrao", nomeGuerra: "MAURÍCIO" },
-            "3872319": { role: "padrao", nomeGuerra: "ALESSANDRO" },
-            "4230760": { role: "padrao", nomeGuerra: "DAYKER" },
-            "4278623": { role: "padrao", nomeGuerra: "CASSIANO" },
-            "4279310": { role: "admin", nomeGuerra: "MARTINS" },
-            "4279808": { role: "padrao", nomeGuerra: "GUIMARÃES" },
-            "4289064": { role: "padrao", nomeGuerra: "BELOMO" },
-            "4289102": { role: "padrao", nomeGuerra: "ALISSON" },
-            "4289366": { role: "padrao", nomeGuerra: "DEIVID" },
-            "4299140": { role: "padrao", nomeGuerra: "DETONI" },
-            "4353781": { role: "padrao", nomeGuerra: "TOMIELLO" },
-            "4353927": { role: "padrao", nomeGuerra: "COAN" },
-            "4353935": { role: "padrao", nomeGuerra: "VANDERLAN" },
-            "4353986": { role: "padrao", nomeGuerra: "MONTEIRO" },
-            "4354273": { role: "padrao", nomeGuerra: "GONÇALVES" },
-            "4354435": { role: "padrao", nomeGuerra: "ISMAEL" },
-            "4354532": { role: "padrao", nomeGuerra: "SANTOS" },
-            "4354583": { role: "padrao", nomeGuerra: "JONATHAN" },
-            "4354680": { role: "padrao", nomeGuerra: "VARGAS" },
-            "4354737": { role: "admin", nomeGuerra: "BRUNO" },
-            "4355113": { role: "padrao", nomeGuerra: "RAUBACH" },
-            "4355148": { role: "padrao", nomeGuerra: "LOPES" },
-            "4355229": { role: "padrao", nomeGuerra: "FRANCIS" },
-            "4355822": { role: "padrao", nomeGuerra: "BARBOSA" },
-            "4356047": { role: "padrao", nomeGuerra: "VIANEI" },
-            "4375149": { role: "padrao", nomeGuerra: "FONTANA" },
-            "4387759": { role: "padrao", nomeGuerra: "JULIAN" },
-            "4387767": { role: "padrao", nomeGuerra: "IBALDO" },
-            "4387775": { role: "padrao", nomeGuerra: "CAMPOS" },
-            "4387821": { role: "padrao", nomeGuerra: "PORCELIS" },
-            "4388003": { role: "padrao", nomeGuerra: "BUENO" },
-            "4388178": { role: "padrao", nomeGuerra: "HIDALGO" },
-            "4388283": { role: "padrao", nomeGuerra: "ADRIANO BARBOSA" },
-            "4388305": { role: "padrao", nomeGuerra: "EIDER" },
-            "4388380": { role: "padrao", nomeGuerra: "MARTINS" },
-            "4395140": { role: "padrao", nomeGuerra: "GAUTIER" },
-            "4395476": { role: "padrao", nomeGuerra: "RAFAEL" },
-            "4490053": { role: "padrao", nomeGuerra: "RENAN" },
-            "4490169": { role: "padrao", nomeGuerra: "MAIA" },
-            "4490193": { role: "padrao", nomeGuerra: "CORREA" },
-            "4490223": { role: "padrao", nomeGuerra: "SEIBT" },
-            "4490258": { role: "padrao", nomeGuerra: "SIQUEIRA" },
-            "4490266": { role: "padrao", nomeGuerra: "PAULINO" },
-            "4490339": { role: "padrao", nomeGuerra: "ZANETTI" },
-            "4490355": { role: "padrao", nomeGuerra: "PETER" },
-            "4490452": { role: "padrao", nomeGuerra: "PINTO" },
-            "4490479": { role: "padrao", nomeGuerra: "EVERTON" },
-            "4490541": { role: "padrao", nomeGuerra: "SPERLING" },
-            "4490576": { role: "padrao", nomeGuerra: "BAIGORRA" },
-            "4490614": { role: "padrao", nomeGuerra: "CARDOSO" },
-            "4490665": { role: "padrao", nomeGuerra: "DOTTA" },
-            "4490738": { role: "padrao", nomeGuerra: "SOARES" },
-            "4490800": { role: "padrao", nomeGuerra: "VOLZ" },
-            "4490835": { role: "padrao", nomeGuerra: "AMARANTE" },
-            "4490843": { role: "padrao", nomeGuerra: "BOTTINI" },
-            "4496990": { role: "padrao", nomeGuerra: "FOLLETO" },
-            "4550552": { role: "padrao", nomeGuerra: "PIRES" },
-            "4550757": { role: "padrao", nomeGuerra: "WESTPHALEN" },
-            "4550846": { role: "padrao", nomeGuerra: "JORDAN" },
-            "4551990": { role: "padrao", nomeGuerra: "MUNDEL" },
-            "4626290": { role: "padrao", nomeGuerra: "MAURÍCIO" },
-            "4626672": { role: "padrao", nomeGuerra: "AZEREDO" },
-            "4672410": { role: "admin", nomeGuerra: "GARIBALDI" },
-            "4672445": { role: "padrao", nomeGuerra: "KINGESKI" },
-            "4782534": { role: "padrao", nomeGuerra: "ASSUNÇÃO" },
-            "4782917": { role: "padrao", nomeGuerra: "NATHAN" },
-            "4843584": { role: "padrao", nomeGuerra: "CABRAL" },
-            "4843673": { role: "padrao", nomeGuerra: "TEIXEIRA" },
-            "4845510": { role: "padrao", nomeGuerra: "VILAR" },
-            "4845544": { role: "padrao", nomeGuerra: "THIAGO" },
-            "4980662": { role: "padrao", nomeGuerra: "SANTOS" },
-            "4981340": { role: "padrao", nomeGuerra: "BRUNA" },
-            "4982924": { role: "padrao", nomeGuerra: "CECCON" },
-            "4982975": { role: "padrao", nomeGuerra: "COSME" },
-            "4982991": { role: "padrao", nomeGuerra: "ARAUJO" },
-            "4983793": { role: "padrao", nomeGuerra: "CATELAN" }
-        };
-
-        let clickedLinkHref = null;
-
-        function atualizarInterface(userRole) {
-            allShortcutButtons.forEach(link => {
-                const requiredRole = link.dataset.role;
-                // Um link está "bloqueado visualmente" se ele requer admin e o usuário NÃO é admin
-                if (requiredRole === 'admin' && userRole !== 'admin') {
-                    link.classList.add('link-bloqueado');
-                    link.title = "Acesso restrito ao comando.";
-                } else {
-                    link.classList.remove('link-bloqueado');
-                    if (link.title === "Acesso restrito ao comando.") {
-                        link.title = "";
-                    }
-                }
-            });
-        }
-        
-        function gerarSenhaEsperada(nome) {
-            let senha = nome.toLowerCase();
-            senha = senha.replace(/\s/g, '');
-            senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            return senha + "193";
-        }
-
-        function handleLogin() {
-            const enteredUsername = usernameInput.value.trim(); // ID Funcional
-            const enteredPassword = passwordInput.value.trim();
-            const userData = efetivo[enteredUsername];
-
-            if (userData) {
-                const expectedPassword = gerarSenhaEsperada(userData.nomeGuerra);
-                if (enteredPassword === expectedPassword) {
-                    sessionStorage.setItem('isBbmAuthenticated', 'true');
-                    sessionStorage.setItem('bbmUserRole', userData.role);
-                    loginOverlay.style.display = 'none';
-                    atualizarInterface(userData.role);
-
-                    // Verifica se o link clicado existe e não está visualmente bloqueado
-                    if (clickedLinkHref) {
-                        const clickedLinkElement = Array.from(allShortcutButtons).find(l => l.href === clickedLinkHref);
-                        // Se o link NÃO está bloqueado visualmente (ou seja, é um link geral ou o usuário é admin)
-                        if (clickedLinkElement && !clickedLinkElement.classList.contains('link-bloqueado')) {
-                            window.open(clickedLinkHref, '_blank');
-                        }
-                        clickedLinkHref = null; 
-                    }
-                    return;
-                }
-            }
-            loginError.style.display = 'block';
-            passwordInput.value = "";
-            passwordInput.focus();
-        }
-
-        // Verifica a autenticação na carga da página
-        const isAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
-        const userRole = sessionStorage.getItem('bbmUserRole');
-        if (isAuthenticated && userRole) {
-            atualizarInterface(userRole);
-        } else {
-            // Se não autenticado, atualiza a interface para bloquear os links de admin.
-            // O overlay de login NÃO é exibido automaticamente ao carregar.
-            atualizarInterface('none'); 
-        }
-
-        // Adiciona o listener de clique para TODOS os botões
-        allShortcutButtons.forEach(link => {
-            if (link.href.startsWith('mailto:')) {
-                return; // Ignora links de e-mail
-            }
-
-            link.addEventListener('click', (event) => {
-                const requiredRole = link.dataset.role; // Pega o 'role' que o link exige, se houver
-                const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
-                const currentUserRole = sessionStorage.getItem('bbmUserRole');
-
-                // Sempre que um link for clicado, se o usuário NÃO estiver autenticado
-                if (!userIsAuthenticated) {
-                    event.preventDefault(); // Impede a navegação imediata
-                    clickedLinkHref = link.href; // Armazena o href para abrir após o login
-                    loginOverlay.style.display = 'flex'; // Exibe o overlay de login
-                    usernameInput.focus();
-                } else {
-                    // Se o usuário está autenticado, verifica se ele tem o role necessário para links de admin
-                    if (requiredRole === 'admin' && currentUserRole !== 'admin') {
-                        event.preventDefault(); // Bloqueia acesso se não for admin
-                        alert("Acesso restrito ao comando. Você não tem permissão para acessar este link."); // Mensagem de alerta
-                    }
-                    // Caso contrário (não exige admin ou é admin), a navegação ocorre normalmente
-                }
-            });
-        });
-
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            handleLogin();
-        });
-
-        loginOverlay.addEventListener('click', (event) => {
-            if (event.target === loginOverlay) {
-                loginOverlay.style.display = 'none';
-                clickedLinkHref = null;
-            }
-        });
-    });
-</script>
-</body>
-</html>
+                    <i class="fas fa-clock text-2xl
