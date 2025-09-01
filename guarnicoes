@@ -154,15 +154,21 @@
             display: flex; flex-direction: column; gap: 0.5rem;
             align-items: center; width: 100%;
         }
+        /* Estilos para Aniversariantes */
+        #aniversariantes-section { background-color: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 0.75rem; }
+        .aniversariante-dia-titulo { font-size: 1.2rem; font-weight: bold; color: #FFD700; text-transform: uppercase; }
+        .aniversariante-dia-nome { font-size: 1.6rem; font-weight: bold; color: white; }
+        .aniversariantes-semana-titulo { font-size: 1.1rem; font-weight: bold; color: #FFD700; margin-top: 1.2rem; }
+        .aniversariantes-semana-nomes { color: #FFD700; font-weight: 500; }
+        .aniversariantes-mes-titulo { font-size: 1rem; font-weight: bold; color: #bombeiros-orange; margin-top: 1.2rem; }
+        .aniversariantes-mes-nomes { font-size: 0.8rem; color: #bdc3c7; line-height: 1.5; }
+
         @media (max-width: 1543px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(7, 140px); max-width: calc(7 * 140px + 6 * 1rem); } }
         @media (max-width: 1279px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(5, 140px); max-width: calc(5 * 140px + 4 * 1rem); } }
         @media (max-width: 1023px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(4, 140px); max-width: calc(4 * 140px + 3 * 1rem); } }
         @media (max-width: 767px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(3, 140px); max-width: calc(3 * 140px + 2 * 1rem); } }
         @media (max-width: 639px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(2, 140px); max-width: calc(2 * 140px + 1 * 1rem); } }
-        .main-container-fluid {
-            max-width: 100%; padding-left: 1rem; padding-right: 1rem;
-            margin-left: auto; margin-right: auto;
-        }
+        .main-container-fluid { max-width: 100%; padding-left: 1rem; padding-right: 1rem; margin-left: auto; margin-right: auto; }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col">
@@ -208,9 +214,20 @@
             </div>
 
             <hr class="border-gray-600 my-8">
+
+            <div id="aniversariantes-section" class="mb-8 text-center">
+                <h2 class="text-xl font-bold text-bombeiros-yellow mb-4">
+                    <i class="fas fa-birthday-cake mr-2"></i>ANIVERSARIANTES
+                </h2>
+                <div id="aniversariante-dia-container" class="mb-4"></div>
+                <div id="aniversariantes-semana-container" class="mb-4"></div>
+                <div id="aniversariantes-mes-container"></div>
+            </div>
+
+            <hr class="border-gray-600 my-8">
             
             <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
-                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (25/Ago/2025)
+                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (01/Set/2025)
             </h2>
             <p class="text-gray-300 text-center mb-6 text-sm">
                 Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
@@ -247,126 +264,216 @@
             "ATP-765": {
                 "viatura_display": "ATP-765 (Oficial Supervisor)",
                 "militares": [
-                    { "funcao": "OFICIAL SUPERVISOR (Alfa 4)", "nome": "CAP RODRIGO DA SILVA BORGES" }
+                    {
+                        "funcao": "OFICIAL SUPERVISOR (Alfa 4)",
+                        "nome": "CAP MAURÍCIO"
+                    },
+                    {
+                        "funcao": "COV DO ALFA 4 (08h-20h)",
+                        "nome": "1º TEN PME RIBEIRO"
+                    }
                 ],
-                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
-            },
-            "ATP-201": {
-                "viatura_display": "ATP-201 (Comando de Socorro)",
-                "militares": [
-                    { "funcao": "COMANDANTE DE SOCORRO (Alfa 5)", "nome": "1º TEN PATRICIO" },
-                    { "funcao": "COV DO ALFA 5", "nome": "SD VINICIUS" }
-                ],
-                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "Misto",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "AÇORIANOS": {
             "ABT-0595": {
                 "viatura_display": "ABT-0595",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT FLÁVIO" },
-                    { "funcao": "COV (08h-20h)", "nome": "SD TEMP PAULINO" },
-                    { "funcao": "COV (20h-08h)", "nome": "SD LAGO" },
-                    { "funcao": "CHEFE LINHA D. (08h-17h)", "nome": "SD TEMP CORREA" },
-                    { "funcao": "CHEFE LINHA E. (11h-08h)", "nome": "SD IBALDO" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "SD DREYER"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD TEMP DOTTA"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "2º SGT GUEDES"
+                    }
                 ],
-                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "TERESÓPOLIS": {
             "ABT-0594": {
                 "viatura_display": "ABT-0594",
                 "militares": [
-                    { "funcao": "CMT GU (11h-08h)", "nome": "SD THIAGO" },
-                    { "funcao": "CMT GU (08h-11h)", "nome": "1º SGT GOMES" },
-                    { "funcao": "COV", "nome": "SD ZEMPER" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD CASSIANO" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "1º SGT GOMES"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD GONÇALVES"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD HIDALGO"
+                    }
                 ],
-                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
-            },
-            "AR-0455": {
-                "viatura_display": "AR-0455",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BRUM" },
-                    { "funcao": "COV", "nome": "SD BARREIRO" },
-                    { "funcao": "RESGATISTA", "nome": "SD ROSEANNE" }
-                ],
-                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "ASSUNÇÃO": {
             "ABT-0596": {
                 "viatura_display": "ABT-0596",
                 "militares": [
-                    { "funcao": "CMT GU (20h-08h)", "nome": "SD BRUM" },
-                    { "funcao": "CMT GU (08h-20h)", "nome": "SD PORCELIS" },
-                    { "funcao": "COV", "nome": "SD RAUBACH" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD TEMP MAIA" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "1º SGT LINCOLN"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "2º SGT PANAZZOLO"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD CECCON"
+                    }
                 ],
-                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "RESTINGA": {
             "ABT-0598": {
                 "viatura_display": "ABT-0598",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BRUNO" },
-                    { "funcao": "COV", "nome": "SD FINGER" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD DAYKER" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "2º SGT PME SALDANHA"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD FINGER"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD BARRETO"
+                    }
                 ],
-                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "BELÉM NOVO": {
             "ABT-0599": {
                 "viatura_display": "ABT-0599",
                 "militares": [
-                    { "funcao": "CMT GU (20h-08h)", "nome": "1º SGT PME JULIANO" },
-                    { "funcao": "CMT GU (08h-20h)", "nome": "SD RAUBUSTT" },
-                    { "funcao": "COV", "nome": "SD MAURÍCIO" },
-                    { "funcao": "CHEFE LINHA D. (08h-20h)", "nome": "SD COSME" },
-                    { "funcao": "CHEFE LINHA E. (20h-08h)", "nome": "SD RAUBUSTT" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "SD MARTINEZ"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD FERREIRA"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD TEMP VOLZ"
+                    }
                 ],
-                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "PASSO D'AREIA": {
             "ABT-0600": {
                 "viatura_display": "ABT-0600",
                 "militares": [
-                    { "funcao": "CMT GU (11h-08h)", "nome": "SD BUENO" },
-                    { "funcao": "CMT GU (08h-11h)", "nome": "SD PEDRO" },
-                    { "funcao": "COV", "nome": "1º SGT AIRTON" },
-                    { "funcao": "CHEFE LINHA D. (08h-11h)", "nome": "SD BUENO" },
-                    { "funcao": "CHEFE LINHA E.", "nome": "SD EIDER" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "SD THALIN"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD MONTEIRO"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD TEMP SOARES"
+                    }
                 ],
-                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "FLORESTA": {
             "ABT-0597": {
                 "viatura_display": "ABT-0597",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "2º SGT SAUL" },
-                    { "funcao": "COV", "nome": "SD SIQUEIRA" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "2º SGT PME DACHI" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "1º SGT PAIM"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD SIQUEIRA"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD DA SILVA"
+                    }
                 ],
-                "turno": "24h", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         },
         "PARTENON": {
             "ABT-327": {
                 "viatura_display": "ABT-327",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BATISTA" },
-                    { "funcao": "COV", "nome": "SD BELOMO" },
-                    { "funcao": "CHEFE DE LINHA", "nome": "SD JONATHAN" },
-                    { "funcao": "AUXILIAR LINHA (14h-14h)", "nome": "SD CABRAL" }
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "SD PATRICK"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD BERNARDES"
+                    },
+                    {
+                        "funcao": "CHEFE DE LINHA",
+                        "nome": "SD VARGAS"
+                    }
                 ],
-                "turno": "Misto", "inicio_data": "25/Ago/2025", "inicio_hora": "08:00", "fim_data": "26/Ago/2025", "fim_hora": "08:00"
+                "turno": "24h",
+                "inicio_data": "01/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "02/Set/2025",
+                "fim_hora": "08:00"
             }
         }
     };
+    const aniversariantesData = {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const guarnicoesGrid = document.getElementById('guarnicoes-grid');
@@ -374,6 +481,7 @@
         const modalContentDiv = document.getElementById('modal-content');
         const dataAtualizacaoSpan = document.getElementById('data-atualizacao');
 
+        // FUNÇÕES DE RENDERIZAÇÃO
         function formatarDataHoraAtual() {
             const agora = new Date();
             const dia = String(agora.getDate());
@@ -383,57 +491,82 @@
             return `${dia}/${mes} às ${horas}:${minutos}`;
         }
 
-        if(dataAtualizacaoSpan) {
-            dataAtualizacaoSpan.textContent = formatarDataHoraAtual();
+        function renderizarAniversariantes() {
+            const diaContainer = document.getElementById('aniversariante-dia-container');
+            const semanaContainer = document.getElementById('aniversariantes-semana-container');
+            const mesContainer = document.getElementById('aniversariantes-mes-container');
+
+            if (aniversariantesData.dia && aniversariantesData.dia.length > 0) {
+                const nomes = aniversariantesData.dia.map(p => p.nome_guerra).join(', ');
+                diaContainer.innerHTML = `
+                    <p class="aniversariante-dia-titulo">Aniversariante do Dia</p>
+                    <p class="aniversariante-dia-nome">${nomes}</p>
+                `;
+            }
+
+            if (aniversariantesData.semana && aniversariantesData.semana.length > 0) {
+                const nomes = aniversariantesData.semana.map(p => p.nome_guerra).join(' • ');
+                semanaContainer.innerHTML = `
+                    <p class="aniversariantes-semana-titulo">Aniversariantes da Semana</p>
+                    <p class="aniversariantes-semana-nomes">${nomes}</p>
+                `;
+            }
+
+            if (aniversariantesData.mes && aniversariantesData.mes.length > 0) {
+                 const nomes = aniversariantesData.mes.map(p => p.nome_guerra).join(' • ');
+                mesContainer.innerHTML = `
+                    <p class="aniversariantes-mes-titulo">Aniversariantes do Mês</p>
+                    <p class="aniversariantes-mes-nomes">${nomes}</p>
+                `;
+            }
         }
 
-        const pelotaoOrder = [
-            "OFICIAL DE SERVIÇO",
-            "AÇORIANOS",
-            "TERESÓPOLIS",
-            "ASSUNÇÃO",
-            "RESTINGA",
-            "BELÉM NOVO",
-            "PASSO D'AREIA",
-            "FLORESTA",
-            "PARTENON"
-        ];
+        function renderizarGuarnicoes() {
+            const pelotaoOrder = ["OFICIAL DE SERVIÇO", "AÇORIANOS", "TERESÓPOLIS", "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", "FLORESTA", "PARTENON"];
+            pelotaoOrder.forEach(pelotaoName => {
+                const pelotaoData = guarnicoesData[pelotaoName];
+                if (pelotaoData) {
+                    const quartelColumn = document.createElement('div');
+                    quartelColumn.classList.add('quartel-column');
+                    const guarnicaoButton = document.createElement('div');
+                    guarnicaoButton.classList.add('guarnicao-button');
+                    
+                    if (pelotaoName === 'OFICIAL DE SERVIÇO') {
+                        guarnicaoButton.classList.add('guarnicao-oficial');
+                    }
 
-        pelotaoOrder.forEach(pelotaoName => {
-            const pelotaoData = guarnicoesData[pelotaoName];
-            if (pelotaoData) {
-                const quartelColumn = document.createElement('div');
-                quartelColumn.classList.add('quartel-column');
-                const guarnicaoButton = document.createElement('div');
-                guarnicaoButton.classList.add('guarnicao-button');
-                
-                if (pelotaoName === 'OFICIAL DE SERVIÇO') {
-                    guarnicaoButton.classList.add('guarnicao-oficial');
+                    guarnicaoButton.setAttribute('data-pelotao-name', pelotaoName);
+                    const buttonVisibleContent = document.createElement('div');
+                    buttonVisibleContent.classList.add('button-visible-content');
+                    buttonVisibleContent.innerHTML = `<span class="guarnicao-name-only">${pelotaoName}</span><i class="fas fa-chevron-down guarnicao-arrow"></i>`;
+                    guarnicaoButton.appendChild(buttonVisibleContent);
+                    const modalSourceData = document.createElement('div');
+                    modalSourceData.classList.add('modal-source-data');
+                    modalSourceData.style.display = 'none';
+                    let modalHtml = `<h3 class="modal-quartel-title">${pelotaoName}</h3>`;
+                    for (const viaturaKey in pelotaoData) {
+                        const viaturaData = pelotaoData[viaturaKey];
+                        modalHtml += `<h4 class="modal-viatura-subtitle">${viaturaData.viatura_display}</h4><div class="modal-personnel-section">`;
+                        viaturaData.militares.forEach(militar => {
+                            modalHtml += `<div class="person-role-modal"><strong>${militar.funcao}:</strong> <span>${militar.nome}</span></div>`;
+                        });
+                        modalHtml += `</div><div class="modal-turn-details-section"><div class="turn-type-label-modal">Turno: ${viaturaData.turno}</div><div class="duty-detail-modal">Início: ${viaturaData.inicio_data} - das ${viaturaData.inicio_hora}</div><div class="duty-detail-modal">Fim: ${viaturaData.fim_data} - às ${viaturaData.fim_hora}</div></div><hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">`;
+                    }
+                    modalSourceData.innerHTML = modalHtml;
+                    guarnicaoButton.appendChild(modalSourceData);
+                    quartelColumn.appendChild(guarnicaoButton);
+                    guarnicoesGrid.appendChild(quartelColumn);
                 }
+            });
+        }
 
-                guarnicaoButton.setAttribute('data-pelotao-name', pelotaoName);
-                const buttonVisibleContent = document.createElement('div');
-                buttonVisibleContent.classList.add('button-visible-content');
-                buttonVisibleContent.innerHTML = `<span class="guarnicao-name-only">${pelotaoName}</span><i class="fas fa-chevron-down guarnicao-arrow"></i>`;
-                guarnicaoButton.appendChild(buttonVisibleContent);
-                const modalSourceData = document.createElement('div');
-                modalSourceData.classList.add('modal-source-data');
-                modalSourceData.style.display = 'none';
-                let modalHtml = `<h3 class="modal-quartel-title">${pelotaoName}</h3>`;
-                for (const viaturaKey in pelotaoData) {
-                    const viaturaData = pelotaoData[viaturaKey];
-                    modalHtml += `<h4 class="modal-viatura-subtitle">${viaturaData.viatura_display}</h4><div class="modal-personnel-section">`;
-                    viaturaData.militares.forEach(militar => {
-                        modalHtml += `<div class="person-role-modal"><strong>${militar.funcao}:</strong> <span>${militar.nome}</span></div>`;
-                    });
-                    modalHtml += `</div><div class="modal-turn-details-section"><div class="turn-type-label-modal">Turno: ${viaturaData.turno}</div><div class="duty-detail-modal">Início: ${viaturaData.inicio_data} - das ${viaturaData.inicio_hora}</div><div class="duty-detail-modal">Fim: ${viaturaData.fim_data} - às ${viaturaData.fim_hora}</div></div><hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">`;
-                }
-                modalSourceData.innerHTML = modalHtml;
-                guarnicaoButton.appendChild(modalSourceData);
-                quartelColumn.appendChild(guarnicaoButton);
-                guarnicoesGrid.appendChild(quartelColumn);
-            }
-        });
+        // EXECUÇÃO PRINCIPAL
+        if (dataAtualizacaoSpan) {
+            dataAtualizacaoSpan.textContent = formatarDataHoraAtual();
+        }
+        
+        renderizarAniversariantes();
+        renderizarGuarnicoes();
 
         const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
         guarnicaoButtons.forEach(button => {
