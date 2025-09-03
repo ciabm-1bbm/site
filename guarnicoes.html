@@ -154,15 +154,7 @@
             display: flex; flex-direction: column; gap: 0.5rem;
             align-items: center; width: 100%;
         }
-        /* Estilos para Aniversariantes */
-        #aniversariantes-section { background-color: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 0.75rem; }
-        .aniversariante-dia-titulo { font-size: 1.2rem; font-weight: bold; color: #FFD700; text-transform: uppercase; }
-        .aniversariante-dia-nome { font-size: 1.6rem; font-weight: bold; color: white; }
-        .aniversariantes-semana-titulo { font-size: 1.1rem; font-weight: bold; color: #FFD700; margin-top: 1.2rem; }
-        .aniversariantes-semana-nomes { color: #FFD700; font-weight: 500; }
-        .aniversariantes-mes-titulo { font-size: 1rem; font-weight: bold; color: #bombeiros-orange; margin-top: 1.2rem; }
-        .aniversariantes-mes-nomes { font-size: 0.8rem; color: #bdc3c7; line-height: 1.5; }
-
+        
         @media (max-width: 1543px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(7, 140px); max-width: calc(7 * 140px + 6 * 1rem); } }
         @media (max-width: 1279px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(5, 140px); max-width: calc(5 * 140px + 4 * 1rem); } }
         @media (max-width: 1023px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(4, 140px); max-width: calc(4 * 140px + 3 * 1rem); } }
@@ -214,20 +206,9 @@
             </div>
 
             <hr class="border-gray-600 my-8">
-
-            <div id="aniversariantes-section" class="mb-8 text-center">
-                <h2 class="text-xl font-bold text-bombeiros-yellow mb-4">
-                    <i class="fas fa-birthday-cake mr-2"></i>ANIVERSARIANTES
-                </h2>
-                <div id="aniversariante-dia-container" class="mb-4"></div>
-                <div id="aniversariantes-semana-container" class="mb-4"></div>
-                <div id="aniversariantes-mes-container"></div>
-            </div>
-
-            <hr class="border-gray-600 my-8">
             
             <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
-                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (02/Set/2025)
+                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (03/Set/2025)
             </h2>
             <p class="text-gray-300 text-center mb-6 text-sm">
                 Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
@@ -266,17 +247,17 @@
                 "militares": [
                     {
                         "funcao": "OFICIAL SUPERVISOR (Alfa 4)",
-                        "nome": "CAP MARIANA"
+                        "nome": "CAP BÁRBARA"
                     },
                     {
                         "funcao": "COV DO ALFA 4",
-                        "nome": "1º TEN PME JAIRO"
+                        "nome": "1º TEN PME DILMAR"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             },
             "ATP-201": {
@@ -284,21 +265,17 @@
                 "militares": [
                     {
                         "funcao": "COMANDANTE DE SOCORRO (Alfa 5)",
-                        "nome": "1º TEN VIEIRA"
+                        "nome": "1º TEN MEDINA"
                     },
                     {
-                        "funcao": "COV DO ALFA 5 (08h-20h)",
-                        "nome": "SD BARBOSA"
-                    },
-                    {
-                        "funcao": "COV DO ALFA 5 (20h-08h)",
-                        "nome": "SD DOMINGUES"
+                        "funcao": "COV DO ALFA 5",
+                        "nome": "SD VINICIUS"
                     }
                 ],
-                "turno": "Misto",
-                "inicio_data": "02/Set/2025",
+                "turno": "24h",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
@@ -308,21 +285,35 @@
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "1º SGT FLÁVIO"
+                        "nome": "SD JULIAN"
                     },
                     {
                         "funcao": "COV",
-                        "nome": "SD IBALDO"
+                        "nome": "2º SGT GUIMARÃES"
                     },
                     {
                         "funcao": "CHEFE DE LINHA",
-                        "nome": "SD ALESSANDRO"
+                        "nome": "SD TEMP CORREA"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
+                "fim_hora": "08:00"
+            },
+            "AT-0671": {
+                "viatura_display": "AT-0671",
+                "militares": [
+                    {
+                        "funcao": "COV",
+                        "nome": "SD VINICIUS"
+                    }
+                ],
+                "turno": "24h",
+                "inicio_data": "03/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
@@ -332,45 +323,71 @@
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "1º SGT LUCIANO"
+                        "nome": "2º SGT PME CARGNELUTTI"
                     },
                     {
                         "funcao": "COV",
-                        "nome": "SD ZEMPER"
+                        "nome": "SD DEIVID"
                     },
                     {
                         "funcao": "CHEFE DE LINHA",
                         "nome": "SD TOMIELLO"
+                    },
+                    {
+                        "funcao": "AUXILIAR LINHA",
+                        "nome": "SD TEMP CARDOSO"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
+                "fim_hora": "08:00"
+            },
+            "AR-0766": {
+                "viatura_display": "AR-0766",
+                "militares": [
+                    {
+                        "funcao": "CMT GU",
+                        "nome": "SD DORNELES"
+                    },
+                    {
+                        "funcao": "COV",
+                        "nome": "SD VINÍCIUS"
+                    }
+                ],
+                "turno": "24h",
+                "inicio_data": "03/Set/2025",
+                "inicio_hora": "08:00",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
         "ASSUNÇÃO": {
-            "ABT-0596": {
-                "viatura_display": "ABT-0596",
+            "ABT-1364": {
+                "viatura_display": "ABT-1364",
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "SD BRUM"
+                        "nome": "2º SGT COAN"
                     },
                     {
                         "funcao": "COV",
                         "nome": "SD PETER"
                     },
                     {
-                        "funcao": "CHEFE DE LINHA",
-                        "nome": "SD PORCELIS"
+                        "funcao": "CHEFE LINHA D. (20h-08h)",
+                        "nome": "SD BAIGORRA"
+                    },
+                    {
+                        "funcao": "CHEFE LINHA D. (08h-20h)",
+                        "nome": "SD BRUM"
                     }
                 ],
-                "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "turno": "Misto",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
@@ -380,21 +397,25 @@
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "SD BERGHAHN"
+                        "nome": "2º SGT PME SALDANHA"
                     },
                     {
                         "funcao": "COV",
-                        "nome": "1º SGT RONALDO"
+                        "nome": "2º SGT PRADIER"
                     },
                     {
-                        "funcao": "CHEFE DE LINHA",
-                        "nome": "SD DAYKER"
+                        "funcao": "CHEFE LINHA D.",
+                        "nome": "SD CATELAN"
+                    },
+                    {
+                        "funcao": "CHEFE LINHA E.",
+                        "nome": "SD TEMP VOLZ"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
@@ -404,21 +425,21 @@
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "2º SGT MENDES"
+                        "nome": "1º SGT ASSIS"
                     },
                     {
                         "funcao": "COV",
-                        "nome": "SD FERREIRA"
+                        "nome": "SD ROGER"
                     },
                     {
                         "funcao": "CHEFE DE LINHA",
-                        "nome": "SD DETONI"
+                        "nome": "SD COSME"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
@@ -428,21 +449,25 @@
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "SD BUENO"
+                        "nome": "SD PEDRO"
                     },
                     {
-                        "funcao": "COV",
-                        "nome": "1º SGT AIRTON"
+                        "funcao": "COV (20h-08h)",
+                        "nome": "SD BARBOSA"
                     },
                     {
-                        "funcao": "CHEFE DE LINHA",
+                        "funcao": "CHEFE LINHA D. (20h-08h)",
                         "nome": "SD EIDER"
+                    },
+                    {
+                        "funcao": "CHEFE LINHA D. (08h-20h)",
+                        "nome": "SD DREYER"
                     }
                 ],
-                "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "turno": "Misto",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
@@ -452,7 +477,7 @@
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "2º SGT SAUL"
+                        "nome": "2º SGT PME DACHI"
                     },
                     {
                         "funcao": "COV",
@@ -460,50 +485,48 @@
                     },
                     {
                         "funcao": "CHEFE DE LINHA",
-                        "nome": "SD FRANCIS"
+                        "nome": "SD DANILO"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         },
         "PARTENON": {
-            "ABT-327": {
-                "viatura_display": "ABT-327",
+            "ABT-1365": {
+                "viatura_display": "ABT-1365",
                 "militares": [
                     {
                         "funcao": "CMT GU",
-                        "nome": "SD BATISTA"
+                        "nome": "SD JONATHAN"
                     },
                     {
                         "funcao": "COV",
-                        "nome": "SD BRUNO EDUARDO"
+                        "nome": "SD BELOMO"
                     },
                     {
                         "funcao": "CHEFE DE LINHA",
-                        "nome": "SD JONATHAN"
+                        "nome": "SD TEMP ZANETTI"
                     }
                 ],
                 "turno": "24h",
-                "inicio_data": "02/Set/2025",
+                "inicio_data": "03/Set/2025",
                 "inicio_hora": "08:00",
-                "fim_data": "03/Set/2025",
+                "fim_data": "04/Set/2025",
                 "fim_hora": "08:00"
             }
         }
     };
-    const aniversariantesData = {};
-
+    
     document.addEventListener('DOMContentLoaded', () => {
         const guarnicoesGrid = document.getElementById('guarnicoes-grid');
         const modalOverlay = document.getElementById('guarnicao-details-overlay');
         const modalContentDiv = document.getElementById('modal-content');
         const dataAtualizacaoSpan = document.getElementById('data-atualizacao');
 
-        // FUNÇÕES DE RENDERIZAÇÃO
         function formatarDataHoraAtual() {
             const agora = new Date();
             const dia = String(agora.getDate());
@@ -511,36 +534,6 @@
             const horas = String(agora.getHours()).padStart(2, '0');
             const minutos = String(agora.getMinutes()).padStart(2, '0');
             return `${dia}/${mes} às ${horas}:${minutos}`;
-        }
-
-        function renderizarAniversariantes() {
-            const diaContainer = document.getElementById('aniversariante-dia-container');
-            const semanaContainer = document.getElementById('aniversariantes-semana-container');
-            const mesContainer = document.getElementById('aniversariantes-mes-container');
-
-            if (aniversariantesData.dia && aniversariantesData.dia.length > 0) {
-                const nomes = aniversariantesData.dia.map(p => p.nome_guerra).join(', ');
-                diaContainer.innerHTML = `
-                    <p class="aniversariante-dia-titulo">Aniversariante do Dia</p>
-                    <p class="aniversariante-dia-nome">${nomes}</p>
-                `;
-            }
-
-            if (aniversariantesData.semana && aniversariantesData.semana.length > 0) {
-                const nomes = aniversariantesData.semana.map(p => p.nome_guerra).join(' • ');
-                semanaContainer.innerHTML = `
-                    <p class="aniversariantes-semana-titulo">Aniversariantes da Semana</p>
-                    <p class="aniversariantes-semana-nomes">${nomes}</p>
-                `;
-            }
-
-            if (aniversariantesData.mes && aniversariantesData.mes.length > 0) {
-                 const nomes = aniversariantesData.mes.map(p => p.nome_guerra).join(' • ');
-                mesContainer.innerHTML = `
-                    <p class="aniversariantes-mes-titulo">Aniversariantes do Mês</p>
-                    <p class="aniversariantes-mes-nomes">${nomes}</p>
-                `;
-            }
         }
 
         function renderizarGuarnicoes() {
@@ -582,12 +575,10 @@
             });
         }
 
-        // EXECUÇÃO PRINCIPAL
         if (dataAtualizacaoSpan) {
             dataAtualizacaoSpan.textContent = formatarDataHoraAtual();
         }
         
-        renderizarAniversariantes();
         renderizarGuarnicoes();
 
         const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
