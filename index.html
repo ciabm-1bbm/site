@@ -233,7 +233,7 @@
                     <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">ESTATÍSTICAS</span>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1tO5BvhpvN3z0U8v2V7ZGiVA9tm054k1QdX2dnvMtLAM/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                <a href="https://docs.google.com/spreadsheets/d/1DbFURN7FxvMs_UeSWQkODaMRo1t06LA3Ww6t5B8l0RA/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">Nº MSG EXPRESSAS</span>
                 </a>
@@ -286,8 +286,8 @@
                     <span class="button-text">NOTAS PARA BI</span>
                 </a>
                 
-                <a href="https://drive.google.com/drive/u/1/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" 
-                    <i class="fas fa-book-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                <a href="#" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
+                    <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">MATERIAL PARA LEITURA</span>
                 </a>
 
@@ -376,7 +376,7 @@
 			"2414155": { role: "admin", nomeGuerra: "1º TEN FREITAS", nascimento: "08/03" },
 			"2414600": { role: "admin", nomeGuerra: "1° SGT LINCOLN", nascimento: "24/12" },
 			"2423146": { role: "padrao", nomeGuerra: "SD DORNELES", nascimento: "14/09" },
-
+			"2423154": { role: "padrao", nomeGuerra: "SOBIESKI", nascimento: "" }, // DADOS NÃO ENCONTRADOS NA NOVA PLANILHA
 			"2423219": { role: "admin", nomeGuerra: "1º TEN VIEIRA", nascimento: "30/04" },
 			"2519160": { role: "padrao", nomeGuerra: "1 SGT RIBEIRO", nascimento: "26/10" },
 			"2519720": { role: "padrao", nomeGuerra: "2° SGT BEN-HUR", nascimento: "24/12" },
@@ -392,8 +392,8 @@
 			"2688379": { role: "admin", nomeGuerra: "2° SGT BECKER", nascimento: "28/04" },
 			"2689138": { role: "admin", nomeGuerra: "1° TEN PATRICIO", nascimento: "25/03" },
 			"2690721": { role: "admin", nomeGuerra: "1° SGT FERNANDO", nascimento: "09/04" },
-			"2691175": { role: "padrao", nomeGuerra: "LUIZ", nascimento: "13/01" },
-
+			"2691175": { role: "padrao", nomeGuerra: "LUIZ", nascimento: "" }, // DADOS NÃO ENCONTRADOS NA NOVA PLANILHA
+			"2810727": { role: "padrao", nomeGuerra: "HOFFMANN", nascimento: "" }, // DADOS NÃO ENCONTRADOS NA NOVA PLANILHA
 			"2822130": { role: "admin", nomeGuerra: "SD MEDEIROS", nascimento: "01/01" },
 			"2823900": { role: "admin", nomeGuerra: "1° SGT ALBUQUERQUE", nascimento: "16/10" },
 			"2826097": { role: "padrao", nomeGuerra: "SD MARTINEZ", nascimento: "05/10" },
@@ -440,7 +440,7 @@
 			"3205614": { role: "admin", nomeGuerra: "SD HERMENEGILDO", nascimento: "27/12" },
 			"3622363": { role: "padrao", nomeGuerra: "SD BERNARDES", nascimento: "22/02" },
 			"3694623": { role: "admin", nomeGuerra: "2° SGT SCHNEIDER", nascimento: "08/10" },
-			"3695034": { role: "padrao", nomeGuerra: "SD THIAGO", nascimento: "13/12" },
+			"3695034": { role: "padrao", nomeGuerra: "SD THIAGO COELHO", nascimento: "13/12" },
 			"3695212": { role: "padrao", nomeGuerra: "SD PEDRO", nascimento: "22/11" },
 			"3695832": { role: "padrao", nomeGuerra: "2° SGT CASTRO", nascimento: "24/03" },
 			"3696049": { role: "padrao", nomeGuerra: "SD BATISTA", nascimento: "07/08" },
@@ -562,7 +562,6 @@
             const diaSemana = diasSemana[hoje.getDay()];
             document.getElementById('data-atual').textContent = `${dia}/${mesNome}/${ano} - ${diaSemana}`;
 
-            // --- Lógica para o Widget do Dia ---
             const widgetDia = document.getElementById('widget-aniversarios-dia');
             const listaDia = document.getElementById('lista-aniversariantes-dia');
             const diaFormatado = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
@@ -578,17 +577,15 @@
                 widgetDia.style.display = 'block';
             }
 
-            // --- Lógica para o Widget do Mês ---
             const widgetMes = document.getElementById('widget-aniversarios-mes');
             const listaMes = document.getElementById('lista-aniversariantes-mes');
             document.getElementById('mes-atual-nome').textContent = mesNome;
             
-            // Define o período de destaque: hoje + 6 dias
-            const datasDaSemana = new Set();
-            for (let i = 0; i < 7; i++) {
+            const datasDeDestaque = new Set();
+            for (let i = 0; i < 7; i++) { // Pega hoje e os próximos 6 dias
                 const dataChecagem = new Date();
                 dataChecagem.setDate(hoje.getDate() + i);
-                datasDaSemana.add(`${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`);
+                datasDeDestaque.add(`${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`);
             }
 
             const aniversariantesDoMes = [];
@@ -608,7 +605,7 @@
                 const htmlAniversariantes = aniversariantesDoMes.map(p => {
                     const [dia, mes] = p.data.split('/');
                     const nomeFormatado = `${p.nome} (${dia}/${mes})`;
-                    if (datasDaSemana.has(p.data)) {
+                    if (datasDeDestaque.has(p.data)) {
                         return `<span class="bg-yellow-500 text-black rounded px-1 py-0.5">${nomeFormatado}</span>`;
                     }
                     return `<span>${nomeFormatado}</span>`;
@@ -642,4 +639,3 @@
 </script>
 </body>
 </html>
-
