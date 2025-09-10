@@ -556,16 +556,10 @@
         };
 
         // --- 2. DECLARAÇÃO DAS FUNÇÕES ---
-        function checarAniversarios() {
-            // ... (código do widget, sem alterações)
-        }
+        // (As funções checarAniversarios, atualizarInterface, e handleLogin não foram alteradas e estão omitidas para brevidade)
 
-        function atualizarInterface(userRole) {
-            // ... (código de interface, sem alterações)
-        }
-        
-        // FUNÇÃO DE SENHA CORRIGIDA
         function gerarSenhaEsperada(nomeCompletoComPosto) {
+            // Regex para remover posto/graduação do início do nome de guerra
             const regexPosto = /^(maj|cap|1º ten pme|1° ten pme|2° sgt pme|1º ten|1° ten|2° sgt|3° sgt|sd temp|sd)\s*/i;
             const nomeDeGuerraApenas = nomeCompletoComPosto.replace(regexPosto, '');
 
@@ -573,10 +567,6 @@
             senha = senha.replace(/\s/g, '');
             senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             return senha + "193";
-        }
-
-        function handleLogin() {
-            // ... (código de login, sem alterações)
         }
 
         // --- 3. EXECUÇÃO DOS SCRIPTS AO CARREGAR A PÁGINA ---
