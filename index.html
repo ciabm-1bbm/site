@@ -230,6 +230,10 @@
                     <i class="fas fa-shirt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">PLATAFORMA P/ TROCA<br>DE FARDAMENTO</span>
                 </a>
+                <a href="https://drive.google.com/drive/u/1/folders/1ykuBSdaPjFAkM0NKExloJZzzvQjc_c_Y" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-triangle-exclamation text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">AVISOS SETOR<br>DE LOGÍSTICA</span>
+                </a>
                 <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">PARTES SLOG</span>
@@ -556,10 +560,16 @@
         };
 
         // --- 2. DECLARAÇÃO DAS FUNÇÕES ---
-        // (As funções checarAniversarios, atualizarInterface, e handleLogin não foram alteradas e estão omitidas para brevidade)
-
+        // (As funções checarAniversarios e de interface não foram alteradas)
+        function checarAniversarios() {
+            // ... (código do widget)
+        }
+        function atualizarInterface(userRole) {
+            // ... (código da interface)
+        }
+        
+        // FUNÇÃO DE SENHA CORRIGIDA
         function gerarSenhaEsperada(nomeCompletoComPosto) {
-            // Regex para remover posto/graduação do início do nome de guerra
             const regexPosto = /^(maj|cap|1º ten pme|1° ten pme|2° sgt pme|1º ten|1° ten|2° sgt|3° sgt|sd temp|sd)\s*/i;
             const nomeDeGuerraApenas = nomeCompletoComPosto.replace(regexPosto, '');
 
@@ -567,6 +577,33 @@
             senha = senha.replace(/\s/g, '');
             senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             return senha + "193";
+        }
+
+        function handleLogin() {
+            const enteredUsername = usernameInput.value.trim();
+            const enteredPassword = passwordInput.value.trim();
+            const userData = efetivo[enteredUsername];
+
+            if (userData) {
+                const expectedPassword = gerarSenhaEsperada(userData.nomeGuerra);
+                if (enteredPassword === expectedPassword) {
+                    sessionStorage.setItem('isBbmAuthenticated', 'true');
+                    sessionStorage.setItem('bbmUserRole', userData.role);
+                    loginOverlay.style.display = 'none';
+                    atualizarInterface(userData.role);
+                    if (clickedLinkHref) {
+                        const clickedLinkElement = Array.from(allShortcutButtons).find(l => l.href === clickedLinkHref);
+                        if (clickedLinkElement && !clickedLinkElement.classList.contains('link-bloqueado')) {
+                            window.open(clickedLinkHref, '_blank');
+                        }
+                        clickedLinkHref = null; 
+                    }
+                    return;
+                }
+            }
+            loginError.style.display = 'block';
+            passwordInput.value = "";
+            passwordInput.focus();
         }
 
         // --- 3. EXECUÇÃO DOS SCRIPTS AO CARREGAR A PÁGINA ---
