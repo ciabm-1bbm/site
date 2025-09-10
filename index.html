@@ -225,7 +225,12 @@
                     <i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">FICHA DE RENOVAÇÃO</span>
                 </a>
-                 <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                 
+                <a href="https://ciabm-1bbm.github.io/troca_de_fardamento/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-shirt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">PLATAFORMA P/ TROCA<br>DE FARDAMENTO</span>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">PARTES SLOG</span>
                 </a>
@@ -286,9 +291,9 @@
                     <span class="button-text">NOTAS PARA BI</span>
                 </a>
                 
-                <a href="https://drive.google.com/drive/u/1/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
+                <a href="#" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
                     <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MATERIAL PARA LEITURA E APERFEIÇOAMENTO</span>
+                    <span class="button-text">MATERIAL PARA LEITURA</span>
                 </a>
 
                 <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
@@ -582,7 +587,7 @@
             document.getElementById('mes-atual-nome').textContent = mesNome;
             
             const datasDeDestaque = new Set();
-            for (let i = 0; i < 7; i++) { // Pega hoje e os próximos 6 dias
+            for (let i = 0; i < 7; i++) {
                 const dataChecagem = new Date();
                 dataChecagem.setDate(hoje.getDate() + i);
                 datasDeDestaque.add(`${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`);
@@ -616,10 +621,50 @@
             }
         }
 
-        // Funções de Login e Interface (sem alterações)
-        function atualizarInterface(userRole) { /* ... */ }
-        function gerarSenhaEsperada(nome) { /* ... */ }
-        function handleLogin() { /* ... */ }
+        function atualizarInterface(userRole) {
+            allShortcutButtons.forEach(link => {
+                const requiredRole = link.dataset.role;
+                if (requiredRole === 'admin' && userRole !== 'admin') {
+                    link.classList.add('link-bloqueado');
+                    link.title = "Acesso restrito ao comando.";
+                } else {
+                    link.classList.remove('link-bloqueado');
+                    if (link.title === "Acesso restrito ao comando.") { link.title = ""; }
+                }
+            });
+        }
+        
+        function gerarSenhaEsperada(nome) {
+            let senha = nome.toLowerCase().replace(/\s/g, '');
+            senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return senha + "193";
+        }
+
+        function handleLogin() {
+            const enteredUsername = usernameInput.value.trim();
+            const enteredPassword = passwordInput.value.trim();
+            const userData = efetivo[enteredUsername];
+            if (userData) {
+                const expectedPassword = gerarSenhaEsperada(userData.nomeGuerra);
+                if (enteredPassword === expectedPassword) {
+                    sessionStorage.setItem('isBbmAuthenticated', 'true');
+                    sessionStorage.setItem('bbmUserRole', userData.role);
+                    loginOverlay.style.display = 'none';
+                    atualizarInterface(userData.role);
+                    if (clickedLinkHref) {
+                        const clickedLinkElement = Array.from(allShortcutButtons).find(l => l.href === clickedLinkHref);
+                        if (clickedLinkElement && !clickedLinkElement.classList.contains('link-bloqueado')) {
+                            window.open(clickedLinkHref, '_blank');
+                        }
+                        clickedLinkHref = null; 
+                    }
+                    return;
+                }
+            }
+            loginError.style.display = 'block';
+            passwordInput.value = "";
+            passwordInput.focus();
+        }
 
         // --- 3. EXECUÇÃO DOS SCRIPTS AO CARREGAR A PÁGINA ---
         checarAniversarios();
@@ -632,12 +677,38 @@
         }
 
         // --- 4. ADIÇÃO DOS EVENT LISTENERS ---
-        allShortcutButtons.forEach(link => { /* ... */ });
-        loginForm.addEventListener('submit', (event) => { /* ... */ });
-        loginOverlay.addEventListener('click', (event) => { /* ... */ });
+        allShortcutButtons.forEach(link => {
+            if (link.href.startsWith('mailto:')) { return; }
+            link.addEventListener('click', (event) => {
+                const requiredRole = link.dataset.role;
+                const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
+                const currentUserRole = sessionStorage.getItem('bbmUserRole');
+                if (!userIsAuthenticated) {
+                    event.preventDefault();
+                    clickedLinkHref = link.href;
+                    loginOverlay.style.display = 'flex';
+                    usernameInput.focus();
+                } else {
+                    if (requiredRole === 'admin' && currentUserRole !== 'admin') {
+                        event.preventDefault();
+                        alert("Acesso restrito ao comando. Você não tem permissão para acessar este link.");
+                    }
+                }
+            });
+        });
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            handleLogin();
+        });
+
+        loginOverlay.addEventListener('click', (event) => {
+            if (event.target === loginOverlay) {
+                loginOverlay.style.display = 'none';
+                clickedLinkHref = null;
+            }
+        });
     });
 </script>
 </body>
 </html>
-
-
