@@ -84,33 +84,6 @@
             word-break: break-word;
             hyphens: auto;
         }
-        .login-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
-        }
-        .login-box {
-            background-color: #2D3748; padding: 2rem; border-radius: 0.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            text-align: center; width: 90%; max-width: 400px;
-        }
-        .login-box input {
-            width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 0.25rem;
-            background-color: #4A5568; color: white; border: 1px solid #718096;
-        }
-        .login-box input::placeholder { color: #A0AEC0; }
-        .login-box button {
-            width: 100%; padding: 0.75rem; border-radius: 0.25rem;
-            background-color: #FF8C00; color: white; font-weight: bold;
-            cursor: pointer; transition: background-color 0.3s;
-        }
-        .login-box button:hover { background-color: #cc7000; }
-        .link-bloqueado {
-            opacity: 0.5; cursor: not-allowed; background-color: #4A5568 !important;
-        }
-        .link-bloqueado:hover {
-            transform: none; box-shadow: none; background-color: #4A5568 !important;
-        }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col">
@@ -172,23 +145,23 @@
                     <span class="button-text">ESCALA ÚNICA SETEMBRO</span>
                 </a>
                 
-                <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">MAPA DE ETAPA E HE</span>
                 </a>
-                <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-calendar-times text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">INDISPONIBILIDADE MENSAL</span>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">CONFIRMAÇÃO de FÉRIAS</span>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">DISP. MERGULHADOR /<br>CINOTECNIA</span>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
+                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">FUNÇÕES CIA</span>
                 </a>
@@ -298,6 +271,10 @@
                 <a href="#" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
                     <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">MATERIAL PARA LEITURA</span>
+                </a>
+                <a href="https://drive.google.com/drive/u/1/folders/1CBg3klq4zgWPLRRDQWzCt7brfTDGcNUl" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                    <i class="fas fa-certificate text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                    <span class="button-text">CERTIDÕES SENASP<br>(2025)</span>
                 </a>
 
                 <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
@@ -549,12 +526,13 @@
             // (Esta função não foi alterada)
         }
         
-        // FUNÇÃO DE SENHA CORRIGIDA E SIMPLIFICADA
-        function gerarSenhaEsperada(nomeGuerra) {
-            let senha = nomeGuerra.toLowerCase();
-            senha = senha.replace(/\s/g, ''); // Remove espaços (ex: "DA COSTA" -> "dacosta")
-            senha = senha.replace(/\./g, '');  // Remove pontos (ex: "J. BARBOSA" -> "jbarbosa")
-            senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos (ex: "JÚLIA" -> "julia")
+        function gerarSenhaEsperada(nomeCompletoComPosto) {
+            const regexPosto = /^(maj|cap|cel|ten|1º ten pme|1° ten pme|2° sgt pme|1º ten|1° ten|2° sgt|3° sgt|sd temp|sd)\s*/i;
+            const nomeDeGuerraApenas = nomeCompletoComPosto.replace(regexPosto, '');
+
+            let senha = nomeDeGuerraApenas.toLowerCase();
+            senha = senha.replace(/\s/g, '');
+            senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             return senha + "193";
         }
 
@@ -586,7 +564,7 @@
         }
 
         // --- 3. EXECUÇÃO DOS SCRIPTS AO CARREGAR A PÁGINA ---
-        // checarAniversarios(); // Removido para simplificar, já que a lista de aniversários foi removida
+        checarAniversarios();
         const isAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
         const userRole = sessionStorage.getItem('bbmUserRole');
         if (isAuthenticated && userRole) {
@@ -631,4 +609,3 @@
 </script>
 </body>
 </html>
-
