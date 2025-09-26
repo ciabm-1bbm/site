@@ -295,11 +295,11 @@
                     <span class="button-text">NOTAS PARA BI</span>
                 </a>
                 
-                <a href="#" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
+                <a href="https://drive.google.com/drive/u/1/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
                     <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">MATERIAL PARA LEITURA</span>
                 </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1VW2rI33lDLl7DQL-zDkiGUBvkXqZG44j" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
+                <a href="https://drive.google.com/drive/u/1/folders/1CBg3klq4zgWPLRRDQWzCt7brfTDGcNUl" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
                     <i class="fas fa-certificate text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
                     <span class="button-text">CERTIDÕES SENASP<br>(2025)</span>
                 </a>
@@ -365,7 +365,7 @@
         let clickedLinkHref = null;
 
         const efetivo = {
-            "3527301": { role: "admin", nomeGuerra: "CAP BONA", nascimento: "25/09" },
+			"3527301": { role: "admin", nomeGuerra: "CAP BONA", nascimento: "25/09" },
             "2426650": { role: "admin", nomeGuerra: "CEL DEOCLIDES", nascimento: "06/08" },
             "2242583": { role: "admin", nomeGuerra: "TEN CANDIDO", nascimento: "28/08" },
 			"2237423": { role: "padrao", nomeGuerra: "3° SGT RAMOS", nascimento: "13/01" },
@@ -407,9 +407,7 @@
 			"2688379": { role: "admin", nomeGuerra: "2° SGT BECKER", nascimento: "28/04" },
 			"2689138": { role: "admin", nomeGuerra: "1° TEN PATRICIO", nascimento: "25/03" },
 			"2690721": { role: "admin", nomeGuerra: "1° SGT FERNANDO", nascimento: "09/04" },
-			"2691175": { role: "padrao", nomeGuerra: "LUIZ", nascimento: "" },
-			"2810727": { role: "padrao", nomeGuerra: "HOFFMANN", nascimento: "" },
-			"2822130": { role: "admin", nomeGuerra: "SD MEDEIROS", nascimento: "01/01" },
+			"2822130": { role: "admin", nomeGuerra: "SD MEDEIROS", nascimento: "13/02" },
 			"2823900": { role: "admin", nomeGuerra: "1° SGT ALBUQUERQUE", nascimento: "16/10" },
 			"2826097": { role: "padrao", nomeGuerra: "SD MARTINEZ", nascimento: "05/10" },
 			"2856476": { role: "admin", nomeGuerra: "1° SGT PAIM", nascimento: "13/06" },
@@ -576,16 +574,15 @@
             const ano = hoje.getFullYear();
             const diaSemana = diasSemana[hoje.getDay()];
             document.getElementById('data-atual').textContent = `${dia}/${mesNome}/${ano} - ${diaSemana}`;
-            
+
             const widgetDia = document.getElementById('widget-aniversarios-dia');
             const listaDia = document.getElementById('lista-aniversariantes-dia');
             const diaFormatado = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
             
             const aniversariantesDoDia = [];
-            const efetivoCompleto = { ...efetivo, ...efetivoAniversarios }; // Combina as listas para os widgets
-            for (const id in efetivoCompleto) {
-                if (efetivoCompleto[id].nascimento === diaFormatado) {
-                    aniversariantesDoDia.push(efetivoCompleto[id].nomeGuerra);
+            for (const id in efetivo) {
+                if (efetivo[id].nascimento === diaFormatado) {
+                    aniversariantesDoDia.push(efetivo[id].nomeGuerra);
                 }
             }
             if (aniversariantesDoDia.length > 0) {
@@ -606,8 +603,8 @@
 
             const aniversariantesDoMes = [];
             const mesAtual = hoje.getMonth() + 1;
-            for (const id in efetivoCompleto) {
-                const militar = efetivoCompleto[id];
+            for (const id in efetivo) {
+                const militar = efetivo[id];
                 if (militar.nascimento) {
                     const [nascDia, nascMes] = militar.nascimento.split('/').map(Number);
                     if (nascMes === mesAtual) {
