@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMPANHIA DE BOMBEIRO MILITAR do 1º BBM</title>
+    <title>Guarnições de Serviço - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,10 +13,8 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'cbmrs-blue': '#1A5276',
-                        'cbmrs-light-blue': '#4A90E2',
                         'fire-red': '#DC2626',
-                        'dark-red-opaque': '#8B0000',
-                        'pure-white': '#FFFFFF',
+                        'light-blue': '#3B82F6',
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -35,82 +33,134 @@
             background-image: url('images/background.jpg');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
             position: relative;
             z-index: 0;
         }
         .hero-background::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
-        .shortcut-button {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            height: 100px;
-            padding: 8px;
+        .shortcut-button-blue {
+            transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(59, 130, 246, 0.3);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            height: 50px; padding: 4px; color: white;
+            font-size: 9px; font-weight: 700; line-height: 1.2;
+            word-break: break-word; hyphens: auto; text-decoration: none;
         }
-        .shortcut-button:hover {
+        .shortcut-button-blue:hover {
+            background-color: rgba(59, 130, 246, 0.5);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             transform: translateY(-5px);
         }
-        .shortcut-button.bg-bombeiros-orange {
+        .shortcut-button-blue i {
+            color: white; font-size: 1.2rem; margin-bottom: 0.2rem;
+        }
+        .guarnicao-button {
+            transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 215, 0, 0.3);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 0.5rem; min-height: 140px; position: relative;
+            cursor: pointer; overflow: hidden;
+        }
+        .guarnicao-button:hover {
+            background-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            position: relative; top: -3px; z-index: 10;
+        }
+        .guarnicao-oficial {
             background-color: rgba(255, 140, 0, 0.5);
+            border-color: rgba(255, 165, 0, 0.7);
         }
-        .shortcut-button.bg-bombeiros-orange:hover {
-            background-color: rgba(255, 140, 0, 0.75);
+        .guarnicao-oficial:hover {
+            background-color: rgba(255, 140, 0, 0.7);
         }
-        .shortcut-button.bg-dark-red-opaque {
-            background-color: rgba(139, 0, 0, 0.5);
+        .button-visible-content {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100%; width: 100%;
         }
-        .shortcut-button.bg-dark-red-opaque:hover {
-            background-color: rgba(139, 0, 0, 0.75);
+        .guarnicao-name-only {
+            font-size: 0.9rem; font-weight: 700; color: white;
+            line-height: 1.2; margin-bottom: 0.3rem;
         }
-        .button-text {
-            font-size: 11px;
-            font-weight: 700;
-            color: white;
-            line-height: 1.2;
-            word-break: break-word;
-            hyphens: auto;
+        .guarnicao-arrow {
+            color: white; font-size: 1.2rem; transition: transform 0.3s ease;
         }
-        .login-overlay {
+        .guarnicao-button.active .guarnicao-arrow { transform: rotate(180deg); }
+        .guarnicao-details-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.6); display: none;
+            align-items: center; justify-content: center; z-index: 10000;
         }
-        .login-box {
-            background-color: #2D3748; padding: 2rem; border-radius: 0.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            text-align: center; width: 90%; max-width: 400px;
+        .guarnicao-details-overlay.active { display: flex; }
+        .guarnicao-details-box {
+            background-color: #1F2937; color: #E5E7EB; padding: 1rem;
+            border-radius: 0.75rem; max-width: 320px; width: 90%;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); position: relative;
+            transform: translateY(20px); transition: transform 0.3s ease;
         }
-        .login-box input {
-            width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 0.25rem;
-            background-color: #4A5568; color: white; border: 1px solid #718096;
+        .guarnicao-details-overlay.active .guarnicao-details-box { transform: translateY(0); }
+        .guarnicao-details-box .close-button {
+            position: absolute; top: 0.5rem; right: 0.7rem; background: none;
+            border: none; color: #E5E7EB; font-size: 1.8rem;
+            cursor: pointer; transition: color 0.3s ease;
         }
-        .login-box input::placeholder { color: #A0AEC0; }
-        .login-box button {
-            width: 100%; padding: 0.75rem; border-radius: 0.25rem;
-            background-color: #FF8C00; color: white; font-weight: bold;
-            cursor: pointer; transition: background-color 0.3s;
+        .guarnicao-details-box .close-button:hover { color: #DC2626; }
+        .modal-quartel-title {
+            font-size: 1.2rem; font-weight: bold; color: #bombeiros-orange;
+            margin-bottom: 0.3rem; text-align: center;
         }
-        .login-box button:hover { background-color: #cc7000; }
-        .link-bloqueado {
-            opacity: 0.5; cursor: not-allowed; background-color: #4A5568 !important;
+        .modal-viatura-subtitle {
+            font-size: 0.9rem; font-weight: bold; color: #FFD700;
+            margin-bottom: 0.8rem; text-align: center;
         }
-        .link-bloqueado:hover {
-            transform: none; box-shadow: none; background-color: #4A5568 !important;
+        .modal-personnel-section {
+            margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 0.8rem;
         }
+        .modal-personnel-section .person-role-modal {
+            font-size: 0.8rem; line-height: 1.2; margin-bottom: 0.1rem;
+            display: flex; justify-content: space-between; flex-wrap: wrap;
+        }
+        .modal-personnel-section .person-role-modal strong {
+            font-weight: bold; color: #4A90E2; flex-shrink: 0; margin-right: 0.5rem;
+        }
+        .modal-personnel-section .person-role-modal span {
+            font-weight: normal; color: #E5E7EB; text-align: right; flex-grow: 1;
+        }
+        .modal-turn-details-section {
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.8rem;
+            text-align: center;
+        }
+        .modal-turn-details-section .turn-type-label-modal {
+            font-size: 0.8rem; font-weight: bold; color: #FFD700; margin-bottom: 0.4rem;
+        }
+        .modal-turn-details-section .duty-detail-modal {
+            font-size: 0.7rem; color: #A0AEC0; margin-bottom: 0.1rem;
+        }
+        .guarnicoes-por-quartel-grid {
+            display: grid; grid-template-columns: repeat(9, 140px);
+            gap: 1rem; justify-content: center;
+            max-width: calc(9 * 140px + 8 * 1rem); margin: 0 auto;
+        }
+        .quartel-column {
+            display: flex; flex-direction: column; gap: 0.5rem;
+            align-items: center; width: 100%;
+        }
+        
+        @media (max-width: 1543px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(7, 140px); max-width: calc(7 * 140px + 6 * 1rem); } }
+        @media (max-width: 1279px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(5, 140px); max-width: calc(5 * 140px + 4 * 1rem); } }
+        @media (max-width: 1023px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(4, 140px); max-width: calc(4 * 140px + 3 * 1rem); } }
+        @media (max-width: 767px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(3, 140px); max-width: calc(3 * 140px + 2 * 1rem); } }
+        @media (max-width: 639px) { .guarnicoes-por-quartel-grid { grid-template-columns: repeat(2, 140px); max-width: calc(2 * 140px + 1 * 1rem); } }
+        .main-container-fluid { max-width: 100%; padding-left: 1rem; padding-right: 1rem; margin-left: auto; margin-right: auto; }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col">
@@ -120,585 +170,303 @@
         <div class="container mx-auto px-4 text-center">
             <div class="flex flex-wrap items-center justify-center gap-4">
                 <div class="bg-cbmrs-blue p-2 rounded-lg">
-                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 md:h-20 w-auto">
+                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-12 md:h-16 w-auto">
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
-                        COMPANHIA DE BOMBEIRO MILITAR do 1º BBM
+                    <h1 class="text-lg md:text-xl font-extrabold text-bombeiros-yellow">
+                        Página das Guarnições de Serviço do 1º BBM
                     </h1>
                 </div>
                 <div class="bg-cbmrs-blue p-2 rounded-lg">
-                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-16 md:h-20 w-auto">
+                    <img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" class="h-12 md:h-16 w-auto">
                 </div>
             </div>
-            
-            <div class="mt-3">
-                <h2 class="text-lg md:text-xl font-bold text-white">
-                    Bem-vindo, <span class="text-bombeiros-orange">Guerreiro do Fogo!</span>
-                </h2>
-                <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-1">
-                    Aqui tu poderás acessar as principais ferramentas criadas pelos membros da CIA para facilitar o acesso às demandas administrativas, otimizando teu tempo e o nosso trabalho em prol da sociedade. Avante CBMRS!
-                </p>
-                
-                <div class="mt-4 max-w-4xl mx-auto flex flex-col md:flex-row gap-4">
-                    <div id="widget-aniversarios-dia" class="w-full md:w-1/2 p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg" style="display: none;">
-                        <h3 class="font-bold text-bombeiros-yellow flex items-center">
-                            <i class="fas fa-birthday-cake mr-2"></i>
-                            Aniversariantes do Dia
-                        </h3>
-                        <span id="data-atual" class="block text-xs text-gray-400 font-mono text-left mb-2"></span>
-                        <p class="text-sm text-left text-white" id="lista-aniversariantes-dia"></p>
-                    </div>
-
-                    <div id="widget-aniversarios-mes" class="w-full md:w-1/2 p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg" style="display: none;">
-                         <h3 class="font-bold text-cbmrs-light-blue flex items-center mb-2">
-                            <i class="fas fa-calendar-alt mr-2"></i>
-                            Aniversariantes do Mês de <span id="mes-atual-nome" class="ml-1"></span>
-                        </h3>
-                        <div class="text-xs text-left text-white" id="lista-aniversariantes-mes"></div>
-                    </div>
-                </div>
-
-            </div>
+            <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-2">
+                Elaborada para acesso do Efetivo Operacional, unificação de links e procedimentos atinentes ao serviço diário.
+            </p>
         </div>
     </header>
 
-    <main class="flex items-center justify-center py-6">
-        <div class="container mx-auto px-4 text-center">
-             <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
-
-                <a href="https://docs.google.com/spreadsheets/d/1iKbIc6_7RHpPQWxdr7fMab4ljt5wntMsFTt9UDLD4rA/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESCALA ÚNICA SETEMBRO</span>
-                </a>
-                
-                <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MAPA DE ETAPA E HE</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-calendar-times text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">INDISPONIBILIDADE MENSAL</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONFIRMAÇÃO de FÉRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">DISP. MERGULHADOR /<br>CINOTECNIA</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" data-role="admin">
-                    <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FUNÇÕES CIA</span>
-                </a>
-                
-                <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FORMULÁRIO</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PREVISÃO (OUTUBRO)</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">EFETIVO</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/144g1qOiO44steK7mbICkFt-pXF_vebDqDyPmzgd22hM/edit?gid=1128532433#gid=1128532433" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PLANO de FÉRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AFASTAMENTOS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">VALIDADE CCVTE</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">TOXICOLÓGICO</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1HR8JO24uWEWSOfeUuzphWUFweMeN0XRX" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FICHA DE RENOVAÇÃO</span>
-                </a>
-                 
-                <a href="https://ciabm-1bbm.github.io/troca_de_fardamento/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-shirt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PLATAFORMA P/ TROCA<br>DE FARDAMENTO</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1ykuBSdaPjFAkM0NKExloJZzzvQjc_c_Y" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-triangle-exclamation text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AVISOS SETOR<br>DE LOGÍSTICA</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PARTES SLOG</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESTATÍSTICAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1DbFURN7FxvMs_UeSWQkODaMRo1t06LA3Ww6t5B8l0RA/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">Nº MSG EXPRESSAS</span>
-                </a>
-                <a href="https://drive.google.com/file/d/1QzmPk-RvWS5wl8sR3xPaWpmDAGU1cNET/view?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-route text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">TUTORIAL DIÁRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/17UVmvKgC_bgrtR245o07PThuHrduCUK7rI203q2GbG8/edit#gid=0" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-truck-moving text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">VIATURAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1X2tn-ay7Xc0zOxV9lpJzN24KEelkzzB6JS7ewQzVCwE/edit?gid=926343856#gid=926343856" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-ship text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">EQUIPAMENTOS</span>
-                </a>
-                <a href="https://gestaodefrotas.planejamento.rs.gov.br/frota/gestao/abastecimento/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-invoice-dollar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONSULTA VALORES<br>COMBUSTÍVEL</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1eGyJ9OOvhvVACvd88X2oMfkYi_epj15X6sV9gUDWS8Q/edit?gid=1519715908#gid=1519715908" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-life-ring text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">SITUAÇÃO GUARDA VIDAS<br>2024/25</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/16hXVQaxmRfkn9YPNG1-4yTPgdong0UYm" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-gas-pump text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ABASTECIMENTOS</span>
-                </a>
-                <a href="https://docs.google.com/document/d/1DRnUQCHcH__eoh_gcvJxhUUXp_nvavyguV-lyVkW20g/edit?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-list-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CHECKLIST DOS MAPAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1tlmByosp_RENxiMZVeNJL0bg5BS3yPtCmsW8-N9MC3o/edit?gid=416715601#gid=416715601" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-car-side text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AUTORIZAÇÃO DESLOCAMENTO VTR</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1DJm9aKGiudhPhEFBJ94SXQiMRTdV_xXN?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ORDENS DE SERVIÇO EM VIGOR</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1rDz7ecttIN-z7h--wEdSQQO4cLkINZkk" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MODELOS DOCS</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1enYhn1PD-8nBmNKEWDQNjfAJoC6fKxeC?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-newspaper text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">BOLETIM INTERNO</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1wLuQM7gZMsm5iMw3wOOJd7kA8HRmaHRN?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">NOTAS PARA BI</span>
-                </a>
-                
-                <a href="#" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
-                    <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MATERIAL PARA LEITURA</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1CBg3klq4zgWPLRRDQWzCt7brfTDGcNUl" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-certificate text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CERTIDÕES SENASP<br>(2025)</span>
-                </a>
-
-                <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-envelope-open-text text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">E-MAIL CIA</span>
-                </a>
-                <a href="https://wa.me/+5555984423613" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fab fa-whatsapp text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">WHATSAPP CIA</span>
-                </a>
-
-                <a href="https://intranet.cbm.rs.gov.br/" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-desktop text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">INTRANET CBM</span>
-                </a>
-                <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">E-193</span>
-                </a>
-                <a href="guarnicoes.html" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">GUARNIÇÕES DE SERVIÇO</span>
-                </a>
+    <main class="flex-grow py-6 px-4">
+        <div class="main-container-fluid">
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-light-blue mb-4 text-center">
+                    <i class="fas fa-external-link-alt mr-2"></i> LINKS RÁPIDOS DE ACESSO:
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-4 justify-center">
+                    <a href="https://www.google.com/maps/d/u/0/viewer?mid=1yI6n4-YfxnX6tNdQdoyH5tfLwbs&g_ep=CAESCjExLjE0My4zMDUYACDdYiqZASw5NDIzODM0MCw5NDIwMzMyNCw0NzA3NTQ4OSw5NDIxNjQyNiw5NDIxNjQxMyw5NDIyMzI5OSw5NDIxNjQxMyw5NDIxMjQ5Niw5NDIwNzM5NCw5NDIwNzUwNiw5NDIwODUwNiw5NDIxNzUyMyw5NDIxODY1Myw5NDIyOTgzOSw0NzA4NzExOCw0NzA4NDM5Myw5NDIxMzIwMEICQlI%3D&shorturl=1&ll=-30.079202709120683%2C-51.0992469928464&z=13" class="shortcut-button-blue"><i class="fas fa-link"></i><span>MAPA DE HIDRANTES E SUB ÁREAS DOS PELOTÕES</span></a>
+                    <a href="https://docs.google.com/document/d/1j3rt0UlxHjzJnnM4n0u-0j-vpE-3VlFP/edit" class="shortcut-button-blue"><i class="fas fa-link"></i><span>FICHA DE ACIDENTE DE VTR</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/17pPNkLr0lQtMeFeLTdh1J5lGpu0S3yHq" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROCEDIMENTO OPERACIONAL PADRÃO</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1ZB4jtNcUsls__DPG_WvJ0FhZejW4Ou1U" class="shortcut-button-blue"><i class="fas fa-link"></i><span>TROCAS DE SERVIÇO</span></a>
+                    <a href="#" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROJETO TREINAMENTO DE EVACUAÇÃO ESCOLAR</span></a>
+                    <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button-blue"><i class="fas fa-link"></i><span>E-193</span></a>
+                    <a href="https://docs.google.com/spreadsheets/d/1fJGyYv9-KRxizh_LIDV59pUHGT90RBg14PXJZzKjs0c/edit?gid=396999060#gid=396999060" class="shortcut-button-blue"><i class="fas fa-link"></i><span>INSTRUÇÃO DIÁRIA</span></a>
+                    <a href="https://drive.google.com/drive/u/1/folders/1i1GOOjiXGqAAu4eTUpTHTZtxUjZBGDLM" class="shortcut-button-blue"><i class="fas fa-link"></i><span>PROJETO BOMBEIRO NA ESCOLA</span></a>
+                </div>
             </div>
+            
+            <hr class="border-gray-600 my-8">
+            
+            <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
+                GUARNIÇÕES DE SERVIÇO EM PORTO ALEGRE - 1º BBM (26/Set/2025)
+            </h2>
+            <p class="text-gray-300 text-center mb-6 text-sm">
+                Guarnições de Serviço em Porto Alegre. Organizadas por pelotão e viatura, clique nos ícones para mais detalhes.
+            </p>
+
+            <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid"></div>
+            <p class="text-gray-300 text-center mb-4 text-sm">
+                OBS.: Última atualização: <span id="data-atualizacao"></span>, por CIABM.
+            </p>
         </div>
     </main>
 </div>
 
 <footer class="bg-gray-800 text-gray-400 py-3 z-10">
     <div class="container mx-auto px-4 text-center text-xs">
-        <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+        <p>© 2025 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
         <p class="mt-1">
             Para demais assuntos acesse a
-            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-light-blue hover:underline">Página do CBMRS na Internet.</a>
+            <a href="https://www.bombeiros.rs.gov.br/inicial" target="_blank" class="text-cbmrs-blue hover:underline">Página do CBMRS na Internet.</a>
         </p>
     </div>
 </footer>
 
+<div id="guarnicao-details-overlay" class="guarnicao-details-overlay">
+    <div class="guarnicao-details-box">
+        <button class="close-button" onclick="closeModal()">×</button>
+        <div id="modal-content"></div>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const efetivoAniversarios = {
-			"3527301": { nomeGuerra: "CAP BONA", nascimento: "25/09" },
-            "2426650": { nomeGuerra: "CEL DEOCLIDES", nascimento: "06/08" },
-            "2242583": { nomeGuerra: "TEN CANDIDO", nascimento: "28/08" },
-			"2237423": { nomeGuerra: "3° SGT RAMOS", nascimento: "13/01" },
-			"2241951": { nomeGuerra: "1º TEN PME DONATO", nascimento: "30/08" },
-			"2247410": { nomeGuerra: "1º TEN PME EVERTON", nascimento: "24/09" },
-			"2248204": { nomeGuerra: "2° SGT PME CARGNELUTTI", nascimento: "21/01" },
-			"2250470": { nomeGuerra: "2° SGT PME SALDANHA", nascimento: "30/08" },
-			"2260280": { nomeGuerra: "1º TEN PME MOREIRA", nascimento: "03/06" },
-			"2260670": { nomeGuerra: "2° SGT PME DACHI", nascimento: "15/02" },
-			"2262070": { nomeGuerra: "1° TEN PME RIBEIRO", nascimento: "30/04" },
-			"2262363": { nomeGuerra: "1º TEN PME TERRA", nascimento: "15/09" },
-			"2267373": { nomeGuerra: "1º TEN PME DILMAR", nascimento: "02/02" },
-			"2284995": { nomeGuerra: "1º TEN PME LUIS FERNANDO", nascimento: "29/07" },
-			"2285045": { nomeGuerra: "1º TEN PME JAIRO", nascimento: "19/04" },
-			"2303876": { nomeGuerra: "1° TEN EDSON DOMINGUES", nascimento: "28/03" },
-			"2328674": { nomeGuerra: "1º TEN PME TAIRONE", nascimento: "28/05" },
-			"2328798": { nomeGuerra: "1º TEN PME PRADE", nascimento: "11/08" },
-			"2328828": { nomeGuerra: "1° SGT FRANCO", nascimento: "28/02" },
-			"2328925": { nomeGuerra: "1° SGT DELAVECHIA", nascimento: "18/04" },
-			"2328976": { nomeGuerra: "3° SGT GONZAGA", nascimento: "02/09" },
-			"2329034": { nomeGuerra: "1° SGT MARCZAK", nascimento: "23/08" },
-			"2414066": { nomeGuerra: "1° SGT LUCIANO", nascimento: "16/03" },
-			"2414155": { nomeGuerra: "1º TEN FREITAS", nascimento: "08/03" },
-			"2414600": { nomeGuerra: "1° SGT LINCOLN", nascimento: "24/12" },
-			"2423146": { nomeGuerra: "SD DORNELES", nascimento: "14/09" },
-			"2423154": { nomeGuerra: "SOBIESKI", nascimento: "" },
-			"2423219": { nomeGuerra: "1º TEN VIEIRA", nascimento: "30/04" },
-			"2519160": { nomeGuerra: "1 SGT RIBEIRO", nascimento: "26/10" },
-			"2519720": { nomeGuerra: "2° SGT BEN-HUR", nascimento: "24/12" },
-			"2520087": { nomeGuerra: "2° SGT JÚLIO", nascimento: "17/10" },
-			"2612887": { nomeGuerra: "1° SGT PME JULIANO", nascimento: "14/05" },
-			"2614170": { nomeGuerra: "1° SGT DORNELLES", nascimento: "20/03" },
-			"2615134": { nomeGuerra: "1° SGT RONALDO", nascimento: "14/06" },
-			"2683520": { nomeGuerra: "1° TEN SITENESKI", nascimento: "11/06" },
-			"2684640": { nomeGuerra: "1º TEN MEDINA", nascimento: "14/12" },
-			"2685582": { nomeGuerra: "MAJ HOMRICH", nascimento: "18/08" },
-			"2686589": { nomeGuerra: "1° SGT GUEDES", nascimento: "09/10" },
-			"2688280": { nomeGuerra: "2° SGT FABIANA", nascimento: "27/10" },
-			"2688379": { nomeGuerra: "2° SGT BECKER", nascimento: "28/04" },
-			"2689138": { nomeGuerra: "1° TEN PATRICIO", nascimento: "25/03" },
-			"2690721": { nomeGuerra: "1° SGT FERNANDO", nascimento: "09/04" },
-			"2691175": { nomeGuerra: "LUIZ", nascimento: "" },
-			"2810727": { nomeGuerra: "HOFFMANN", nascimento: "" },
-			"2822130": { nomeGuerra: "SD MEDEIROS", nascimento: "01/01" },
-			"2823900": { nomeGuerra: "1° SGT ALBUQUERQUE", nascimento: "16/10" },
-			"2826097": { nomeGuerra: "SD MARTINEZ", nascimento: "05/10" },
-			"2856476": { nomeGuerra: "1° SGT PAIM", nascimento: "13/06" },
-			"2871980": { nomeGuerra: "SD PESSOTA", nascimento: "06/06" },
-			"2877015": { nomeGuerra: "2° SGT PRADIER", nascimento: "27/04" },
-			"2877350": { nomeGuerra: "SD BRUNA", nascimento: "20/08" },
-			"2877708": { nomeGuerra: "2° SGT JUNIOR", nascimento: "06/07" },
-			"2878143": { nomeGuerra: "2° SGT PANAZZOLO", nascimento: "19/03" },
-			"2879620": { nomeGuerra: "1° SGT FLÁVIO", nascimento: "20/04" },
-			"2880601": { nomeGuerra: "2° SGT CHIEZA", nascimento: "30/11" },
-			"2882337": { nomeGuerra: "2° SGT THAIS", nascimento: "07/11" },
-			"2885450": { nomeGuerra: "2° SGT FABRICIO", nascimento: "08/07" },
-			"2891301": { nomeGuerra: "SD FERREIRA", nascimento: "23/10" },
-			"2915219": { nomeGuerra: "2 SGT SAUL", nascimento: "21/05" },
-			"2918951": { nomeGuerra: "2° SGT BARBARA", nascimento: "02/10" },
-			"2919478": { nomeGuerra: "SD FARIAS", nascimento: "25/11" },
-			"2919540": { nomeGuerra: "1° SGT AIRTON", nascimento: "08/10" },
-			"2919559": { nomeGuerra: "2° SGT CESAR", nascimento: "26/09" },
-			"2919591": { nomeGuerra: "1° SGT LAMADRIL", nascimento: "22/11" },
-			"2968550": { nomeGuerra: "SD DOMINGUES", nascimento: "31/12" },
-			"2970031": { nomeGuerra: "SD BRUM", nascimento: "30/03" },
-			"2971577": { nomeGuerra: "SD BARREIRO", nascimento: "24/08" },
-			"2985675": { nomeGuerra: "SD BOTEGA", nascimento: "06/01" },
-			"2987120": { nomeGuerra: "SD JUSSIE", nascimento: "08/04" },
-			"2993767": { nomeGuerra: "1° SGT ARIAS", nascimento: "01/01" },
-			"2993996": { nomeGuerra: "SD ESPINOSA", nascimento: "24/09" },
-			"2994500": { nomeGuerra: "SD LEANDRO", nascimento: "02/10" },
-			"3085120": { nomeGuerra: "1° SGT ASSIS", nascimento: "15/07" },
-			"3135896": { nomeGuerra: "1° SGT GUEDES", nascimento: "10/04" },
-			"3136019": { nomeGuerra: "1° SGT POSENATO", nascimento: "02/10" },
-			"3136671": { nomeGuerra: "SD FINGER", nascimento: "15/11" },
-			"3136728": { nomeGuerra: "SD FERREIRA", nascimento: "06/06" },
-			"3137473": { nomeGuerra: "1° SGT MATHEUS", nascimento: "24/06" },
-			"3137600": { nomeGuerra: "SD BERGHAHN", nascimento: "11/02" },
-			"3139859": { nomeGuerra: "SD DANILO", nascimento: "21/01" },
-			"3140717": { nomeGuerra: "SD VICENTE", nascimento: "14/10" },
-			"3142647": { nomeGuerra: "SD DIEIQUE", nascimento: "18/08" },
-			"3146316": { nomeGuerra: "CAP LOPES", nascimento: "10/05" },
-			"3148947": { nomeGuerra: "1° SGT GOMES", nascimento: "10/10" },
-			"3159000": { nomeGuerra: "SD GONZALEZ", nascimento: "05/10" },
-			"3164071": { nomeGuerra: "SD VINICIUS", nascimento: "05/01" },
-			"3169804": { nomeGuerra: "SD PATRICK", nascimento: "09/10" },
-			"3205614": { nomeGuerra: "SD HERMENEGILDO", nascimento: "27/12" },
-			"3622363": { nomeGuerra: "SD BERNARDES", nascimento: "22/02" },
-			"3694623": { nomeGuerra: "2° SGT SCHNEIDER", nascimento: "08/10" },
-			"3695034": { nomeGuerra: "SD THIAGO COELHO", nascimento: "13/12" },
-			"3695212": { nomeGuerra: "SD PEDRO", nascimento: "22/11" },
-			"3695832": { nomeGuerra: "2° SGT CASTRO", nascimento: "24/03" },
-			"3696049": { nomeGuerra: "SD BATISTA", nascimento: "07/08" },
-			"3696111": { nomeGuerra: "SD BITENCOURT", nascimento: "29/12" },
-			"3696391": { nomeGuerra: "SD BOTTINI", nascimento: "28/02" },
-			"3696510": { nomeGuerra: "SD RAUBUSTT", nascimento: "12/02" },
-			"3696570": { nomeGuerra: "SD DREYER", nascimento: "19/08" },
-			"3696669": { nomeGuerra: "SD THALIN", nascimento: "14/01" },
-			"3696715": { nomeGuerra: "2° SGT KANOFRE", nascimento: "04/02" },
-			"3696758": { nomeGuerra: "SD BARRETO", nascimento: "29/08" },
-			"3696790": { nomeGuerra: "2 SGT DA COSTA", nascimento: "17/11" },
-			"3696847": { nomeGuerra: "SD ACÁCIO", nascimento: "05/05" },
-			"3696944": { nomeGuerra: "SD LAGO", nascimento: "05/02" },
-			"3697100": { nomeGuerra: "SD GUTERRES", nascimento: "16/01" },
-			"3697193": { nomeGuerra: "SD BRUM", nascimento: "27/02" },
-			"3697290": { nomeGuerra: "SD ROGER", nascimento: "25/11" },
-			"3697550": { nomeGuerra: "SD DA SILVA", nascimento: "25/08" },
-			"3697630": { nomeGuerra: "2° SGT MENDES", nascimento: "25/08" },
-			"3697673": { nomeGuerra: "SD BRUNO", nascimento: "30/05" },
-			"3698360": { nomeGuerra: "SD VILELA", nascimento: "23/02" },
-			"3698602": { nomeGuerra: "SD FABIO", nascimento: "03/04" },
-			"3698653": { nomeGuerra: "2 SGT JULIA", nascimento: "25/05" },
-			"3698734": { nomeGuerra: "SD ROGAN", nascimento: "24/09" },
-			"3699145": { nomeGuerra: "SD THIAGO", nascimento: "28/05" },
-			"3701638": { nomeGuerra: "SD CRISTIANO", nascimento: "14/04" },
-			"3705374": { nomeGuerra: "SD ALANA", nascimento: "03/02" },
-			"3718093": { nomeGuerra: "SD ZEMPER", nascimento: "06/10" },
-			"3718123": { nomeGuerra: "SD SCHULTZ", nascimento: "06/08" },
-			"3725570": { nomeGuerra: "SD BRUNO EDUARDO", nascimento: "20/02" },
-			"3726207": { nomeGuerra: "SD MAURÍCIO", nascimento: "10/12" },
-			"3872319": { nomeGuerra: "SD ALESSANDRO", nascimento: "17/10" },
-			"3878902": { nomeGuerra: "CAP ANA PAULA", nascimento: "08/05" },
-			"4230760": { nomeGuerra: "SD DAYKER", nascimento: "13/09" },
-			"4278623": { nomeGuerra: "SD CASSIANO", nascimento: "01/03" },
-			"4279310": { nomeGuerra: "CAP MARTINS", nascimento: "01/10" },
-			"4279808": { nomeGuerra: "2° SGT GUIMARÃES", nascimento: "26/10" },
-			"4289064": { nomeGuerra: "SD BELOMO", nascimento: "26/07" },
-			"4289102": { nomeGuerra: "SD ALISSON", nascimento: "06/09" },
-			"4289366": { nomeGuerra: "SD DEIVID", nascimento: "05/10" },
-			"4299140": { nomeGuerra: "SD DETONI", nascimento: "16/10" },
-			"4353781": { nomeGuerra: "SD TOMIELLO", nascimento: "04/09" },
-			"4353927": { nomeGuerra: "2° SGT COAN", nascimento: "10/09" },
-			"4353986": { nomeGuerra: "SD MONTEIRO", nascimento: "28/06" },
-			"4354273": { nomeGuerra: "SD GONÇALVES", nascimento: "30/11" },
-			"4354435": { nomeGuerra: "SD ISMAEL", nascimento: "18/04" },
-			"4354532": { nomeGuerra: "SD SANTOS", nascimento: "19/02" },
-			"4354583": { nomeGuerra: "SD JONATHAN", nascimento: "04/04" },
-			"4354680": { nomeGuerra: "SD VARGAS", nascimento: "30/06" },
-			"4354737": { nomeGuerra: "SD BRUNO", nascimento: "24/06" },
-			"4355113": { nomeGuerra: "SD RAUBACH", nascimento: "02/02" },
-			"4355148": { nomeGuerra: "SD LOPES", nascimento: "14/09" },
-			"4355229": { nomeGuerra: "SD FRANCIS", nascimento: "17/12" },
-			"4355555": { nomeGuerra: "SD TONELLOTTO", nascimento: "05/11" },
-			"4356047": { nomeGuerra: "2 SGT VIANEI", nascimento: "05/12" },
-			"4375149": { nomeGuerra: "SD FONTANA", nascimento: "04/04" },
-			"4387759": { nomeGuerra: "SD JULIAN", nascimento: "17/09" },
-			"4387767": { nomeGuerra: "SD IBALDO", nascimento: "15/07" },
-			"4387775": { nomeGuerra: "SD CAMPOS", nascimento: "08/07" },
-			"4387821": { nomeGuerra: "SD PORCELIS", nascimento: "08/08" },
-			"4388003": { nomeGuerra: "SD BUENO", nascimento: "10/05" },
-			"4388178": { nomeGuerra: "SD HIDALGO", nascimento: "24/04" },
-			"4388283": { nomeGuerra: "SD BARBOSA", nascimento: "23/07" },
-			"4388305": { nomeGuerra: "SD EIDER", nascimento: "27/05" },
-			"4388380": { nomeGuerra: "SD MARTINS", nascimento: "28/05" },
-			"4395140": { nomeGuerra: "SD GAUTIER", nascimento: "18/04" },
-			"4395476": { nomeGuerra: "SD RAFAEL", nascimento: "28/02" },
-			"4395778": { nomeGuerra: "SD THIAGO", nascimento: "05/05" },
-			"4490053": { nomeGuerra: "SD TEMP RENAN", nascimento: "23/02" },
-			"4490169": { nomeGuerra: "SD TEMP MAIA", nascimento: "04/10" },
-			"4490193": { nomeGuerra: "SD TEMP CORREA", nascimento: "27/07" },
-			"4490258": { nomeGuerra: "SD SIQUEIRA", nascimento: "04/05" },
-			"4490266": { nomeGuerra: "SD TEMP PAULINO", nascimento: "13/05" },
-			"4490339": { nomeGuerra: "SD TEMP ZANETTI", nascimento: "30/09" },
-			"4490355": { nomeGuerra: "SD PETER", nascimento: "04/09" },
-			"4490452": { nomeGuerra: "SD TEMP PINTO", nascimento: "05/02" },
-			"4490479": { nomeGuerra: "SD TEMP EVERTON", nascimento: "19/08" },
-			"4490541": { nomeGuerra: "SD TEMP SPERLING", nascimento: "31/03" },
-			"4490576": { nomeGuerra: "SD BAIGORRA", nascimento: "20/02" },
-			"4490614": { nomeGuerra: "SD TEMP CARDOSO", nascimento: "09/03" },
-			"4490665": { nomeGuerra: "SD TEMP DOTTA", nascimento: "12/09" },
-			"4490738": { nomeGuerra: "SD TEMP SOARES", nascimento: "04/06" },
-			"4490800": { nomeGuerra: "SD TEMP VOLZ", nascimento: "23/07" },
-			"4490843": { nomeGuerra: "SD TEMP WESLEY", nascimento: "14/02" },
-			"4496990": { nomeGuerra: "SD TEMP FILIPE", nascimento: "03/12" },
-			"4550552": { nomeGuerra: "SD PIRES", nascimento: "06/03" },
-			"4550609": { nomeGuerra: "SD MAGALHÃES", nascimento: "18/12" },
-			"4550757": { nomeGuerra: "SD WESTPHALEN", nascimento: "01/03" },
-			"4550846": { nomeGuerra: "SD JORDAN", nascimento: "15/04" },
-			"4551990": { nomeGuerra: "SD MUNDEL", nascimento: "02/03" },
-			"4626290": { nomeGuerra: "SD MAURICIO", nascimento: "17/11" },
-			"4626672": { nomeGuerra: "SD AZEREDO", nascimento: "28/01" },
-			"4672410": { nomeGuerra: "SD GARIBALDI", nascimento: "05/08" },
-			"4672445": { nomeGuerra: "SD KINGESKI", nascimento: "12/08" },
-			"4782534": { nomeGuerra: "SD ASSUNÇÃO", nascimento: "24/10" },
-			"4782917": { nomeGuerra: "SD NATHAN", nascimento: "18/07" },
-			"4843584": { nomeGuerra: "SD CABRAL", nascimento: "28/01" },
-			"4843673": { nomeGuerra: "SD TEIXEIRA", nascimento: "31/07" },
-			"4845510": { nomeGuerra: "SD VINÍCIUS", nascimento: "16/10" },
-			"4845544": { nomeGuerra: "SD THIAGO", nascimento: "18/04" },
-			"4845579": { nomeGuerra: "SD AARON", nascimento: "11/10" },
-			"4980662": { nomeGuerra: "SD SANTOS", nascimento: "14/08" },
-			"4981340": { nomeGuerra: "SD BRUNA", nascimento: "10/01" },
-			"4982924": { nomeGuerra: "SD CECCON", nascimento: "22/05" },
-			"4982959": { nomeGuerra: "SD ROSEANNE", nascimento: "29/03" },
-			"4982975": { nomeGuerra: "SD COSME", nascimento: "19/08" },
-			"4982991": { nomeGuerra: "SD ARAUJO", nascimento: "08/11" },
-			"4983793": { nomeGuerra: "SD CATELAN", nascimento: "04/09" }
-        };
-
-        // --- 2. DECLARAÇÃO DAS FUNÇÕES ---
-        function checarAniversarios() {
-            const hoje = new Date();
-            const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-            const meses = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
-
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            const mesNome = meses[hoje.getMonth()];
-            const ano = hoje.getFullYear();
-            const diaSemana = diasSemana[hoje.getDay()];
-            document.getElementById('data-atual').textContent = `${dia}/${mesNome}/${ano} - ${diaSemana}`;
-            
-            const widgetDia = document.getElementById('widget-aniversarios-dia');
-            const listaDia = document.getElementById('lista-aniversariantes-dia');
-            const diaFormatado = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
-            
-            const aniversariantesDoDia = [];
-            for (const id in efetivo) {
-                if (efetivo[id].nascimento === diaFormatado) {
-                    aniversariantesDoDia.push(efetivo[id].nomeGuerra);
-                }
+    // --- DADOS ATUALIZADOS EM 26/SET/2025 ---
+    const guarnicoesData = {
+        "OFICIAL DE SERVIÇO": {
+            "ATP-0640": {
+                "viatura_display": "ATP-0640 (Oficial Supervisor)",
+                "militares": [
+                    { "funcao": "OFICIAL SUPERVISOR", "nome": "CAP RÂINIERE" },
+                    { "funcao": "COV", "nome": "1º TEN PME RIBEIRO" }
+                ],
+                "turno": "24h",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
             }
-            if (aniversariantesDoDia.length > 0) {
-                listaDia.innerHTML = `Parabéns: <span class="font-bold">${aniversariantesDoDia.join(', ')}</span>!`;
-                widgetDia.style.display = 'block';
+        },
+        "AÇORIANOS": {
+            "ABT-291": {
+                "viatura_display": "ABT-291",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "1º SGT PME ARAGÃO" },
+                    { "funcao": "COV", "nome": "2º SGT GUIMARÃES" },
+                    { "funcao": "CHEFE LINHA D.", "nome": "SD ALESSANDRO" },
+                    { "funcao": "CHEFE LINHA E.", "nome": "SD TEMP CORREA" }
+                ],
+                "turno": "24h",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
+            },
+            "AT-0671": {
+                "viatura_display": "AT-0671",
+                "militares": [
+                    { "funcao": "COV", "nome": "2º SGT VIANEI" }
+                ],
+                "turno": "24h",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
             }
-
-            const widgetMes = document.getElementById('widget-aniversarios-mes');
-            const listaMes = document.getElementById('lista-aniversariantes-mes');
-            document.getElementById('mes-atual-nome').textContent = mesNome;
-            
-            const datasDeDestaque = new Set();
-            for (let i = 0; i < 7; i++) {
-                const dataChecagem = new Date();
-                dataChecagem.setDate(hoje.getDate() + i);
-                datasDeDestaque.add(`${String(dataChecagem.getDate()).padStart(2, '0')}/${String(dataChecagem.getMonth() + 1).padStart(2, '0')}`);
+        },
+        "TERESÓPOLIS": {
+            "ABT-1364": {
+                "viatura_display": "ABT-1364",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "1º SGT ALBUQUERQUE" },
+                    { "funcao": "COV", "nome": "SD GONÇALVES" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD CASSIANO" }
+                ],
+                "turno": "24h",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
             }
-
-            const aniversariantesDoMes = [];
-            const mesAtual = hoje.getMonth() + 1;
-            for (const id in efetivo) {
-                const militar = efetivo[id];
-                if (militar.nascimento) {
-                    const [nascDia, nascMes] = militar.nascimento.split('/').map(Number);
-                    if (nascMes === mesAtual) {
-                        aniversariantesDoMes.push({ nome: militar.nomeGuerra, data: militar.nascimento, dia: nascDia });
-                    }
-                }
+        },
+        "ASSUNÇÃO": {
+            "ABT-0596": {
+                "viatura_display": "ABT-0596",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT JUNIOR" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD BRUM" },
+                    { "funcao": "COV (12h)", "nome": "SD RAUBACH" },
+                    { "funcao": "COV (12h)", "nome": "2º SGT PANAZZOLO" }
+                ],
+                "turno": "Misto",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
             }
-            
-            aniversariantesDoMes.sort((a, b) => a.dia - b.dia);
-            if (aniversariantesDoMes.length > 0) {
-                const htmlAniversariantes = aniversariantesDoMes.map(p => {
-                    const [dia, mes] = p.data.split('/');
-                    const nomeFormatado = `${p.nome} (${dia}/${mes})`;
-                    if (datasDeDestaque.has(p.data)) {
-                        return `<span class="bg-yellow-500 text-black rounded px-1 py-0.5">${nomeFormatado}</span>`;
-                    }
-                    return `<span>${nomeFormatado}</span>`;
-                }).join(' &bull; ');
-                
-                listaMes.innerHTML = htmlAniversariantes;
-                widgetMes.style.display = 'block';
+        },
+        "RESTINGA": {
+            "ABT-0598": {
+                "viatura_display": "ABT-0598",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD FABIO" },
+                    { "funcao": "COV", "nome": "1º SGT RONALDO" },
+                    { "funcao": "CHEFE LINHA D.", "nome": "SD MARTINS" },
+                    { "funcao": "CHEFE LINHA E. (12h)", "nome": "SD BARRETO" }
+                ],
+                "turno": "Misto",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
+            }
+        },
+        "BELÉM NOVO": {
+            "ABT-0599": {
+                "viatura_display": "ABT-0599",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "2º SGT MENDES" },
+                    { "funcao": "COV", "nome": "SD MAURÍCIO" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD TEMP FILIPE" }
+                ],
+                "turno": "24h",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
+            }
+        },
+        "PASSO D'AREIA": {
+            "ABT-0600": {
+                "viatura_display": "ABT-0600",
+                "militares": [
+                    { "funcao": "CMT GU", "nome": "SD THALIN" },
+                    { "funcao": "CHEFE DE LINHA", "nome": "SD EIDER" },
+                    { "funcao": "COV (12h)", "nome": "SD BARBOSA" },
+                    { "funcao": "COV (12h)", "nome": "1º SGT AIRTON" }
+                ],
+                "turno": "Misto",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
+            }
+        },
+        "FLORESTA": {
+            "ABT-0597": {
+                "viatura_display": "ABT-0597",
+                "militares": [
+                    { "funcao": "COV (24h)", "nome": "SD SIQUEIRA" },
+                    { "funcao": "CMT GU (9h)", "nome": "1º SGT PAIM" },
+                    { "funcao": "CMT GU (15h)", "nome": "2º SGT SAUL" },
+                    { "funcao": "CHEFE LINHA E. (9h)", "nome": "2º SGT SAUL" },
+                    { "funcao": "CHEFE LINHA D. (12h)", "nome": "SD ACÁCIO" },
+                    { "funcao": "AUXILIAR DE LINHA (20h)", "nome": "SD CAMPOS" }
+                ],
+                "turno": "Misto",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
+            }
+        },
+        "PARTENON": {
+            "ABT-1365": {
+                "viatura_display": "ABT-1365",
+                "militares": [
+                    { "funcao": "CMT GU (20h)", "nome": "1º SGT FERNANDO" },
+                    { "funcao": "COV (8h)", "nome": "SD BRUNO EDUARDO" },
+                    { "funcao": "COV (16h)", "nome": "SD BELOMO" },
+                    { "funcao": "CHEFE LINHA D. (12h)", "nome": "2º SGT SCHNEIDER" },
+                    { "funcao": "CHEFE LINHA D. (12h)", "nome": "SD LOPES" }
+                ],
+                "turno": "Misto",
+                "inicio_data": "26/Set/2025", "inicio_hora": "08:00",
+                "fim_data": "27/Set/2025", "fim_hora": "08:00"
             }
         }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const guarnicoesGrid = document.getElementById('guarnicoes-grid');
+        const modalOverlay = document.getElementById('guarnicao-details-overlay');
+        const modalContentDiv = document.getElementById('modal-content');
+        const dataAtualizacaoSpan = document.getElementById('data-atualizacao');
 
-        function atualizarInterface(userRole) {
-            allShortcutButtons.forEach(link => {
-                const requiredRole = link.dataset.role;
-                if (requiredRole === 'admin' && userRole !== 'admin') {
-                    link.classList.add('link-bloqueado');
-                    link.title = "Acesso restrito ao comando.";
-                } else {
-                    link.classList.remove('link-bloqueado');
-                    if (link.title === "Acesso restrito ao comando.") { link.title = ""; }
+        function formatarDataHoraAtual() {
+            const agora = new Date();
+            const dia = String(agora.getDate());
+            const mes = agora.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+            const horas = String(agora.getHours()).padStart(2, '0');
+            const minutos = String(agora.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes} às ${horas}:${minutos}`;
+        }
+
+        function renderizarGuarnicoes() {
+            const pelotaoOrder = ["OFICIAL DE SERVIÇO", "AÇORIANOS", "TERESÓPOLIS", "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", "FLORESTA", "PARTENON"];
+            pelotaoOrder.forEach(pelotaoName => {
+                const pelotaoData = guarnicoesData[pelotaoName];
+                if (pelotaoData) {
+                    const quartelColumn = document.createElement('div');
+                    quartelColumn.classList.add('quartel-column');
+                    
+                    const containerButton = document.createElement('div');
+                    containerButton.classList.add('guarnicao-button');
+                    
+                    if (pelotaoName === 'OFICIAL DE SERVIÇO') {
+                        containerButton.classList.add('guarnicao-oficial');
+                    }
+
+                    containerButton.setAttribute('data-pelotao-name', pelotaoName);
+                    const buttonVisibleContent = document.createElement('div');
+                    buttonVisibleContent.classList.add('button-visible-content');
+                    
+                    const quartelTitle = document.createElement('div');
+                    quartelTitle.innerHTML = `<span class="guarnicao-name-only">${pelotaoName}</span><i class="fas fa-chevron-down guarnicao-arrow"></i>`;
+                    
+                    containerButton.appendChild(quartelTitle);
+
+                    const modalSourceData = document.createElement('div');
+                    modalSourceData.classList.add('modal-source-data');
+                    modalSourceData.style.display = 'none';
+
+                    let modalHtml = `<h3 class="modal-quartel-title">${pelotaoName}</h3>`;
+                    for (const viaturaKey in pelotaoData) {
+                        const viaturaData = pelotaoData[viaturaKey];
+                        modalHtml += `<h4 class="modal-viatura-subtitle">${viaturaData.viatura_display}</h4><div class="modal-personnel-section">`;
+                        viaturaData.militares.forEach(militar => {
+                            modalHtml += `<div class="person-role-modal"><strong>${militar.funcao}:</strong> <span>${militar.nome}</span></div>`;
+                        });
+                        modalHtml += `</div><div class="modal-turn-details-section"><div class="turn-type-label-modal">Turno: ${viaturaData.turno}</div><div class="duty-detail-modal">Início: ${viaturaData.inicio_data} - das ${viaturaData.inicio_hora}</div><div class="duty-detail-modal">Fim: ${viaturaData.fim_data} - às ${viaturaData.fim_hora}</div></div><hr style="border-top: 1px dashed rgba(255,255,255,0.1); margin: 1rem 0;">`;
+                    }
+                    modalSourceData.innerHTML = modalHtml;
+                    containerButton.appendChild(modalSourceData);
+                    
+                    quartelColumn.appendChild(containerButton);
+                    guarnicoesGrid.appendChild(quartelColumn);
                 }
             });
+        }
+
+        if (dataAtualizacaoSpan) {
+            dataAtualizacaoSpan.textContent = formatarDataHoraAtual();
         }
         
-        function gerarSenhaEsperada(nomeCompletoComPosto) {
-            const regexPosto = /^(maj|cap|cel|ten|1º ten pme|1° ten pme|2° sgt pme|1º ten|1° ten|2° sgt|3° sgt|sd temp|sd)\s*/i;
-            const nomeDeGuerraApenas = nomeCompletoComPosto.replace(regexPosto, '');
+        renderizarGuarnicoes();
 
-            let senha = nomeDeGuerraApenas.toLowerCase();
-            senha = senha.replace(/\s/g, '');
-            senha = senha.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            return senha + "193";
-        }
-
-        function handleLogin() {
-            const enteredUsername = usernameInput.value.trim();
-            const enteredPassword = passwordInput.value.trim();
-            const userData = efetivo[enteredUsername];
-
-            if (userData) {
-                const expectedPassword = gerarSenhaEsperada(userData.nomeGuerra);
-                if (enteredPassword === expectedPassword) {
-                    sessionStorage.setItem('isBbmAuthenticated', 'true');
-                    sessionStorage.setItem('bbmUserRole', userData.role);
-                    loginOverlay.style.display = 'none';
-                    atualizarInterface(userData.role);
-                    if (clickedLinkHref) {
-                        const clickedLinkElement = Array.from(allShortcutButtons).find(l => l.href === clickedLinkHref);
-                        if (clickedLinkElement && !clickedLinkElement.classList.contains('link-bloqueado')) {
-                            window.open(clickedLinkHref, '_blank');
-                        }
-                        clickedLinkHref = null; 
-                    }
-                    return;
-                }
-            }
-            loginError.style.display = 'block';
-            passwordInput.value = "";
-            passwordInput.focus();
-        }
-
-        // --- 3. EXECUÇÃO DOS SCRIPTS AO CARREGAR A PÁGINA ---
-        checarAniversarios();
-        const isAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
-        const userRole = sessionStorage.getItem('bbmUserRole');
-        if (isAuthenticated && userRole) {
-            atualizarInterface(userRole);
-        } else {
-            atualizarInterface('none'); 
-        }
-
-        // --- 4. ADIÇÃO DOS EVENT LISTENERS ---
-        allShortcutButtons.forEach(link => {
-            if (link.href.startsWith('mailto:')) { return; }
-            link.addEventListener('click', (event) => {
-                const requiredRole = link.dataset.role;
-                const userIsAuthenticated = sessionStorage.getItem('isBbmAuthenticated') === 'true';
-                const currentUserRole = sessionStorage.getItem('bbmUserRole');
-                if (!userIsAuthenticated) {
-                    event.preventDefault();
-                    clickedLinkHref = link.href;
-                    loginOverlay.style.display = 'flex';
-                    usernameInput.focus();
-                } else {
-                    if (requiredRole === 'admin' && currentUserRole !== 'admin') {
-                        event.preventDefault();
-                        alert("Acesso restrito ao comando. Você não tem permissão para acessar este link.");
-                    }
+        const guarnicaoButtons = document.querySelectorAll('.guarnicao-button');
+        guarnicaoButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const modalSourceData = button.querySelector('.modal-source-data');
+                if (modalSourceData) {
+                    modalContentDiv.innerHTML = modalSourceData.innerHTML;
+                    modalOverlay.classList.add('active');
                 }
             });
         });
 
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            handleLogin();
-        });
+        window.closeModal = () => {
+            modalOverlay.classList.remove('active');
+            modalContentDiv.innerHTML = '';
+            document.querySelectorAll('.guarnicao-button').forEach(btn => btn.classList.remove('active'));
+        };
 
-        loginOverlay.addEventListener('click', (event) => {
-            if (event.target === loginOverlay) {
-                loginOverlay.style.display = 'none';
-                clickedLinkHref = null;
+        modalOverlay.addEventListener('click', (event) => {
+            if (event.target === modalOverlay) {
+                window.closeModal();
             }
         });
     });
