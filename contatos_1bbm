@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telefones Funcionais - 1º BBM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'cbmrs-blue': '#1A5276',
+                        'cbmrs-light-blue': '#4A90E2',
+                        'fire-red': '#DC2626',
+                        'dark-red-opaque': '#8B0000',
+                        'pure-white': '#FFFFFF',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark background from your template */
+        }
+        /* Para simular o background hero, mantendo o fundo escuro do corpo */
+        .page-header {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Estilo base dos botões de atalho, replicado do seu código */
+        .shortcut-button {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100px;
+            padding: 8px;
+            text-decoration: none; /* Garantir que o link não tenha sublinhado */
+        }
+        .shortcut-button:hover {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        /* Cores dos botões de atalho, replicadas do seu código */
+        .shortcut-button.bg-bombeiros-orange {
+            background-color: rgba(255, 140, 0, 0.7); /* Ligeiramente mais opaco para destaque */
+        }
+        .shortcut-button.bg-bombeiros-orange:hover {
+            background-color: rgba(255, 140, 0, 0.9);
+        }
+        .shortcut-button.bg-dark-red-opaque {
+            background-color: rgba(139, 0, 0, 0.7); /* Ligeiramente mais opaco para destaque */
+        }
+        .shortcut-button.bg-dark-red-opaque:hover {
+            background-color: rgba(139, 0, 0, 0.9);
+        }
+        .button-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+            word-break: break-word;
+            hyphens: auto;
+            margin-top: 5px;
+        }
+
+        /* Estilo para destacar o telefone */
+        .phone-number {
+            font-size: 14px;
+            font-weight: 900;
+            color: #FFD700; /* bombeiros-yellow */
+            margin-top: 2px;
+        }
+
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col">
+
+    <div class="flex-grow">
+        <header class="py-4 shadow-lg z-10 page-header">
+            <div class="container mx-auto px-4 text-center">
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <div class="bg-cbmrs-blue p-2 rounded-lg">
+                        <i class="fas fa-fire-extinguisher text-4xl text-bombeiros-yellow md:text-5xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">
+                            CONTATOS FUNCIONAIS
+                        </h1>
+                        <h2 class="text-lg md:text-xl font-bold text-white">
+                            1º Batalhão de Bombeiro Militar (1º BBM)
+                        </h2>
+                    </div>
+                    <div class="bg-cbmrs-blue p-2 rounded-lg">
+                        <i class="fas fa-phone-volume text-4xl text-bombeiros-yellow md:text-5xl"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-1">
+                        Acesse, copie e disque os telefones essenciais para a comunicação interna e operacional.
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <main class="py-6">
+            <div class="container mx-auto px-4">
+                
+                <h3 class="text-center text-2xl font-bold text-bombeiros-orange mb-6 mt-4 border-b border-bombeiros-orange/50 pb-2">
+                    Setores e Seções Operacionais/Apoio
+                </h3>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-center max-w-6xl mx-auto">
+                    
+                    <a href="tel:51986581402" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-xl">
+                        <i class="fas fa-truck-moving text-2xl md:text-4xl text-bombeiros-yellow mb-1"></i>
+                        <span class="button-text">SLog - Almox</span>
+                        <span class="phone-number">(51) 98658-1402</span>
+                    </a>
+                    
+                    <a href="tel:51984346952" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-xl">
+                        <i class="fas fa-bullhorn text-2xl md:text-4xl text-bombeiros-yellow mb-1"></i>
+                        <span class="button-text">SCS - Comunicação</span>
+                        <span class="phone-number">(51) 98434-6952</span>
+                    </a>
+
+                    <a href="tel:51985296447" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-xl">
+                        <i class="fas fa-shield-halved text-2xl md:text-4xl text-bombeiros-yellow mb-1"></i>
+                        <span class="button-text">SODC - Operações</span>
+                        <span class="phone-number">(51) 98529-6447</span>
+                    </a>
+
+                    <a href="tel:55984423613" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-xl">
+                        <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-1"></i>
+                        <span class="button-text">Companhias 1º BBM</span>
+                        <span class="phone-number">(55) 98442-3613</span>
+                    </a>
+                    
+                    <a href="tel:51985773504" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-xl">
+                        <i class="fas fa-star text-2xl md:text-4xl text-bombeiros-yellow mb-1"></i>
+                        <span class="button-text">Oficial de Serviço</span>
+                        <span class="phone-number">(51) 98577-3504</span>
+                    </a>
+                    
+                    <a href="tel:51984348201" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-xl">
+                        <i class="fas fa-fire-truck text-2xl md:text-4xl text-bombeiros-yellow mb-1"></i>
+                        <span class="button-text">AEM/AT - Viaturas</span>
+                        <span class="phone-number">(51) 98434-8201</span>
+                    </a>
+
+                </div>
+                
+                <h3 class="text-center text-2xl font-bold text-dark-red-opaque mb-6 mt-8 border-b border-dark-red-opaque/50 pb-2">
+                    Contatos dos Pelotões/Quartéis
+                </h3>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 justify-center max-w-6xl mx-auto">
+                    
+                    <a href="tel:51985772086" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Açorianos (B-1)</span>
+                        <span class="phone-number">(51) 98577-2086</span>
+                    </a>
+
+                    <a href="tel:51985772436" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Floresta (B-2)</span>
+                        <span class="phone-number">(51) 98577-2436</span>
+                    </a>
+
+                    <a href="tel:51985772437" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Passo D'Areia (B-3)</span>
+                        <span class="phone-number">(51) 98577-2437</span>
+                    </a>
+                    
+                    <a href="tel:51985772434" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Assunção (B-6)</span>
+                        <span class="phone-number">(51) 98577-2434</span>
+                    </a>
+                    
+                    <a href="tel:51982450105" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Partenon (B-7)</span>
+                        <span class="phone-number">(51) 98245-0105</span>
+                    </a>
+
+                    <a href="tel:51985772435" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Belém Novo (B-10)</span>
+                        <span class="phone-number">(51) 98577-2435</span>
+                    </a>
+                    
+                    <a href="tel:51985772438" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Restinga (B-11)</span>
+                        <span class="phone-number">(51) 98577-2438</span>
+                    </a>
+
+                    <a href="tel:51985772430" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-xl">
+                        <i class="fas fa-location-dot text-2xl md:text-4xl text-pure-white mb-1"></i>
+                        <span class="button-text">Pelotão Teresópolis (B-12)</span>
+                        <span class="phone-number">(51) 98577-2430</span>
+                    </a>
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-400 py-3 z-10">
+        <div class="container mx-auto px-4 text-center text-xs">
+            <p>&copy; 2025 Companhia de Bombeiro Militar - 1º BBM.</p>
+            <p class="mt-1">
+                Para emergências, disque:
+                <span class="text-fire-red font-bold">193</span>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
