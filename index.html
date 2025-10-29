@@ -49,33 +49,70 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: -1;
         }
+        
+        /* --- ESTILOS DO FLIP CARD --- */
+
+        /* O 'shortcut-button' agora é o container 3D */
         .shortcut-button {
+            background-color: transparent;
+            height: 100px;
+            perspective: 1000px; /* Efeito 3D */
+            border: none;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .shortcut-button:hover {
+             /* Mantém o efeito de levantar o card */
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+        }
+
+        /* Ao passar o mouse no container, vira o 'inner' */
+        .shortcut-button:hover .flip-card-inner {
+            transform: rotateX(180deg);
+        }
+
+        /* Classes da Frente e Verso */
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            
+            /* Usamos flex para centralizar o conteúdo em ambas as faces */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            height: 100px;
             padding: 8px;
+            
+            /* As classes do Tailwind (bg, rounded) serão aplicadas aqui */
         }
-        .shortcut-button:hover {
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(-5px);
+
+        /* Posição do Verso (já virado) */
+        .flip-card-back {
+            transform: rotateX(180deg);
+            padding: 12px; /* Mais espaço para texto */
         }
-        .shortcut-button.bg-bombeiros-orange {
-            background-color: rgba(255, 140, 0, 0.5);
+
+        .flip-card-back-text {
+            font-size: 12px;
+            color: white;
+            line-height: 1.3;
+            font-weight: 500;
         }
-        .shortcut-button.bg-bombeiros-orange:hover {
-            background-color: rgba(255, 140, 0, 0.75);
-        }
-        .shortcut-button.bg-dark-red-opaque {
-            background-color: rgba(139, 0, 0, 0.5);
-        }
-        .shortcut-button.bg-dark-red-opaque:hover {
-            background-color: rgba(139, 0, 0, 0.75);
-        }
+        
+        /* O texto original do botão */
         .button-text {
             font-size: 11px;
             font-weight: 700;
@@ -84,6 +121,8 @@
             word-break: break-word;
             hyphens: auto;
         }
+        
+        /* --- FIM DOS ESTILOS DO FLIP CARD --- */
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col">
@@ -140,174 +179,460 @@
         <div class="container mx-auto px-4 text-center">
              <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
 
-                <a href="https://docs.google.com/spreadsheets/d/1hz9_33vLgvLfAghnG2TEj1ZuInvdtGRN2Pq8bzWzhMM/edit?usp=drive_web&ouid=110433901850885475814" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESCALA ÚNICA OUTUBRO</span>
+                <a href="https://docs.google.com/spreadsheets/d/1iKbIc6_7RHpPQWxdr7fMab4ljt5wntMsFTt9UDLD4rA/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">ESCALA ÚNICA SETEMBRO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
                 
-                <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MAPA DE ETAPA E HE</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-times text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">INDISPONIBILIDADE MENSAL</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONFIRMAÇÃO de FÉRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">DISP. MERGULHADOR /<br>CINOTECNIA</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FUNÇÕES CIA</span>
+                <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">MAPA DE ETAPA E HE</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
                 
-                <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FORMULÁRIO</span>
+                <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-calendar-times text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">INDISPONIBILIDADE MENSAL</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PREVISÃO (NOVEMBRO)</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">CONFIRMAÇÃO de FÉRIAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">EFETIVO</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">DISP. MERGULHADOR /<br>CINOTECNIA</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/144g1qOiO44steK7mbICkFt-pXF_vebDqDyPmzgd22hM/edit?gid=1128532433#gid=1128532433" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FÉRIAS 2025</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">FUNÇÕES CIA</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1VugtkWyi2lzNAncGf49zw7qjKMeQ9HEsZv3pln--fMw/edit?gid=907566696#gid=907566696" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PLANO de FÉRIAS 2026</span>	
+                
+                <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button" title="Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">FORMULÁRIO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">Todos militares devem preencher a planilha até o dia 27 de Junho de 2025!</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AFASTAMENTOS</span>
+                
+                <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">PREVISÃO (OUTUBRO)</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">VALIDADE CCVTE</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">EFETIVO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">TOXICOLÓGICO</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/144g1qOiO44steK7mbICkFt-pXF_vebDqDyPmzgd22hM/edit?gid=1128532433#gid=1128532433" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">PLANO de FÉRIAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1HR8JO24uWEWSOfeUuzphWUFweMeN0XRX" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">FICHA DE RENOVAÇÃO</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">AFASTAMENTOS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">VALIDADE CCVTE</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">TOXICOLÓGICO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/drive/u/1/folders/1HR8JO24uWEWSOfeUuzphWUFweMeN0XRX" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">FICHA DE RENOVAÇÃO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
                  
-                <a href="https://ciabm-1bbm.github.io/troca_de_fardamento/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-shirt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PLATAFORMA P/ TROCA<br>DE FARDAMENTO</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1ykuBSdaPjFAkM0NKExloJZzzvQjc_c_Y" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-triangle-exclamation text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AVISOS SETOR<br>DE LOGÍSTICA</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">PARTES SLOG</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ESTATÍSTICAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1DbFURN7FxvMs_UeSWQkODaMRo1t06LA3Ww6t5B8l0RA/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONTROLE MSG'S EXPRESSAS</span>
-                </a>
-                <a href="https://drive.google.com/file/d/1QzmPk-RvWS5wl8sR3xPaWpmDAGU1cNET/view?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-route text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">TUTORIAL DE DIÁRIAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/17UVmvKgC_bgrtR245o07PThuHrduCUK7rI203q2GbG8/edit#gid=0" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-truck-moving text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">VIATURAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1X2tn-ay7Xc0zOxV9lpJzN24KEelkzzB6JS7ewQzVCwE/edit?gid=926343856#gid=926343856" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-ship text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">EQUIPAMENTOS</span>
-                </a>
-                <a href="https://gestaodefrotas.planejamento.rs.gov.br/frota/gestao/abastecimento/" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-invoice-dollar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONSULTA VALORES<br>COMBUSTÍVEL</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1eGyJ9OOvhvVACvd88X2oMfkYi_epj15X6sV9gUDWS8Q/edit?gid=1519715908#gid=1519715908" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-life-ring text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">SITUAÇÃO GUARDA VIDAS<br>2024/25</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/16hXVQaxmRfkn9YPNG1-4yTPgdong0UYm" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-gas-pump text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CONTROLE DE ABASTECIMENTOS</span>
-                </a>
-                <a href="https://docs.google.com/document/d/1DRnUQCHcH__eoh_gcvJxhUUXp_nvavyguV-lyVkW20g/edit?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-list-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CHECKLIST PARA<br>ENTREGA DE MAPAS</span>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1tlmByosp_RENxiMZVeNJL0bg5BS3yPtCmsW8-N9MC3o/edit?gid=416715601#gid=416715601" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-car-side text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">AUTORIZAÇÃO DESLOCAMENTO DE VTR</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1DJm9aKGiudhPhEFBJ94SXQiMRTdV_xXN?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">ORDENS DE SERVIÇO EM VIGOR</span>
-                </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1rDz7ecttIN-z7h--wEdSQQO4cLkINZkk" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MODELOS DE DOCUMENTOS</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1enYhn1PD-8nBmNKEWDQNjfAJoC6fKxeC?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-newspaper text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">BOLETIM INTERNO</span>
-                </a>
-                <a href="https://drive.google.com/drive/folders/1wLuQM7gZMsm5iMw3wOOJd7kA8HRmaHRN?usp=sharing" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-file-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">NOTAS PARA BI</span>
+                <a href="https://ciabm-1bbm.github.io/troca_de_fardamento/" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-shirt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">PLATAFORMA P/ TROCA<br>DE FARDAMENTO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
                 
-                <a href="https://drive.google.com/drive/u/1/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md" title="Substitua o # pelo link do seu material!">
-                    <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">MATERIAL PARA CONSULTA</span>
+                <a href="https://drive.google.com/drive/u/1/folders/1ykuBSdaPjFAkM0NKExloJZzzvQjc_c_Y" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-triangle-exclamation text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">AVISOS SETOR<br>DE LOGÍSTICA</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="https://drive.google.com/drive/u/1/folders/1VW2rI33lDLl7DQL-zDkiGUBvkXqZG44j" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-certificate text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">CERTIDÕES SENASP<br>(2025)</span>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">PARTES SLOG</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">ESTATÍSTICAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1DbFURN7FxvMs_UeSWQkODaMRo1t06LA3Ww6t5B8l0RA/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">Nº MSG EXPRESSAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/file/d/1QzmPk-RvWS5wl8sR3xPaWpmDAGU1cNET/view?usp=sharing" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-route text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">TUTORIAL DIÁRIAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/17UVmvKgC_bgrtR245o07PThuHrduCUK7rI203q2GbG8/edit#gid=0" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-truck-moving text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">VIATURAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1X2tn-ay7Xc0zOxV9lpJzN24KEelkzzB6JS7ewQzVCwE/edit?gid=926343856#gid=926343856" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-ship text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">EQUIPAMENTOS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://gestaodefrotas.planejamento.rs.gov.br/frota/gestao/abastecimento/" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-file-invoice-dollar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">CONSULTA VALORES<br>COMBUSTÍVEL</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1eGyJ9OOvhvVACvd88X2oMfkYi_epj15X6sV9gUDWS8Q/edit?gid=1519715908#gid=1519715908" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-life-ring text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">SITUAÇÃO GUARDA VIDAS<br>2024/25</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/drive/u/1/folders/16hXVQaxmRfkn9YPNG1-4yTPgdong0UYm" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-gas-pump text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">ABASTECIMENTOS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/document/d/1DRnUQCHcH__eoh_gcvJxhUUXp_nvavyguV-lyVkW20g/edit?usp=sharing" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-list-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">CHECKLIST DOS MAPAS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://docs.google.com/spreadsheets/d/1tlmByosp_RENxiMZVeNJL0bg5BS3yPtCmsW8-N9MC3o/edit?gid=416715601#gid=416715601" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-car-side text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">AUTORIZAÇÃO DESLOCAMENTO VTR</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/drive/folders/1DJm9aKGiudhPhEFBJ94SXQiMRTdV_xXN?usp=sharing" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">ORDENS DE SERVIÇO EM VIGOR</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/drive/u/1/folders/1rDz7ecttIN-z7h--wEdSQQO4cLkINZkk" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">MODELOS DOCS</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/drive/folders/1enYhn1PD-8nBmNKEWDQNjfAJoC6fKxeC?usp=sharing" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-newspaper text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">BOLETIM INTERNO</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://drive.google.com/drive/folders/1wLuQM7gZMsm5iMw3wOOJd7kA8HRmaHRN?usp=sharing" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-file-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">NOTAS PARA BI</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#" class="shortcut-button" title="Substitua o # pelo link do seu material!">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">MATERIAL PARA LEITURA</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
 
-                <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fas fa-envelope-open-text text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">E-MAIL CIA</span>
-                </a>
-                <a href="https://wa.me/+5555984423613" target="_blank" class="shortcut-button bg-bombeiros-orange rounded-lg shadow-md">
-                    <i class="fab fa-whatsapp text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
-                    <span class="button-text">WHATSAPP CIA</span>
+                <a href="https://drive.google.com/drive/u/1/folders/1CBg3klq4zgWPLRRDQWzCt7brfTDGcNUl" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-certificate text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">CERTIDÕES SENASP<br>(2025)</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">(Aqui vai a descrição. Edite este texto.)</p>
+                        </div>
+                    </div>
                 </a>
 
-                <a href="https://intranet.cbm.rs.gov.br/" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-desktop text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">INTRANET CBM</span>
+                <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fas fa-envelope-open-text text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">E-MAIL CIA</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">Abrir programa de e-mail padrão para enviar uma mensagem para a Companhia.</p>
+                        </div>
+                    </div>
                 </a>
-				 </a>
-
-                <a href="https://e193.cbm.rs.gov.br/" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-desktop text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">E-193</span>
-
-				 
-                <a href="https://ciabm-1bbm.github.io/site/telefones_1bbm.html" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">TELEFONES FUNCIONAIS 1º BBM</span>
+                
+                <a href="https://wa.me/+5555984423613" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-bombeiros-orange rounded-lg shadow-md">
+                            <i class="fab fa-whatsapp text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i>
+                            <span class="button-text">WHATSAPP CIA</span>
+                        </div>
+                        <div class="flip-card-back bg-bombeiros-orange rounded-lg shadow-md">
+                            <p class="flip-card-back-text">Iniciar uma conversa no WhatsApp com o número da Companhia.</p>
+                        </div>
+                    </div>
                 </a>
-                <a href="guarnicoes.html" target="_blank" class="shortcut-button bg-dark-red-opaque rounded-lg shadow-md">
-                    <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
-                    <span class="button-text">GUARNIÇÕES DE SERVIÇO DO DIA</span>
+
+                <a href="https://intranet.cbm.rs.gov.br/" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-dark-red-opaque rounded-lg shadow-md">
+                            <i class="fas fa-desktop text-2xl md:text-4xl text-pure-white mb-2"></i>
+                            <span class="button-text">INTRANET CBM</span>
+                        </div>
+                        <div class="flip-card-back bg-dark-red-opaque rounded-lg shadow-md">
+                            <p class="flip-card-back-text">Acessar a Intranet oficial do Corpo de Bombeiros Militar do RS.</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-dark-red-opaque rounded-lg shadow-md">
+                            <i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i>
+                            <span class="button-text">E-193</span>
+                        </div>
+                        <div class="flip-card-back bg-dark-red-opaque rounded-lg shadow-md">
+                            <p class="flip-card-back-text">Acessar o sistema de despacho de ocorrências E-193.</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="guarnicoes.html" target="_blank" class="shortcut-button">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front bg-dark-red-opaque rounded-lg shadow-md">
+                            <i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i>
+                            <span class="button-text">GUARNIÇÕES DE SERVIÇO</span>
+                        </div>
+                        <div class="flip-card-back bg-dark-red-opaque rounded-lg shadow-md">
+                            <p class="flip-card-back-text">Verificar as guarnições de serviço do 1º BBM em tempo real.</p>
+                        </div>
+                    </div>
                 </a>
             </div>
         </div>
@@ -326,7 +651,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Objeto com as informações de aniversário. Apenas nomes e datas são necessários aqui.
+        // Objeto com as informações de aniversário.
+        // A lista de login foi removida, mas esta lista é usada pelos widgets.
         const efetivoAniversarios = {
 			"3527301": { nomeGuerra: "CAP BONA", nascimento: "25/09" },
             "2426650": { nomeGuerra: "CEL DEOCLIDES", nascimento: "06/08" },
@@ -472,6 +798,7 @@
 			"4355148": { nomeGuerra: "SD LOPES", nascimento: "14/09" },
 			"4355229": { nomeGuerra: "SD FRANCIS", nascimento: "17/12" },
 			"4355555": { nomeGuerra: "SD TONELLOTTO", nascimento: "05/11" },
+            "4355822": { nomeGuerra: "J. BARBOSA", nascimento: "23/07" },
 			"4356047": { nomeGuerra: "2 SGT VIANEI", nascimento: "05/12" },
 			"4375149": { nomeGuerra: "SD FONTANA", nascimento: "04/04" },
 			"4387759": { nomeGuerra: "SD JULIAN", nascimento: "17/09" },
@@ -544,9 +871,9 @@
             const diaFormatado = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
             
             const aniversariantesDoDia = [];
-            for (const id in efetivo) {
-                if (efetivo[id].nascimento === diaFormatado) {
-                    aniversariantesDoDia.push(efetivo[id].nomeGuerra);
+            for (const id in efetivoAniversarios) {
+                if (efetivoAniversarios[id].nascimento === diaFormatado) {
+                    aniversariantesDoDia.push(efetivoAniversarios[id].nomeGuerra);
                 }
             }
             if (aniversariantesDoDia.length > 0) {
@@ -567,8 +894,8 @@
 
             const aniversariantesDoMes = [];
             const mesAtual = hoje.getMonth() + 1;
-            for (const id in efetivo) {
-                const militar = efetivo[id];
+            for (const id in efetivoAniversarios) {
+                const militar = efetivoAniversarios[id];
                 if (militar.nascimento) {
                     const [nascDia, nascMes] = militar.nascimento.split('/').map(Number);
                     if (nascMes === mesAtual) {
@@ -599,6 +926,3 @@
 </script>
 </body>
 </html>
-
-
-
