@@ -1,232 +1,129 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições de Serviço - 1º BBM</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'bombeiros-orange': '#FF8C00',
-                        'bombeiros-yellow': '#FFD700',
-                        'cbmrs-blue': '#1A5276',
-                        'fire-red': '#DC2626',
-                        'light-blue': '#3B82F6',
-                    },
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        .hero-background { background-image: url('images/background.jpg'); background-size: cover; background-position: center; position: relative; z-index: 0; }
-        .hero-background::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); z-index: -1; }
-        .shortcut-button-blue { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); background-color: rgba(59, 130, 246, 0.3); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 50px; padding: 4px; color: white; font-size: 9px; font-weight: 700; line-height: 1.2; word-break: break-word; hyphens: auto; text-decoration: none; }
-        .shortcut-button-blue:hover { background-color: rgba(59, 130, 246, 0.5); transform: translateY(-5px); }
-        .guarnicao-button { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); background-color: rgba(255, 215, 0, 0.3); border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0.5rem; min-height: 140px; cursor: pointer; }
-        .guarnicao-button:hover { background-color: rgba(255, 215, 0, 0.5); top: -3px; }
-        .guarnicao-oficial { background-color: rgba(255, 140, 0, 0.5); border-color: rgba(255, 165, 0, 0.7); }
-        .guarnicao-name-only { font-size: 0.9rem; font-weight: 700; color: white; margin-bottom: 0.3rem; }
-        .guarnicao-details-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; align-items: center; justify-content: center; z-index: 10000; }
-        .guarnicao-details-overlay.active { display: flex; }
-        .guarnicao-details-box { background-color: #1F2937; color: #E5E7EB; padding: 1rem; border-radius: 0.75rem; max-width: 320px; width: 90%; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); position: relative; }
-        .modal-quartel-title { font-size: 1.2rem; font-weight: bold; color: #FF8C00; text-align: center; }
-        .modal-viatura-subtitle { font-size: 0.9rem; font-weight: bold; color: #FFD700; text-align: center; margin-bottom: 0.5rem; }
-        .person-role-modal { font-size: 0.8rem; display: flex; justify-content: space-between; margin-bottom: 0.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .guarnicoes-por-quartel-grid { display: grid; grid-template-columns: repeat(auto-fit, 140px); gap: 1rem; justify-content: center; }
-    </style>
-</head>
-<body class="text-white min-h-screen flex flex-col">
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-<div class="flex-grow hero-background">
-    <header class="py-4 shadow-lg z-10 text-center">
-        <div class="flex justify-center gap-4 items-center">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
-            <h1 class="text-lg font-extrabold text-bombeiros-yellow">Guarnições de Serviço - 1º BBM</h1>
-            <img src="images/brasao_1BBM_PARA_site.png" class="h-12">
-        </div>
-    </header>
+def criar_arte_anjos(imagem_path, letra_musica):
+    # 1. Carregar imagem original
+    try:
+        base_img = Image.open(imagem_path).convert("RGBA")
+    except:
+        return "Erro: Imagem não encontrada. Verifique o nome do arquivo."
 
-    <main class="py-6 px-4">
-        <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
-            PORTO ALEGRE - 1º BBM (17/Dez/2025)
-        </h2>
+    # 2. Configurações de Tamanho (Formato Stories/Papel de Carta Vertical)
+    largura = 1080
+    altura = 1920
+    nova_arte = Image.new("RGBA", (largura, altura), (30, 30, 35, 255)) # Fundo cinza escuro base
+    draw = ImageDraw.Draw(nova_arte)
 
-        <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid"></div>
-        <p class="text-gray-400 text-center mt-6 text-sm">Última atualização: <span id="data-atualizacao"></span></p>
-    </main>
-</div>
-
-<div id="guarnicao-details-overlay" class="guarnicao-details-overlay" onclick="closeModal()">
-    <div class="guarnicao-details-box" onclick="event.stopPropagation()">
-        <div id="modal-content"></div>
-        <button class="mt-4 w-full bg-fire-red py-2 rounded font-bold" onclick="closeModal()">FECHAR</button>
-    </div>
-</div>
-
-<script>
-    const guarnicoesData = {
-        "OFICIAL DE SERVIÇO": {
-            "ESTADO MAIOR": {
-                "viatura_display": "Fiscal de Dia",
-                "militares": [
-                    { "funcao": "MOTORISTA DE DIA", "nome": "SD PESSOTA" }
-                ],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "AÇORIANOS": {
-            "ABT-1364": {
-                "viatura_display": "ABT-1364",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT DELAVECHIA" },
-                    { "funcao": "COV", "nome": "SD VILELA" },
-                    { "funcao": "LINHA D", "nome": "SD ALISSON" },
-                    { "funcao": "LINHA E (08-20)", "nome": "SD IBALDO" },
-                    { "funcao": "LINHA E (20-08)", "nome": "SD ASSUNÇÃO" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            },
-            "AT-0671": {
-                "viatura_display": "AT-0671",
-                "militares": [{ "funcao": "CMT GU", "nome": "SD BOTEGA" }],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "TERESÓPOLIS": {
-            "ABT-0594": {
-                "viatura_display": "ABT-0594",
-                "militares": [
-                    { "funcao": "COV", "nome": "SD DOMINGUES" },
-                    { "funcao": "CMT (08-20)", "nome": "1º SGT LUCIANO" },
-                    { "funcao": "CMT (20-08)", "nome": "2º SGT PME CARGNELUTTI" },
-                    { "funcao": "LINHA D (08-20)", "nome": "2º SGT PME CARGNELUTTI" },
-                    { "funcao": "LINHA E (20-08)", "nome": "SD TOMIELLO" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            },
-            "AR-0766": {
-                "viatura_display": "AR-0766 (Resgate)",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BRUM" },
-                    { "funcao": "COV", "nome": "SD ARAUJO" },
-                    { "funcao": "RESGATISTA", "nome": "SD ROSEANNE" }
-                ],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "ASSUNÇÃO": {
-            "ABT-0596": {
-                "viatura_display": "ABT-0596",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT LINCOLN" },
-                    { "funcao": "COV", "nome": "SD PETER" },
-                    { "funcao": "LINHA D (08-20)", "nome": "SD BRUM" },
-                    { "funcao": "LINHA D (20-08)", "nome": "SD DIEIQUE" },
-                    { "funcao": "LINHA E (20-08)", "nome": "2º SGT PANAZZOLO" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "RESTINGA": {
-            "ABT-0598": {
-                "viatura_display": "ABT-0598",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT KOLINSKI" },
-                    { "funcao": "COV", "nome": "1º SGT RONALDO" },
-                    { "funcao": "LINHA D (20-08)", "nome": "SD THIAGO" },
-                    { "funcao": "LINHA E", "nome": "SD PIRES" }
-                ],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "BELÉM NOVO": {
-            "ABT-0599": {
-                "viatura_display": "ABT-0599",
-                "militares": [
-                    { "funcao": "COV", "nome": "SD MARTINEZ" },
-                    { "funcao": "LINHA E", "nome": "SD DETONI" },
-                    { "funcao": "CMT (20-08)", "nome": "1º SGT ASSIS" },
-                    { "funcao": "LINHA D (20-08)", "nome": "2º SGT VASCONCELOS" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "PASSO D'AREIA": {
-            "ABT-0600": {
-                "viatura_display": "ABT-0600",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD THIAGO" },
-                    { "funcao": "LINHA D", "nome": "SD TEMP SOARES" },
-                    { "funcao": "LINHA E", "nome": "SD FERRANDIN" },
-                    { "funcao": "COV (20-08)", "nome": "1º SGT AIRTON" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "FLORESTA": {
-            "ABT-0597": {
-                "viatura_display": "ABT-0597",
-                "militares": [
-                    { "funcao": "LINHA D", "nome": "SD CAMPOS" },
-                    { "funcao": "CMT (08-20)", "nome": "SD MEDEIROS" },
-                    { "funcao": "CMT (20-08)", "nome": "2º SGT CASTRO" },
-                    { "funcao": "COV (20-08)", "nome": "SD TEMP WESLEY" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "PARTENON": {
-            "ABT-1365": {
-                "viatura_display": "ABT-1365",
-                "militares": [
-                    { "funcao": "LINHA E", "nome": "SD TEMP ZANETTI" },
-                    { "funcao": "CMT (19-08)", "nome": "2º SGT SCHNEIDER" },
-                    { "funcao": "COV (20-08)", "nome": "SD BELOMO" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        }
-    };
-
-    function renderGuarnicoes() {
-        const grid = document.getElementById('guarnicoes-grid');
-        Object.keys(guarnicoesData).forEach(quartel => {
-            const btn = document.createElement('div');
-            btn.className = `guarnicao-button ${quartel === 'OFICIAL DE SERVIÇO' ? 'guarnicao-oficial' : ''}`;
-            btn.innerHTML = `<span class="guarnicao-name-only">${quartel}</span><i class="fas fa-chevron-down text-white"></i>`;
-            btn.onclick = () => showModal(quartel);
-            grid.appendChild(btn);
-        });
-    }
-
-    function showModal(quartel) {
-        const content = document.getElementById('modal-content');
-        let html = `<h3 class="modal-quartel-title">${quartel}</h3>`;
-        const vtrs = guarnicoesData[quartel];
-        Object.keys(vtrs).forEach(vtrKey => {
-            const data = vtrs[vtrKey];
-            html += `<h4 class="modal-viatura-subtitle">${data.viatura_display}</h4>`;
-            data.militares.forEach(m => {
-                html += `<div class="person-role-modal"><strong>${m.funcao}:</strong><span>${m.nome}</span></div>`;
-            });
-            html += `<p class="text-[10px] text-gray-400 mt-2">Início: ${data.inicio}</p>`;
-        });
-        content.innerHTML = html;
-        document.getElementById('guarnicao-details-overlay').classList.add('active');
-    }
-
-    function closeModal() { document.getElementById('guarnicao-details-overlay').classList.remove('active'); }
+    # 3. Processar a Imagem Original para o Fundo
+    # Vamos esticar a imagem original e dar um blur para fazer um fundo texturizado
+    fundo_textura = base_img.resize((largura, altura))
+    fundo_textura = fundo_textura.filter(ImageFilter.GaussianBlur(30))
+    nova_arte.paste(fundo_textura, (0, 0))
     
-    document.getElementById('data-atualizacao').textContent = new Date().toLocaleString('pt-BR');
-    renderGuarnicoes();
-</script>
-</body>
-</html>
+    # Adicionar uma camada escura para legibilidade
+    overlay_escuro = Image.new("RGBA", (largura, altura), (0, 0, 0, 150))
+    nova_arte = Image.alpha_composite(nova_arte, overlay_escuro)
+
+    # 4. Inserir Elementos da Capa Original
+    # A. Logo (Topo) - Vamos tentar recortar a parte superior da imagem original
+    # Assumindo que o logo está no terço superior
+    crop_logo = base_img.crop((0, 0, base_img.width, int(base_img.height * 0.35)))
+    w_logo = int(largura * 0.9)
+    h_logo = int(crop_logo.height * (w_logo / crop_logo.width))
+    logo_resized = crop_logo.resize((w_logo, h_logo))
+    
+    # Criar uma máscara suave para o logo não ficar "quadrado"
+    mask_logo = Image.new("L", (w_logo, h_logo), 0)
+    draw_mask = ImageDraw.Draw(mask_logo)
+    draw_mask.rectangle([(0, 0), (w_logo, h_logo)], fill=255)
+    
+    nova_arte.paste(logo_resized, (int((largura - w_logo)/2), 100), mask=logo_resized.split()[3] if 'A' in logo_resized.getbands() else None)
+
+    # B. Banda (Rodapé) - Parte inferior da imagem
+    crop_banda = base_img.crop((0, int(base_img.height * 0.35), base_img.width, base_img.height))
+    w_banda = largura
+    h_banda = int(crop_banda.height * (w_banda / crop_banda.width))
+    banda_resized = crop_banda.resize((w_banda, h_banda))
+    
+    # Colar banda na parte inferior
+    pos_y_banda = altura - h_banda
+    nova_arte.paste(banda_resized, (0, pos_y_banda))
+    
+    # Fade out na parte superior da foto da banda para misturar com o fundo
+    gradient = Image.new('L', (largura, 200), color=0)
+    for y in range(200):
+        opacity = int(255 * (y / 200))
+        ImageDraw.Draw(gradient).line((0, y, largura, y), fill=opacity)
+    
+    # 5. Área do Texto (O "Papel de Carta")
+    # Criar um retângulo central
+    margem_x = 100
+    margem_y_top = h_logo + 150
+    margem_y_bottom = pos_y_banda - 50
+    
+    # Se a área for muito pequena, ajustamos
+    if margem_y_bottom < margem_y_top:
+        margem_y_bottom = altura - 300
+
+    # Desenhando o título
+    try:
+        # Tenta usar arial se tiver, senão usa padrão
+        font_titulo = ImageFont.truetype("arial.ttf", 80)
+        font_letra = ImageFont.truetype("arial.ttf", 40)
+        font_banda = ImageFont.truetype("arial.ttf", 30)
+    except:
+        font_titulo = ImageFont.load_default()
+        font_letra = ImageFont.load_default()
+        font_banda = ImageFont.load_default()
+
+    draw = ImageDraw.Draw(nova_arte)
+    
+    # Título "Embriaguez" (Cor Laranja/Amarelo inspirada no logo)
+    cor_titulo = (255, 165, 0) 
+    cor_texto = (240, 240, 240)
+    
+    titulo = "Embriaguez"
+    w_t, h_t = draw.textbbox((0, 0), titulo, font=font_titulo)[2:]
+    draw.text(((largura - w_t)/2, margem_y_top), titulo, font=font_titulo, fill=cor_titulo)
+
+    # Letra da Música
+    y_text = margem_y_top + h_t + 60
+    linhas = letra_musica.split('\n')
+    
+    for linha in linhas:
+        # Pular linhas vazias com espaço menor
+        if linha.strip() == "":
+            y_text += 20
+            continue
+            
+        w_l, h_l = draw.textbbox((0, 0), linha, font=font_letra)[2:]
+        draw.text(((largura - w_l)/2, y_text), linha, font=font_letra, fill=cor_texto)
+        y_text += h_l + 15
+
+    # Assinatura pequena
+    texto_extra = "Anjos do Hanngar - Intimidade"
+    w_e, h_e = draw.textbbox((0, 0), texto_extra, font=font_banda)[2:]
+    draw.text(((largura - w_e)/2, y_text + 40), texto_extra, font=font_banda, fill=(150, 150, 150))
+
+    # 6. Salvar
+    nova_arte.save("arte_embriaguez.png")
+    print("Arte criada com sucesso: arte_embriaguez.png")
+
+# Dados
+letra = """Olha pra mim
+Diz que não foi só um sonho meu
+Aconteceu, a luz apagou
+Doce embriaguez...
+E o que era o acaso se perdeu
+Meia-noite no meu quarto eu senti você
+
+E amei demais
+Em todos os sentidos
+E o meu mundo é ficar com você!
+Te amei demais
+Te dei um abrigo em meu corpo,
+Em meu amanhecer
+Amei demais, sempre mais...
+Baby, quero esse amor comigo!"""
+
+# Executar (certifique-se de ter o arquivo cover.jpg na pasta)
+criar_arte_anjos("cover.jpg", letra)
