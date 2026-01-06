@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições de Serviço - 1º BBM</title>
+    <title>Guarnições 1º BBM - 06/01/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,11 +14,8 @@
                         'bombeiros-yellow': '#FFD700',
                         'cbmrs-blue': '#1A5276',
                         'fire-red': '#DC2626',
-                        'light-blue': '#3B82F6',
                     },
-                    fontFamily: {
-                        inter: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { inter: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -27,208 +23,226 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        .hero-background { background-image: url('images/background.jpg'); background-size: cover; background-position: center; position: relative; z-index: 0; }
-        .hero-background::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); z-index: -1; }
-        .shortcut-button-blue { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); background-color: rgba(59, 130, 246, 0.3); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 50px; padding: 4px; color: white; font-size: 9px; font-weight: 700; line-height: 1.2; word-break: break-word; hyphens: auto; text-decoration: none; }
-        .shortcut-button-blue:hover { background-color: rgba(59, 130, 246, 0.5); transform: translateY(-5px); }
-        .guarnicao-button { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.2); background-color: rgba(255, 215, 0, 0.3); border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0.5rem; min-height: 140px; cursor: pointer; }
-        .guarnicao-button:hover { background-color: rgba(255, 215, 0, 0.5); top: -3px; }
-        .guarnicao-oficial { background-color: rgba(255, 140, 0, 0.5); border-color: rgba(255, 165, 0, 0.7); }
-        .guarnicao-name-only { font-size: 0.9rem; font-weight: 700; color: white; margin-bottom: 0.3rem; }
-        .guarnicao-details-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .hero-background { background-image: url('images/background.jpg'); background-size: cover; background-position: center; position: relative; }
+        .hero-background::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 0; }
+        .content-wrapper { position: relative; z-index: 10; }
+        .guarnicao-button { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(31, 41, 55, 0.8); border-radius: 0.75rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem; min-height: 120px; cursor: pointer; }
+        .guarnicao-button:hover { background-color: rgba(55, 65, 81, 0.9); transform: translateY(-3px); border-color: #FFD700; }
+        .guarnicao-oficial { border: 2px solid #FF8C00; background-color: rgba(255, 140, 0, 0.2); }
+        .guarnicao-details-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 1rem; }
         .guarnicao-details-overlay.active { display: flex; }
-        .guarnicao-details-box { background-color: #1F2937; color: #E5E7EB; padding: 1rem; border-radius: 0.75rem; max-width: 320px; width: 90%; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); position: relative; }
-        .modal-quartel-title { font-size: 1.2rem; font-weight: bold; color: #FF8C00; text-align: center; }
-        .modal-viatura-subtitle { font-size: 0.9rem; font-weight: bold; color: #FFD700; text-align: center; margin-bottom: 0.5rem; }
-        .person-role-modal { font-size: 0.8rem; display: flex; justify-content: space-between; margin-bottom: 0.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .guarnicoes-por-quartel-grid { display: grid; grid-template-columns: repeat(auto-fit, 140px); gap: 1rem; justify-content: center; }
+        .guarnicao-details-box { background-color: #1F2937; border: 1px solid #374151; padding: 1.5rem; border-radius: 1rem; max-width: 400px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
     </style>
 </head>
-<body class="text-white min-h-screen flex flex-col">
+<body class="text-white min-h-screen flex flex-col hero-background">
 
-<div class="flex-grow hero-background">
-    <header class="py-4 shadow-lg z-10 text-center">
-        <div class="flex justify-center gap-4 items-center">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
-            <h1 class="text-lg font-extrabold text-bombeiros-yellow">Guarnições de Serviço - 1º BBM</h1>
-            <img src="images/brasao_1BBM_PARA_site.png" class="h-12">
+<div class="flex-grow content-wrapper">
+    <header class="py-6 shadow-2xl text-center">
+        <div class="flex justify-center gap-6 items-center px-4">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-14">
+            <div>
+                <h1 class="text-2xl font-black text-bombeiros-yellow tracking-tighter">1º BBM - PORTO ALEGRE</h1>
+                <p class="text-sm font-bold text-gray-300">Escala de Serviço Operacional</p>
+            </div>
+            <img src="images/brasao_1BBM_PARA_site.png" class="h-14">
         </div>
     </header>
 
-    <main class="py-6 px-4">
-        <h2 class="text-xl font-bold text-bombeiros-orange mb-4 text-center">
-            PORTO ALEGRE - 1º BBM (17/Dez/2025)
-        </h2>
+    <main class="py-8 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-fire-red/20 border-l-4 border-fire-red p-4 mb-8 text-center">
+                <h2 class="text-xl font-bold uppercase tracking-widest">Terça-feira, 06 de Janeiro de 2026</h2>
+            </div>
 
-        <div id="guarnicoes-grid" class="guarnicoes-por-quartel-grid"></div>
-        <p class="text-gray-400 text-center mt-6 text-sm">Última atualização: <span id="data-atualizacao"></span></p>
+            <div id="guarnicoes-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
     </main>
 </div>
 
 <div id="guarnicao-details-overlay" class="guarnicao-details-overlay" onclick="closeModal()">
     <div class="guarnicao-details-box" onclick="event.stopPropagation()">
         <div id="modal-content"></div>
-        <button class="mt-4 w-full bg-fire-red py-2 rounded font-bold" onclick="closeModal()">FECHAR</button>
+        <button class="mt-6 w-full bg-fire-red hover:bg-red-700 text-white py-3 rounded-lg font-black transition-colors" onclick="closeModal()">FECHAR</button>
     </div>
 </div>
 
 <script>
     const guarnicoesData = {
-        "OFICIAL DE SERVIÇO": {
-            "ESTADO MAIOR": {
-                "viatura_display": "Fiscal de Dia",
+        "OFICIAL DE DIA": {
+            "ATP-0640": {
+                "vtr": "Estado Maior",
                 "militares": [
-                    { "funcao": "MOTORISTA DE DIA", "nome": "SD PESSOTA" }
+                    { "f": "OFICIAL DE SV", "n": "CAP RODRIGO BORGES" },
+                    { "f": "MOT. DE DIA", "n": "SD FELIPE IANZER" }
                 ],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
+                "t": "24h"
             }
         },
         "AÇORIANOS": {
             "ABT-1364": {
-                "viatura_display": "ABT-1364",
+                "vtr": "ABT-1364 / AEM-0482",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT DELAVECHIA" },
-                    { "funcao": "COV", "nome": "SD VILELA" },
-                    { "funcao": "LINHA D", "nome": "SD ALISSON" },
-                    { "funcao": "LINHA E (08-20)", "nome": "SD IBALDO" },
-                    { "funcao": "LINHA E (20-08)", "nome": "SD ASSUNÇÃO" }
+                    { "f": "CMT GU / SOCORRO", "n": "2º SGT KANOFRE" },
+                    { "f": "COV", "n": "SD NATHAN" },
+                    { "f": "LINHA DIREITA", "n": "SD PIRES" },
+                    { "f": "COV (AEM/AT)", "n": "SD MUNDEL" }
                 ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            },
-            "AT-0671": {
-                "viatura_display": "AT-0671",
-                "militares": [{ "funcao": "CMT GU", "nome": "SD BOTEGA" }],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
+                "t": "24h"
             }
         },
         "TERESÓPOLIS": {
             "ABT-0594": {
-                "viatura_display": "ABT-0594",
+                "vtr": "ABT-0594 / AR-0766",
                 "militares": [
-                    { "funcao": "COV", "nome": "SD DOMINGUES" },
-                    { "funcao": "CMT (08-20)", "nome": "1º SGT LUCIANO" },
-                    { "funcao": "CMT (20-08)", "nome": "2º SGT PME CARGNELUTTI" },
-                    { "funcao": "LINHA D (08-20)", "nome": "2º SGT PME CARGNELUTTI" },
-                    { "funcao": "LINHA E (20-08)", "nome": "SD TOMIELLO" }
+                    { "f": "CMT GU", "n": "SD CASSIANO" },
+                    { "f": "COV", "n": "SD DEIVID" },
+                    { "f": "LINHA DIREITA", "n": "SD TEMP SPERLING" },
+                    { "f": "CMT (AR-0766)", "n": "SD LOPES" },
+                    { "f": "COV (AR-0766)", "n": "SD VINÍCIUS" }
                 ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            },
-            "AR-0766": {
-                "viatura_display": "AR-0766 (Resgate)",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD BRUM" },
-                    { "funcao": "COV", "nome": "SD ARAUJO" },
-                    { "funcao": "RESGATISTA", "nome": "SD ROSEANNE" }
-                ],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
+                "t": "24h"
             }
         },
         "ASSUNÇÃO": {
             "ABT-0596": {
-                "viatura_display": "ABT-0596",
+                "vtr": "ABT-0596",
                 "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT LINCOLN" },
-                    { "funcao": "COV", "nome": "SD PETER" },
-                    { "funcao": "LINHA D (08-20)", "nome": "SD BRUM" },
-                    { "funcao": "LINHA D (20-08)", "nome": "SD DIEIQUE" },
-                    { "funcao": "LINHA E (20-08)", "nome": "2º SGT PANAZZOLO" }
+                    { "f": "CMT GU", "n": "SD BRUM" },
+                    { "f": "COV", "n": "SD TEMP PINTO" },
+                    { "f": "LINHA DIREITA", "n": "SD PORCELIS" }
                 ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "RESTINGA": {
-            "ABT-0598": {
-                "viatura_display": "ABT-0598",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "1º SGT KOLINSKI" },
-                    { "funcao": "COV", "nome": "1º SGT RONALDO" },
-                    { "funcao": "LINHA D (20-08)", "nome": "SD THIAGO" },
-                    { "funcao": "LINHA E", "nome": "SD PIRES" }
-                ],
-                "turno": "24h", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "BELÉM NOVO": {
-            "ABT-0599": {
-                "viatura_display": "ABT-0599",
-                "militares": [
-                    { "funcao": "COV", "nome": "SD MARTINEZ" },
-                    { "funcao": "LINHA E", "nome": "SD DETONI" },
-                    { "funcao": "CMT (20-08)", "nome": "1º SGT ASSIS" },
-                    { "funcao": "LINHA D (20-08)", "nome": "2º SGT VASCONCELOS" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
-            }
-        },
-        "PASSO D'AREIA": {
-            "ABT-0600": {
-                "viatura_display": "ABT-0600",
-                "militares": [
-                    { "funcao": "CMT GU", "nome": "SD THIAGO" },
-                    { "funcao": "LINHA D", "nome": "SD TEMP SOARES" },
-                    { "funcao": "LINHA E", "nome": "SD FERRANDIN" },
-                    { "funcao": "COV (20-08)", "nome": "1º SGT AIRTON" }
-                ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
+                "t": "24h"
             }
         },
         "FLORESTA": {
             "ABT-0597": {
-                "viatura_display": "ABT-0597",
+                "vtr": "ABT-0597",
                 "militares": [
-                    { "funcao": "LINHA D", "nome": "SD CAMPOS" },
-                    { "funcao": "CMT (08-20)", "nome": "SD MEDEIROS" },
-                    { "funcao": "CMT (20-08)", "nome": "2º SGT CASTRO" },
-                    { "funcao": "COV (20-08)", "nome": "SD TEMP WESLEY" }
+                    { "f": "CMT GU", "n": "2º SGT SAUL" },
+                    { "f": "COV", "n": "SD TEMP DOTTA" },
+                    { "f": "LINHA ESQUERDA", "n": "SD CAMPOS" }
                 ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
+                "t": "24h"
+            }
+        },
+        "RESTINGA": {
+            "ABT-0598": {
+                "vtr": "ABT-0598",
+                "militares": [
+                    { "f": "CMT GU", "n": "SD MARTINS" },
+                    { "f": "COV", "n": "1º SGT RONALDO" },
+                    { "f": "LINHA DIREITA", "n": "SD ASSUNÇÃO" }
+                ],
+                "t": "24h"
+            }
+        },
+        "BELÉM NOVO": {
+            "ABT-0599": {
+                "vtr": "ABT-0599 / ATP-1451",
+                "militares": [
+                    { "f": "CMT GU", "n": "SD DETONI" },
+                    { "f": "COV", "n": "SD MAURÍCIO" },
+                    { "f": "LINHA DIREITA", "n": "SD COSME" }
+                ],
+                "t": "24h"
+            }
+        },
+        "PASSO D'AREIA": {
+            "ABT-0600": {
+                "vtr": "ABT-0600",
+                "militares": [
+                    { "f": "CMT GU", "n": "SD THIAGO" },
+                    { "f": "COV", "n": "2º SGT FABRICIO" },
+                    { "f": "LINHA ESQUERDA", "n": "SD DA SILVA" }
+                ],
+                "t": "24h"
             }
         },
         "PARTENON": {
             "ABT-1365": {
-                "viatura_display": "ABT-1365",
+                "vtr": "ABT-1365",
                 "militares": [
-                    { "funcao": "LINHA E", "nome": "SD TEMP ZANETTI" },
-                    { "funcao": "CMT (19-08)", "nome": "2º SGT SCHNEIDER" },
-                    { "funcao": "COV (20-08)", "nome": "SD BELOMO" }
+                    { "f": "CMT GU", "n": "SD BATISTA" },
+                    { "f": "COV", "n": "2º SGT BECKER" },
+                    { "f": "LINHA DIREITA", "n": "SD CABRAL" }
                 ],
-                "turno": "Misto", "inicio": "17/12/2025 08:00", "fim": "18/12/2025 08:00"
+                "t": "24h"
+            }
+        },
+        "BBS - ESPECIALIZADA": {
+            "CANIL": {
+                "vtr": "ABC-10647 / 792",
+                "militares": [
+                    { "f": "CINOTÉCNICO", "n": "SD BERTAZZO" },
+                    { "f": "CINOTÉCNICO", "n": "SD DE LIMA" }
+                ],
+                "t": "24h"
+            },
+            "MERGULHO": {
+                "vtr": "ATP-0555",
+                "militares": [
+                    { "f": "CMT GU (08-20)", "n": "2º SGT SIMAS" },
+                    { "f": "MERGULHADOR", "n": "SD MATTE" },
+                    { "f": "MERGULHADOR", "n": "SD SANTTANNA" }
+                ],
+                "t": "12h"
+            },
+            "AQUÁTICA": {
+                "vtr": "EABS / EAL / EIN",
+                "militares": [
+                    { "f": "CMT SOCORRO", "n": "1º SGT MARCELO" },
+                    { "f": "CONDUTOR NAVAL", "n": "SD ROBERTO" }
+                ],
+                "t": "24h"
             }
         }
     };
 
     function renderGuarnicoes() {
         const grid = document.getElementById('guarnicoes-grid');
-        Object.keys(guarnicoesData).forEach(quartel => {
-            const btn = document.createElement('div');
-            btn.className = `guarnicao-button ${quartel === 'OFICIAL DE SERVIÇO' ? 'guarnicao-oficial' : ''}`;
-            btn.innerHTML = `<span class="guarnicao-name-only">${quartel}</span><i class="fas fa-chevron-down text-white"></i>`;
-            btn.onclick = () => showModal(quartel);
-            grid.appendChild(btn);
+        Object.keys(guarnicoesData).forEach(secao => {
+            const card = document.createElement('div');
+            const isOficial = secao === "OFICIAL DE DIA";
+            card.className = `guarnicao-button ${isOficial ? 'guarnicao-oficial' : ''}`;
+            card.innerHTML = `
+                <span class="text-xs font-black text-bombeiros-yellow mb-1 uppercase">${secao}</span>
+                <i class="fas ${isOficial ? 'fa-star' : 'fa-fire-extinguisher'} text-white mb-2"></i>
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Ver Guarnição</span>
+            `;
+            card.onclick = () => showModal(secao);
+            grid.appendChild(card);
         });
     }
 
-    function showModal(quartel) {
+    function showModal(secao) {
         const content = document.getElementById('modal-content');
-        let html = `<h3 class="modal-quartel-title">${quartel}</h3>`;
-        const vtrs = guarnicoesData[quartel];
-        Object.keys(vtrs).forEach(vtrKey => {
-            const data = vtrs[vtrKey];
-            html += `<h4 class="modal-viatura-subtitle">${data.viatura_display}</h4>`;
-            data.militares.forEach(m => {
-                html += `<div class="person-role-modal"><strong>${m.funcao}:</strong><span>${m.nome}</span></div>`;
-            });
-            html += `<p class="text-[10px] text-gray-400 mt-2">Início: ${data.inicio}</p>`;
+        let html = `<h3 class="text-xl font-black text-bombeiros-orange mb-4 border-b border-gray-700 pb-2 uppercase">${secao}</h3>`;
+        
+        const subUnidades = guarnicoesData[secao];
+        Object.keys(subUnidades).forEach(key => {
+            const data = subUnidades[key];
+            html += `
+                <div class="mb-4 bg-gray-800/50 p-3 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-bold text-bombeiros-yellow">${data.vtr || key}</span>
+                        <span class="text-[10px] bg-fire-red px-2 py-0.5 rounded-full font-bold">${data.t}</span>
+                    </div>
+                    ${data.militares.map(m => `
+                        <div class="flex justify-between text-xs py-1 border-b border-gray-700/50">
+                            <span class="text-gray-400 font-medium">${m.f}:</span>
+                            <span class="font-bold text-white">${m.n}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         });
+        
         content.innerHTML = html;
         document.getElementById('guarnicao-details-overlay').classList.add('active');
     }
 
     function closeModal() { document.getElementById('guarnicao-details-overlay').classList.remove('active'); }
-    
-    document.getElementById('data-atualizacao').textContent = new Date().toLocaleString('pt-BR');
     renderGuarnicoes();
 </script>
 </body>
 </html>
-
