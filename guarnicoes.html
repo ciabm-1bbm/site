@@ -43,7 +43,7 @@
         .flip-card {
             background-color: transparent;
             perspective: 1000px;
-            height: 300px; /* Aumentado para caber nomes maiores */
+            height: 320px; /* Aumentado um pouco mais para acomodar bem a imagem e textos */
         }
         .flip-card-inner {
             position: relative;
@@ -344,11 +344,16 @@
                 `;
             });
 
+            // Lógica para escolher o ícone (Estrela ou Imagem do Caminhão)
+            const iconHtml = isOficial 
+                ? `<i class="fas fa-star text-bombeiros-yellow text-5xl drop-shadow-lg"></i>` 
+                : `<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-20 h-20 object-contain filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]" alt="Viatura">`;
+
             card.innerHTML = `
                 <div class="flip-card-inner">
                     <div class="flip-card-front shadow-2xl">
-                        <div class="bg-gradient-to-br from-slate-700 to-slate-900 w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white/10">
-                            <i class="fas ${isOficial ? 'fa-star text-bombeiros-yellow' : 'fa-truck-fire text-white'} text-4xl"></i>
+                        <div class="bg-gradient-to-br from-slate-700 to-slate-900 w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white/10 overflow-hidden p-1">
+                            ${iconHtml}
                         </div>
                         <h3 class="text-lg font-black tracking-tight uppercase text-center">${secao}</h3>
                         <div class="mt-6 flex items-center gap-2 text-gray-500 font-bold text-[10px] uppercase tracking-widest">
