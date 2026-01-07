@@ -25,7 +25,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
         
-        /* Estilização do Background */
         .hero-background { 
             background-image: url('images/background.jpg'); 
             background-size: cover; 
@@ -35,16 +34,16 @@
         }
         .hero-background::before { 
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.8) 100%); 
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%); 
             z-index: 0; 
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* Estrutura do Flip Card */
+        /* Flip Card - Tamanho Aumentado */
         .flip-card {
             background-color: transparent;
             perspective: 1000px;
-            height: 240px;
+            height: 300px; /* Aumentado para caber nomes maiores */
         }
         .flip-card-inner {
             position: relative;
@@ -63,76 +62,86 @@
             height: 100%;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            border-radius: 1rem;
+            border-radius: 1.25rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
         }
         .flip-card-front {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(12px);
             align-items: center;
             justify-content: center;
+            padding: 1.5rem;
         }
         .flip-card-back {
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.98);
             transform: rotateY(180deg);
-            padding: 1rem;
+            padding: 1.25rem;
             text-align: left;
             border-color: #FF8C00;
         }
 
-        /* Card de Oficial (Destaque) */
         .oficial-card .flip-card-front {
             border: 2px solid #FF8C00;
-            background: rgba(255, 140, 0, 0.15);
+            background: rgba(255, 140, 0, 0.2);
         }
 
-        /* Scrollbar customizada para o verso do card */
-        .card-scroll::-webkit-scrollbar { width: 4px; }
+        .card-scroll::-webkit-scrollbar { width: 5px; }
         .card-scroll::-webkit-scrollbar-track { background: transparent; }
         .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 10px; }
+
+        /* Animação suave para as estatísticas */
+        .stat-box { transition: all 0.3s ease; }
+        .stat-box:hover { transform: scale(1.05); }
     </style>
 </head>
 <body class="hero-background min-h-screen">
 
 <div class="content-wrapper">
-    <header class="py-6 bg-black/30 backdrop-blur-md border-b border-white/10">
-        <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12 md:h-16">
+    <header class="py-6 bg-black/40 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-6">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20">
             <div class="text-center">
-                <h1 class="text-2xl md:text-3xl font-black text-bombeiros-yellow tracking-tighter uppercase italic">1º BBM - Porto Alegre</h1>
-                <p class="text-xs md:text-sm font-bold text-gray-400 tracking-widest">SISTEMA DE GESTÃO OPERACIONAL</p>
+                <h1 class="text-3xl md:text-4xl font-black text-bombeiros-yellow tracking-tighter uppercase italic">1º BBM - Porto Alegre</h1>
+                <p class="text-sm md:text-base font-bold text-gray-400 tracking-widest mt-1">SISTEMA DE GESTÃO OPERACIONAL</p>
             </div>
-            <img src="images/brasao_1BBM_PARA_site.png" class="h-12 md:h-16">
+            <img src="images/brasao_1BBM_PARA_site.png" class="h-16 md:h-20">
         </div>
     </header>
 
     <main class="py-8 px-4 container mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="bg-fire-red/20 border-l-4 border-fire-red p-6 rounded-r-xl flex flex-col justify-center">
-                <span class="text-fire-red font-black text-sm uppercase">Prontidão Atual</span>
-                <h2 id="data-display" class="text-2xl font-black text-white leading-tight">Carregando data...</h2>
+        
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-10">
+            <div class="xl:col-span-3 bg-fire-red/20 border-l-8 border-fire-red p-6 rounded-r-2xl shadow-xl flex flex-col justify-center">
+                <span class="text-fire-red font-black text-sm uppercase tracking-widest">Prontidão</span>
+                <h2 id="data-display" class="text-2xl font-black text-white leading-tight">...</h2>
             </div>
 
-            <div class="lg:col-span-2 bg-slate-800/80 backdrop-blur-md p-4 rounded-xl border border-white/10 shadow-2xl">
-                <div class="flex items-center gap-3 mb-3 border-b border-white/10 pb-2">
-                    <i class="fas fa-chart-pie text-bombeiros-yellow"></i>
-                    <h3 class="font-black text-sm uppercase tracking-wider">Resumo do Efetivo de Serviço</h3>
+            <div class="xl:col-span-6 bg-slate-800/60 backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-2xl">
+                <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-2">
+                    <i class="fas fa-users text-bombeiros-yellow"></i>
+                    <h3 class="font-black text-sm uppercase tracking-wider text-gray-300">Resumo de Militares</h3>
                 </div>
-                <div id="resumo-efetivo" class="grid grid-cols-3 md:grid-cols-6 gap-2">
+                <div id="stats-militares" class="grid grid-cols-4 gap-3">
+                    </div>
+            </div>
+
+            <div class="xl:col-span-3 bg-slate-800/60 backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-2xl">
+                <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-2">
+                    <i class="fas fa-truck-moving text-bombeiros-orange"></i>
+                    <h3 class="font-black text-sm uppercase tracking-wider text-gray-300">Meios Disponíveis</h3>
+                </div>
+                <div id="stats-meios" class="grid grid-cols-2 gap-3">
                     </div>
             </div>
         </div>
 
-        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             </div>
     </main>
-
-    <footer class="py-6 text-center text-gray-500 text-xs border-t border-white/5 mt-10">
-        <p>&copy; 2026 1º Batalhão de Bombeiro Militar - RS</p>
-    </footer>
 </div>
 
 <script>
@@ -149,11 +158,12 @@
         },
         "AÇORIANOS": {
             "ABT-1364": {
-                "vtr": "ABT-1364",
+                "vtr": "ABT-1364 / AEM-0482",
                 "militares": [
                     { "f": "CMT GU", "n": "1º SGT DELAVECHIA" },
                     { "f": "COV", "n": "SD VINICIUS" },
-                    { "f": "LINHA DIREITA", "n": "SD TEIXEIRA" }
+                    { "f": "LINHA DIREITA", "n": "SD TEIXEIRA" },
+                    { "f": "COV (AEM)", "n": "SD MUNDEL" }
                 ],
                 "t": "24h"
             }
@@ -206,7 +216,7 @@
         },
         "BELÉM NOVO": {
             "ABT-0599": {
-                "vtr": "ABT-0599",
+                "vtr": "ABT-0599 / ATP-1451",
                 "militares": [
                     { "f": "CMT GU", "n": "2º SGT MENDES" },
                     { "f": "COV", "n": "2º SGT CHIEZA" },
@@ -226,6 +236,17 @@
                 "t": "24h"
             }
         },
+        "PARTENON": {
+            "ABT-1365": {
+                "vtr": "ABT-1365",
+                "militares": [
+                    { "f": "CMT GU", "n": "SD PATRICK" },
+                    { "f": "COV", "n": "SD BRUNO EDUARDO" },
+                    { "f": "AUX. LINHA", "n": "SD TEMP ZANETTI" }
+                ],
+                "t": "24h"
+            }
+        },
         "CANIL": {
             "ABC-792": {
                 "vtr": "ABC-792 / 793",
@@ -237,8 +258,8 @@
             }
         },
         "AQUÁTICA": {
-            "EABS": {
-                "vtr": "EMBARCAÇÕES",
+            "EMBARCAÇÕES": {
+                "vtr": "EABS / EAL / EIN",
                 "militares": [
                     { "f": "CMT GU", "n": "SD CÁSSIO" },
                     { "f": "CONDUTOR", "n": "SD DENIS" }
@@ -249,67 +270,74 @@
     };
 
     function processarEfetivo() {
-        let stats = { cap: 0, sgt: 0, sd: 0, abt: 0, ar: 0, total: 0 };
+        let s = { cap: 0, sgt: 0, sd: 0, abt: 0, ar: 0, totalMil: 0 };
         
         Object.values(guarnicoesData).forEach(secao => {
-            Object.keys(secao).forEach(key => {
-                if(key.includes("ABT")) stats.abt++;
-                if(key.includes("AR")) stats.ar++;
+            Object.keys(secao).forEach(vtrKey => {
+                const info = secao[vtrKey];
                 
-                secao[key].militares.forEach(m => {
-                    stats.total++;
-                    if(m.n.includes("CAP")) stats.cap++;
-                    else if(m.n.includes("SGT")) stats.sgt++;
-                    else stats.sd++;
+                // Contagem de Viaturas por nome
+                const fullText = (vtrKey + info.vtr).toUpperCase();
+                if(fullText.includes("ABT")) s.abt++;
+                if(fullText.includes("AR-")) s.ar++;
+
+                // Contagem de Militares por patente no nome
+                info.militares.forEach(m => {
+                    s.totalMil++;
+                    const nome = m.n.toUpperCase();
+                    if(nome.includes("CAP")) s.cap++;
+                    else if(nome.includes("SGT")) s.sgt++;
+                    else s.sd++;
                 });
             });
         });
 
-        const container = document.getElementById('resumo-efetivo');
-        const labels = [
-            { l: 'CAP', v: stats.cap, c: 'text-orange-500' },
-            { l: 'SGT', v: stats.sgt, c: 'text-yellow-500' },
-            { l: 'SD', v: stats.sd, c: 'text-blue-400' },
-            { l: 'VTR ABT', v: stats.abt, c: 'text-red-500' },
-            { l: 'VTR AR', v: stats.ar, c: 'text-green-500' },
-            { l: 'TOTAL', v: stats.total, c: 'text-white' }
-        ];
+        // Preencher Efetivo
+        document.getElementById('stats-militares').innerHTML = `
+            ${renderStat('CAP', s.cap, 'text-orange-500')}
+            ${renderStat('SGT', s.sgt, 'text-yellow-400')}
+            ${renderStat('SD', s.sd, 'text-blue-400')}
+            ${renderStat('TOTAL MILITARES', s.totalMil, 'text-white bg-white/10')}
+        `;
 
-        container.innerHTML = labels.map(item => `
-            <div class="bg-black/40 p-2 rounded border border-white/5 text-center">
-                <div class="text-[10px] font-bold text-gray-500 uppercase">${item.l}</div>
-                <div class="text-lg font-black ${item.c}">${item.v}</div>
+        // Preencher Meios
+        document.getElementById('stats-meios').innerHTML = `
+            ${renderStat('ABT', s.abt, 'text-red-500')}
+            ${renderStat('AR', s.ar, 'text-green-500')}
+        `;
+    }
+
+    function renderStat(label, val, colorClass) {
+        return `
+            <div class="stat-box bg-black/40 p-3 rounded-xl border border-white/5 text-center ${colorClass.includes('bg') ? colorClass : ''}">
+                <div class="text-[10px] font-black opacity-60 uppercase mb-1">${label}</div>
+                <div class="text-2xl font-black ${colorClass.includes('bg') ? '' : colorClass}">${val}</div>
             </div>
-        `).join('');
+        `;
     }
 
     function renderCards() {
         const grid = document.getElementById('guarnicoes-grid');
-        const dataH2 = document.getElementById('data-display');
-        
-        // Data fixa solicitada
-        dataH2.innerText = "Quarta-feira, 07 de Janeiro de 2026";
+        document.getElementById('data-display').innerText = "Quarta-feira, 07 de Janeiro de 2026";
 
         Object.keys(guarnicoesData).forEach(secao => {
             const isOficial = secao === "OFICIAL DE DIA";
-            const subUnidades = guarnicoesData[secao];
-            
             const card = document.createElement('div');
             card.className = `flip-card ${isOficial ? 'oficial-card' : ''}`;
             
             let guarnicaoHtml = "";
-            Object.keys(subUnidades).forEach(key => {
-                const data = subUnidades[key];
+            Object.keys(guarnicoesData[secao]).forEach(vtrKey => {
+                const data = guarnicoesData[secao][vtrKey];
                 guarnicaoHtml += `
-                    <div class="mb-3 last:mb-0">
-                        <div class="text-[10px] font-black text-bombeiros-orange uppercase border-b border-orange-500/30 mb-1 flex justify-between">
+                    <div class="mb-4 last:mb-0 bg-white/5 p-3 rounded-lg border border-white/5">
+                        <div class="text-xs font-black text-bombeiros-yellow uppercase border-b border-white/10 mb-2 pb-1 flex justify-between">
                             <span>${data.vtr}</span>
-                            <span class="text-white">${data.t}</span>
+                            <span class="text-fire-red">${data.t}</span>
                         </div>
                         ${data.militares.map(m => `
-                            <div class="flex justify-between text-[10px] leading-tight mb-1">
-                                <span class="text-gray-400">${m.f}:</span>
-                                <span class="font-bold text-white text-right">${m.n}</span>
+                            <div class="flex justify-between items-center mb-1.5 border-b border-white/5 pb-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">${m.f}</span>
+                                <span class="text-sm font-black text-white ml-2">${m.n}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -318,18 +346,20 @@
 
             card.innerHTML = `
                 <div class="flip-card-inner">
-                    <div class="flip-card-front shadow-xl">
-                        <div class="bg-bombeiros-orange/20 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas ${isOficial ? 'fa-star text-bombeiros-yellow' : 'fa-truck text-white'} text-2xl"></i>
+                    <div class="flip-card-front shadow-2xl">
+                        <div class="bg-gradient-to-br from-slate-700 to-slate-900 w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white/10">
+                            <i class="fas ${isOficial ? 'fa-star text-bombeiros-yellow' : 'fa-truck-fire text-white'} text-4xl"></i>
                         </div>
-                        <h3 class="text-sm font-black tracking-tighter uppercase px-2">${secao}</h3>
-                        <span class="mt-4 text-[9px] font-bold text-gray-500 uppercase tracking-widest animate-pulse">Passe o mouse</span>
+                        <h3 class="text-lg font-black tracking-tight uppercase text-center">${secao}</h3>
+                        <div class="mt-6 flex items-center gap-2 text-gray-500 font-bold text-[10px] uppercase tracking-widest">
+                            <i class="fas fa-sync-alt animate-spin-slow"></i> Info Guarnição
+                        </div>
                     </div>
                     <div class="flip-card-back shadow-2xl">
-                        <h4 class="text-xs font-black text-white mb-3 uppercase flex items-center gap-2">
-                             <i class="fas fa-users text-bombeiros-orange"></i> Guarnição
+                        <h4 class="text-sm font-black text-bombeiros-orange mb-4 uppercase flex items-center gap-2">
+                             <i class="fas fa-id-badge"></i> Detalhes do Serviço
                         </h4>
-                        <div class="card-scroll overflow-y-auto pr-2 flex-grow">
+                        <div class="card-scroll overflow-y-auto pr-1 flex-grow">
                             ${guarnicaoHtml}
                         </div>
                     </div>
@@ -339,9 +369,20 @@
         });
     }
 
-    // Iniciar
+    // Iniciar sistema
     processarEfetivo();
     renderCards();
 </script>
+
+<style>
+    @keyframes spin-slow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+        animation: spin-slow 8s linear infinite;
+    }
+</style>
+
 </body>
 </html>
