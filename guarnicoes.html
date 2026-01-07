@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard 1º BBM - 07/01/2026</title>
+    <title>Guarnições 1º BBM - 07/01/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,7 +12,9 @@
                     colors: {
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
+                        'cbmrs-blue': '#1A5276',
                         'fire-red': '#DC2626',
+                        'dark-bg': '#0f172a',
                     },
                     fontFamily: { inter: ['Inter', 'sans-serif'] }
                 }
@@ -21,173 +23,325 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        .hero-background { background-image: url('images/background.jpg'); background-size: cover; background-position: center; position: relative; }
-        .hero-background::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 0; }
-        .content-wrapper { position: relative; z-index: 10; }
-        .guarnicao-button { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1); background-color: rgba(31, 41, 55, 0.8); border-radius: 0.75rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem; min-height: 120px; cursor: pointer; }
-        .guarnicao-button:hover { background-color: rgba(55, 65, 81, 0.9); transform: translateY(-3px); border-color: #FFD700; }
-        .guarnicao-oficial { border: 2px solid #FF8C00; background-color: rgba(255, 140, 0, 0.2); }
-        .guarnicao-details-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 1rem; backdrop-filter: blur(4px); }
-        .guarnicao-details-overlay.active { display: flex; }
-        .guarnicao-details-box { background-color: #1F2937; border: 1px solid #374151; padding: 1.5rem; border-radius: 1rem; max-width: 400px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
         
-        /* Dashboard Estilizado */
-        .efetivo-card { background: rgba(17, 24, 39, 0.95); border: 1px solid #FFD700; border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; }
-        .stat-line { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .stat-label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #D1D5DB; }
-        .stat-value { font-size: 1.1rem; font-weight: 900; color: #FFD700; }
+        /* Estilização do Background */
+        .hero-background { 
+            background-image: url('images/background.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed;
+            position: relative; 
+        }
+        .hero-background::before { 
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.8) 100%); 
+            z-index: 0; 
+        }
+        .content-wrapper { position: relative; z-index: 10; }
+
+        /* Estrutura do Flip Card */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+            height: 240px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .flip-card-front {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+        }
+        .flip-card-back {
+            background: rgba(15, 23, 42, 0.95);
+            transform: rotateY(180deg);
+            padding: 1rem;
+            text-align: left;
+            border-color: #FF8C00;
+        }
+
+        /* Card de Oficial (Destaque) */
+        .oficial-card .flip-card-front {
+            border: 2px solid #FF8C00;
+            background: rgba(255, 140, 0, 0.15);
+        }
+
+        /* Scrollbar customizada para o verso do card */
+        .card-scroll::-webkit-scrollbar { width: 4px; }
+        .card-scroll::-webkit-scrollbar-track { background: transparent; }
+        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 10px; }
     </style>
 </head>
-<body class="text-white min-h-screen flex flex-col hero-background">
+<body class="hero-background min-h-screen">
 
-<div class="flex-grow content-wrapper">
-    <header class="py-6 text-center shadow-2xl">
-        <div class="flex justify-center gap-6 items-center px-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-14">
-            <div>
-                <h1 class="text-2xl font-black text-bombeiros-yellow tracking-tighter uppercase">1º BBM - PORTO ALEGRE</h1>
-                <p class="text-sm font-bold text-gray-300">Quadro de Horário Operacional</p>
+<div class="content-wrapper">
+    <header class="py-6 bg-black/30 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 flex flex-wrap justify-between items-center gap-4">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12 md:h-16">
+            <div class="text-center">
+                <h1 class="text-2xl md:text-3xl font-black text-bombeiros-yellow tracking-tighter uppercase italic">1º BBM - Porto Alegre</h1>
+                <p class="text-xs md:text-sm font-bold text-gray-400 tracking-widest">SISTEMA DE GESTÃO OPERACIONAL</p>
             </div>
-            <img src="images/brasao_1BBM_PARA_site.png" class="h-14">
+            <img src="images/brasao_1BBM_PARA_site.png" class="h-12 md:h-16">
         </div>
     </header>
 
-    <main class="py-8 px-6">
-        <div class="max-w-4xl mx-auto">
-            
-            <div class="efetivo-card shadow-2xl">
-                <h3 class="text-center text-bombeiros-yellow font-black mb-6 uppercase tracking-widest border-b border-bombeiros-yellow/30 pb-2">
-                    <i class="fas fa-chart-line mr-2"></i>Efetivo de Serviço no Dia
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12">
-                    <div class="stat-line"><span class="stat-label">Total Viaturas ABT</span><span id="stat-abt" class="stat-value">0</span></div>
-                    <div class="stat-line"><span class="stat-label">Total Viaturas AR</span><span id="stat-ar" class="stat-value">0</span></div>
-                    <div class="stat-line"><span class="stat-label">Total Capitães (CAP)</span><span id="stat-cap" class="stat-value text-white">0</span></div>
-                    <div class="stat-line"><span class="stat-label">Total Sargentos (SGT)</span><span id="stat-sgt" class="stat-value text-white">0</span></div>
-                    <div class="stat-line"><span class="stat-label">Total Soldados (SD)</span><span id="stat-sd" class="stat-value text-white">0</span></div>
-                    <div class="stat-line bg-fire-red/20 px-3 rounded mt-1"><span class="stat-label text-white font-black italic">TOTAL MILITARES</span><span id="stat-total" class="stat-value text-white">0</span></div>
+    <main class="py-8 px-4 container mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-fire-red/20 border-l-4 border-fire-red p-6 rounded-r-xl flex flex-col justify-center">
+                <span class="text-fire-red font-black text-sm uppercase">Prontidão Atual</span>
+                <h2 id="data-display" class="text-2xl font-black text-white leading-tight">Carregando data...</h2>
+            </div>
+
+            <div class="lg:col-span-2 bg-slate-800/80 backdrop-blur-md p-4 rounded-xl border border-white/10 shadow-2xl">
+                <div class="flex items-center gap-3 mb-3 border-b border-white/10 pb-2">
+                    <i class="fas fa-chart-pie text-bombeiros-yellow"></i>
+                    <h3 class="font-black text-sm uppercase tracking-wider">Resumo do Efetivo de Serviço</h3>
                 </div>
+                <div id="resumo-efetivo" class="grid grid-cols-3 md:grid-cols-6 gap-2">
+                    </div>
             </div>
-
-            <div class="bg-fire-red/20 border-l-4 border-fire-red p-4 mb-8 text-center">
-                <h2 class="text-xl font-bold uppercase tracking-widest">Quarta-feira, 07 de Janeiro de 2026</h2>
-            </div>
-
-            <div id="guarnicoes-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
         </div>
-    </main>
-</div>
 
-<div id="guarnicao-details-overlay" class="guarnicao-details-overlay" onclick="closeModal()">
-    <div class="guarnicao-details-box" onclick="event.stopPropagation()">
-        <div id="modal-content"></div>
-        <button class="mt-6 w-full bg-fire-red hover:bg-red-700 text-white py-3 rounded-lg font-black transition-all" onclick="closeModal()">FECHAR</button>
-    </div>
+        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            </div>
+    </main>
+
+    <footer class="py-6 text-center text-gray-500 text-xs border-t border-white/5 mt-10">
+        <p>&copy; 2026 1º Batalhão de Bombeiro Militar - RS</p>
+    </footer>
 </div>
 
 <script>
     const guarnicoesData = {
         "OFICIAL DE DIA": {
-            "ATP-0640": { vtr: "Estado Maior", militares: [{ f: "OFICIAL SV", n: "CAP BORGES" }, { f: "MOT. DIA", n: "SD CORREA" }], t: "24h" }
+            "ATP-0640": {
+                "vtr": "ESTADO MAIOR",
+                "militares": [
+                    { "f": "OFICIAL DE SV", "n": "CAP BORGES" },
+                    { "f": "MOT. DE DIA", "n": "SD CORREA" }
+                ],
+                "t": "24h"
+            }
         },
         "AÇORIANOS": {
-            "ABT-1364": { vtr: "ABT-1364 / AEM-0482", militares: [{ f: "CMT GU", n: "1º SGT DELAVECHIA" }, { f: "COV", n: "SD VINICIUS" }, { f: "LINHA DIREITA", n: "SD TEIXEIRA" }], t: "24h" },
-            "AT-0671": { vtr: "AT-0671", militares: [{ f: "COV", n: "SD BOTTINI" }], t: "24h" }
+            "ABT-1364": {
+                "vtr": "ABT-1364",
+                "militares": [
+                    { "f": "CMT GU", "n": "1º SGT DELAVECHIA" },
+                    { "f": "COV", "n": "SD VINICIUS" },
+                    { "f": "LINHA DIREITA", "n": "SD TEIXEIRA" }
+                ],
+                "t": "24h"
+            }
         },
         "TERESÓPOLIS": {
-            "ABT-0594": { vtr: "ABT-0594", militares: [{ f: "CMT GU", n: "2º SGT PME CARGNELUTTI" }, { f: "COV", n: "SD ZEMPER" }, { f: "LINHA DIREITA", n: "SD TEMP CARDOSO" }], t: "24h" },
-            "AR-0766": { vtr: "AR-0766", militares: [{ f: "CMT GU", n: "SD BRUM" }, { f: "COV", n: "SD ARAUJO" }, { f: "RESGATISTA", n: "SD ROSEANNE" }], t: "24h" }
+            "ABT-0594": {
+                "vtr": "ABT-0594 / AR-0766",
+                "militares": [
+                    { "f": "CMT GU", "n": "2º SGT CARGNELUTTI" },
+                    { "f": "COV", "n": "SD ZEMPER" },
+                    { "f": "LINHA DIREITA", "n": "SD TEMP CARDOSO" },
+                    { "f": "CMT AR", "n": "SD BRUM" },
+                    { "f": "RESGATISTA", "n": "SD ROSEANNE" }
+                ],
+                "t": "24h"
+            }
         },
         "ASSUNÇÃO": {
-            "ABT-0596": { vtr: "ABT-0596", militares: [{ f: "COV", n: "SD RAUBACH" }, { f: "LINHA ESQUERDA", n: "SD TEMP MAIA" }, { f: "CMT (08-20)", n: "2º SGT JUNIOR" }, { f: "CMT (20-08)", n: "SD BRUM" }], t: "Misto" }
+            "ABT-0596": {
+                "vtr": "ABT-0596",
+                "militares": [
+                    { "f": "CMT GU", "n": "2º SGT JUNIOR" },
+                    { "f": "COV", "n": "SD RAUBACH" },
+                    { "f": "LINHA ESQUERDA", "n": "SD TEMP MAIA" }
+                ],
+                "t": "24h"
+            }
         },
         "FLORESTA": {
-            "ABT-0597": { vtr: "ABT-0597", militares: [{ f: "CMT GU", n: "SD CRISTIANO" }, { f: "COV", n: "SD SIQUEIRA" }, { f: "LINHA DIREITA", n: "SD KINGESKI" }], t: "24h" }
+            "ABT-0597": {
+                "vtr": "ABT-0597",
+                "militares": [
+                    { "f": "CMT GU", "n": "SD CRISTIANO" },
+                    { "f": "COV", "n": "SD SIQUEIRA" },
+                    { "f": "LINHA DIREITA", "n": "SD KINGESKI" }
+                ],
+                "t": "24h"
+            }
         },
         "RESTINGA": {
-            "ABT-0598": { vtr: "ABT-0598", militares: [{ f: "CMT GU", n: "2º SGT LUIZ" }, { f: "COV", n: "SD FINGER" }, { f: "LINHA DIREITA", n: "SD TEMP VOLZ" }], t: "24h" }
+            "ABT-0598": {
+                "vtr": "ABT-0598",
+                "militares": [
+                    { "f": "CMT GU", "n": "2º SGT LUIZ" },
+                    { "f": "COV", "n": "SD FINGER" },
+                    { "f": "LINHA DIREITA", "n": "SD TEMP VOLZ" }
+                ],
+                "t": "24h"
+            }
         },
         "BELÉM NOVO": {
-            "ABT-0599": { vtr: "ABT-0599 / ATP-1451", militares: [{ f: "CMT GU", n: "2º SGT MENDES" }, { f: "COV", n: "2º SGT CHIEZA" }, { f: "LINHA DIREITA", n: "SD TEMP FILIPE" }], t: "24h" }
+            "ABT-0599": {
+                "vtr": "ABT-0599",
+                "militares": [
+                    { "f": "CMT GU", "n": "2º SGT MENDES" },
+                    { "f": "COV", "n": "2º SGT CHIEZA" },
+                    { "f": "LINHA DIREITA", "n": "SD TEMP FILIPE" }
+                ],
+                "t": "24h"
+            }
         },
         "PASSO D'AREIA": {
-            "ABT-0600": { vtr: "ABT-0600", militares: [{ f: "COV", n: "SD TEMP PAULINO" }, { f: "LINHA DIREITA", n: "SD EIDER" }, { f: "CMT (08-20)", n: "2º SGT RICARDO" }, { f: "LE / CMT (Noite)", n: "SD PEDRO" }], t: "Misto" }
+            "ABT-0600": {
+                "vtr": "ABT-0600",
+                "militares": [
+                    { "f": "CMT GU", "n": "2º SGT RICARDO" },
+                    { "f": "COV", "n": "SD TEMP PAULINO" },
+                    { "f": "LINHA DIREITA", "n": "SD EIDER" }
+                ],
+                "t": "24h"
+            }
         },
-        "PARTENON": {
-            "ABT-1365": { vtr: "ABT-1365", militares: [{ f: "CMT GU", n: "SD PATRICK" }, { f: "COV", n: "SD BRUNO EDUARDO" }, { f: "LD", n: "SD TEMP ZANETTI" }], t: "24h" }
+        "CANIL": {
+            "ABC-792": {
+                "vtr": "ABC-792 / 793",
+                "militares": [
+                    { "f": "CINOTÉCNICO", "n": "2º SGT FARIA" },
+                    { "f": "CINOTÉCNICO", "n": "SD BRUNO" }
+                ],
+                "t": "24h"
+            }
         },
-        "BBS - ESPECIAL": {
-            "CANIL": { vtr: "ABC-792 / 793", militares: [{ f: "CINOTÉCNICO", n: "2º SGT FARIA" }, { f: "CINOTÉCNICO", n: "SD BRUNO" }], t: "24h" },
-            "MERGULHO": { vtr: "ATP-0555", militares: [{ f: "CMT GU", n: "2º SGT SIMAS" }, { f: "MERG", n: "SD BONAZZA" }, { f: "MERG", n: "SD MATTE" }], t: "12h" },
-            "AQUÁTICA": { vtr: "EABS / EAL / EIN", militares: [{ f: "CMT GU", n: "SD CÁSSIO" }, { f: "COND. NAVAL", n: "SD DENIS" }], t: "24h" },
-            "CCOB": { vtr: "AODC-CCOB", militares: [{ f: "OPERADOR", n: "2º SGT MÔNICA" }], t: "24h" }
+        "AQUÁTICA": {
+            "EABS": {
+                "vtr": "EMBARCAÇÕES",
+                "militares": [
+                    { "f": "CMT GU", "n": "SD CÁSSIO" },
+                    { "f": "CONDUTOR", "n": "SD DENIS" }
+                ],
+                "t": "24h"
+            }
         }
     };
 
-    function calculateStats() {
-        let abt = 0, ar = 0, sd = 0, sgt = 0, cap = 0;
-        const totalUnico = new Set();
-
-        Object.keys(guarnicoesData).forEach(secao => {
-            const sub = guarnicoesData[secao];
-            Object.keys(sub).forEach(key => {
-                if(key.includes("ABT")) abt++;
-                if(key.includes("AR")) ar++;
-
-                sub[key].militares.forEach(m => {
-                    totalUnico.add(m.n);
-                    const nome = m.n.toUpperCase();
-                    if(nome.includes("SD")) sd++;
-                    else if(nome.includes("SGT")) sgt++;
-                    else if(nome.includes("CAP")) cap++;
+    function processarEfetivo() {
+        let stats = { cap: 0, sgt: 0, sd: 0, abt: 0, ar: 0, total: 0 };
+        
+        Object.values(guarnicoesData).forEach(secao => {
+            Object.keys(secao).forEach(key => {
+                if(key.includes("ABT")) stats.abt++;
+                if(key.includes("AR")) stats.ar++;
+                
+                secao[key].militares.forEach(m => {
+                    stats.total++;
+                    if(m.n.includes("CAP")) stats.cap++;
+                    else if(m.n.includes("SGT")) stats.sgt++;
+                    else stats.sd++;
                 });
             });
         });
 
-        document.getElementById('stat-abt').innerText = abt;
-        document.getElementById('stat-ar').innerText = ar;
-        document.getElementById('stat-sd').innerText = sd;
-        document.getElementById('stat-sgt').innerText = sgt;
-        document.getElementById('stat-cap').innerText = cap;
-        document.getElementById('stat-total').innerText = totalUnico.size;
+        const container = document.getElementById('resumo-efetivo');
+        const labels = [
+            { l: 'CAP', v: stats.cap, c: 'text-orange-500' },
+            { l: 'SGT', v: stats.sgt, c: 'text-yellow-500' },
+            { l: 'SD', v: stats.sd, c: 'text-blue-400' },
+            { l: 'VTR ABT', v: stats.abt, c: 'text-red-500' },
+            { l: 'VTR AR', v: stats.ar, c: 'text-green-500' },
+            { l: 'TOTAL', v: stats.total, c: 'text-white' }
+        ];
+
+        container.innerHTML = labels.map(item => `
+            <div class="bg-black/40 p-2 rounded border border-white/5 text-center">
+                <div class="text-[10px] font-bold text-gray-500 uppercase">${item.l}</div>
+                <div class="text-lg font-black ${item.c}">${item.v}</div>
+            </div>
+        `).join('');
     }
 
-    function render() {
+    function renderCards() {
         const grid = document.getElementById('guarnicoes-grid');
+        const dataH2 = document.getElementById('data-display');
+        
+        // Data fixa solicitada
+        dataH2.innerText = "Quarta-feira, 07 de Janeiro de 2026";
+
         Object.keys(guarnicoesData).forEach(secao => {
+            const isOficial = secao === "OFICIAL DE DIA";
+            const subUnidades = guarnicoesData[secao];
+            
             const card = document.createElement('div');
-            const isOficial = secao.includes("OFICIAL");
-            card.className = `guarnicao-button ${isOficial ? 'guarnicao-oficial' : ''}`;
+            card.className = `flip-card ${isOficial ? 'oficial-card' : ''}`;
+            
+            let guarnicaoHtml = "";
+            Object.keys(subUnidades).forEach(key => {
+                const data = subUnidades[key];
+                guarnicaoHtml += `
+                    <div class="mb-3 last:mb-0">
+                        <div class="text-[10px] font-black text-bombeiros-orange uppercase border-b border-orange-500/30 mb-1 flex justify-between">
+                            <span>${data.vtr}</span>
+                            <span class="text-white">${data.t}</span>
+                        </div>
+                        ${data.militares.map(m => `
+                            <div class="flex justify-between text-[10px] leading-tight mb-1">
+                                <span class="text-gray-400">${m.f}:</span>
+                                <span class="font-bold text-white text-right">${m.n}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+
             card.innerHTML = `
-                <span class="text-[10px] font-black text-bombeiros-yellow mb-1 uppercase tracking-tighter">${secao}</span>
-                <i class="fas ${isOficial ? 'fa-star text-orange-400' : 'fa-truck-moving text-white'} text-2xl mb-2"></i>
-                <span class="text-[9px] text-gray-400 font-bold uppercase">Detalhes</span>
+                <div class="flip-card-inner">
+                    <div class="flip-card-front shadow-xl">
+                        <div class="bg-bombeiros-orange/20 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas ${isOficial ? 'fa-star text-bombeiros-yellow' : 'fa-truck text-white'} text-2xl"></i>
+                        </div>
+                        <h3 class="text-sm font-black tracking-tighter uppercase px-2">${secao}</h3>
+                        <span class="mt-4 text-[9px] font-bold text-gray-500 uppercase tracking-widest animate-pulse">Passe o mouse</span>
+                    </div>
+                    <div class="flip-card-back shadow-2xl">
+                        <h4 class="text-xs font-black text-white mb-3 uppercase flex items-center gap-2">
+                             <i class="fas fa-users text-bombeiros-orange"></i> Guarnição
+                        </h4>
+                        <div class="card-scroll overflow-y-auto pr-2 flex-grow">
+                            ${guarnicaoHtml}
+                        </div>
+                    </div>
+                </div>
             `;
-            card.onclick = () => showModal(secao);
             grid.appendChild(card);
         });
-        calculateStats();
     }
 
-    function showModal(secao) {
-        const content = document.getElementById('modal-content');
-        let html = `<h3 class="text-xl font-black text-bombeiros-orange mb-4 border-b border-gray-700 pb-2 uppercase">${secao}</h3>`;
-        const sub = guarnicoesData[secao];
-        Object.keys(sub).forEach(v => {
-            html += `<div class="mb-4 bg-gray-800/80 p-3 rounded-lg border border-white/5">
-                <div class="flex justify-between text-xs font-bold text-bombeiros-yellow mb-2"><span>${sub[v].vtr}</span><span>${sub[v].t}</span></div>
-                ${sub[v].militares.map(m => `<div class="flex justify-between text-xs py-1 border-b border-white/5">
-                    <span class="text-gray-400">${m.f}:</span><span class="font-bold">${m.n}</span>
-                </div>`).join('')}
-            </div>`;
-        });
-        content.innerHTML = html;
-        document.getElementById('guarnicao-details-overlay').classList.add('active');
-    }
-
-    function closeModal() { document.getElementById('guarnicao-details-overlay').classList.remove('active'); }
-    render();
+    // Iniciar
+    processarEfetivo();
+    renderCards();
 </script>
 </body>
 </html>
