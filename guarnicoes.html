@@ -42,13 +42,13 @@
         .flip-card-front { background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 1.5rem; }
         .flip-card-back { background: rgba(15, 23, 42, 0.98); transform: rotateY(180deg); padding: 1.25rem; text-align: left; border-color: #FF8C00; }
         
-        /* Estilo Tooltip Customizado */
+        /* Tooltip Customizado para o Resumo */
         .stat-box { transition: all 0.3s ease; position: relative; cursor: pointer; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.95); color: #fff; text-align: left; padding: 10px; border-radius: 8px;
-            width: 200px; z-index: 100; border: 1px solid #FF8C00; font-size: 11px; line-height: 1.4;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s;
+            background: rgba(0, 0, 0, 0.95); color: #fff; text-align: left; padding: 12px; border-radius: 8px;
+            width: 220px; z-index: 100; border: 1px solid #FF8C00; font-size: 11px; line-height: 1.5;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.3s;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
         
@@ -64,7 +64,7 @@
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20">
             <div class="text-center">
                 <h1 class="text-3xl md:text-4xl font-black text-bombeiros-yellow tracking-tighter uppercase italic">1º BBM - Porto Alegre</h1>
-                <p class="text-sm md:text-base font-bold text-gray-400 tracking-widest mt-1 uppercase">Escala de Serviço Operacional</p>
+                <p class="text-sm md:text-base font-bold text-gray-400 tracking-widest mt-1 uppercase">Escala de Serviço Operacional - 08/01/2026</p>
             </div>
             <img src="images/brasao_1BBM_PARA_site.png" class="h-16 md:h-20">
         </div>
@@ -80,7 +80,7 @@
             <div class="xl:col-span-6 bg-slate-800/60 backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-2xl">
                 <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-2">
                     <i class="fas fa-users text-bombeiros-yellow"></i>
-                    <h3 class="font-black text-sm uppercase tracking-wider text-gray-300">Resumo de Militares</h3>
+                    <h3 class="font-black text-sm uppercase tracking-wider text-gray-300">Resumo de Militares (Passe o mouse)</h3>
                 </div>
                 <div id="stats-militares" class="grid grid-cols-4 gap-3"></div>
             </div>
@@ -99,14 +99,15 @@
 </div>
 
 <script>
+    // Dados extraídos do PDF da Escala de 08/01/2026
     const guarnicoesData = {
         "OFICIAL DE DIA": [
             { vtr: "ATP-0640", mil: [{f: "OFICIAL SUPERVISOR", n: "CAP ALINE"}, {f: "COV", n: "SD VARGAS"}], t: "24h" }
         ],
         "AÇORIANOS": [
             { vtr: "ABT-1364", mil: [{f: "CMT GU", n: "1º SGT PME ARAGÃO"}, {f: "COV", n: "SD PESSOTA"}, {f: "LINHA DIREITA", n: "SD TEMP CORREA"}], t: "24h" },
-            { vtr: "AEM-0482", mil: [{f: "COV", n: "SD MUNDEL"}], t: "24h" },
-            { vtr: "AT-0671", mil: [{f: "COV", n: "SD BOTTINI"}], t: "24h" }
+            { vtr: "AEM-0482", mil: [{f: "CMT SOCORRO", n: "SD PESSOTA"}, {f: "COV", n: "SD ROGER"}], t: "24h" },
+            { vtr: "AT-0671", mil: [{f: "COV", n: "SD ROGER"}], t: "24h" }
         ],
         "TERESÓPOLIS": [
             { vtr: "ABT-0594", mil: [{f: "CMT SOCORRO", n: "1º SGT LUCIANO"}, {f: "COV", n: "2º SGT BEN-HUR"}, {f: "LINHA DIREITA", n: "SD JORDAN"}], t: "24h" },
@@ -125,16 +126,17 @@
             { vtr: "ABT-0599", mil: [{f: "CMT GU", n: "1º SGT PME JULIANO"}, {f: "COV", n: "SD MARTINEZ"}, {f: "LINHA DIREITA", n: "SD DETONI"}], t: "24h" }
         ],
         "PASSO D'AREIA": [
-            { vtr: "ABT-0600", mil: [{f: "CMT GU", n: "SD ADAM"}, {f: "COV", n: "SD ISMAEL"}, {f: "LINHA DIREITA", n: "SD TEMP SOARES"}], t: "24h" }
+            { vtr: "ABT-0600", mil: [{f: "CMT GU", n: "SD ADAM"}, {f: "COV (08-20h)", n: "SD ISMAEL"}, {f: "COV (20-08h)", n: "SD TEMP PAULINO"}, {f: "LINHA DIREITA", n: "SD TEMP SOARES"}], t: "24h" }
         ],
         "PARTENON": [
             { vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD JONATHAN"}, {f: "COV", n: "2º SGT BARREIRO"}, {f: "LINHA DIREITA", n: "SD CABRAL"}], t: "24h" }
         ],
-        "CANIL": [
-            { vtr: "ABC-792", mil: [{f: "CINOTÉCNICO", n: "1º SGT PABLO"}, {f: "CINOTÉCNICO", n: "SD LOPES"}], t: "24h" }
+        "CANIL / BBS": [
+            { vtr: "ABC-792 / 793", mil: [{f: "CINOTÉCNICO", n: "1º SGT PABLO"}, {f: "CINOTÉCNICO", n: "SD LOPES"}], t: "24h" }
         ],
-        "AQUÁTICA": [
-            { vtr: "EMBARCAÇÕES", mil: [{f: "CMT GU", n: "1º SGT MARCELO"}, {f: "CONDUTOR", n: "2º SGT CESAR ZANFONATO"}], t: "24h" }
+        "ESPECIALIZADAS / BBS": [
+            { vtr: "ATP-1190 (MERG)", mil: [{f: "CMT GU", n: "2º SGT MENDONÇA"}, {f: "MERG", n: "SD DAMIEL"}, {f: "MERG", n: "SD SANTTANNA"}], t: "12h" },
+            { vtr: "EABS-08 (AQUAT)", mil: [{f: "CMT GU", n: "1º SGT MARCELO"}, {f: "CONDUTOR", n: "2º SGT CESAR ZANFONATO"}], t: "24h" }
         ]
     };
 
@@ -155,7 +157,7 @@
             ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
             ${renderStat('SD', s.sd.length, 'text-blue-400', s.sd)}
-            ${renderStat('MILITARES', s.totalMil, 'text-white bg-white/10', ['Total Geral de Militares'])}
+            ${renderStat('MILITARES', s.totalMil, 'text-white bg-white/10', ['Total Geral Efetivo'])}
         `;
         document.getElementById('stats-meios').innerHTML = `
             ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
@@ -164,7 +166,7 @@
     }
 
     function renderStat(label, val, color, list) {
-        const items = list.map(i => `• ${i}`).join('<br>');
+        const items = [...new Set(list)].map(i => `• ${i}`).join('<br>');
         return `<div class="stat-box bg-black/40 p-3 rounded-xl border border-white/5 text-center">
             <div class="text-[10px] font-black opacity-60 uppercase mb-1">${label}</div>
             <div class="text-2xl font-black ${color}">${val}</div>
