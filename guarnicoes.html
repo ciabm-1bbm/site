@@ -31,8 +31,7 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* Cards menores e responsividade: 6 colunas no PC (xl), 4 no tablet (md), 2 no celular */
-        .flip-card { background-color: transparent; perspective: 1000px; height: 240px; }
+        .flip-card { background-color: transparent; perspective: 1000px; height: 260px; }
         .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
         .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
         .flip-card-front, .flip-card-back { 
@@ -42,14 +41,13 @@
         .flip-card-front { background: rgba(30, 41, 59, 0.95); align-items: center; justify-content: center; padding: 0.75rem; }
         .flip-card-back { background: rgba(15, 23, 42, 1); transform: rotateY(180deg); padding: 0.75rem; text-align: left; border-color: #FF8C00; }
         
-        /* Tooltip ajustado com z-index alto para ficar à frente dos cards */
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
             background: #000; color: #fff; text-align: left; padding: 10px; border-radius: 8px;
-            width: 220px; z-index: 1000; border: 1px solid #FF8C00; font-size: 11px;
+            width: 240px; z-index: 1000; border: 1px solid #FF8C00; font-size: 11px;
             box-shadow: 0 10px 30px rgba(0,0,0,1); opacity: 0; transition: opacity 0.3s;
-            max-height: 180px; overflow-y: auto;
+            max-height: 200px; overflow-y: auto;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
         
@@ -96,41 +94,41 @@
 </div>
 
 <script>
-    // Dados extraídos da Escala de 09/01/2026
     const guarnicoesData = {
+        "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP ALESSANDRA"}, {f: "COV", n: "SD HOLSBACK"}], t: "24h" }],
         "AÇORIANOS": [{ vtr: "ABT-1364", mil: [{f: "CMT GU", n: "1º SGT DELAVECHIA"}, {f: "COV", n: "SD MUNDEL"}, {f: "LD", n: "SD PIRES"}], t: "24h" }],
         "TERESÓPOLIS": [{ vtr: "ABT-0594 / AR", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LD", n: "SD TEMP SPERLING"}], t: "24h" }],
-        "ASSUNÇÃO": [{ vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT LEANDRO"}, {f: "COV", n: "SD TEMP PINTO"}, {f: "LD", n: "SD PORCELIS"}], t: "24h" }],
-        "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "2º SGT SAUL"}, {f: "COV", n: "SD TEMP DOTTA"}, {f: "LD", n: "SD DA SILVA"}, {f: "LE", n: "SD FRANCIS"}], t: "24h" }],
+        "ASSUNÇÃO": [{ vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT LEANDRO"}, {f: "LD", n: "SD PORCELIS"}, {f: "COV", n: "SD TEMP PINTO"}], t: "24h" }],
+        "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "2º SGT SAUL"}, {f: "LD", n: "SD DA SILVA"}, {f: "LE", n: "SD FRANCIS"}, {f: "COV", n: "SD TEMP DOTTA"}], t: "24h" }],
         "RESTINGA": [{ vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV", n: "1º SGT RONALDO"}, {f: "LD", n: "SD TEMP VOLZ"}], t: "24h" }],
-        "BELÉM NOVO": [{ vtr: "ABT-0599", mil: [{f: "CMT GU", n: "2º SGT MENDES"}, {f: "LE", n: "SD COSME"}, {f: "LD", n: "SD TEMP FILIPE"}], t: "24h" }],
+        "BELÉM NOVO": [{ vtr: "ABT-0599", mil: [{f: "CMT 08-20h", n: "SD COSME"}, {f: "COV", n: "SD MAURÍCIO"}, {f: "LD 08-20h", n: "SD TEMP FILIPE"}, {f: "CMT 20-08h", n: "2º SGT MENDES"}, {f: "LE 20-08h", n: "SD COSME"}], t: "24h" }],
         "PASSO D'AREIA": [{ vtr: "ABT-0600", mil: [{f: "CMT GU", n: "1º SGT MATHEUS"}, {f: "COV", n: "2º SGT FABRICIO"}, {f: "LD", n: "SD THIAGO"}], t: "24h" }],
         "PARTENON": [{ vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD BATISTA"}, {f: "COV", n: "2º SGT BECKER"}, {f: "LD", n: "SD JULIAN"}], t: "24h" }],
         "CANIL / BBS": [{ vtr: "ABC-10647", mil: [{f: "CINO", n: "2º SGT TRINDADE"}, {f: "CINO", n: "SD BERTAZZO"}], t: "24h" }],
         "AQUÁTICA / BBS": [{ vtr: "EABS-08", mil: [{f: "CMT GU", n: "SD BICALHO"}, {f: "COND", n: "SD ROBERTO"}], t: "24h" }],
-        "MERGULHO / BBS": [{ vtr: "ATP-0555", mil: [{f: "CMT", n: "2º SGT MENDONÇA"}, {f: "MERG", n: "SD BONAZZA"}, {f: "MERG", n: "SD MATTE"}], t: "12h" }],
-        "CENTRO OP.": [{ vtr: "CCOB/COBOM", mil: [{f: "CCOB", n: "SD NATASCHA"}, {f: "COBOM", n: "1º SGT RIBEIRO"}, {f: "COBOM", n: "2º SGT BARBARA"}], t: "12h" }]
+        "ESPEC / CCOB": [
+            { vtr: "ATP-1190", mil: [{f: "CMT", n: "2º SGT MENDONÇA"}, {f: "MERG", n: "SD BONAZZA"}, {f: "MERG", n: "SD MATTE"}], t: "12h" },
+            { vtr: "CCOB/COBOM", mil: [{f: "CCOB", n: "SD NATASCHA"}, {f: "COBOM", n: "1º SGT RIBEIRO"}, {f: "COBOM", n: "2º SGT BARBARA"}], t: "12h" }
+        ]
     };
 
     function processarEfetivo() {
-        let s = { sgt: [], sd: [], abt: [], ar: [], total: 0 };
+        let s = { cap: [], sgt: [], sd: [], abt: [], ar: [], total: 0 };
         Object.values(guarnicoesData).flat().forEach(v => {
             if(v.vtr.includes("ABT")) s.abt.push(v.vtr);
             if(v.vtr.includes("AR")) s.ar.push(v.vtr);
             v.mil.forEach(m => {
                 s.total++;
-                if(m.n.includes("SGT")) s.sgt.push(m.n);
+                if(m.n.includes("CAP")) s.cap.push(m.n);
+                else if(m.n.includes("SGT")) s.sgt.push(m.n);
                 else s.sd.push(m.n);
             });
         });
-
         document.getElementById('stats-militares').innerHTML = `
-            <div class="bg-black/40 p-1 rounded border border-white/5 text-center col-span-1">
-                <div class="text-[8px] font-black opacity-40 uppercase">CAP</div><div class="text-sm font-black text-orange-500">0</div>
-            </div>
+            ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
             ${renderStat('SD', s.sd.length, 'text-blue-400', s.sd)}
-            ${renderStat('TOTAL', s.total, 'text-white bg-white/10', ['Total Efetivo'])}
+            ${renderStat('MILITARES', s.total, 'text-white bg-white/10', ['Total Efetivo'])}
         `;
         document.getElementById('stats-meios').innerHTML = `
             ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
@@ -153,7 +151,6 @@
             const vtrs = guarnicoesData[secao].map(v => v.vtr).join(' / ');
             const card = document.createElement('div');
             card.className = "flip-card";
-            
             let verso = guarnicoesData[secao].map(v => `
                 <div class="mb-2 bg-white/5 p-2 rounded border border-white/5">
                     <div class="text-[8px] font-black text-bombeiros-yellow border-b border-white/10 mb-1 flex justify-between uppercase">
@@ -165,13 +162,12 @@
                     </div>`).join('')}
                 </div>
             `).join('');
-
             card.innerHTML = `<div class="flip-card-inner">
                 <div class="flip-card-front shadow-lg">
                     <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mb-2 border border-white/10 overflow-hidden">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-10 h-10 object-contain">
+                        ${secao.includes("OFICIAL") ? '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>' : '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-10 h-10 object-contain">'}
                     </div>
-                    <h3 class="text-[11px] font-black uppercase tracking-tighter leading-tight text-center">${secao}<br><span class="text-[8px] text-gray-400 font-normal italic tracking-normal">(${vtrs})</span></h3>
+                    <h3 class="text-[11px] font-black uppercase tracking-tighter leading-tight text-center">${secao}<br><span class="text-[8px] text-gray-400 font-normal italic">(${vtrs})</span></h3>
                 </div>
                 <div class="flip-card-back shadow-xl">
                     <h4 class="text-[9px] font-black text-bombeiros-orange mb-1 uppercase border-b border-orange-500/30 pb-0.5">Guarnição</h4>
@@ -181,9 +177,7 @@
             grid.appendChild(card);
         });
     }
-
-    processarEfetivo();
-    renderCards();
+    processarEfetivo(); renderCards();
 </script>
 </body>
 </html>
