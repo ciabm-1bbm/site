@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições 1º BBM - 09/01/2026</title>
+    <title>Gestão de Guarnições 1º BBM - 09/01/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,23 +31,47 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        .flip-card { background-color: transparent; perspective: 1000px; height: 260px; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
-        .flip-card-front, .flip-card-back { 
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
-            border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; overflow: hidden; 
+        /* Card Fixo com Efeito de Zoom */
+        .guarnicao-card {
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        .flip-card-front { background: rgba(30, 41, 59, 0.95); align-items: center; justify-content: center; padding: 0.75rem; }
-        .flip-card-back { background: rgba(15, 23, 42, 1); transform: rotateY(180deg); padding: 0.75rem; text-align: left; border-color: #FF8C00; }
-        
+        .guarnicao-card:hover {
+            transform: scale(1.08);
+            z-index: 50;
+            border-color: #FF8C00;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .guarnicao-card .extra-info {
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.4s ease;
+            background: rgba(255, 140, 0, 0.1);
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .guarnicao-card:hover .extra-info {
+            max-height: 30px;
+            opacity: 1;
+            padding: 5px 0;
+        }
+
+        /* Tooltip ajustado para aparecer sempre à frente */
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
-            background: #000; color: #fff; text-align: left; padding: 10px; border-radius: 8px;
-            width: 240px; z-index: 1000; border: 1px solid #FF8C00; font-size: 11px;
+            background: #000; color: #fff; text-align: left; padding: 12px; border-radius: 8px;
+            width: 250px; z-index: 2000; border: 1px solid #FF8C00; font-size: 11px;
             box-shadow: 0 10px 30px rgba(0,0,0,1); opacity: 0; transition: opacity 0.3s;
-            max-height: 200px; overflow-y: auto;
+            max-height: 250px; overflow-y: auto;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
         
@@ -89,7 +113,7 @@
             </div>
         </div>
 
-        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3"></div>
+        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4"></div>
     </main>
 </div>
 
@@ -97,7 +121,7 @@
     const guarnicoesData = {
         "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP ALESSANDRA"}, {f: "COV", n: "SD HOLSBACK"}], t: "24h" }],
         "AÇORIANOS": [{ vtr: "ABT-1364", mil: [{f: "CMT GU", n: "1º SGT DELAVECHIA"}, {f: "COV", n: "SD MUNDEL"}, {f: "LD", n: "SD PIRES"}], t: "24h" }],
-        "TERESÓPOLIS": [{ vtr: "ABT-0594", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LD", n: "SD TEMP SPERLING"}], t: "24h" }],
+        "TERESÓPOLIS": [{ vtr: "ABT-0594 / AR", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LD", n: "SD TEMP SPERLING"}], t: "24h" }],
         "ASSUNÇÃO": [{ vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT LEANDRO"}, {f: "LD", n: "SD PORCELIS"}, {f: "COV", n: "SD TEMP PINTO"}], t: "24h" }],
         "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "2º SGT SAUL"}, {f: "LD", n: "SD DA SILVA"}, {f: "LE", n: "SD FRANCIS"}, {f: "COV", n: "SD TEMP DOTTA"}], t: "24h" }],
         "RESTINGA": [{ vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV", n: "1º SGT RONALDO"}, {f: "LD", n: "SD TEMP VOLZ"}], t: "24h" }],
@@ -128,7 +152,7 @@
             ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
             ${renderStat('SD', s.sd.length, 'text-blue-400', s.sd)}
-            ${renderStat('MILITARES', s.total, 'text-white bg-white/10', ['Total Efetivo'])}
+            ${renderStat('TOTAL', s.total, 'text-white bg-white/10', ['Total Efetivo Escalado'])}
         `;
         document.getElementById('stats-meios').innerHTML = `
             ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
@@ -150,30 +174,33 @@
         Object.keys(guarnicoesData).forEach(secao => {
             const vtrs = guarnicoesData[secao].map(v => v.vtr).join(' / ');
             const card = document.createElement('div');
-            card.className = "flip-card";
-            let verso = guarnicoesData[secao].map(v => `
-                <div class="mb-2 bg-white/5 p-2 rounded border border-white/5">
+            card.className = "guarnicao-card shadow-lg";
+            
+            let guarnicaoHtml = guarnicoesData[secao].map(v => `
+                <div class="px-2 mb-2">
                     <div class="text-[8px] font-black text-bombeiros-yellow border-b border-white/10 mb-1 flex justify-between uppercase">
-                        <span>${v.vtr}</span><span>${v.t}</span>
+                        <span>${v.vtr}</span><span class="text-fire-red">${v.t}</span>
                     </div>
-                    ${v.mil.map(m => `<div class="flex justify-between text-[8px] mb-0.5 leading-tight">
+                    ${v.mil.map(m => `<div class="flex justify-between text-[9px] mb-0.5 leading-tight">
                         <span class="text-gray-400 font-bold uppercase">${m.f}:</span>
                         <span class="font-black text-white text-right ml-2">${m.n}</span>
                     </div>`).join('')}
                 </div>
             `).join('');
-            card.innerHTML = `<div class="flip-card-inner">
-                <div class="flip-card-front shadow-lg">
-                    <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mb-2 border border-white/10 overflow-hidden">
+
+            card.innerHTML = `
+                <div class="extra-info">Status: Prontidão Operacional</div>
+                <div class="p-3 border-b border-white/10 flex flex-col items-center bg-slate-800/50">
+                    <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mb-2 border border-white/10 overflow-hidden shadow-inner">
                         ${secao.includes("OFICIAL") ? '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>' : '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-10 h-10 object-contain">'}
                     </div>
-                    <h3 class="text-[11px] font-black uppercase tracking-tighter leading-tight text-center">${secao}<br><span class="text-[8px] text-gray-400 font-normal italic">(${vtrs})</span></h3>
+                    <h3 class="text-[11px] font-black uppercase tracking-tighter leading-tight text-center">${secao}</h3>
+                    <span class="text-[8px] text-gray-400 font-normal italic">(${vtrs})</span>
                 </div>
-                <div class="flip-card-back shadow-xl">
-                    <h4 class="text-[9px] font-black text-bombeiros-orange mb-1 uppercase border-b border-orange-500/30 pb-0.5">Guarnição</h4>
-                    <div class="card-scroll overflow-y-auto pr-1 flex-grow">${verso}</div>
+                <div class="card-scroll overflow-y-auto p-2 flex-grow">
+                    ${guarnicaoHtml}
                 </div>
-            </div>`;
+            `;
             grid.appendChild(card);
         });
     }
@@ -181,4 +208,3 @@
 </script>
 </body>
 </html>
-
