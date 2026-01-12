@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Guarnições 1º BBM - 09/01/2026</title>
+    <title>Gestão de Guarnições 1º BBM - 12/01/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,52 +31,51 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* Card Fixo com Efeito de Zoom */
+        /* Card Fixo com Preenchimento Total e Zoom */
         .guarnicao-card {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100%;
+            width: 100%;
         }
         .guarnicao-card:hover {
-            transform: scale(1.08);
-            z-index: 50;
+            transform: scale(1.05) translateY(-5px);
+            z-index: 40;
             border-color: #FF8C00;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
-        .guarnicao-card .extra-info {
+
+        .extra-info {
             max-height: 0;
             opacity: 0;
-            transition: all 0.4s ease;
-            background: rgba(255, 140, 0, 0.1);
+            transition: all 0.3s ease;
+            background: rgba(255, 140, 0, 0.2);
             text-align: center;
             font-size: 10px;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
         }
         .guarnicao-card:hover .extra-info {
             max-height: 30px;
             opacity: 1;
-            padding: 5px 0;
+            padding: 4px 0;
         }
 
-        /* Tooltip ajustado para aparecer sempre à frente */
+        /* Tooltip Resumo - Z-Index Superior */
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
             background: #000; color: #fff; text-align: left; padding: 12px; border-radius: 8px;
-            width: 250px; z-index: 2000; border: 1px solid #FF8C00; font-size: 11px;
+            width: 260px; z-index: 1000; border: 1px solid #FF8C00; font-size: 11px;
             box-shadow: 0 10px 30px rgba(0,0,0,1); opacity: 0; transition: opacity 0.3s;
             max-height: 250px; overflow-y: auto;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
         
-        .tooltip-list::-webkit-scrollbar { width: 4px; }
-        .tooltip-list::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
         .card-scroll::-webkit-scrollbar { width: 4px; }
         .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
     </style>
@@ -88,18 +87,18 @@
         <div class="container mx-auto px-4 flex justify-between items-center">
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-10">
             <div class="text-center">
-                <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase leading-tight">1º BBM - Porto Alegre</h1>
-                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Escala Operacional - 09/01/2026</p>
+                <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - Porto Alegre</h1>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Escala Operacional - 12/01/2026</p>
             </div>
             <img src="images/brasao_1BBM_PARA_site.png" class="h-10">
         </div>
     </header>
 
-    <main class="py-4 px-4 container mx-auto">
+    <main class="py-4 px-4 w-full">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-6 relative z-50">
             <div class="lg:col-span-3 bg-fire-red/20 border-l-4 border-fire-red p-3 rounded-r-xl flex flex-col justify-center">
                 <span class="text-fire-red font-black text-[9px] uppercase">Prontidão</span>
-                <h2 class="text-base font-black text-white leading-tight">Sexta-feira, 09/01/2026</h2>
+                <h2 class="text-base font-black text-white leading-tight">Segunda-feira, 12/01/2026</h2>
             </div>
 
             <div class="lg:col-span-6 bg-slate-800/80 p-3 rounded-xl border border-white/10">
@@ -113,27 +112,34 @@
             </div>
         </div>
 
-        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4"></div>
+        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 justify-items-stretch"></div>
     </main>
 </div>
 
 <script>
+    // Dados extraídos da Escala 4.pdf (12/01/2026)
     const guarnicoesData = {
-        "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP ALESSANDRA"}, {f: "COV", n: "SD HOLSBACK"}], t: "24h" }],
-        "AÇORIANOS": [{ vtr: "ABT-1364", mil: [{f: "CMT GU", n: "1º SGT DELAVECHIA"}, {f: "COV", n: "SD MUNDEL"}, {f: "LD", n: "SD PIRES"}], t: "24h" }],
-        "TERESÓPOLIS": [{ vtr: "ABT-0594", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LD", n: "SD TEMP SPERLING"}], t: "24h" }],
-        "ASSUNÇÃO": [{ vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT LEANDRO"}, {f: "LD", n: "SD PORCELIS"}, {f: "COV", n: "SD TEMP PINTO"}], t: "24h" }],
-        "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "2º SGT SAUL"}, {f: "LD", n: "SD DA SILVA"}, {f: "LE", n: "SD FRANCIS"}, {f: "COV", n: "SD TEMP DOTTA"}], t: "24h" }],
+        "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP PELLEGRINI"}, {f: "COV", n: "SD LUIGI"}], t: "24h" }],
+        "AÇORIANOS": [
+            { vtr: "ABT-1364", mil: [{f: "CMT GU", n: "1º SGT PME ARAGÃO"}, {f: "COV", n: "2º SGT PESSOTA"}, {f: "LD", n: "SD PIRES"}], t: "24h" },
+            { vtr: "AEM-0482", mil: [{f: "COV", n: "SD BOTTINI"}], t: "24h" }
+        ],
+        "TERESÓPOLIS": [
+            { vtr: "ABT-0594", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "2º SGT BEN-HUR"}, {f: "LD", n: "SD TEMP CARDOSO"}], t: "24h" },
+            { vtr: "AR-0766", mil: [{f: "CMT GU", n: "SD DORNELES"}, {f: "COV", n: "SD SANTOS"}], t: "24h" }
+        ],
+        "ASSUNÇÃO": [{ vtr: "ABT-0596", mil: [{f: "CMT GU", n: "SD DIEIQUE"}, {f: "COV", n: "SD PETER"}, {f: "LD", n: "SD PORCELIS"}], t: "24h" }],
+        "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "2º SGT SAUL"}, {f: "COV", n: "SD TEMP DOTTA"}, {f: "LD", n: "SD FRANCIS"}, {f: "AUX", n: "SD KINGESKI"}], t: "24h" }],
         "RESTINGA": [{ vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV", n: "1º SGT RONALDO"}, {f: "LD", n: "SD TEMP VOLZ"}], t: "24h" }],
-        "BELÉM NOVO": [{ vtr: "ABT-0599", mil: [{f: "CMT 08-20h", n: "SD COSME"}, {f: "COV", n: "SD MAURÍCIO"}, {f: "LD 08-20h", n: "SD TEMP FILIPE"}, {f: "CMT 20-08h", n: "2º SGT MENDES"}, {f: "LE 20-08h", n: "SD COSME"}], t: "24h" }],
-        "PASSO D'AREIA": [{ vtr: "ABT-0600", mil: [{f: "CMT GU", n: "1º SGT MATHEUS"}, {f: "COV", n: "2º SGT FABRICIO"}, {f: "LD", n: "SD THIAGO"}], t: "24h" }],
-        "PARTENON": [{ vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD BATISTA"}, {f: "COV", n: "2º SGT BECKER"}, {f: "LD", n: "SD JULIAN"}], t: "24h" }],
-        "CANIL / BBS": [{ vtr: "ABC-10647", mil: [{f: "CINO", n: "2º SGT TRINDADE"}, {f: "CINO", n: "SD BERTAZZO"}], t: "24h" }],
-        "AQUÁTICA / BBS": [{ vtr: "EABS-08", mil: [{f: "CMT GU", n: "SD BICALHO"}, {f: "COND", n: "SD ROBERTO"}], t: "24h" }],
-        "ESPEC / CCOB": [
-            { vtr: "ATP-1190", mil: [{f: "CMT", n: "2º SGT MENDONÇA"}, {f: "MERG", n: "SD BONAZZA"}, {f: "MERG", n: "SD MATTE"}], t: "12h" },
-            { vtr: "CCOB/COBOM", mil: [{f: "CCOB", n: "SD NATASCHA"}, {f: "COBOM", n: "1º SGT RIBEIRO"}, {f: "COBOM", n: "2º SGT BARBARA"}], t: "12h" }
-        ]
+        "BELÉM NOVO": [{ vtr: "ABT-0599", mil: [{f: "CMT (08-20h)", n: "SD DETONI"}, {f: "COV (08-20h)", n: "SD MARTINEZ"}, {f: "CMT (20-08h)", n: "2º SGT MENDES"}, {f: "COV (20-08h)", n: "SD MAURÍCIO"}, {f: "LD", n: "SD COSME"}], t: "24h" }],
+        "PASSO D'AREIA": [{ vtr: "ABT-0600", mil: [{f: "CMT GU", n: "SD PEDRO"}, {f: "COV", n: "2º SGT FABRICIO"}, {f: "LE", n: "SD ADAM"}, {f: "LD", n: "SD EIDER"}], t: "24h" }],
+        "PARTENON": [{ vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD BATISTA"}, {f: "COV", n: "2º SGT BECKER"}, {f: "LD", n: "SD CABRAL"}, {f: "LE", n: "SD JULIAN"}], t: "24h" }],
+        "CANIL / BBS": [{ vtr: "ABC-792", mil: [{f: "CINO", n: "SD BERTAZZO"}, {f: "CINO", n: "SD LOPES"}], t: "24h" }],
+        "ESPECIALIZADAS": [
+            { vtr: "ATP-1190 (MERG)", mil: [{f: "CMT", n: "2º SGT ADRIANO"}, {f: "MERG", n: "SD LOURIVAL"}, {f: "MERG", n: "SD VINÍCIUS"}], t: "12h" },
+            { vtr: "AQUÁTICA", mil: [{f: "CMT GU", n: "SD BICALHO"}, {f: "COND", n: "SD ROBERTO"}], t: "24h" }
+        ],
+        "OPERAÇÕES": [{ vtr: "CCOB/COBOM", mil: [{f: "CCOB", n: "SD MUNHOZ"}, {f: "COBOM", n: "SD CORREA"}], t: "24h" }]
     };
 
     function processarEfetivo() {
@@ -152,7 +158,7 @@
             ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
             ${renderStat('SD', s.sd.length, 'text-blue-400', s.sd)}
-            ${renderStat('TOTAL', s.total, 'text-white bg-white/10', ['Total Efetivo Escalado'])}
+            ${renderStat('TOTAL', s.total, 'text-white bg-white/10', ['Efetivo Total Escalado'])}
         `;
         document.getElementById('stats-meios').innerHTML = `
             ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
@@ -189,12 +195,12 @@
             `).join('');
 
             card.innerHTML = `
-                <div class="extra-info">Status: Prontidão Operacional</div>
-                <div class="p-3 border-b border-white/10 flex flex-col items-center bg-slate-800/50">
+                <div class="extra-info">PRONTIDÃO 1º BBM</div>
+                <div class="p-3 border-b border-white/10 flex flex-col items-center bg-slate-800/40">
                     <div class="bg-slate-700 w-12 h-12 rounded-full flex items-center justify-center mb-2 border border-white/10 overflow-hidden shadow-inner">
-                        ${secao.includes("OFICIAL") ? '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>' : '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-10 h-10 object-contain">'}
+                        ${secao.includes("OFICIAL") ? '<i class="fas fa-star text-bombeiros-yellow text-2xl"></i>' : '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-10 h-10 object-contain">'}
                     </div>
-                    <h3 class="text-[11px] font-black uppercase tracking-tighter leading-tight text-center">${secao}</h3>
+                    <h3 class="text-[10px] font-black uppercase tracking-tighter leading-tight text-center">${secao}</h3>
                     <span class="text-[8px] text-gray-400 font-normal italic">(${vtrs})</span>
                 </div>
                 <div class="card-scroll overflow-y-auto p-2 flex-grow">
@@ -208,4 +214,3 @@
 </script>
 </body>
 </html>
-
