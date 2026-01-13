@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento de Ocorrências 1º BBM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cbm-red': '#DC2626',
+                        'cbm-yellow': '#FFD700',
+                        'cbm-orange': '#FF8C00',
+                        'dark-bg': '#0f172a',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
+        .card-oc {
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+        }
+        .card-oc:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        
+        /* Cores por tipo */
+        .tipo-incendio { border-color: #DC2626; background: linear-gradient(90deg, rgba(220, 38, 38, 0.1) 0%, rgba(15, 23, 42, 1) 100%); }
+        .tipo-resgate { border-color: #FF8C00; background: linear-gradient(90deg, rgba(255, 140, 0, 0.1) 0%, rgba(15, 23, 42, 1) 100%); }
+        .tipo-padrao { border-color: #3B82F6; background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, rgba(15, 23, 42, 1) 100%); }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #FFD700;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <header class="mb-8 flex justify-between items-center border-b border-gray-700 pb-4">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase">
+                <i class="fas fa-fire-extinguisher text-cbm-red mr-2"></i> Ocorrências em Andamento
+            </h1>
+            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">1º BBM - Porto Alegre</p>
+        </div>
+        <button onclick="fetchOcorrencias()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition flex items-center gap-2">
+            <i class="fas fa-sync-alt"></i> Atualizar
+        </button>
+    </header>
+
+    <main>
+        <div id="loading" class="flex flex-col items-center justify-center py-20">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-gray-500 animate-pulse">Buscando dados do CBM/RS...</p>
+        </div>
+
+        <div id="oc-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 hidden">
+            </div>
+
+        <div id="empty-state" class="hidden text-center py-20 text-gray-500">
+            <i class="fas fa-check-circle text-4xl mb-3 text-green-500"></i>
+            <p>Nenhuma ocorrência ativa em Porto Alegre no momento.</p>
+        </div>
+        
+        <div class="text-center mt-8 text-xs text-gray-600 font-mono">
+            Dados fornecidos por e193.cbm.rs.gov.br | Atualizado em: <span id="last-update">--:--</span>
+        </div>
+    </main>
+
+<script>
+    // ------------------------------------------------------------------
+    // IMPORTANTE: COLE AQUI A URL QUE VOCÊ COPIOU DO GOOGLE APPS SCRIPT
+    // ------------------------------------------------------------------
+    const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
+
+    async function fetchOcorrencias() {
+        const grid = document.getElementById('oc-grid');
+        const loading = document.getElementById('loading');
+        const empty = document.getElementById('empty-state');
+        const btnIcon = document.querySelector('.fa-sync-alt');
+
+        // UI Updates
+        grid.classList.add('hidden');
+        empty.classList.add('hidden');
+        loading.classList.remove('hidden');
+        btnIcon.classList.add('fa-spin');
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            
+            loading.classList.add('hidden');
+            btnIcon.classList.remove('fa-spin');
+
+            if (data.error) {
+                alert("Erro ao buscar dados: " + data.error);
+                return;
+            }
+
+            if (data.length === 0) {
+                empty.classList.remove('hidden');
+            } else {
+                grid.classList.remove('hidden');
+                renderCards(data);
+            }
+            
+            // Data atual
+            const now = new Date();
+            document.getElementById('last-update').innerText = now.toLocaleTimeString();
+
+        } catch (error) {
+            console.error(error);
+            loading.innerHTML = `<p class="text-red-500">Erro de conexão. Verifique a URL da API.</p>`;
+        }
+    }
+
+    function renderCards(lista) {
+        const grid = document.getElementById('oc-grid');
+        grid.innerHTML = '';
+
+        lista.forEach(oc => {
+            // Define estilo baseado no tipo
+            let tipoClass = 'tipo-padrao';
+            let icon = 'fa-bell';
+            
+            const tipoUpper = oc.tipo.toUpperCase();
+            if (tipoUpper.includes('INCÊNDIO') || tipoUpper.includes('FOGO')) {
+                tipoClass = 'tipo-incendio';
+                icon = 'fa-fire';
+            } else if (tipoUpper.includes('PRÉ-HOSPITALAR') || tipoUpper.includes('RESGATE') || tipoUpper.includes('TRÂNSITO')) {
+                tipoClass = 'tipo-resgate';
+                icon = 'fa-ambulance';
+            }
+
+            const card = document.createElement('div');
+            card.className = `card-oc bg-slate-800 rounded-lg p-4 relative overflow-hidden ${tipoClass}`;
+            
+            // Monta lista de viaturas
+            let vtrsHtml = '';
+            if (oc.viaturas.length > 0) {
+                vtrsHtml = `<div class="mt-4 pt-3 border-t border-gray-700/50">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-2">Meios Empregados:</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${oc.viaturas.map(v => `
+                            <span class="bg-black/40 border border-white/10 px-2 py-1 rounded text-[10px] font-mono text-cbm-yellow">
+                                ${v.prefixo} <span class="text-gray-500">|</span> ${v.status.replace('Desl.:', 'Desl').replace('Cheg.:', 'Local')}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] font-bold text-gray-400 tracking-wider">
+                        #${oc.id}
+                    </span>
+                    <span class="text-[10px] font-bold text-white flex items-center gap-1">
+                        <i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1]}
+                    </span>
+                </div>
+                
+                <h3 class="text-lg font-black text-white leading-tight uppercase mb-1 flex items-center gap-2">
+                    <i class="fas ${icon}"></i> ${oc.tipo}
+                </h3>
+                
+                <div class="text-sm text-gray-300 font-medium mt-2">
+                    <i class="fas fa-map-marker-alt text-cbm-red mr-1"></i> ${oc.endereco}
+                </div>
+                <div class="text-xs text-gray-500 font-bold uppercase mt-1 ml-4">
+                    ${oc.cidade}
+                </div>
+
+                ${vtrsHtml}
+
+                <div class="absolute top-0 right-0 p-1">
+                     <span class="flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Carregar ao iniciar
+    fetchOcorrencias();
+    
+    // Atualizar a cada 60 segundos automaticamente
+    setInterval(fetchOcorrencias, 60000);
+</script>
+</body>
+</html>
