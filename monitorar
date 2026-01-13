@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento 1º BBM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: white; font-family: sans-serif; }
+        .card-oc { border-left: 5px solid #475569; transition: transform 0.2s; }
+        .card-oc:hover { transform: translateY(-2px); }
+        .tipo-fogo { border-color: #ef4444; background: linear-gradient(to right, rgba(239,68,68,0.1), rgba(15,23,42,1)); }
+        .tipo-resgate { border-color: #f59e0b; background: linear-gradient(to right, rgba(245,158,11,0.1), rgba(15,23,42,1)); }
+    </style>
+</head>
+<body class="p-4">
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
+    </script>
+
+    <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+        <div>
+            <h1 class="text-2xl font-black text-white uppercase"><i class="fas fa-fire-extinguisher text-red-500"></i> Ocorrências POA</h1>
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Tempo Real - 1º BBM</p>
+        </div>
+        <div id="status" class="text-xs font-mono text-gray-500">Aguardando...</div>
+    </header>
+
+    <div id="loading" class="text-center py-10">
+        <i class="fas fa-spinner fa-spin text-4xl text-yellow-500 mb-2"></i>
+        <p class="animate-pulse text-gray-400">Consultando e193...</p>
+    </div>
+
+    <div id="grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 hidden"></div>
+    <div id="vazio" class="hidden text-center py-10 text-gray-500">Nenhuma ocorrência ativa em Porto Alegre.</div>
+
+    <script>
+        async function carregar() {
+            if(API_URL.includes("COLE_AQUI")) {
+                alert("Gustavo, você esqueceu de colar o link do Google no código!");
+                return;
+            }
+            
+            try {
+                const req = await fetch(API_URL);
+                const dados = await req.json();
+                
+                document.getElementById('loading').classList.add('hidden');
+                const grid = document.getElementById('grid');
+                const vazio = document.getElementById('vazio');
+                grid.innerHTML = '';
+                
+                if(!dados || dados.length === 0) {
+                    vazio.classList.remove('hidden');
+                    grid.classList.add('hidden');
+                } else {
+                    vazio.classList.add('hidden');
+                    grid.classList.remove('hidden');
+                    
+                    dados.forEach(oc => {
+                        let style = '';
+                        let icon = 'fa-bell';
+                        if(oc.tipo.includes('INCÊNDIO')) { style = 'tipo-fogo'; icon = 'fa-fire'; }
+                        else if(oc.tipo.includes('HOSPITALAR') || oc.tipo.includes('TRÂNSITO')) { style = 'tipo-resgate'; icon = 'fa-ambulance'; }
+                        
+                        let vtrs = oc.viaturas.map(v => 
+                            `<span class="bg-black/50 border border-white/10 px-2 py-1 rounded text-xs text-yellow-400 font-mono mr-1 mb-1 inline-block">${v.prefixo}</span>`
+                        ).join('');
+
+                        grid.innerHTML += `
+                            <div class="card-oc bg-slate-800 rounded p-4 relative ${style}">
+                                <div class="flex justify-between text-xs text-gray-400 font-bold mb-1">
+                                    <span>#${oc.id}</span>
+                                    <span>${oc.dataHora.split(' ')[1]}</span>
+                                </div>
+                                <h2 class="text-lg font-black uppercase leading-tight mb-2"><i class="fas ${icon}"></i> ${oc.tipo}</h2>
+                                <p class="text-sm text-gray-300"><i class="fas fa-map-marker-alt text-red-500"></i> ${oc.endereco}</p>
+                                <p class="text-xs text-gray-500 font-bold uppercase mt-1 mb-3">${oc.cidade}</p>
+                                <div>${vtrs}</div>
+                            </div>
+                        `;
+                    });
+                }
+                document.getElementById('status').innerText = "Atualizado: " + new Date().toLocaleTimeString();
+            } catch(e) {
+                document.getElementById('loading').innerHTML = "<span class='text-red-500'>Erro ao conectar. Verifique o link do Google.</span>";
+            }
+        }
+        carregar();
+        setInterval(carregar, 60000);
+    </script>
+</body>
+</html>
