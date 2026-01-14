@@ -3,45 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoramento 1º BBM</title>
+    <title>Monitoramento Ocorrências - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; }
-        .card-oc { border-left: 5px solid #475569; transition: transform 0.2s; }
-        .card-oc:hover { transform: translateY(-2px); }
-        .tipo-fogo { border-color: #ef4444; background: linear-gradient(to right, rgba(239,68,68,0.1), rgba(15,23,42,1)); }
-        .tipo-resgate { border-color: #f59e0b; background: linear-gradient(to right, rgba(245,158,11,0.1), rgba(15,23,42,1)); }
+        body { background-color: #0f172a; color: white; overflow-x: hidden; }
+        
+        /* Fundo estilo Hero do site de gestão */
+        .hero-background { 
+            background-image: url('https://img.freepik.com/free-photo/firefighters-operation_155003-755.jpg?t=st=1736886000~exp=1736889600~hmac=fake_url_placeholder'); /* Coloquei uma imagem genérica de fundo ou use a sua local 'images/background.jpg' */
+            background-size: cover; background-position: center; background-attachment: fixed; position: relative; 
+        }
+        .hero-background::before { 
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.90) 100%); z-index: 0; 
+        }
+        .content-wrapper { position: relative; z-index: 10; }
+
+        /* Estilo do Card Unificado */
+        .card-oc { 
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+        }
+        .card-oc:hover { 
+            transform: scale(1.02) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        /* Cores Específicas por Tipo */
+        .border-fogo { border-left: 6px solid #DC2626; }
+        .text-fogo { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
+        
+        .border-resgate { border-left: 6px solid #FFD700; }
+        .text-resgate { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+
+        .border-padrao { border-left: 6px solid #94a3b8; }
+        .text-padrao { color: #94a3b8; }
     </style>
 </head>
-<body class="p-4">
+<body class="hero-background min-h-screen font-sans">
+    
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
     </script>
 
-    <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-        <div>
-            <h1 class="text-2xl font-black text-white uppercase"><i class="fas fa-fire-extinguisher text-red-500"></i> Ocorrências POA</h1>
-            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Tempo Real - 1º BBM</p>
+    <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
+        
+        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-4 md:gap-0">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+            </div>
+
+            <div class="text-center px-4">
+                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
+                    Ocorrências em Andamento
+                </h1>
+                <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-2 uppercase tracking-widest">
+                    Porto Alegre - 1º BBM
+                </h2>
+                <div id="status" class="text-xs font-mono text-gray-400 mt-2 bg-black/30 inline-block px-3 py-1 rounded-full">
+                    Aguardando atualização...
+                </div>
+            </div>
+
+            <div class="flex-shrink-0">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
+            </div>
+        </header>
+
+        <div id="loading" class="text-center py-20">
+            <i class="fas fa-circle-notch fa-spin text-5xl text-bombeiros-orange mb-4"></i>
+            <p class="animate-pulse text-gray-300 font-bold uppercase tracking-widest">Sincronizando com e193...</p>
         </div>
-        <div id="status" class="text-xs font-mono text-gray-500">Aguardando...</div>
-    </header>
 
-    <div id="loading" class="text-center py-10">
-        <i class="fas fa-spinner fa-spin text-4xl text-yellow-500 mb-2"></i>
-        <p class="animate-pulse text-gray-400">Consultando e193...</p>
+        <div id="vazio" class="hidden text-center py-20 bg-slate-800/50 rounded-xl border border-white/5 w-full max-w-2xl backdrop-blur-sm">
+            <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+            <h3 class="text-2xl font-bold text-white">Sem Ocorrências Ativas</h3>
+            <p class="text-gray-400 mt-2">Nenhuma ocorrência em andamento no momento.</p>
+        </div>
+
+        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-3xl hidden pb-10">
+            </div>
+
     </div>
-
-    <div id="grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 hidden"></div>
-    <div id="vazio" class="hidden text-center py-10 text-gray-500">Nenhuma ocorrência ativa em Porto Alegre.</div>
 
     <script>
         async function carregar() {
-            if(API_URL.includes("COLE_AQUI")) {
-                alert("Gustavo, você esqueceu de colar o link do Google no código!");
-                return;
-            }
-            
             try {
                 const req = await fetch(API_URL);
                 const dados = await req.json();
@@ -49,6 +118,8 @@
                 document.getElementById('loading').classList.add('hidden');
                 const grid = document.getElementById('grid');
                 const vazio = document.getElementById('vazio');
+                const statusDiv = document.getElementById('status');
+                
                 grid.innerHTML = '';
                 
                 if(!dados || dados.length === 0) {
@@ -59,35 +130,104 @@
                     grid.classList.remove('hidden');
                     
                     dados.forEach(oc => {
-                        let style = '';
+                        // Definição de Estilos baseados no tipo
+                        let borderClass = 'border-padrao';
+                        let textClass = 'text-padrao';
                         let icon = 'fa-bell';
-                        if(oc.tipo.includes('INCÊNDIO')) { style = 'tipo-fogo'; icon = 'fa-fire'; }
-                        else if(oc.tipo.includes('HOSPITALAR') || oc.tipo.includes('TRÂNSITO')) { style = 'tipo-resgate'; icon = 'fa-ambulance'; }
                         
-                        let vtrs = oc.viaturas.map(v => 
-                            `<span class="bg-black/50 border border-white/10 px-2 py-1 rounded text-xs text-yellow-400 font-mono mr-1 mb-1 inline-block">${v.prefixo}</span>`
-                        ).join('');
+                        if(oc.tipo && oc.tipo.toUpperCase().includes('INCÊNDIO')) { 
+                            borderClass = 'border-fogo'; 
+                            textClass = 'text-fogo'; 
+                            icon = 'fa-fire'; 
+                        }
+                        else if(oc.tipo && (oc.tipo.toUpperCase().includes('HOSPITALAR') || oc.tipo.toUpperCase().includes('TRÂNSITO') || oc.tipo.toUpperCase().includes('BUSCA'))) { 
+                            borderClass = 'border-resgate'; 
+                            textClass = 'text-resgate'; 
+                            icon = 'fa-ambulance'; 
+                        }
+                        
+                        // Formatação das Viaturas
+                        let vtrs = 'Sem viaturas';
+                        if(oc.viaturas && oc.viaturas.length > 0) {
+                            vtrs = oc.viaturas.map(v => 
+                                `<span class="bg-bombeiros-orange/20 border border-bombeiros-orange/50 px-3 py-1 rounded text-sm text-bombeiros-orange font-bold font-mono inline-block shadow-sm">
+                                    <i class="fas fa-truck-moving mr-1"></i> ${v.prefixo}
+                                </span>`
+                            ).join('');
+                        }
 
+                        // Verificação de segurança para o campo Pelotão
+                        // Tenta ler oc.pelotao, se não existir tenta extrair de algum lugar ou deixa vazio
+                        let pelotaoHtml = '';
+                        if(oc.pelotao) {
+                             pelotaoHtml = `<div class="mt-2 text-gray-400 text-xs font-bold uppercase tracking-wider border-t border-white/10 pt-2">
+                                                <i class="fas fa-shield-alt text-bombeiros-yellow mr-1"></i> ${oc.pelotao}
+                                            </div>`;
+                        } else {
+                            // Se a API ainda não tiver o campo "pelotao", pode-se usar um placeholder ou remover este bloco
+                            pelotaoHtml = `<div class="mt-2 text-gray-500 text-xs font-bold uppercase tracking-wider border-t border-white/10 pt-2">
+                                                <i class="fas fa-shield-alt mr-1"></i> Pelotão não informado
+                                           </div>`;
+                        }
+
+                        // HTML do Card
                         grid.innerHTML += `
-                            <div class="card-oc bg-slate-800 rounded p-4 relative ${style}">
-                                <div class="flex justify-between text-xs text-gray-400 font-bold mb-1">
-                                    <span>#${oc.id}</span>
-                                    <span>${oc.dataHora.split(' ')[1]}</span>
+                            <div class="card-oc ${borderClass} p-6 relative">
+                                
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="bg-black/40 px-3 py-1 rounded text-xs text-gray-400 font-mono font-bold tracking-widest border border-white/5">
+                                        #${oc.id}
+                                    </span>
+                                    <span class="text-sm font-bold text-gray-300 flex items-center">
+                                        <i class="far fa-clock mr-2 text-bombeiros-orange"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}
+                                    </span>
                                 </div>
-                                <h2 class="text-lg font-black uppercase leading-tight mb-2"><i class="fas ${icon}"></i> ${oc.tipo}</h2>
-                                <p class="text-sm text-gray-300"><i class="fas fa-map-marker-alt text-red-500"></i> ${oc.endereco}</p>
-                                <p class="text-xs text-gray-500 font-bold uppercase mt-1 mb-3">${oc.cidade}</p>
-                                <div>${vtrs}</div>
+
+                                <h2 class="text-2xl md:text-3xl font-black uppercase leading-none mb-3 ${textClass}">
+                                    <i class="fas ${icon} mr-2"></i> ${oc.tipo}
+                                </h2>
+
+                                <div class="mb-4">
+                                    <p class="text-lg text-white font-medium leading-tight">
+                                        <i class="fas fa-map-marker-alt text-red-500 mr-2"></i> ${oc.endereco}
+                                    </p>
+                                    <p class="text-sm text-gray-400 font-bold uppercase ml-6 mt-1">${oc.cidade}</p>
+                                </div>
+
+                                <div class="bg-black/20 rounded-lg p-3 border border-white/5">
+                                    <div class="mb-2 text-xs text-gray-500 uppercase font-bold">Viaturas Empenhadas:</div>
+                                    <div class="flex flex-wrap gap-2 mb-2">
+                                        ${vtrs}
+                                    </div>
+                                    ${pelotaoHtml}
+                                </div>
+
                             </div>
                         `;
                     });
                 }
-                document.getElementById('status').innerText = "Atualizado: " + new Date().toLocaleTimeString();
+                
+                // Atualiza relógio
+                const agora = new Date();
+                statusDiv.innerHTML = `<i class="fas fa-sync-alt mr-1"></i> Atualizado: ${agora.toLocaleTimeString()}`;
+                statusDiv.classList.remove('text-red-500');
+                statusDiv.classList.add('text-green-400');
+
             } catch(e) {
-                document.getElementById('loading').innerHTML = "<span class='text-red-500'>Erro ao conectar. Verifique o link do Google.</span>";
+                console.error(e);
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-red-500 bg-red-900/20 p-4 rounded-lg border border-red-500/50 inline-block">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>
+                        Falha na conexão com a base de dados.
+                    </div>`;
+                document.getElementById('status').innerText = "Erro de Conexão";
+                document.getElementById('status').classList.add('text-red-500');
             }
         }
+
+        // Inicia
         carregar();
+        // Atualiza a cada 60 segundos
         setInterval(carregar, 60000);
     </script>
 </body>
