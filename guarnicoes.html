@@ -31,9 +31,9 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* CARD FIXO COM ZOOM E BORDA */
+        /* CARD COM DESIGN PREMIUM */
         .guarnicao-card {
-            background: rgba(30, 41, 59, 0.95);
+            background: rgba(30, 41, 59, 0.95); /* Fundo base */
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
@@ -46,17 +46,15 @@
             transform: scale(1.03);
             z-index: 40;
             border-color: #FF8C00;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
         }
 
-        /* BARRA DE STATUS NO TOPO DO CARD */
         .status-bar {
             height: 4px;
             background: linear-gradient(to right, #FF8C00, #FFD700);
             width: 100%;
         }
 
-        /* TOOLTIPS DO RESUMO */
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
@@ -112,7 +110,6 @@
 </div>
 
 <script>
-    // DADOS 15/01/2026 - Atualizados
     const guarnicoesData = {
         "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "OFICIAL SV", n: "A CONFIRMAR"}, {f: "MOT. DIA", n: "A CONFIRMAR"}], t: "24h" }],
         "AÇORIANOS": [
@@ -155,7 +152,6 @@
             });
         });
         
-        // Efetivo - COR TOTAL ALTERADA PARA VERDE LIMÃO
         document.getElementById('stats-militares').innerHTML = `
             ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
@@ -163,7 +159,6 @@
             ${renderStat('TOTAL', s.total, 'text-lime-400', ['Efetivo Total Escalado'])}
         `;
         
-        // Meios - COR AR ALTERADA PARA VERMELHO
         document.getElementById('stats-meios').innerHTML = `
             ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
             ${renderStat('AR', 1, 'text-red-500', ['AR-0766'])}
@@ -186,13 +181,13 @@
             const card = document.createElement('div');
             card.className = "guarnicao-card shadow-xl";
             
-            // Definição de Ícones
             let iconHtml = '';
             if(secao.includes("OFICIAL")) iconHtml = '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>';
             else if(secao.includes("COBOM")) iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>';
             else if(secao.includes("AQUÁTICA")) iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>';
             else if(secao.includes("CANIL")) iconHtml = '<i class="fas fa-dog text-amber-600 text-3xl"></i>';
-            else iconHtml = '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-12 h-12 object-contain">';
+            // AQUI ESTÁ A MÁGICA: mix-blend-multiply para remover o fundo branco
+            else iconHtml = '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-12 h-12 object-contain mix-blend-multiply filter contrast-125">';
 
             let guarnicaoHtml = guarnicoesData[secao].map(v => `
                 <div class="px-3 mb-3">
@@ -209,7 +204,7 @@
             card.innerHTML = `
                 <div class="status-bar"></div>
                 <div class="p-4 border-b border-white/10 flex flex-col items-center bg-slate-800/40">
-                    <div class="bg-slate-700 w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 border-white/10 overflow-hidden shadow-inner">
+                    <div class="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 border-white/10 overflow-hidden shadow-inner">
                         ${iconHtml}
                     </div>
                     <h3 class="text-sm font-black uppercase tracking-tight leading-tight text-center">${secao}</h3>
