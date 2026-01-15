@@ -89,12 +89,10 @@
 <body class="hero-background min-h-screen font-sans">
     
     <script>
-        // ATENÇÃO: Certifique-se de que este link da API retorna TODAS as ocorrências do estado.
-        // Se o seu script Google estiver filtrando apenas "PORTO ALEGRE", você precisará de um segundo link
-        // ou editar o script Google para aceitar um parâmetro (ex: ?cidade=todas).
-        const API_URL = "https://script.google.com/macros/s/AKfycbwgUAojOAy3nEPytUzOzTwITY18D471b3U7q0BE_lQNfkvvCJTtVBKIDwC3Q8vZ3bqU3A/exec"; 
-        
-        // --- FROTA MAP REMOVIDO PARA VERSÃO ESTADUAL ---
+        // =========================================================================
+        // ATENÇÃO: COLE AQUI O LINK QUE TERMINA EM /exec (GERADO NO PASSO 2)
+        // =========================================================================
+        const API_URL = "https://script.google.com/macros/s/AKfycbwu5DLx5QaUh2szGcXBll5qHIsZrNQrI1vIdBZhQezEq0Y9tJ5RLbeXjRReOLENT1a81Q/exec"; 
     </script>
 
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
@@ -123,7 +121,7 @@
                 </div>
             </div>
 
-            </header>
+        </header>
 
         <div id="loading" class="text-center py-20">
             <i class="fas fa-circle-notch fa-spin text-5xl text-bombeiros-orange mb-4"></i>
@@ -141,12 +139,9 @@
     </div>
 
     <script>
-        // --- FUNÇÕES AUXILIARES DE LOGICA ---
-
         function analisarTipo(tipoRaw) {
             const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
             
-            // Ordem de Prioridade e Cores
             if(tipo.includes("INCÊNDIO")) return { p: 1, cor: 'color-incendio', border: 'border-incendio', icon: 'fa-fire' };
             if(tipo.includes("SALVAMENTO") || tipo.includes("BUSCA") || tipo.includes("RESGATE")) return { p: 2, cor: 'color-resgate', border: 'border-resgate', icon: 'fa-life-ring' };
             if(tipo.includes("HOSPITALAR") || tipo.includes("APH")) return { p: 3, cor: 'color-aph', border: 'border-aph', icon: 'fa-ambulance' };
@@ -159,10 +154,12 @@
             return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
         }
 
-        // Função descobrirPelotao REMOVIDA na versão estadual
-
         async function carregar() {
             try {
+                if (API_URL.includes("edit") || API_URL.includes("COLE_O_SEU_LINK")) {
+                   throw new Error("Link da API inválido. Use o link /exec");
+                }
+
                 const req = await fetch(API_URL);
                 const dadosRaw = await req.json();
                 
@@ -171,6 +168,11 @@
                 const vazio = document.getElementById('vazio');
                 const statusDiv = document.getElementById('status');
                 
+                // Se o JSON retornou um erro do script
+                if (dadosRaw.length === 1 && dadosRaw[0].id === "ERRO") {
+                     throw new Error(dadosRaw[0].endereco);
+                }
+
                 grid.innerHTML = '';
                 
                 if(!dadosRaw || dadosRaw.length === 0) {
@@ -189,9 +191,8 @@
 
                     dadosOrdenados.forEach(oc => {
                         const style = analisarTipo(oc.tipo);
-                        // Lógica de pelotão removida
 
-                        let vtrsHtml = 'Aguardando';
+                        let vtrsHtml = '<span class="text-xs text-gray-500 font-mono">AGUARDANDO EMPENHO</span>';
                         if(oc.viaturas && oc.viaturas.length > 0) {
                             vtrsHtml = oc.viaturas.map(v => 
                                 `<span class="bg-black/40 border border-white/10 px-2 py-1 rounded text-sm text-white font-mono font-bold mr-1 mb-1 inline-block">
@@ -200,9 +201,8 @@
                             ).join('');
                         }
 
-                        // CRIAÇÃO DO LINK GOOGLE MAPS
                         const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
-                        const mapsUrl = `http://maps.google.com/?q=${mapsQuery}`;
+                        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
                         grid.innerHTML += `
                             <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para ver no Google Maps">
@@ -230,7 +230,7 @@
                                             <div class="flex flex-wrap justify-end gap-1 mb-2">
                                                 ${vtrsHtml}
                                             </div>
-                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -249,7 +249,8 @@
 
             } catch(e) {
                 console.error(e);
-                document.getElementById('status').innerHTML = "<span class='text-red-500'>Falha de Conexão</span>";
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = `<span class='text-red-500 font-bold bg-black/50 px-2 py-1 rounded'><i class="fas fa-exclamation-triangle"></i> ERRO: ${e.message}</span>`;
             }
         }
 
