@@ -154,10 +154,7 @@
             return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
         }
 
-        async function carregar() {
-            try {
-                if (API_URL.includes("edit") || API_URL.includes("https://script.google.com/macros/s/AKfycbw4RdcqY7bu9lT2sGs1cE2hhgyyi0vXSDXJIbqOWqwbIVnOd7Sqd0aGnbOngUF88vspFg/exec")) {
-                   throw new Error("Link da API inválido. Use o link /exec");
+    
                 }
 
                 const req = await fetch(API_URL);
