@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoramento Ocorrências - 1º BBM</title>
+    <title>Monitoramento 1º BBM - Tempo Real</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,18 +26,16 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; }
         
-        /* Fundo estilo Hero do site de gestão */
         .hero-background { 
-            background-image: url('https://img.freepik.com/free-photo/firefighters-operation_155003-755.jpg?t=st=1736886000~exp=1736889600~hmac=fake_url_placeholder'); /* Coloquei uma imagem genérica de fundo ou use a sua local 'images/background.jpg' */
+            background-image: url('https://img.freepik.com/free-photo/firefighters-operation_155003-755.jpg?t=st=1736886000~exp=1736889600~hmac=fake_url_placeholder'); 
             background-size: cover; background-position: center; background-attachment: fixed; position: relative; 
         }
         .hero-background::before { 
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.90) 100%); z-index: 0; 
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%); z-index: 0; 
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* Estilo do Card Unificado */
         .card-oc { 
             background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -48,43 +46,102 @@
         .card-oc:hover { 
             transform: scale(1.02) translateY(-5px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            border-color: rgba(255, 255, 255, 0.3);
             background: rgba(30, 41, 59, 0.95);
+            z-index: 50;
         }
 
-        /* Cores Específicas por Tipo */
-        .border-fogo { border-left: 6px solid #DC2626; }
-        .text-fogo { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.3); }
-        
-        .border-resgate { border-left: 6px solid #FFD700; }
-        .text-resgate { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        /* Classes de Cores Solicitadas */
+        .color-incendio { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); } /* Amarelo */
+        .border-incendio { border-left: 6px solid #FFD700; }
 
-        .border-padrao { border-left: 6px solid #94a3b8; }
-        .text-padrao { color: #94a3b8; }
+        .color-resgate { color: #F97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); } /* Laranja */
+        .border-resgate { border-left: 6px solid #F97316; }
+
+        .color-aph { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.4); } /* Vermelho */
+        .border-aph { border-left: 6px solid #DC2626; }
+
+        .color-arvore { color: #84cc16; } /* Verde Oliva/Lima */
+        .border-arvore { border-left: 6px solid #84cc16; }
+
+        .color-insetos { color: #fde68a; } /* Bege/Amarelo Claro */
+        .border-insetos { border-left: 6px solid #fde68a; }
+
+        .color-prev { color: #d1d5db; } /* Cinza Claro */
+        .border-prev { border-left: 6px solid #d1d5db; }
+
+        .color-hazmat { color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } /* Branco */
+        .border-hazmat { border-left: 6px solid #ffffff; }
+
+        .color-vistoria { color: #38bdf8; } /* Azul Claro */
+        .border-vistoria { border-left: 6px solid #38bdf8; }
+
+        /* Botão Pulsante */
+        .btn-estado {
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            transition: transform 0.2s;
+        }
+        .btn-estado:hover { transform: scale(1.05); }
+
     </style>
 </head>
 <body class="hero-background min-h-screen font-sans">
     
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
+        
+        // --- 1. CONFIGURAÇÃO DA FROTA E PELOTÕES ---
+        // Mapeamento exato conforme solicitado
+        const frotaMap = {
+            "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
+            "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
+            "AT-1590": "PELOTÃO AÇORIANOS", "ATP-0543": "PELOTÃO AÇORIANOS", "ATP-0639": "PELOTÃO AÇORIANOS", 
+            "ATP-0640": "PELOTÃO AÇORIANOS", "ATP-0964": "PELOTÃO AÇORIANOS", "ATP-10666": "PELOTÃO AÇORIANOS", 
+            "ATP-1506": "PELOTÃO AÇORIANOS", "ATP-201": "PELOTÃO AÇORIANOS", "EIN-204": "PELOTÃO AÇORIANOS", 
+            "RRC-99": "PELOTÃO AÇORIANOS",
+            
+            "ABT-0594": "PELOTÃO TERESÓPOLIS", "ATP-10654": "PELOTÃO TERESÓPOLIS", "ATP-1505": "PELOTÃO TERESÓPOLIS",
+            
+            "AR-0766": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)", "AR-0455": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)",
+            
+            "ABT-0596": "PELOTÃO ASSUNÇÃO", "ATP-10650": "PELOTÃO ASSUNÇÃO", "ATP-10667": "PELOTÃO ASSUNÇÃO",
+            
+            "ABT-0598": "PELOTÃO RESTINGA", "ATP-1233": "PELOTÃO RESTINGA", "ATP-9836": "PELOTÃO RESTINGA",
+            
+            "ABT-0599": "PELOTÃO BELÉM NOVO", "ATP-10653": "PELOTÃO BELÉM NOVO", "ATP-1451": "PELOTÃO BELÉM NOVO", 
+            "ATP-3759": "PELOTÃO BELÉM NOVO", "EIN-704": "PELOTÃO BELÉM NOVO",
+            
+            "ABT-0597": "PELOTÃO FLORESTA", "ATP-1235": "PELOTÃO FLORESTA", "ATP-292": "PELOTÃO FLORESTA", 
+            "EIN-701": "PELOTÃO FLORESTA", "ATP-1243": "PELOTÃO FLORESTA",
+            
+            "ABT-0600": "PELOTÃO PASSO D'AREIA",
+            
+            "ABT-1363": "PELOTÃO PARTENON", "ABT-1365": "PELOTÃO PARTENON", "ATP-1452": "PELOTÃO PARTENON"
+        };
     </script>
 
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
-        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-4 md:gap-0">
+        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
             <div class="flex-shrink-0">
                 <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
 
-            <div class="text-center px-4">
+            <div class="text-center px-4 flex-grow">
                 <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
                     Ocorrências em Andamento
                 </h1>
                 <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-2 uppercase tracking-widest">
                     Porto Alegre - 1º BBM
                 </h2>
-                <div id="status" class="text-xs font-mono text-gray-400 mt-2 bg-black/30 inline-block px-3 py-1 rounded-full">
-                    Aguardando atualização...
+                
+                <div class="flex items-center justify-center gap-4 mt-4">
+                    <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                        Iniciando sistema...
+                    </div>
+                    <a href="ocorrencias_estado.html" target="_blank" class="btn-estado px-4 py-1 rounded-full text-xs font-bold uppercase text-white border border-blue-400 flex items-center">
+                        <i class="fas fa-map-marked-alt mr-2"></i> Ver Estado
+                    </a>
                 </div>
             </div>
 
@@ -95,111 +152,127 @@
 
         <div id="loading" class="text-center py-20">
             <i class="fas fa-circle-notch fa-spin text-5xl text-bombeiros-orange mb-4"></i>
-            <p class="animate-pulse text-gray-300 font-bold uppercase tracking-widest">Atualizando Ocorrências...</p>
+            <p class="animate-pulse text-gray-300 font-bold uppercase tracking-widest">Sincronizando Frota...</p>
         </div>
 
         <div id="vazio" class="hidden text-center py-20 bg-slate-800/50 rounded-xl border border-white/5 w-full max-w-2xl backdrop-blur-sm">
             <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
-            <h3 class="text-2xl font-bold text-white">Sem Ocorrências Ativas</h3>
+            <h3 class="text-2xl font-bold text-white">QAP TOTAL</h3>
             <p class="text-gray-400 mt-2">Nenhuma ocorrência em andamento no momento.</p>
         </div>
 
-        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-3xl hidden pb-10">
-            </div>
+        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-10"></div>
 
     </div>
 
     <script>
+        // --- FUNÇÕES AUXILIARES DE LOGICA ---
+
+        // 1. Define Prioridade e Estilo Baseado no Tipo
+        function analisarTipo(tipoRaw) {
+            const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
+            
+            // Ordem de Prioridade e Cores
+            if(tipo.includes("INCÊNDIO")) return { p: 1, cor: 'color-incendio', border: 'border-incendio', icon: 'fa-fire' };
+            if(tipo.includes("SALVAMENTO") || tipo.includes("BUSCA") || tipo.includes("RESGATE")) return { p: 2, cor: 'color-resgate', border: 'border-resgate', icon: 'fa-life-ring' };
+            if(tipo.includes("HOSPITALAR") || tipo.includes("APH")) return { p: 3, cor: 'color-aph', border: 'border-aph', icon: 'fa-ambulance' };
+            if(tipo.includes("ÁRVORE")) return { p: 4, cor: 'color-arvore', border: 'border-arvore', icon: 'fa-tree' };
+            if(tipo.includes("INSETOS") || tipo.includes("ABELHA") || tipo.includes("VESPA")) return { p: 5, cor: 'color-insetos', border: 'border-insetos', icon: 'fa-bug' };
+            if(tipo.includes("PREVENTIVA")) return { p: 6, cor: 'color-prev', border: 'border-prev', icon: 'fa-shield-alt' };
+            if(tipo.includes("PERIGOSOS") || tipo.includes("HAZMAT")) return { p: 7, cor: 'color-hazmat', border: 'border-hazmat', icon: 'fa-skull-crossbones' };
+            if(tipo.includes("VISTORIA")) return { p: 8, cor: 'color-vistoria', border: 'border-vistoria', icon: 'fa-clipboard-check' };
+            
+            // Padrão se não achar nada
+            return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
+        }
+
+        // 2. Descobre o Pelotão baseado na Viatura
+        function descobrirPelotao(viaturasArray) {
+            if (!viaturasArray || viaturasArray.length === 0) return "AGUARDANDO EMPENHO";
+            
+            // Pega a primeira viatura que tiver um mapeamento conhecido
+            for (let v of viaturasArray) {
+                let prefixo = v.prefixo.trim().toUpperCase();
+                if (frotaMap[prefixo]) {
+                    return frotaMap[prefixo];
+                }
+            }
+            return "PELOTÃO NÃO IDENTIFICADO NA LISTA";
+        }
+
         async function carregar() {
             try {
                 const req = await fetch(API_URL);
-                const dados = await req.json();
+                const dadosRaw = await req.json();
                 
                 document.getElementById('loading').classList.add('hidden');
                 const grid = document.getElementById('grid');
                 const vazio = document.getElementById('vazio');
                 const statusDiv = document.getElementById('status');
                 
+                // Limpa o grid para reconstruir (Simula o F5)
                 grid.innerHTML = '';
                 
-                if(!dados || dados.length === 0) {
+                if(!dadosRaw || dadosRaw.length === 0) {
                     vazio.classList.remove('hidden');
                     grid.classList.add('hidden');
                 } else {
                     vazio.classList.add('hidden');
                     grid.classList.remove('hidden');
                     
-                    dados.forEach(oc => {
-                        // Definição de Estilos baseados no tipo
-                        let borderClass = 'border-padrao';
-                        let textClass = 'text-padrao';
-                        let icon = 'fa-bell';
-                        
-                        if(oc.tipo && oc.tipo.toUpperCase().includes('INCÊNDIO')) { 
-                            borderClass = 'border-fogo'; 
-                            textClass = 'text-fogo'; 
-                            icon = 'fa-fire'; 
-                        }
-                        else if(oc.tipo && (oc.tipo.toUpperCase().includes('HOSPITALAR') || oc.tipo.toUpperCase().includes('TRÂNSITO') || oc.tipo.toUpperCase().includes('BUSCA'))) { 
-                            borderClass = 'border-resgate'; 
-                            textClass = 'text-resgate'; 
-                            icon = 'fa-ambulance'; 
-                        }
-                        
-                        // Formatação das Viaturas
-                        let vtrs = 'Sem viaturas';
+                    // Clona e Ordena os dados por Prioridade
+                    let dadosOrdenados = [...dadosRaw];
+                    dadosOrdenados.sort((a, b) => {
+                        let styleA = analisarTipo(a.tipo);
+                        let styleB = analisarTipo(b.tipo);
+                        return styleA.p - styleB.p;
+                    });
+
+                    dadosOrdenados.forEach(oc => {
+                        const style = analisarTipo(oc.tipo);
+                        const pelotaoNome = descobrirPelotao(oc.viaturas);
+
+                        // Renderiza Viaturas
+                        let vtrsHtml = 'Aguardando';
                         if(oc.viaturas && oc.viaturas.length > 0) {
-                            vtrs = oc.viaturas.map(v => 
-                                `<span class="bg-bombeiros-orange/20 border border-bombeiros-orange/50 px-3 py-1 rounded text-sm text-bombeiros-orange font-bold font-mono inline-block shadow-sm">
-                                    <i class="fas fa-truck-moving mr-1"></i> ${v.prefixo}
+                            vtrsHtml = oc.viaturas.map(v => 
+                                `<span class="bg-black/40 border border-white/10 px-2 py-1 rounded text-sm text-white font-mono font-bold mr-1 mb-1 inline-block">
+                                    ${v.prefixo}
                                 </span>`
                             ).join('');
                         }
 
-                        // Verificação de segurança para o campo Pelotão
-                        // Tenta ler oc.pelotao, se não existir tenta extrair de algum lugar ou deixa vazio
-                        let pelotaoHtml = '';
-                        if(oc.pelotao) {
-                             pelotaoHtml = `<div class="mt-2 text-gray-400 text-xs font-bold uppercase tracking-wider border-t border-white/10 pt-2">
-                                                <i class="fas fa-shield-alt text-bombeiros-yellow mr-1"></i> ${oc.pelotao}
-                                            </div>`;
-                        } else {
-                            // Se a API ainda não tiver o campo "pelotao", pode-se usar um placeholder ou remover este bloco
-                            pelotaoHtml = `<div class="mt-2 text-gray-500 text-xs font-bold uppercase tracking-wider border-t border-white/10 pt-2">
-                                                <i class="fas fa-shield-alt mr-1"></i> Pelotão não informado
-                                           </div>`;
-                        }
-
-                        // HTML do Card
+                        // HTML DO CARD
                         grid.innerHTML += `
-                            <div class="card-oc ${borderClass} p-6 relative">
+                            <div class="card-oc ${style.border} p-6 relative w-full">
                                 
-                                <div class="flex justify-between items-center mb-3">
-                                    <span class="bg-black/40 px-3 py-1 rounded text-xs text-gray-400 font-mono font-bold tracking-widest border border-white/5">
-                                        #${oc.id}
-                                    </span>
-                                    <span class="text-sm font-bold text-gray-300 flex items-center">
-                                        <i class="far fa-clock mr-2 text-bombeiros-orange"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}
-                                    </span>
-                                </div>
-
-                                <h2 class="text-2xl md:text-3xl font-black uppercase leading-none mb-3 ${textClass}">
-                                    <i class="fas ${icon} mr-2"></i> ${oc.tipo}
-                                </h2>
-
-                                <div class="mb-4">
-                                    <p class="text-lg text-white font-medium leading-tight">
-                                        <i class="fas fa-map-marker-alt text-red-500 mr-2"></i> ${oc.endereco}
-                                    </p>
-                                    <p class="text-sm text-gray-400 font-bold uppercase ml-6 mt-1">${oc.cidade}</p>
-                                </div>
-
-                                <div class="bg-black/20 rounded-lg p-3 border border-white/5">
-                                    <div class="mb-2 text-xs text-gray-500 uppercase font-bold">Viaturas Empenhadas:</div>
-                                    <div class="flex flex-wrap gap-2 mb-2">
-                                        ${vtrs}
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex items-center mb-1">
+                                            <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-gray-500 font-mono border border-white/5 mr-2">#${oc.id}</span>
+                                            <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
+                                        </div>
+                                        <h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">
+                                            <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${oc.tipo}
+                                        </h2>
+                                        <p class="text-lg text-white font-medium leading-tight opacity-90">
+                                            ${oc.endereco}
+                                        </p>
+                                        <p class="text-xs text-gray-500 font-bold uppercase mt-1">${oc.cidade}</p>
                                     </div>
-                                    ${pelotaoHtml}
+
+                                    <div class="flex flex-col items-end pl-4 min-w-[30%]">
+                                        <div class="text-right">
+                                            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
+                                            <div class="flex flex-wrap justify-end gap-1 mb-2">
+                                                ${vtrsHtml}
+                                            </div>
+                                            <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
+                                                <div class="text-[9px] text-bombeiros-orange font-bold uppercase tracking-wider">PELOTÃO RESPONSÁVEL</div>
+                                                <div class="text-xs text-white font-bold uppercase glow">${pelotaoNome}</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -207,28 +280,23 @@
                     });
                 }
                 
-                // Atualiza relógio
+                // Relógio de Atualização
                 const agora = new Date();
-                statusDiv.innerHTML = `<i class="fas fa-sync-alt mr-1"></i> Atualizado: ${agora.toLocaleTimeString()}`;
-                statusDiv.classList.remove('text-red-500');
-                statusDiv.classList.add('text-green-400');
+                const horaString = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                statusDiv.innerHTML = `<i class="fas fa-satellite-dish mr-1 animate-pulse text-green-500"></i> Atualizado às ${horaString}`;
 
             } catch(e) {
                 console.error(e);
-                document.getElementById('loading').innerHTML = `
-                    <div class="text-red-500 bg-red-900/20 p-4 rounded-lg border border-red-500/50 inline-block">
-                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i><br>
-                        Falha na conexão com a base de dados.
-                    </div>`;
-                document.getElementById('status').innerText = "Erro de Conexão";
-                document.getElementById('status').classList.add('text-red-500');
+                document.getElementById('status').innerHTML = "<span class='text-red-500'>Falha de Conexão</span>";
             }
         }
 
-        // Inicia
+        // Executa ao abrir
         carregar();
-        // Atualiza a cada 60 segundos
+        
+        // RECARREGA A TELA (EXECUTA A FUNÇÃO) A CADA 60 SEGUNDOS (60000ms)
         setInterval(carregar, 60000);
+
     </script>
 </body>
 </html>
