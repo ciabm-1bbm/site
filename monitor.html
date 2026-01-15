@@ -91,7 +91,6 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
         
         // --- 1. CONFIGURAÇÃO DA FROTA E PELOTÕES ---
-        // Mapeamento exato conforme solicitado
         const frotaMap = {
             "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
             "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
@@ -139,8 +138,8 @@
                     <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
                         Iniciando sistema...
                     </div>
-                    <a href="monitor.cbmrs.html" target="_blank" class="btn-estado px-4 py-1 rounded-full text-xs font-bold uppercase text-white border border-blue-400 flex items-center">
-                        <i class="fas fa-map-marked-alt mr-2"></i> ver Ocorências no RS
+                    <a href="ocorrencias_estado.html" target="_blank" class="btn-estado px-4 py-1 rounded-full text-xs font-bold uppercase text-white border border-blue-400 flex items-center">
+                        <i class="fas fa-map-marked-alt mr-2"></i> Ver Estado
                     </a>
                 </div>
             </div>
@@ -190,7 +189,6 @@
         function descobrirPelotao(viaturasArray) {
             if (!viaturasArray || viaturasArray.length === 0) return "AGUARDANDO EMPENHO";
             
-            // Pega a primeira viatura que tiver um mapeamento conhecido
             for (let v of viaturasArray) {
                 let prefixo = v.prefixo.trim().toUpperCase();
                 if (frotaMap[prefixo]) {
@@ -210,7 +208,7 @@
                 const vazio = document.getElementById('vazio');
                 const statusDiv = document.getElementById('status');
                 
-                // Limpa o grid para reconstruir (Simula o F5)
+                // Limpa o grid para reconstruir
                 grid.innerHTML = '';
                 
                 if(!dadosRaw || dadosRaw.length === 0) {
@@ -220,7 +218,7 @@
                     vazio.classList.add('hidden');
                     grid.classList.remove('hidden');
                     
-                    // Clona e Ordena os dados por Prioridade
+                    // Ordena
                     let dadosOrdenados = [...dadosRaw];
                     dadosOrdenados.sort((a, b) => {
                         let styleA = analisarTipo(a.tipo);
@@ -268,7 +266,6 @@
                                                 ${vtrsHtml}
                                             </div>
                                             <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
-                                                <div class="text-[9px] text-bombeiros-orange font-bold uppercase tracking-wider">PELOTÃO RESPONSÁVEL</div>
                                                 <div class="text-xs text-white font-bold uppercase glow">${pelotaoNome}</div>
                                             </div>
                                         </div>
@@ -280,7 +277,7 @@
                     });
                 }
                 
-                // Relógio de Atualização
+                // Relógio
                 const agora = new Date();
                 const horaString = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 statusDiv.innerHTML = `<i class="fas fa-satellite-dish mr-1 animate-pulse text-green-500"></i> Atualizado às ${horaString}`;
@@ -291,12 +288,8 @@
             }
         }
 
-        // Executa ao abrir
         carregar();
-        
-        // RECARREGA A TELA (EXECUTA A FUNÇÃO) A CADA 60 SEGUNDOS (60000ms)
-        setInterval(carregar, 60000);
-
+        setInterval(carregar, 60000); // 60 segundos
     </script>
 </body>
 </html>
