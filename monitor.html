@@ -48,31 +48,32 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             background: rgba(30, 41, 59, 0.95);
             z-index: 50;
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         /* Classes de Cores Solicitadas */
-        .color-incendio { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); } /* Amarelo */
+        .color-incendio { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); } 
         .border-incendio { border-left: 6px solid #FFD700; }
 
-        .color-resgate { color: #F97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); } /* Laranja */
+        .color-resgate { color: #F97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); } 
         .border-resgate { border-left: 6px solid #F97316; }
 
-        .color-aph { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.4); } /* Vermelho */
+        .color-aph { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.4); } 
         .border-aph { border-left: 6px solid #DC2626; }
 
-        .color-arvore { color: #84cc16; } /* Verde Oliva/Lima */
+        .color-arvore { color: #84cc16; } 
         .border-arvore { border-left: 6px solid #84cc16; }
 
-        .color-insetos { color: #fde68a; } /* Bege/Amarelo Claro */
+        .color-insetos { color: #fde68a; } 
         .border-insetos { border-left: 6px solid #fde68a; }
 
-        .color-prev { color: #d1d5db; } /* Cinza Claro */
+        .color-prev { color: #d1d5db; } 
         .border-prev { border-left: 6px solid #d1d5db; }
 
-        .color-hazmat { color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } /* Branco */
+        .color-hazmat { color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } 
         .border-hazmat { border-left: 6px solid #ffffff; }
 
-        .color-vistoria { color: #38bdf8; } /* Azul Claro */
+        .color-vistoria { color: #38bdf8; } 
         .border-vistoria { border-left: 6px solid #38bdf8; }
 
         /* Botão Pulsante */
@@ -90,7 +91,7 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
         
-        // --- 1. CONFIGURAÇÃO DA FROTA E PELOTÕES ---
+        // --- CONFIGURAÇÃO DA FROTA E PELOTÕES ---
         const frotaMap = {
             "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
             "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
@@ -234,8 +235,13 @@
                             ).join('');
                         }
 
+                        // CRIAÇÃO DO LINK GOOGLE MAPS
+                        // Codifica o endereço para formato de URL e adiciona "RS" para garantir estado
+                        const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
+                        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
                         grid.innerHTML += `
-                            <div class="card-oc ${style.border} p-6 relative w-full">
+                            <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para ver no Google Maps">
                                 
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
@@ -246,10 +252,10 @@
                                         <h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">
                                             <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${oc.tipo}
                                         </h2>
-                                        <p class="text-lg text-white font-medium leading-tight opacity-90">
-                                            ${oc.endereco}
+                                        <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors">
+                                            <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
                                         </p>
-                                        <p class="text-xs text-gray-500 font-bold uppercase mt-1">${oc.cidade}</p>
+                                        <p class="text-xs text-gray-500 font-bold uppercase mt-1 ml-5">${oc.cidade}</p>
                                     </div>
 
                                     <div class="flex flex-col items-end pl-4 min-w-[30%]">
@@ -263,6 +269,10 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
+                                    <i class="fas fa-external-link-alt text-white text-xs"></i>
                                 </div>
 
                             </div>
