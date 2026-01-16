@@ -28,43 +28,55 @@
         
         /* --- CONFIGURAÇÃO DO BACKGROUND MARCA D'ÁGUA --- */
         .hero-background { 
-            background-color: #0f172a; /* Cor de fundo base */
+            background-color: #0f172a; 
             position: relative;
         }
 
         /* CAMADA 1: O BRASÃO COMO MARCA D'ÁGUA */
         .hero-background::before { 
             content: '';
-            position: fixed; /* Fixo na tela, não rola com o conteúdo */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Centraliza perfeitamente */
+            position: fixed; /* Fixo para não rolar com a página */
             
-            width: 80vw; /* Ocupa 80% da largura da visão */
-            height: 80vh; /* Ocupa 80% da altura da visão */
-            max-width: 900px; /* Limite máximo para telas gigantes */
+            /* POSICIONAMENTO: Ocupa da linha do cabeçalho para baixo */
+            left: 5%;
+            right: 5%;
+            bottom: 20px;
             
-            /* URL do Brasão do 1º BBM */
+            /* Altura inicial para DESKTOP (cabeçalho mais baixo) */
+            top: 220px; 
+            
+            /* URL do Brasão */
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center;
+            
+            /* Centralização e Tamanho */
+            background-position: center center; /* Centralizado no espaço disponível */
             background-repeat: no-repeat;
-            background-size: contain; /* Garante que o brasão inteiro apareça */
-            z-index: 0; /* Fica atrás de tudo */
+            background-size: contain; /* Garante que o brasão caiba inteiro sem cortar */
+            
+            z-index: 0;
 
             /* EFEITOS VISUAIS */
-            opacity: 0.07; /* Opacidade bem baixa para ser sutil (ajuste se precisar) */
-            filter: grayscale(100%); /* Torna monocromático */
-            pointer-events: none; /* Garante que não atrapalhe cliques */
+            opacity: 0.15; /* Um pouco mais visível */
+            filter: grayscale(100%); 
+            pointer-events: none; 
         }
 
-        /* CAMADA 2: GRADIENTE ESCURO PARA MELHORAR LEITURA DO TEXTO */
+        /* AJUSTE PARA CELULAR (Quando o cabeçalho fica mais alto) */
+        @media (max-width: 768px) {
+            .hero-background::before {
+                /* Empurra o logo mais para baixo no celular pois o menu é vertical */
+                top: 450px; 
+                opacity: 0.1; /* Um pouco mais suave no celular para não brigar com texto */
+            }
+        }
+
+        /* CAMADA 2: GRADIENTE SUAVE */
         .hero-background::after {
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            /* Um gradiente radial sutil que escurece as bordas */
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.95) 100%);
-            z-index: 1; /* Fica sobre o brasão, mas sob o conteúdo */
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+            z-index: 1; 
             pointer-events: none;
         }
         /* -------------------------------------------------- */
@@ -143,7 +155,7 @@
 
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
-        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
+        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6 relative z-20">
             <div class="flex-shrink-0">
                 <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
@@ -184,7 +196,7 @@
             <p class="text-gray-400 mt-2">Nenhuma ocorrência em andamento no momento.</p>
         </div>
 
-        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-10"></div>
+        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-10 relative z-10"></div>
 
     </div>
 
@@ -260,11 +272,12 @@
                         ).join('');
                     }
 
-                    const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
-                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+                    // CRIAÇÃO DO LINK PARA WAZE
+                    const wazeQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
+                    const wazeUrl = `https://waze.com/ul?q=${wazeQuery}&navigate=yes`;
 
                     grid.innerHTML += `
-                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Ver no Maps">
+                        <div onclick="window.open('${wazeUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para navegar com Waze">
                             <div class="flex justify-between items-start">
                                 <div class="flex-1">
                                     <div class="flex items-center mb-1">
@@ -274,7 +287,7 @@
                                     <h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">
                                         <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${oc.tipo}
                                     </h2>
-                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300">
+                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
                                     </p>
                                     <p class="text-sm text-gray-400 font-bold uppercase mt-2 ml-5 border-l-2 border-gray-600 pl-2">${oc.cidade}</p>
@@ -298,7 +311,7 @@
                                 </div>
                             </div>
                             <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
-                                <i class="fas fa-external-link-alt text-white text-xs"></i>
+                                <i class="fas fa-location-arrow text-white text-xs"></i>
                             </div>
                         </div>
                     `;
