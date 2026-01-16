@@ -254,25 +254,23 @@
                         ).join('');
                     }
 
-                    // --- TRATAMENTO DO TIPO (SPLIT NA BARRA /) ---
+                    // --- TRATAMENTO DO TIPO ---
                     let tipoPrincipal = oc.tipo;
                     let tipoSecundario = "";
                     
                     if(oc.tipo.includes('/')) {
                         const parts = oc.tipo.split('/');
-                        // Pega a primeira parte como titulo principal
                         tipoPrincipal = parts[0].trim();
                         // Junta o resto (se houver mais barras) como subtitulo
                         tipoSecundario = parts.slice(1).join('/').trim();
                     }
 
-                    // Link Waze
-                    const wazeQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
-                    const wazeUrl = `https://waze.com/ul?q=${wazeQuery}&navigate=yes`;
+                    // LINK GOOGLE MAPS
+                    const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
-                    // --- LAYOUT AJUSTADO PARA MOBILE: flex-col no mobile, md:flex-row no pc ---
                     grid.innerHTML += `
-                        <div onclick="window.open('${wazeUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para navegar com Waze">
+                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para ver no Google Maps">
                             
                             <div class="flex flex-col md:flex-row justify-between items-start gap-4">
                                 
@@ -286,7 +284,7 @@
                                         <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${tipoPrincipal}
                                     </h2>
                                     
-                                    ${tipoSecundario ? `<p class="text-sm font-bold opacity-80 uppercase leading-tight mb-2 pl-9 ${style.cor}">${tipoSecundario}</p>` : ''}
+                                    ${tipoSecundario ? `<h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">${tipoSecundario}</h2>` : ''}
                                     
                                     <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors mt-2">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
@@ -303,7 +301,9 @@
                                         </div>
                                     </div>
 
-                                    <div class="clear-both"></div> <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 mt-2">Viaturas</div>
+                                    <div class="clear-both"></div> 
+
+                                    <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 mt-2">Viaturas</div>
                                     <div class="flex flex-wrap md:justify-end gap-1">
                                         ${vtrsHtml}
                                     </div>
@@ -312,7 +312,7 @@
                             </div>
                             
                             <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
-                                <i class="fas fa-location-arrow text-white text-xs"></i>
+                                <i class="fas fa-map-marked-alt text-white text-xs"></i>
                             </div>
                         </div>
                     `;
