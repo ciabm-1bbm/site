@@ -3,141 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estatísticas 1º BBM - Porto Alegre</title>
+    <title>Estatísticas Operacionais 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'bombeiros-orange': '#FF8C00',
-                        'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'dark-slate': '#0f172a',
+                        'fire-yellow': '#FFD700',
+                        'bombeiros-orange': '#F97316',
+                        'dark-bg': '#0f172a'
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        body { background-color: #0f172a; color: white; overflow-x: hidden; }
+        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
         
-        /* --- BACKGROUND MARCA D'ÁGUA (Mantido do seu site) --- */
-        .hero-background { background-color: #0f172a; position: relative; }
-        .hero-background::before { 
-            content: ''; position: fixed; left: 5%; right: 5%; bottom: 20px; top: 320px; 
-            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center top; background-repeat: no-repeat; background-size: contain; 
-            z-index: 0; opacity: 0.15; filter: grayscale(100%); pointer-events: none; 
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .hero-bg::before {
+            content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
+            background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
+            background-size: contain; opacity: 0.1; filter: grayscale(100%);
         }
-        .hero-background::after {
-            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
-            z-index: 1; pointer-events: none;
+        .hero-bg::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, rgba(15,23,42,0.4) 0%, rgba(15,23,42,0.9) 100%);
         }
 
-        .content-wrapper { position: relative; z-index: 10; }
-
-        /* --- ESTILO DOS CARDS (GLASSMORPHISM) --- */
-        .card-stat { 
+        .glass-card {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            transition: transform 0.3s ease;
+            backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
         }
-        .card-stat:hover { border-color: rgba(255, 255, 255, 0.2); }
+        .glass-card:hover { border-color: rgba(255,255,255,0.2); }
 
-        /* Estilo da Tabela */
-        .custom-table th { background-color: rgba(0,0,0,0.3); color: #FFD700; padding: 12px; text-align: left; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
-        .custom-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .custom-table tr:hover { background-color: rgba(255,255,255,0.05); }
+        .upload-btn {
+            background: linear-gradient(45deg, #F97316, #EA580C);
+            transition: all 0.3s;
+        }
+        .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4); }
 
-        /* Cores Específicas para Gráficos */
-        .text-glow { text-shadow: 0 0 10px rgba(255, 140, 0, 0.3); }
+        /* Scrollbar personalizada para tabela */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
-<body class="hero-background min-h-screen font-sans">
+<body class="min-h-screen">
 
-    <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
+    <div class="hero-bg"></div>
+
+    <div class="container mx-auto px-4 py-8 relative z-10">
         
-        <header class="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
-            <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-20 md:h-24 drop-shadow-lg opacity-90">
-            </div>
-            <div class="text-center px-4 flex-grow">
-                <h1 class="text-3xl md:text-4xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
-                    Painel Estatístico
-                </h1>
-                <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest text-glow">
-                    1º Batalhão de Bombeiro Militar
-                </h2>
-                <div class="mt-2 text-xs font-mono text-gray-400 bg-black/30 inline-block px-3 py-1 rounded-full border border-white/5">
-                    <i class="fas fa-database mr-2"></i>DADOS: NOVEMBRO/2025
+        <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-6 glass-card p-6">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 drop-shadow-lg opacity-90">
+            
+            <div class="text-center flex-1">
+                <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white mb-2">Painel Estatístico</h1>
+                <h2 class="text-xl md:text-2xl font-bold text-fire-yellow tracking-widest uppercase">1º Batalhão de Bombeiros Militar</h2>
+                
+                <div class="mt-4 flex flex-wrap justify-center gap-3">
+                    <span class="bg-fire-red/20 border border-fire-red/50 text-fire-red px-4 py-1 rounded-full text-xs font-bold uppercase flex items-center">
+                        <i class="fas fa-calendar-alt mr-2"></i><span id="labelMes">DEZEMBRO 2025</span>
+                    </span>
+                    <span class="bg-blue-500/20 border border-blue-500/50 text-blue-400 px-4 py-1 rounded-full text-xs font-bold uppercase flex items-center">
+                        <i class="fas fa-clipboard-list mr-2"></i>Total: <span id="totalDisplay" class="ml-1 text-white">1384</span>
+                    </span>
                 </div>
             </div>
-            <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-20 md:h-24 drop-shadow-lg opacity-90">
-            </div>
+
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 drop-shadow-lg opacity-90">
         </header>
 
-        <div class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div class="flex justify-end mb-6">
+            <label for="csvInput" class="upload-btn cursor-pointer text-white px-6 py-3 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg">
+                <i class="fas fa-file-excel"></i> Importar Novo Excel/CSV
+                <input type="file" id="csvInput" class="hidden" accept=".csv, .txt">
+            </label>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             
-            <div class="card-stat">
-                <h3 class="text-lg font-bold text-white uppercase mb-4 border-l-4 border-bombeiros-orange pl-3">
-                    <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Ocorrências por Subunidade
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase flex justify-between">
+                    <span>Ocorrências por Subunidade</span>
+                    <i class="fas fa-chart-pie text-gray-500"></i>
                 </h3>
-                <div class="relative h-64 md:h-80 w-full flex justify-center">
+                <div class="relative h-72">
                     <canvas id="chartPelotoes"></canvas>
                 </div>
             </div>
 
-            <div class="card-stat">
-                <h3 class="text-lg font-bold text-white uppercase mb-4 border-l-4 border-fire-red pl-3">
-                    <i class="fas fa-chart-bar mr-2 text-gray-400"></i>Natureza das Ocorrências
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase flex justify-between">
+                    <span>Natureza das Ocorrências</span>
+                    <i class="fas fa-chart-bar text-gray-500"></i>
                 </h3>
-                <div class="relative h-64 md:h-80 w-full">
+                <div class="relative h-72">
                     <canvas id="chartNatureza"></canvas>
                 </div>
             </div>
-
         </div>
 
-        <div class="w-full max-w-7xl card-stat mb-10">
-            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                <h3 class="text-lg font-bold text-white uppercase border-l-4 border-blue-500 pl-3">
-                    <i class="fas fa-list mr-2 text-gray-400"></i>Detalhamento Operacional
-                </h3>
-                <div class="relative">
-                    <input type="text" id="searchInput" placeholder="Filtrar (Ex: Restinga)..." 
-                           class="bg-black/30 border border-white/20 rounded px-3 py-1 text-sm text-white focus:outline-none focus:border-bombeiros-orange">
-                    <i class="fas fa-search absolute right-3 top-2 text-gray-500 text-xs"></i>
-                </div>
-            </div>
+        <div class="glass-card p-6 overflow-hidden">
+            <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">
+                Últimas Ocorrências Registradas
+            </h3>
             
-            <div class="overflow-x-auto">
-                <table class="w-full custom-table" id="tabelaDados">
-                    <thead>
-                        <tr>
-                            <th>Data/Hora</th>
-                            <th>Natureza</th>
-                            <th>Bairro/Local</th>
-                            <th>Guarnição</th>
-                            <th>Status</th>
+            <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-slate-900/90 backdrop-blur text-xs text-gray-400 uppercase font-bold">
+                        <tr class="border-b border-gray-700">
+                            <th class="p-3">Data/Hora</th>
+                            <th class="p-3">Natureza</th>
+                            <th class="p-3">Bairro</th>
+                            <th class="p-3">Guarnição (OBM)</th>
+                            <th class="p-3 text-right">Nº Oc.</th>
                         </tr>
                     </thead>
-                    <tbody id="tabelaBody">
-                        <tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Carregando dados...</td></tr>
-                    </tbody>
+                    <tbody id="tabelaBody" class="text-sm text-gray-200 font-mono">
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -145,120 +144,231 @@
     </div>
 
     <script>
-        // =========================================================================
-        // PASSO 1: CONFIGURAÇÃO DA PLANILHA
-        // =========================================================================
-        // Substitua este link pelo link do seu CSV "Publicado na Web"
-        // (Veja instruções abaixo do código)
-        const SHEET_CSV_URL = 'SEU_LINK_CSV_AQUI'; 
+        // =========================================================
+        // DADOS PRÉ-PROCESSADOS DE DEZEMBRO/2025 (Do seu arquivo)
+        // =========================================================
+        const dadosDezembro = {
+            total: 1384,
+            pelotoes: {
+                labels: ["2ª Cia Passo D'Areia", "1ª Cia Teresópolis", "1ª Cia Açorianos", "2ª Cia Floresta", "2ª Cia Partenon", "1ª Cia Restinga", "1ª Cia Assunção", "1ª Cia Belém Novo", "Outros"],
+                data: [257, 238, 193, 188, 162, 110, 106, 92, 38]
+            },
+            natureza: {
+                labels: ["Manejo de Insetos", "Incêndio", "Busca e Resgate", "Pré-Hospitalar", "Preventivas", "Corte de Árvore", "Não Atendida", "Prod. Perigosos", "Trote"],
+                data: [408, 329, 163, 159, 157, 99, 44, 14, 9]
+            },
+            // Amostra das últimas ocorrências do dia 31/12/2025
+            recentes: [
+                { id: '855851', data: '31/12/2025 - 23:50', nat: 'AÇÕES PREVENTIVAS', bairro: 'JARDIM ITU SABARÁ', vtr: '2ª Cia Partenon' },
+                { id: '855846', data: '31/12/2025 - 22:54', nat: 'PRODUTOS PERIGOSOS', bairro: 'PRAIA DE BELAS', vtr: '1ª Cia Açorianos' },
+                { id: '855835', data: '31/12/2025 - 22:01', nat: 'OCORRÊNCIA NÃO ATENDIDA', bairro: 'CIDADE BAIXA', vtr: '1ª Cia Açorianos' },
+                { id: '855816', data: '31/12/2025 - 21:14', nat: 'ATENDIMENTO PRÉ-HOSPITALAR', bairro: 'ABERTA DOS MORROS', vtr: '1ª Cia Teresópolis' },
+                { id: '855810', data: '31/12/2025 - 20:56', nat: 'INCÊNDIO', bairro: 'CAMAQUÃ', vtr: '1ª Cia Assunção' },
+                { id: '855803', data: '31/12/2025 - 20:36', nat: 'SALVAMENTO/BUSCA/RESGATE', bairro: 'SARANDI', vtr: '2ª Cia Passo D\'Areia' },
+                { id: '855800', data: '31/12/2025 - 20:19', nat: 'ATENDIMENTO PRÉ-HOSPITALAR', bairro: 'CRISTAL', vtr: '1ª Cia Teresópolis' },
+                { id: '855786', data: '31/12/2025 - 19:57', nat: 'AVERIGUAÇÃO/MANEJO DE INSETOS', bairro: 'CAVALHADA', vtr: '1ª Cia Assunção' },
+                { id: '855780', data: '31/12/2025 - 19:49', nat: 'AVERIGUAÇÃO/MANEJO DE INSETOS', bairro: 'PONTA GROSSA', vtr: '1ª Cia Belém Novo' },
+                { id: '855773', data: '31/12/2025 - 19:37', nat: 'PRODUTOS PERIGOSOS', bairro: 'INDEPENDÊNCIA', vtr: '1ª Cia Açorianos' }
+            ]
+        };
 
-        // =========================================================================
-        // DADOS FAKES DE TESTE (Para funcionar agora, enquanto você não poe o link)
-        // =========================================================================
-        // Quando colocar o link da planilha, pode apagar essa lista 'dadosManuais'
-        const dadosManuais = [
-            { data: '01/11 08:30', nat: 'INCÊNDIO RESIDENCIAL', bairro: 'RESTINGA', guarnicao: '1º PEL RESTINGA', status: 'ATENDIDA' },
-            { data: '01/11 10:15', nat: 'RESGATE VEICULAR', bairro: 'PARTENON', guarnicao: '2º CIA PARTENON', status: 'ATENDIDA' },
-            { data: '02/11 14:20', nat: 'CORTE DE ÁRVORE', bairro: 'MENINO DEUS', guarnicao: '1º CIA AÇORIANOS', status: 'ATENDIDA' },
-            { data: '03/11 09:00', nat: 'VISTORIA', bairro: 'CENTRO', guarnicao: '1º CIA AZENHA', status: 'EM ANDAMENTO' },
-            { data: '03/11 19:45', nat: 'FOGO EM LIXO', bairro: 'FLORESTA', guarnicao: '2º CIA FLORESTA', status: 'ATENDIDA' },
-            { data: '04/11 03:10', nat: 'APH', bairro: 'SARANDI', guarnicao: '2º CIA PASSO D\'AREIA', status: 'ATENDIDA' }
-        ];
+        // Variáveis globais dos gráficos
+        let chartP = null;
+        let chartN = null;
 
-        // Configuração Visual do Chart.js para Dark Mode
+        // Configuração Chart.js
         Chart.defaults.color = '#94a3b8';
-        Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+        Chart.defaults.font.family = 'Inter';
 
-        // --- RENDERIZAR GRÁFICOS ---
-        function renderChartPelotoes() {
-            const ctx = document.getElementById('chartPelotoes').getContext('2d');
-            new Chart(ctx, {
+        // --- INICIALIZAÇÃO ---
+        window.onload = function() {
+            // Carrega os dados de Dezembro direto
+            atualizarDashboard(dadosDezembro);
+        };
+
+        // --- FUNÇÃO PRINCIPAL: ATUALIZA TUDO ---
+        function atualizarDashboard(dados) {
+            // 1. Atualiza Totais
+            document.getElementById('totalDisplay').innerText = dados.total;
+            
+            // 2. Destrói gráficos antigos se existirem
+            if(chartP) chartP.destroy();
+            if(chartN) chartN.destroy();
+
+            // 3. Renderiza Gráfico Pizza (Pelotões)
+            const ctxP = document.getElementById('chartPelotoes').getContext('2d');
+            chartP = new Chart(ctxP, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Açorianos', 'Floresta', 'Passo D\'Areia', 'Partenon', 'Auto Resgate', 'Teresópolis', 'Restinga'],
+                    labels: dados.pelotoes.labels,
                     datasets: [{
-                        data: [186, 169, 159, 126, 108, 104, 91], // Dados do seu PDF
+                        data: dados.pelotoes.data,
                         backgroundColor: [
-                            '#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#ec4899'
+                            '#f59e0b', '#ef4444', '#3b82f6', '#10b981', 
+                            '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#64748b'
                         ],
-                        borderWidth: 0
+                        borderWidth: 0,
+                        hoverOffset: 15
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 12, padding: 15, font: { family: 'Inter' } } }
-                    }
+                        legend: { position: 'right', labels: { boxWidth: 12, padding: 15, font: {size: 11} } }
+                    },
+                    cutout: '65%'
                 }
             });
-        }
 
-        function renderChartNatureza() {
-            const ctx = document.getElementById('chartNatureza').getContext('2d');
-            new Chart(ctx, {
+            // 4. Renderiza Gráfico Barras (Natureza)
+            const ctxN = document.getElementById('chartNatureza').getContext('2d');
+            chartN = new Chart(ctxN, {
                 type: 'bar',
                 data: {
-                    labels: ['Incêndio', 'Salvamento', 'Pré-Hospitalar', 'Preventiva', 'Outros'],
+                    labels: dados.natureza.labels,
                     datasets: [{
-                        label: 'Total',
-                        data: [45, 30, 25, 15, 10], // Exemplo
+                        label: 'Ocorrências',
+                        data: dados.natureza.data,
                         backgroundColor: '#DC2626',
-                        borderRadius: 4
+                        borderRadius: 4,
+                        barThickness: 'flex',
+                        maxBarThickness: 40
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } },
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } }
                 }
             });
+
+            // 5. Renderiza Tabela
+            renderTable(dados.recentes);
         }
 
-        // --- RENDERIZAR TABELA ---
-        function renderTable(dados) {
+        function renderTable(lista) {
             const tbody = document.getElementById('tabelaBody');
             tbody.innerHTML = '';
             
-            dados.forEach(d => {
-                // Definir cor baseada na natureza (igual ao seu monitoramento)
-                let iconClass = 'fa-bell text-gray-400';
-                let borderClass = 'border-l-4 border-gray-500';
-                
-                if(d.nat.includes('INCÊNDIO')) { iconClass = 'fa-fire text-yellow-400'; borderClass = 'border-l-4 border-yellow-400'; }
-                if(d.nat.includes('RESGATE') || d.nat.includes('SALVAMENTO')) { iconClass = 'fa-life-ring text-orange-500'; borderClass = 'border-l-4 border-orange-500'; }
-                if(d.nat.includes('APH')) { iconClass = 'fa-ambulance text-red-600'; borderClass = 'border-l-4 border-red-600'; }
+            lista.forEach(oc => {
+                let cor = 'text-white';
+                let icon = 'fa-bell';
+                let tipo = oc.nat ? oc.nat.toUpperCase() : "OUTROS";
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="font-mono text-xs text-gray-300">${d.data}</td>
-                    <td class="${borderClass} pl-3 font-bold text-white"><i class="fas ${iconClass} mr-2"></i>${d.nat}</td>
-                    <td class="text-gray-300 uppercase">${d.bairro}</td>
-                    <td><span class="bg-blue-900/40 text-blue-300 px-2 py-1 rounded text-xs font-bold border border-blue-500/20">${d.guarnicao}</span></td>
-                    <td><span class="text-green-400 text-xs font-bold"><i class="fas fa-check mr-1"></i>${d.status}</span></td>
+                if(tipo.includes('INCÊNDIO')) { cor = 'text-fire-yellow'; icon = 'fa-fire'; }
+                else if(tipo.includes('PREVENTIVA') || tipo.includes('VISTORIA')) { cor = 'text-gray-400'; icon = 'fa-shield-alt'; }
+                else if(tipo.includes('ÁRVORE')) { cor = 'text-green-400'; icon = 'fa-tree'; }
+                else if(tipo.includes('INSETO')) { cor = 'text-yellow-200'; icon = 'fa-bug'; }
+                else if(tipo.includes('APH') || tipo.includes('HOSPITALAR')) { cor = 'text-red-500'; icon = 'fa-ambulance'; }
+                else { cor = 'text-bombeiros-orange'; icon = 'fa-exclamation-triangle'; }
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
+                        <td class="p-3 font-mono opacity-80">${oc.data}</td>
+                        <td class="p-3 font-bold ${cor}"><i class="fas ${icon} w-5 text-center"></i> ${oc.nat}</td>
+                        <td class="p-3 uppercase text-xs tracking-wider">${oc.bairro}</td>
+                        <td class="p-3"><span class="bg-slate-700/50 text-slate-300 px-2 py-1 rounded text-xs border border-white/10">${oc.vtr}</span></td>
+                        <td class="p-3 text-right font-mono opacity-50">#${oc.id}</td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
+                tbody.innerHTML += row;
             });
         }
 
-        // --- SISTEMA DE BUSCA NA TABELA ---
-        document.getElementById('searchInput').addEventListener('keyup', function(e) {
-            const termo = e.target.value.toLowerCase();
-            const linhas = document.querySelectorAll('#tabelaBody tr');
-            linhas.forEach(linha => {
-                const texto = linha.innerText.toLowerCase();
-                linha.style.display = texto.includes(termo) ? '' : 'none';
+        // =========================================================
+        // LÓGICA DE IMPORTAÇÃO DE ARQUIVO (CSV)
+        // =========================================================
+        document.getElementById('csvInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    processarCSV(results.data);
+                }
             });
         });
 
-        // --- INICIALIZAÇÃO ---
-        // Aqui simularia o carregamento do CSV. Por enquanto, usa os dados manuais.
-        window.onload = function() {
-            renderChartPelotoes();
-            renderChartNatureza();
-            renderTable(dadosManuais);
-        };
+        function processarCSV(data) {
+            // Verifica se as colunas essenciais existem
+            if (!data[0].hasOwnProperty('Emergência') || !data[0].hasOwnProperty('Obm.')) {
+                alert("Erro: O arquivo não parece estar no formato correto (Colunas 'Emergência' e 'Obm.' não encontradas).");
+                return;
+            }
+
+            // Variáveis de contagem
+            const countPelotao = {};
+            const countNatureza = {};
+            let total = 0;
+            const recentes = [];
+
+            // Helper para identificar pelotão
+            const mapearPelotao = (obm) => {
+                const s = obm ? obm.toUpperCase() : "";
+                if(s.includes("AÇORIANOS")) return "1ª Cia Açorianos";
+                if(s.includes("FLORESTA")) return "2ª Cia Floresta";
+                if(s.includes("PASSO")) return "2ª Cia Passo D'Areia";
+                if(s.includes("RESTINGA")) return "1ª Cia Restinga";
+                if(s.includes("TERESÓPOLIS")) return "1ª Cia Teresópolis";
+                if(s.includes("PARTENON")) return "2ª Cia Partenon";
+                if(s.includes("BELÉM NOVO")) return "1ª Cia Belém Novo";
+                if(s.includes("ASSUNÇÃO")) return "1ª Cia Assunção";
+                return "Outros";
+            };
+
+            // Processa linha a linha
+            data.forEach(row => {
+                total++;
+                
+                // Pelotão
+                const pel = mapearPelotao(row['Obm.']);
+                countPelotao[pel] = (countPelotao[pel] || 0) + 1;
+
+                // Natureza (simplificada)
+                let nat = row['Emergência'] || "Outros";
+                // Agrupamentos simples
+                if(nat.includes("INSETO")) nat = "Manejo de Insetos";
+                if(nat.includes("INCÊNDIO")) nat = "Incêndio";
+                if(nat.includes("SALVAMENTO") || nat.includes("BUSCA")) nat = "Busca e Resgate";
+                
+                countNatureza[nat] = (countNatureza[nat] || 0) + 1;
+
+                // Lista de Recentes (pega os primeiros 20 do arquivo)
+                if (recentes.length < 20) {
+                    recentes.push({
+                        id: row['Nº Oc.'],
+                        data: row['Data'],
+                        nat: row['Emergência'],
+                        bairro: row['Bairro'],
+                        vtr: pel // Usando o pelotão no lugar da VTR para ficar mais legível
+                    });
+                }
+            });
+
+            // Prepara objeto final
+            const novoDataset = {
+                total: total,
+                pelotoes: {
+                    labels: Object.keys(countPelotao),
+                    data: Object.values(countPelotao)
+                },
+                natureza: {
+                    labels: Object.keys(countNatureza),
+                    data: Object.values(countNatureza)
+                },
+                recentes: recentes
+            };
+
+            // Atualiza a tela
+            atualizarDashboard(novoDataset);
+            document.getElementById('labelMes').innerText = "DADOS IMPORTADOS";
+            alert("Dados carregados com sucesso!");
+        }
 
     </script>
 </body>
