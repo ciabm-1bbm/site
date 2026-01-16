@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas 1º BBM - Porto Alegre</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                        'dark-slate': '#0f172a',
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { background-color: #0f172a; color: white; overflow-x: hidden; }
+        
+        /* --- BACKGROUND MARCA D'ÁGUA (Mantido do seu site) --- */
+        .hero-background { background-color: #0f172a; position: relative; }
+        .hero-background::before { 
+            content: ''; position: fixed; left: 5%; right: 5%; bottom: 20px; top: 320px; 
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
+            background-position: center top; background-repeat: no-repeat; background-size: contain; 
+            z-index: 0; opacity: 0.15; filter: grayscale(100%); pointer-events: none; 
+        }
+        .hero-background::after {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        .content-wrapper { position: relative; z-index: 10; }
+
+        /* --- ESTILO DOS CARDS (GLASSMORPHISM) --- */
+        .card-stat { 
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .card-stat:hover { border-color: rgba(255, 255, 255, 0.2); }
+
+        /* Estilo da Tabela */
+        .custom-table th { background-color: rgba(0,0,0,0.3); color: #FFD700; padding: 12px; text-align: left; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .custom-table tr:hover { background-color: rgba(255,255,255,0.05); }
+
+        /* Cores Específicas para Gráficos */
+        .text-glow { text-shadow: 0 0 10px rgba(255, 140, 0, 0.3); }
+    </style>
+</head>
+<body class="hero-background min-h-screen font-sans">
+
+    <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
+        
+        <header class="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-20 md:h-24 drop-shadow-lg opacity-90">
+            </div>
+            <div class="text-center px-4 flex-grow">
+                <h1 class="text-3xl md:text-4xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
+                    Painel Estatístico
+                </h1>
+                <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest text-glow">
+                    1º Batalhão de Bombeiro Militar
+                </h2>
+                <div class="mt-2 text-xs font-mono text-gray-400 bg-black/30 inline-block px-3 py-1 rounded-full border border-white/5">
+                    <i class="fas fa-database mr-2"></i>DADOS: NOVEMBRO/2025
+                </div>
+            </div>
+            <div class="flex-shrink-0">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-20 md:h-24 drop-shadow-lg opacity-90">
+            </div>
+        </header>
+
+        <div class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            
+            <div class="card-stat">
+                <h3 class="text-lg font-bold text-white uppercase mb-4 border-l-4 border-bombeiros-orange pl-3">
+                    <i class="fas fa-chart-pie mr-2 text-gray-400"></i>Ocorrências por Subunidade
+                </h3>
+                <div class="relative h-64 md:h-80 w-full flex justify-center">
+                    <canvas id="chartPelotoes"></canvas>
+                </div>
+            </div>
+
+            <div class="card-stat">
+                <h3 class="text-lg font-bold text-white uppercase mb-4 border-l-4 border-fire-red pl-3">
+                    <i class="fas fa-chart-bar mr-2 text-gray-400"></i>Natureza das Ocorrências
+                </h3>
+                <div class="relative h-64 md:h-80 w-full">
+                    <canvas id="chartNatureza"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="w-full max-w-7xl card-stat mb-10">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                <h3 class="text-lg font-bold text-white uppercase border-l-4 border-blue-500 pl-3">
+                    <i class="fas fa-list mr-2 text-gray-400"></i>Detalhamento Operacional
+                </h3>
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Filtrar (Ex: Restinga)..." 
+                           class="bg-black/30 border border-white/20 rounded px-3 py-1 text-sm text-white focus:outline-none focus:border-bombeiros-orange">
+                    <i class="fas fa-search absolute right-3 top-2 text-gray-500 text-xs"></i>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full custom-table" id="tabelaDados">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Natureza</th>
+                            <th>Bairro/Local</th>
+                            <th>Guarnição</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody">
+                        <tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin mr-2"></i>Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // =========================================================================
+        // PASSO 1: CONFIGURAÇÃO DA PLANILHA
+        // =========================================================================
+        // Substitua este link pelo link do seu CSV "Publicado na Web"
+        // (Veja instruções abaixo do código)
+        const SHEET_CSV_URL = 'SEU_LINK_CSV_AQUI'; 
+
+        // =========================================================================
+        // DADOS FAKES DE TESTE (Para funcionar agora, enquanto você não poe o link)
+        // =========================================================================
+        // Quando colocar o link da planilha, pode apagar essa lista 'dadosManuais'
+        const dadosManuais = [
+            { data: '01/11 08:30', nat: 'INCÊNDIO RESIDENCIAL', bairro: 'RESTINGA', guarnicao: '1º PEL RESTINGA', status: 'ATENDIDA' },
+            { data: '01/11 10:15', nat: 'RESGATE VEICULAR', bairro: 'PARTENON', guarnicao: '2º CIA PARTENON', status: 'ATENDIDA' },
+            { data: '02/11 14:20', nat: 'CORTE DE ÁRVORE', bairro: 'MENINO DEUS', guarnicao: '1º CIA AÇORIANOS', status: 'ATENDIDA' },
+            { data: '03/11 09:00', nat: 'VISTORIA', bairro: 'CENTRO', guarnicao: '1º CIA AZENHA', status: 'EM ANDAMENTO' },
+            { data: '03/11 19:45', nat: 'FOGO EM LIXO', bairro: 'FLORESTA', guarnicao: '2º CIA FLORESTA', status: 'ATENDIDA' },
+            { data: '04/11 03:10', nat: 'APH', bairro: 'SARANDI', guarnicao: '2º CIA PASSO D\'AREIA', status: 'ATENDIDA' }
+        ];
+
+        // Configuração Visual do Chart.js para Dark Mode
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
+
+        // --- RENDERIZAR GRÁFICOS ---
+        function renderChartPelotoes() {
+            const ctx = document.getElementById('chartPelotoes').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Açorianos', 'Floresta', 'Passo D\'Areia', 'Partenon', 'Auto Resgate', 'Teresópolis', 'Restinga'],
+                    datasets: [{
+                        data: [186, 169, 159, 126, 108, 104, 91], // Dados do seu PDF
+                        backgroundColor: [
+                            '#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#ec4899'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, padding: 15, font: { family: 'Inter' } } }
+                    }
+                }
+            });
+        }
+
+        function renderChartNatureza() {
+            const ctx = document.getElementById('chartNatureza').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Incêndio', 'Salvamento', 'Pré-Hospitalar', 'Preventiva', 'Outros'],
+                    datasets: [{
+                        label: 'Total',
+                        data: [45, 30, 25, 15, 10], // Exemplo
+                        backgroundColor: '#DC2626',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // --- RENDERIZAR TABELA ---
+        function renderTable(dados) {
+            const tbody = document.getElementById('tabelaBody');
+            tbody.innerHTML = '';
+            
+            dados.forEach(d => {
+                // Definir cor baseada na natureza (igual ao seu monitoramento)
+                let iconClass = 'fa-bell text-gray-400';
+                let borderClass = 'border-l-4 border-gray-500';
+                
+                if(d.nat.includes('INCÊNDIO')) { iconClass = 'fa-fire text-yellow-400'; borderClass = 'border-l-4 border-yellow-400'; }
+                if(d.nat.includes('RESGATE') || d.nat.includes('SALVAMENTO')) { iconClass = 'fa-life-ring text-orange-500'; borderClass = 'border-l-4 border-orange-500'; }
+                if(d.nat.includes('APH')) { iconClass = 'fa-ambulance text-red-600'; borderClass = 'border-l-4 border-red-600'; }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-mono text-xs text-gray-300">${d.data}</td>
+                    <td class="${borderClass} pl-3 font-bold text-white"><i class="fas ${iconClass} mr-2"></i>${d.nat}</td>
+                    <td class="text-gray-300 uppercase">${d.bairro}</td>
+                    <td><span class="bg-blue-900/40 text-blue-300 px-2 py-1 rounded text-xs font-bold border border-blue-500/20">${d.guarnicao}</span></td>
+                    <td><span class="text-green-400 text-xs font-bold"><i class="fas fa-check mr-1"></i>${d.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- SISTEMA DE BUSCA NA TABELA ---
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            const termo = e.target.value.toLowerCase();
+            const linhas = document.querySelectorAll('#tabelaBody tr');
+            linhas.forEach(linha => {
+                const texto = linha.innerText.toLowerCase();
+                linha.style.display = texto.includes(termo) ? '' : 'none';
+            });
+        });
+
+        // --- INICIALIZAÇÃO ---
+        // Aqui simularia o carregamento do CSV. Por enquanto, usa os dados manuais.
+        window.onload = function() {
+            renderChartPelotoes();
+            renderChartNatureza();
+            renderTable(dadosManuais);
+        };
+
+    </script>
+</body>
+</html>
