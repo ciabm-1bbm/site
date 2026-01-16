@@ -100,7 +100,6 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwC9slTL0Ua4i0jaOW1c1rbQKLpFNxrVMwC-snOvg0oPIsCoe_IlJr7yT_Y42iu2OiBuQ/exec"; 
         
-        // Mantemos o mapeamento caso seja necessário, mas a lógica priorizará a cidade
         const frotaMap = {
             "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
             "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
@@ -124,8 +123,8 @@
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
         <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
-            <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+            <div class="flex-shrink-0 opacity-80">
+                 <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_rs.png?raw=true" alt="Brasão RS" class="h-20 grayscale opacity-50">
             </div>
 
             <div class="text-center px-4 flex-grow">
@@ -148,8 +147,8 @@
                 </div>
             </div>
 
-            <div class="flex-shrink-0 opacity-80">
-                 <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_rs.png?raw=true" alt="Brasão RS" class="h-20 grayscale opacity-50">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
         </header>
 
@@ -206,7 +205,6 @@
             loading.classList.add('hidden');
             grid.innerHTML = '';
 
-            // Filtro Local
             let filtrados = lista.filter(oc => {
                 const textoCompleto = (oc.cidade + " " + oc.tipo + " " + oc.endereco).toUpperCase();
                 return textoCompleto.includes(termoBusca);
@@ -219,7 +217,6 @@
                 vazio.classList.add('hidden');
                 grid.classList.remove('hidden');
                 
-                // Ordenação
                 filtrados.sort((a, b) => {
                     let styleA = analisarTipo(a.tipo);
                     let styleB = analisarTipo(b.tipo);
@@ -228,6 +225,19 @@
 
                 filtrados.forEach(oc => {
                     const style = analisarTipo(oc.tipo);
+
+                    // --- LÓGICA DE QUEBRA DO TIPO (TÍTULO) ---
+                    let tipoPrincipal = oc.tipo;
+                    let tipoDetalhe = "";
+
+                    // Se houver barra, divide
+                    if (oc.tipo.includes("/")) {
+                        const partes = oc.tipo.split("/");
+                        tipoPrincipal = partes[0].trim();
+                        // Junta o restante caso haja mais de uma barra
+                        tipoDetalhe = partes.slice(1).join("/").trim(); 
+                    }
+                    // ------------------------------------------
 
                     let vtrsHtml = 'Aguardando';
                     if(oc.viaturas && oc.viaturas.length > 0) {
@@ -241,24 +251,30 @@
                     const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
+                    // --- AJUSTE RESPONSIVO (flex-col no mobile, md:flex-row no desktop) ---
                     grid.innerHTML += `
-                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Ver no Maps">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
+                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer group" title="Ver no Maps">
+                            <div class="flex flex-col md:flex-row justify-between items-start">
+                                
+                                <div class="flex-1 w-full">
                                     <div class="flex items-center mb-1">
                                         <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-gray-500 font-mono border border-white/5 mr-2">#${oc.id}</span>
                                         <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
                                     </div>
-                                    <h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">
-                                        <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${oc.tipo}
+                                    
+                                    <h2 class="text-2xl md:text-3xl font-black uppercase leading-none mb-1 ${style.cor}">
+                                        <i class="fas ${style.icon} mr-2 text-xl md:text-2xl opacity-80"></i> ${tipoPrincipal}
                                     </h2>
+                                    
+                                    ${tipoDetalhe ? `<p class="text-sm md:text-base font-bold text-gray-400 uppercase mb-2 pl-8 md:pl-10 leading-tight">${tipoDetalhe}</p>` : '<div class="mb-2"></div>'}
+
                                     <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
                                     </p>
                                 </div>
 
-                                <div class="flex flex-col items-end pl-4 min-w-[35%]">
-                                    <div class="text-right">
+                                <div class="flex flex-col items-end w-full md:w-auto md:min-w-[35%] md:pl-4 mt-4 md:mt-0">
+                                    <div class="text-right w-full">
                                         
                                         <div class="mb-2">
                                             <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">GUARNIÇÃO DO CB</div>
