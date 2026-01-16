@@ -123,8 +123,8 @@
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
         <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
-            <div class="flex-shrink-0 opacity-80">
-                 <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_rs.png?raw=true" alt="Brasão RS" class="h-20 grayscale opacity-50">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
 
             <div class="text-center px-4 flex-grow">
@@ -147,8 +147,8 @@
                 </div>
             </div>
 
-            <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+            <div class="flex-shrink-0 opacity-80">
+                 <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_rs.png?raw=true" alt="Brasão RS" class="h-20 grayscale opacity-50">
             </div>
         </header>
 
@@ -226,18 +226,10 @@
                 filtrados.forEach(oc => {
                     const style = analisarTipo(oc.tipo);
 
-                    // --- LÓGICA DE QUEBRA DO TIPO (TÍTULO) ---
-                    let tipoPrincipal = oc.tipo;
-                    let tipoDetalhe = "";
-
-                    // Se houver barra, divide
-                    if (oc.tipo.includes("/")) {
-                        const partes = oc.tipo.split("/");
-                        tipoPrincipal = partes[0].trim();
-                        // Junta o restante caso haja mais de uma barra
-                        tipoDetalhe = partes.slice(1).join("/").trim(); 
-                    }
-                    // ------------------------------------------
+                    // --- AJUSTE: LÓGICA DE QUEBRA DO TIPO (TÍTULO) ---
+                    // Substitui a barra por uma quebra de linha <br>, mas mantém o estilo
+                    let tipoExibicao = oc.tipo.replace(/\//g, "/<br>"); 
+                    // -------------------------------------------------
 
                     let vtrsHtml = 'Aguardando';
                     if(oc.viaturas && oc.viaturas.length > 0) {
@@ -248,12 +240,12 @@
                         ).join('');
                     }
 
+                    // --- AJUSTE: URL PARA GOOGLE MAPS PADRÃO ---
                     const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
-                    // --- AJUSTE RESPONSIVO (flex-col no mobile, md:flex-row no desktop) ---
                     grid.innerHTML += `
-                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer group" title="Ver no Maps">
+                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer group" title="Ver no Google Maps">
                             <div class="flex flex-col md:flex-row justify-between items-start">
                                 
                                 <div class="flex-1 w-full">
@@ -262,12 +254,10 @@
                                         <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
                                     </div>
                                     
-                                    <h2 class="text-2xl md:text-3xl font-black uppercase leading-none mb-1 ${style.cor}">
-                                        <i class="fas ${style.icon} mr-2 text-xl md:text-2xl opacity-80"></i> ${tipoPrincipal}
+                                    <h2 class="text-2xl md:text-3xl font-black uppercase leading-tight mb-2 ${style.cor}">
+                                        <i class="fas ${style.icon} mr-2 opacity-80"></i>${tipoExibicao}
                                     </h2>
                                     
-                                    ${tipoDetalhe ? `<p class="text-sm md:text-base font-bold text-gray-400 uppercase mb-2 pl-8 md:pl-10 leading-tight">${tipoDetalhe}</p>` : '<div class="mb-2"></div>'}
-
                                     <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
                                     </p>
