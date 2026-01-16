@@ -3,252 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoramento Bombeiros RS (Exceto POA)</title>
+    <title>Monitoramento CBMRS - Estado RS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --text-primary: #e0e0e0;
-            --accent-color: #d32f2f; /* Vermelho Bombeiro */
-            --highlight: #ffca28;
+        body { background-color: #0f172a; color: white; overflow-x: hidden; }
+        
+        .hero-background { 
+            background-image: url('https://img.freepik.com/free-photo/firefighters-operation_155003-755.jpg?t=st=1736886000~exp=1736889600~hmac=fake_url_placeholder'); 
+            background-size: cover; background-position: center; background-attachment: fixed; position: relative; 
+        }
+        .hero-background::before { 
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%); z-index: 0; 
+        }
+        .content-wrapper { position: relative; z-index: 10; }
+
+        .card-oc { 
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+        }
+        .card-oc:hover { 
+            transform: scale(1.02) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            background: rgba(30, 41, 59, 0.98);
+            z-index: 50;
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            margin: 0;
-            padding: 20px;
+        /* Cores */
+        .color-incendio { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); } 
+        .border-incendio { border-left: 6px solid #FFD700; }
+        .color-resgate { color: #F97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); } 
+        .border-resgate { border-left: 6px solid #F97316; }
+        .color-aph { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.4); } 
+        .border-aph { border-left: 6px solid #DC2626; }
+        .color-arvore { color: #84cc16; } 
+        .border-arvore { border-left: 6px solid #84cc16; }
+        .color-insetos { color: #fde68a; } 
+        .border-insetos { border-left: 6px solid #fde68a; }
+        .color-prev { color: #d1d5db; } 
+        .border-prev { border-left: 6px solid #d1d5db; }
+        .color-hazmat { color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } 
+        .border-hazmat { border-left: 6px solid #ffffff; }
+        .color-vistoria { color: #38bdf8; } 
+        .border-vistoria { border-left: 6px solid #38bdf8; }
+
+        /* Input de Busca */
+        .search-input {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 999px;
+            width: 100%;
+            max-width: 300px;
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #FF8C00;
+            background: rgba(0,0,0,0.6);
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-        }
-
-        #status-bar {
-            text-align: right;
-            font-size: 0.9em;
-            color: #888;
-            margin-bottom: 20px;
-        }
-
-        /* Grid do Painel */
-        #ocorrencias-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        /* Estilo do Cartão */
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 5px solid var(--accent-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-        }
-
-        .card h3 {
-            margin: 0 0 10px 0;
-            color: var(--highlight);
-            font-size: 1.1em;
-            text-transform: uppercase;
-        }
-
-        .card-info {
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .card-city {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin: 10px 0;
-            color: #fff;
-        }
-
-        .viaturas {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #444;
-            font-size: 0.85em;
-        }
-
-        .viatura-tag {
-            background-color: #444;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 5px;
-            display: inline-block;
-            margin-bottom: 2px;
-        }
-
-        .loading {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 50px;
-            font-size: 1.5em;
-            color: #666;
-        }
     </style>
 </head>
-<body>
-
-<header>
-    <h1>Ocorrências CBMRS - Interior</h1>
-    <div id="status-bar">Carregando...</div>
-</header>
-
-<div id="ocorrencias-grid">
-    <div class="loading">Buscando dados em tempo real...</div>
-</div>
-
-<script>
-    // Configuração
-    const URL_FONTE = 'https://e193.cbm.rs.gov.br/aodc/oc.php';
-    const PROXY_URL = 'https://api.allorigins.win/raw?url='; // Proxy para evitar bloqueio CORS
-    const INTERVALO_ATUALIZACAO = 60000; // 60 segundos
-
-    // Função Principal
-    async function atualizarPainel() {
-        const statusBar = document.getElementById('status-bar');
-        const grid = document.getElementById('ocorrencias-grid');
+<body class="hero-background min-h-screen font-sans">
+    
+    <script>
+        // ATENÇÃO: SUBSTITUA PELA API QUE RETORNA O ESTADO TODO SE FOR DIFERENTE
+        const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
         
-        statusBar.innerText = 'Atualizando...';
+        // Mantemos o mapeamento de POA, caso apareçam viaturas da capital
+        const frotaMap = {
+            "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
+            "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
+            "AT-1590": "PELOTÃO AÇORIANOS", "ATP-0543": "PELOTÃO AÇORIANOS", "ATP-0639": "PELOTÃO AÇORIANOS", 
+            "ATP-0640": "PELOTÃO AÇORIANOS", "ATP-0964": "PELOTÃO AÇORIANOS", "ATP-10666": "PELOTÃO AÇORIANOS", 
+            "ATP-1506": "PELOTÃO AÇORIANOS", "ATP-201": "PELOTÃO AÇORIANOS", "EIN-204": "PELOTÃO AÇORIANOS", 
+            "RRC-99": "PELOTÃO AÇORIANOS",
+            "ABT-0594": "PELOTÃO TERESÓPOLIS", "ATP-10654": "PELOTÃO TERESÓPOLIS", "ATP-1505": "PELOTÃO TERESÓPOLIS",
+            "AR-0766": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)", "AR-0455": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)",
+            "ABT-0596": "PELOTÃO ASSUNÇÃO", "ATP-10650": "PELOTÃO ASSUNÇÃO", "ATP-10667": "PELOTÃO ASSUNÇÃO",
+            "ABT-0598": "PELOTÃO RESTINGA", "ATP-1233": "PELOTÃO RESTINGA", "ATP-9836": "PELOTÃO RESTINGA",
+            "ABT-0599": "PELOTÃO BELÉM NOVO", "ATP-10653": "PELOTÃO BELÉM NOVO", "ATP-1451": "PELOTÃO BELÉM NOVO", 
+            "ATP-3759": "PELOTÃO BELÉM NOVO", "EIN-704": "PELOTÃO BELÉM NOVO",
+            "ABT-0597": "PELOTÃO FLORESTA", "ATP-1235": "PELOTÃO FLORESTA", "ATP-292": "PELOTÃO FLORESTA", 
+            "EIN-701": "PELOTÃO FLORESTA", "ATP-1243": "PELOTÃO FLORESTA",
+            "ABT-0600": "PELOTÃO PASSO D'AREIA",
+            "ABT-1363": "PELOTÃO PARTENON", "ABT-1365": "PELOTÃO PARTENON", "ATP-1452": "PELOTÃO PARTENON"
+        };
+    </script>
 
-        try {
-            // Busca o HTML bruto do site do governo via Proxy
-            const response = await fetch(PROXY_URL + encodeURIComponent(URL_FONTE));
-            const textoHtml = await response.text();
+    <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
+        
+        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+            </div>
 
-            // Cria um parser para ler o HTML recebido
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(textoHtml, 'text/html');
-
-            // Limpa o painel atual
-            grid.innerHTML = '';
-            let contador = 0;
-
-            // LÓGICA DE PARSE (ADAPTADA AO LAYOUT OBSERVADO)
-            // O site parece usar tags H6 para TIPO e CIDADE ou uma estrutura de divs.
-            // Vou usar uma estratégia genérica de varredura baseada no texto, 
-            // pois a estrutura exata de classes não é visível sem inspeção profunda.
-            
-            // Vamos selecionar os containers principais. Supondo que sejam divs ou trs.
-            // Se o site usa Bootstrap ou divs genéricas, vamos tentar identificar padrões.
-            // Estratégia: Pegar todo o texto e dividir pelos blocos visuais ou tentar achar os elementos container.
-            
-            // *Tentativa de extração baseada na estrutura padrão do CBM:*
-            // Geralmente são "cards" dentro de um container "row" ou "col".
-            // Vou iterar sobre elementos que parecem conter a estrutura de ocorrência.
-            
-            // Procura elementos que contêm o cabeçalho de tipo (geralmente h6 ou h5)
-            const possiveisOcorrencias = doc.querySelectorAll('div.col-sm-6, div.col-md-4, td'); // Classes comuns bootstrap ou tabelas
-
-            // Se não achar por classe, tenta achar pelo padrão visual dos H6
-            const headersTipo = doc.querySelectorAll('h6'); 
-
-            // Agrupa os dados baseados nos headers (Cada ocorrência começa com um Tipo)
-            // O padrão parece ser: H6 (Tipo) -> Texto (ID/Data) -> H6 (Cidade) -> Texto (Endereço)
-            
-            // Vamos iterar pelos headers de TIPO e pegar os irmãos seguintes
-            for (let i = 0; i < headersTipo.length; i++) {
-                let elTipo = headersTipo[i];
-                let textoTipo = elTipo.innerText.trim();
+            <div class="text-center px-4 flex-grow">
+                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
+                    Ocorrências em Andamento
+                </h1>
+                <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-2 uppercase tracking-widest">
+                    RIO GRANDE DO SUL
+                </h2>
                 
-                // Validação básica se é um cabeçalho de ocorrência (evita lixo)
-                if (textoTipo === "") continue;
+                <div class="flex flex-col items-center justify-center gap-2 mt-4">
+                    <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                        Iniciando sistema...
+                    </div>
+                    <input type="text" id="searchInput" onkeyup="filtrarCidades()" placeholder="🔍 Filtrar por cidade..." class="search-input">
+                </div>
+            </div>
 
-                // Tenta encontrar a cidade (proximo h6)
-                // Nota: O DOM pode ter nós de texto entre os elementos
-                let proximoElemento = elTipo.nextElementSibling;
-                let dadosDataId = "";
-                let cidade = "";
-                let endereco = "";
-                let viaturas = "";
+            <div class="flex-shrink-0 opacity-80">
+                 <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo RS" class="h-20 grayscale opacity-50">
+            </div>
+        </header>
 
-                // Varre os próximos elementos até achar a próxima ocorrência ou fim
-                // Simplificação: Pega o nó de texto imediatamente após o H6 do Tipo
-                if (elTipo.nextSibling && elTipo.nextSibling.nodeType === 3) {
-                     dadosDataId = elTipo.nextSibling.textContent.trim();
-                }
+        <div id="loading" class="text-center py-20">
+            <i class="fas fa-circle-notch fa-spin text-5xl text-bombeiros-orange mb-4"></i>
+            <p class="animate-pulse text-gray-300 font-bold uppercase tracking-widest">Carregando Estado...</p>
+        </div>
 
-                // Procura o H6 da cidade logo a frente
-                let elCidade = null;
-                let temp = elTipo.nextElementSibling;
-                while(temp) {
-                    if(temp.tagName === 'H6') {
-                        elCidade = temp;
-                        break;
-                    }
-                    temp = temp.nextElementSibling;
-                    // Segurança para não pular para o próximo card de ocorrência errada
-                    if(temp && temp.tagName === 'HR') break; 
-                }
+        <div id="vazio" class="hidden text-center py-20 bg-slate-800/50 rounded-xl border border-white/5 w-full max-w-2xl backdrop-blur-sm">
+            <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+            <h3 class="text-2xl font-bold text-white">Sem ocorrências</h3>
+            <p class="text-gray-400 mt-2">Nenhuma ocorrência encontrada nos filtros atuais.</p>
+        </div>
 
-                if (elCidade) {
-                    cidade = elCidade.innerText.trim();
-                    
-                    // --- FILTRO SOLICITADO ---
-                    if (cidade.toUpperCase() === 'PORTO ALEGRE') {
-                        continue; // Pula esta iteração, não desenha o card
-                    }
+        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-10"></div>
 
-                    // Pega endereço (texto após cidade)
-                    if (elCidade.nextSibling) {
-                        endereco = elCidade.nextSibling.textContent.trim();
-                    }
+    </div>
 
-                    // Tenta capturar viaturas (elementos abaixo do endereço)
-                    // Esta parte é aproximada sem ver o código fonte exato
-                    let containerViaturas = elCidade.parentElement; 
-                    if(containerViaturas) {
-                         viaturas = containerViaturas.innerText.split('Viaturas:')[1] || "";
-                    }
-                } else {
-                    // Se não achou cidade, pode não ser uma ocorrência válida
-                    continue; 
-                }
+    <script>
+        let dadosGlobais = []; // Armazena dados para a busca
 
-                // Monta o Card HTML
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <h3>${textoTipo}</h3>
-                    <div class="card-info"><strong>ID/Data:</strong> ${dadosDataId}</div>
-                    <div class="card-city">${cidade}</div>
-                    <div class="card-info">📍 ${endereco}</div>
-                    ${viaturas ? `<div class="viaturas">🚒 ${viaturas}</div>` : ''}
-                `;
-                
-                grid.appendChild(card);
-                contador++;
-            }
-
-            // Atualiza barra de status
-            const agora = new Date();
-            statusBar.innerText = `Atualizado em: ${agora.toLocaleTimeString()} - Total: ${contador} ocorrências (POA Ocultado)`;
-
-        } catch (erro) {
-            console.error(erro);
-            statusBar.innerText = 'Erro ao atualizar. Tentando novamente...';
-            grid.innerHTML = '<div class="loading">Erro de conexão ou formato alterado.</div>';
+        function analisarTipo(tipoRaw) {
+            const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
+            if(tipo.includes("INCÊNDIO")) return { p: 1, cor: 'color-incendio', border: 'border-incendio', icon: 'fa-fire' };
+            if(tipo.includes("SALVAMENTO") || tipo.includes("BUSCA") || tipo.includes("RESGATE")) return { p: 2, cor: 'color-resgate', border: 'border-resgate', icon: 'fa-life-ring' };
+            if(tipo.includes("HOSPITALAR") || tipo.includes("APH")) return { p: 3, cor: 'color-aph', border: 'border-aph', icon: 'fa-ambulance' };
+            if(tipo.includes("ÁRVORE")) return { p: 4, cor: 'color-arvore', border: 'border-arvore', icon: 'fa-tree' };
+            if(tipo.includes("INSETOS")) return { p: 5, cor: 'color-insetos', border: 'border-insetos', icon: 'fa-bug' };
+            if(tipo.includes("PREVENTIVA")) return { p: 6, cor: 'color-prev', border: 'border-prev', icon: 'fa-shield-alt' };
+            if(tipo.includes("PERIGOSOS") || tipo.includes("HAZMAT")) return { p: 7, cor: 'color-hazmat', border: 'border-hazmat', icon: 'fa-skull-crossbones' };
+            if(tipo.includes("VISTORIA")) return { p: 8, cor: 'color-vistoria', border: 'border-vistoria', icon: 'fa-clipboard-check' };
+            return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
         }
-    }
 
-    // Inicia o loop
-    atualizarPainel();
-    setInterval(atualizarPainel, INTERVALO_ATUALIZACAO);
+        // LÓGICA ADAPTADA PARA O ESTADO
+        function descobrirGuarnicao(viaturasArray, cidade) {
+            if (!viaturasArray || viaturasArray.length === 0) {
+                // Se não tem viatura, mas tem cidade, mostra a guarnição da cidade
+                return cidade ? `GUARNIÇÃO DE ${cidade.toUpperCase()}` : "AGUARDANDO EMPENHO";
+            }
+            
+            // Tenta achar no mapa (POA)
+            for (let v of viaturasArray) {
+                let prefixo = v.prefixo.trim().toUpperCase();
+                if (frotaMap[prefixo]) {
+                    return frotaMap[prefixo];
+                }
+            }
+            // Se não achar no mapa (Interior), retorna a cidade
+            return `GUARNIÇÃO DE ${cidade.toUpperCase()}`;
+        }
 
-</script>
+        async function carregar() {
+            try {
+                const req = await fetch(API_URL);
+                const dadosRaw = await req.json();
+                dadosGlobais = dadosRaw; // Salva para filtro local
+                renderizar(dadosGlobais);
+            } catch(e) {
+                console.error(e);
+                document.getElementById('status').innerHTML = "<span class='text-red-500'>Erro na Conexão</span>";
+            }
+        }
 
+        function renderizar(lista) {
+            const grid = document.getElementById('grid');
+            const vazio = document.getElementById('vazio');
+            const statusDiv = document.getElementById('status');
+            const loading = document.getElementById('loading');
+            const termoBusca = document.getElementById('searchInput').value.toUpperCase();
+
+            loading.classList.add('hidden');
+            grid.innerHTML = '';
+
+            // Filtro Local (Barra de Pesquisa)
+            let filtrados = lista.filter(oc => {
+                const textoCompleto = (oc.cidade + " " + oc.tipo + " " + oc.endereco).toUpperCase();
+                return textoCompleto.includes(termoBusca);
+            });
+
+            if(!filtrados || filtrados.length === 0) {
+                vazio.classList.remove('hidden');
+                grid.classList.add('hidden');
+            } else {
+                vazio.classList.add('hidden');
+                grid.classList.remove('hidden');
+                
+                // Ordenação
+                filtrados.sort((a, b) => {
+                    let styleA = analisarTipo(a.tipo);
+                    let styleB = analisarTipo(b.tipo);
+                    return styleA.p - styleB.p;
+                });
+
+                filtrados.forEach(oc => {
+                    const style = analisarTipo(oc.tipo);
+                    // Usa a nova lógica: Mapa ou Cidade
+                    const nomeGuarnicao = descobrirGuarnicao(oc.viaturas, oc.cidade);
+
+                    let vtrsHtml = 'Aguardando';
+                    if(oc.viaturas && oc.viaturas.length > 0) {
+                        vtrsHtml = oc.viaturas.map(v => 
+                            `<span class="bg-black/40 border border-white/10 px-2 py-1 rounded text-sm text-white font-mono font-bold mr-1 mb-1 inline-block">
+                                ${v.prefixo}
+                            </span>`
+                        ).join('');
+                    }
+
+                    const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
+                    grid.innerHTML += `
+                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Ver no Maps">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-1">
+                                        <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-gray-500 font-mono border border-white/5 mr-2">#${oc.id}</span>
+                                        <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
+                                    </div>
+                                    <h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">
+                                        <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${oc.tipo}
+                                    </h2>
+                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300">
+                                        <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
+                                    </p>
+                                    <p class="text-sm text-gray-400 font-bold uppercase mt-2 ml-5 border-l-2 border-gray-600 pl-2">${oc.cidade}</p>
+                                </div>
+
+                                <div class="flex flex-col items-end pl-4 min-w-[35%]">
+                                    <div class="text-right">
+                                        <div class="mb-2">
+                                            <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
+                                                <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${nomeGuarnicao}</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Viaturas</div>
+                                        <div class="flex flex-wrap justify-end gap-1">
+                                            ${vtrsHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
+                                <i class="fas fa-external-link-alt text-white text-xs"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            const agora = new Date();
+            const horaString = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            statusDiv.innerHTML = `<i class="fas fa-satellite-dish mr-1 animate-pulse text-green-500"></i> Atualizado às ${horaString}`;
+        }
+
+        // Função chamada ao digitar na busca
+        function filtrarCidades() {
+            renderizar(dadosGlobais);
+        }
+
+        carregar();
+        setInterval(carregar, 60000); 
+    </script>
 </body>
 </html>
