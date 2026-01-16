@@ -69,31 +69,12 @@
         .color-vistoria { color: #38bdf8; } 
         .border-vistoria { border-left: 6px solid #38bdf8; }
 
-        /* Input de Busca */
-        .search-input {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 999px;
-            width: 100%;
-            max-width: 300px;
-            transition: all 0.3s;
-        }
-        .search-input:focus {
-            outline: none;
-            border-color: #FF8C00;
-            background: rgba(0,0,0,0.6);
-            box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
-        }
-
     </style>
 </head>
 <body class="hero-background min-h-screen font-sans">
     
     <script>
         // CONFIGURAÇÃO
-        // IMPORTANTE: Use a URL do script que retorna dados de PORTO ALEGRE
         const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
         
         // Mapeamento da Frota de POA
@@ -137,7 +118,6 @@
                     <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
                         Iniciando sistema...
                     </div>
-                    <input type="text" id="searchInput" onkeyup="executarPesquisa()" placeholder="🔍 Pesquisar (Endereço, Tipo...)" class="search-input">
                 </div>
             </div>
 
@@ -152,9 +132,9 @@
         </div>
 
         <div id="vazio" class="hidden text-center py-20 bg-slate-800/50 rounded-xl border border-white/5 w-full max-w-2xl backdrop-blur-sm">
-            <i class="fas fa-search text-5xl text-gray-500 mb-4"></i>
-            <h3 class="text-2xl font-bold text-white">Nada Encontrado</h3>
-            <p class="text-gray-400 mt-2">Nenhuma ocorrência corresponde à sua pesquisa.</p>
+            <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+            <h3 class="text-2xl font-bold text-white">QAP TOTAL</h3>
+            <p class="text-gray-400 mt-2">Nenhuma ocorrência em andamento no momento.</p>
         </div>
 
         <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-10"></div>
@@ -162,8 +142,6 @@
     </div>
 
     <script>
-        let dadosGlobais = []; // Armazena todos os dados para pesquisa local
-
         function analisarTipo(tipoRaw) {
             const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
             if(tipo.includes("INCÊNDIO")) return { p: 1, cor: 'color-incendio', border: 'border-incendio', icon: 'fa-fire' };
@@ -192,36 +170,11 @@
             try {
                 const req = await fetch(API_URL);
                 const dadosRaw = await req.json();
-                
-                // Salva na variável global
-                dadosGlobais = dadosRaw;
-
-                // Executa a pesquisa inicial (ou mostra tudo se o campo estiver vazio)
-                executarPesquisa();
-
+                renderizar(dadosRaw);
             } catch(e) {
                 console.error(e);
                 document.getElementById('status').innerHTML = "<span class='text-red-500'>Erro na Conexão</span>";
             }
-        }
-
-        // NOVA FUNÇÃO DE FILTRO POR PESQUISA (2 LETRAS+)
-        function executarPesquisa() {
-            const termo = document.getElementById('searchInput').value.toUpperCase().trim();
-            
-            // Se tiver menos de 2 letras, mostra TUDO
-            if (termo.length < 2) {
-                renderizar(dadosGlobais);
-                return;
-            }
-
-            // Filtra se tiver 2 letras ou mais
-            const filtrados = dadosGlobais.filter(oc => {
-                const textoCompleto = (oc.cidade + " " + oc.tipo + " " + oc.endereco + " " + oc.pelotao).toUpperCase();
-                return textoCompleto.includes(termo);
-            });
-
-            renderizar(filtrados);
         }
 
         function renderizar(lista) {
@@ -286,7 +239,7 @@
                                         <div class="mb-2">
                                             <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
                                             <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
-                                                <div class="text-xl md:text-2xl text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
+                                                <div class="text-xl text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
                                             </div>
                                         </div>
 
