@@ -1,0 +1,21 @@
+{
+  "name": "CIA 1º BBM - Portal",
+  "short_name": "CIA 1BBM",
+  "description": "Portal de Ferramentas Administrativas da Companhia de Bombeiro Militar",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#FF8C00",
+  "icons": [
+    {
+      "src": "https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
