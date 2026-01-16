@@ -42,21 +42,21 @@
             right: 5%;
             bottom: 20px;
             
-            /* Altura inicial para DESKTOP (cabeçalho mais baixo) */
-            top: 220px; 
+            /* AJUSTE FEITO AQUI: Aumentei o 'top' para empurrar mais para baixo no Desktop */
+            top: 320px; 
             
             /* URL do Brasão */
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
             
             /* Centralização e Tamanho */
-            background-position: center center; /* Centralizado no espaço disponível */
+            background-position: center top; /* Centralizado horizontalmente, alinhado ao topo do container */
             background-repeat: no-repeat;
             background-size: contain; /* Garante que o brasão caiba inteiro sem cortar */
             
             z-index: 0;
 
             /* EFEITOS VISUAIS */
-            opacity: 0.15; /* Um pouco mais visível */
+            opacity: 0.15; 
             filter: grayscale(100%); 
             pointer-events: none; 
         }
@@ -64,9 +64,9 @@
         /* AJUSTE PARA CELULAR (Quando o cabeçalho fica mais alto) */
         @media (max-width: 768px) {
             .hero-background::before {
-                /* Empurra o logo mais para baixo no celular pois o menu é vertical */
-                top: 450px; 
-                opacity: 0.1; /* Um pouco mais suave no celular para não brigar com texto */
+                /* AJUSTE FEITO AQUI: Aumentei o 'top' para empurrar mais para baixo no Mobile */
+                top: 550px; 
+                opacity: 0.1; 
             }
         }
 
