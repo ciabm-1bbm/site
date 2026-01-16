@@ -32,31 +32,23 @@
             position: relative;
         }
 
-        /* CAMADA 1: O BRASÃO COMO MARCA D'ÁGUA */
         .hero-background::before { 
             content: '';
             position: fixed;
             left: 5%;
             right: 5%;
             bottom: 20px;
-            
-            /* Posição do Logo de Fundo (Ajustado para baixo) */
             top: 320px; 
-            
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            
             background-position: center top; 
             background-repeat: no-repeat;
             background-size: contain; 
-            
             z-index: 0;
-
             opacity: 0.15; 
             filter: grayscale(100%); 
             pointer-events: none; 
         }
 
-        /* AJUSTE PARA CELULAR */
         @media (max-width: 768px) {
             .hero-background::before {
                 top: 550px; 
@@ -64,7 +56,6 @@
             }
         }
 
-        /* CAMADA 2: GRADIENTE SUAVE */
         .hero-background::after {
             content: '';
             position: fixed;
@@ -73,7 +64,6 @@
             z-index: 1; 
             pointer-events: none;
         }
-        /* -------------------------------------------------- */
 
         .content-wrapper { position: relative; z-index: 10; }
 
@@ -123,10 +113,8 @@
 <body class="hero-background min-h-screen font-sans">
     
     <script>
-        // CONFIGURAÇÃO
         const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
         
-        // Mapeamento da Frota de POA
         const frotaMap = {
             "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
             "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
@@ -152,7 +140,7 @@
         <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6 relative z-20">
             
             <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
 
             <div class="text-center px-4 flex-grow">
@@ -176,7 +164,7 @@
             </div>
 
             <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
             </div>
         </header>
 
@@ -247,7 +235,6 @@
                 vazio.classList.add('hidden');
                 grid.classList.remove('hidden');
                 
-                // Ordenação por prioridade
                 lista.sort((a, b) => {
                     let styleA = analisarTipo(a.tipo);
                     let styleB = analisarTipo(b.tipo);
@@ -267,44 +254,63 @@
                         ).join('');
                     }
 
-                    // CRIAÇÃO DO LINK PARA WAZE
+                    // --- TRATAMENTO DO TIPO (SPLIT NA BARRA /) ---
+                    let tipoPrincipal = oc.tipo;
+                    let tipoSecundario = "";
+                    
+                    if(oc.tipo.includes('/')) {
+                        const parts = oc.tipo.split('/');
+                        // Pega a primeira parte como titulo principal
+                        tipoPrincipal = parts[0].trim();
+                        // Junta o resto (se houver mais barras) como subtitulo
+                        tipoSecundario = parts.slice(1).join('/').trim();
+                    }
+
+                    // Link Waze
                     const wazeQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
                     const wazeUrl = `https://waze.com/ul?q=${wazeQuery}&navigate=yes`;
 
+                    // --- LAYOUT AJUSTADO PARA MOBILE: flex-col no mobile, md:flex-row no pc ---
                     grid.innerHTML += `
                         <div onclick="window.open('${wazeUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para navegar com Waze">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
+                            
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                                
+                                <div class="w-full md:flex-1">
                                     <div class="flex items-center mb-1">
                                         <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-gray-500 font-mono border border-white/5 mr-2">#${oc.id}</span>
                                         <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
                                     </div>
-                                    <h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">
-                                        <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${oc.tipo}
+                                    
+                                    <h2 class="text-3xl font-black uppercase leading-none mb-1 ${style.cor}">
+                                        <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${tipoPrincipal}
                                     </h2>
-                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors">
+                                    
+                                    ${tipoSecundario ? `<p class="text-sm font-bold opacity-80 uppercase leading-tight mb-2 pl-9 ${style.cor}">${tipoSecundario}</p>` : ''}
+                                    
+                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors mt-2">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
                                     </p>
                                     <p class="text-sm text-gray-400 font-bold uppercase mt-2 ml-5 border-l-2 border-gray-600 pl-2">${oc.cidade}</p>
                                 </div>
 
-                                <div class="flex flex-col items-end pl-4 min-w-[35%]">
-                                    <div class="text-right">
-                                        
-                                        <div class="mb-2">
-                                            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
-                                            <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
-                                                <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Viaturas</div>
-                                        <div class="flex flex-wrap justify-end gap-1">
-                                            ${vtrsHtml}
+                                <div class="w-full md:w-auto md:min-w-[35%] flex flex-col md:items-end md:text-right">
+                                    
+                                    <div class="mb-2">
+                                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
+                                        <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded md:float-right">
+                                            <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
                                         </div>
                                     </div>
+
+                                    <div class="clear-both"></div> <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 mt-2">Viaturas</div>
+                                    <div class="flex flex-wrap md:justify-end gap-1">
+                                        ${vtrsHtml}
+                                    </div>
                                 </div>
+
                             </div>
+                            
                             <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
                                 <i class="fas fa-location-arrow text-white text-xs"></i>
                             </div>
