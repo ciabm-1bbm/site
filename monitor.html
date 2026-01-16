@@ -26,14 +26,49 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; }
         
+        /* --- CONFIGURAÇÃO DO BACKGROUND MARCA D'ÁGUA --- */
         .hero-background { 
-            background-image: url('https://img.freepik.com/free-photo/firefighters-operation_155003-755.jpg?t=st=1736886000~exp=1736889600~hmac=fake_url_placeholder'); 
-            background-size: cover; background-position: center; background-attachment: fixed; position: relative; 
+            background-color: #0f172a; /* Cor de fundo base */
+            position: relative;
         }
+
+        /* CAMADA 1: O BRASÃO COMO MARCA D'ÁGUA */
         .hero-background::before { 
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%); z-index: 0; 
+            content: '';
+            position: fixed; /* Fixo na tela, não rola com o conteúdo */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centraliza perfeitamente */
+            
+            width: 80vw; /* Ocupa 80% da largura da visão */
+            height: 80vh; /* Ocupa 80% da altura da visão */
+            max-width: 900px; /* Limite máximo para telas gigantes */
+            
+            /* URL do Brasão do 1º BBM */
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain; /* Garante que o brasão inteiro apareça */
+            z-index: 0; /* Fica atrás de tudo */
+
+            /* EFEITOS VISUAIS */
+            opacity: 0.07; /* Opacidade bem baixa para ser sutil (ajuste se precisar) */
+            filter: grayscale(100%); /* Torna monocromático */
+            pointer-events: none; /* Garante que não atrapalhe cliques */
         }
+
+        /* CAMADA 2: GRADIENTE ESCURO PARA MELHORAR LEITURA DO TEXTO */
+        .hero-background::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            /* Um gradiente radial sutil que escurece as bordas */
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.95) 100%);
+            z-index: 1; /* Fica sobre o brasão, mas sob o conteúdo */
+            pointer-events: none;
+        }
+        /* -------------------------------------------------- */
+
         .content-wrapper { position: relative; z-index: 10; }
 
         .card-oc { 
