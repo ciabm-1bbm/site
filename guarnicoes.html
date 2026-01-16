@@ -31,7 +31,7 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* CARD FIXO COM ZOOM E BORDA */
+        /* CARD FIXO, JUSTIFICADO E COM ZOOM */
         .guarnicao-card {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
@@ -111,7 +111,7 @@
 </div>
 
 <script>
-    [cite_start]// DADOS 16/01/2026 [cite: 132, 141]
+    // DADOS 16/01/2026
     const guarnicoesData = {
         "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "OFICIAL SV", n: "A CONFIRMAR"}, {f: "MOT. DIA", n: "A CONFIRMAR"}], t: "24h" }],
         "AÇORIANOS": [
@@ -126,7 +126,7 @@
         "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "SD CRISTIANO"}, {f: "COV", n: "SD SIQUEIRA"}, {f: "LINHA", n: "SD KINGESKI"}], t: "24h" }],
         "RESTINGA": [{ vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV", n: "SD FINGER"}, {f: "LINHA", n: "SD ASSUNÇÃO"}], t: "24h" }],
         "BELÉM NOVO": [{ vtr: "ABT-0599", mil: [{f: "CMT GU", n: "SD DETONI"}, {f: "COV", n: "SD MARTINEZ"}, {f: "LINHA", n: "SD COSME"}], t: "24h" }],
-        "PASSO D'AREIA": [{ vtr: "ABT-0600", mil: [{f: "CMT GU", n: "SD PEDRO"}, {f: "COV (08-20h)", n: "SD ISMAEL"}, {f: "COV (20-08h)", n: "A CONFIRMAR"}, {f: "LINHA", n: "SD TEMP SOARES"}], t: "24h" }],
+        "PASSO D'AREIA": [{ vtr: "ABT-0600", mil: [{f: "CMT GU", n: "SD PEDRO"}, {f: "COV (08-20h)", n: "SD ISMAEL"}, {f: "COV (20-08h)", n: "SD TEMP PAULINO"}, {f: "LINHA", n: "SD TEMP SOARES"}], t: "24h" }],
         "PARTENON": [{ vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD PATRICK"}, {f: "COV", n: "SD BRUNO EDUARDO"}, {f: "LINHA", n: "SD TEMP ZANETTI"}], t: "24h" }],
         "CANIL / BBS": [{ vtr: "ABC-792", mil: [{f: "CINOTÉCNICO", n: "SD EUGENIO"}, {f: "CINOTÉCNICO", n: "SD LOPES"}], t: "24h" }],
         "AQUÁTICA / BBS": [
@@ -156,7 +156,7 @@
             });
         });
         
-        // Efetivo - COR TOTAL ALTERADA PARA VERDE LIMÃO
+        // Efetivo - COR TOTAL VERDE LIMÃO
         document.getElementById('stats-militares').innerHTML = `
             ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
@@ -164,7 +164,7 @@
             ${renderStat('TOTAL', s.total, 'text-lime-400', ['Efetivo Total Escalado'])}
         `;
         
-        // Meios - COR AR ALTERADA PARA VERMELHO
+        // Meios - COR AR VERMELHA
         document.getElementById('stats-meios').innerHTML = `
             ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
             ${renderStat('AR', s.ar.length, 'text-red-500', s.ar)}
