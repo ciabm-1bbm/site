@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estatísticas Operacionais 1º BBM</title>
+    <title>Painel Operacional 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -29,6 +29,7 @@
     <style>
         body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
         
+        /* Background Brasão */
         .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .hero-bg::before {
             content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
@@ -40,15 +41,14 @@
             background: radial-gradient(circle, rgba(15,23,42,0.4) 0%, rgba(15,23,42,0.9) 100%);
         }
 
+        /* Glassmorphism Cards */
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
         }
-        .glass-card:hover { border-color: rgba(255,255,255,0.2); }
 
         .upload-btn {
             background: linear-gradient(45deg, #F97316, #EA580C);
@@ -56,11 +56,18 @@
         }
         .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4); }
 
-        /* Scrollbar personalizada para tabela */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        /* Scrollbar Estilizada */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 5px; border: 2px solid rgba(0,0,0,0); background-clip: padding-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #64748b; }
+
+        /* Tabela Fixa Header */
+        .table-container {
+            max-height: 600px; /* Altura para mostrar +/- 10 a 12 itens */
+            overflow-y: auto;
+        }
+        thead th { position: sticky; top: 0; z-index: 10; background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(4px); }
     </style>
 </head>
 <body class="min-h-screen">
@@ -91,7 +98,7 @@
 
         <div class="flex justify-end mb-6">
             <label for="csvInput" class="upload-btn cursor-pointer text-white px-6 py-3 rounded-lg font-bold text-sm flex items-center gap-2 shadow-lg">
-                <i class="fas fa-file-excel"></i> Importar Novo Excel/CSV
+                <i class="fas fa-file-excel"></i> Importar Novo Arquivo (XLSX/CSV)
                 <input type="file" id="csvInput" class="hidden" accept=".csv, .txt">
             </label>
         </div>
@@ -101,9 +108,8 @@
             <div class="glass-card p-6">
                 <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase flex justify-between">
                     <span>Ocorrências por Subunidade</span>
-                    <i class="fas fa-chart-pie text-gray-500"></i>
                 </h3>
-                <div class="relative h-72">
+                <div class="relative h-80">
                     <canvas id="chartPelotoes"></canvas>
                 </div>
             </div>
@@ -111,28 +117,32 @@
             <div class="glass-card p-6">
                 <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase flex justify-between">
                     <span>Natureza das Ocorrências</span>
-                    <i class="fas fa-chart-bar text-gray-500"></i>
                 </h3>
-                <div class="relative h-72">
+                <div class="relative h-80">
                     <canvas id="chartNatureza"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="glass-card p-6 overflow-hidden">
-            <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">
-                Últimas Ocorrências Registradas
-            </h3>
+        <div class="glass-card p-1 overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white border-l-4 border-blue-500 pl-3 uppercase">
+                    Lista Geral de Ocorrências
+                </h3>
+                <span class="text-xs text-gray-400"><i class="fas fa-arrows-alt-v mr-1"></i> Role para ver mais</span>
+            </div>
             
-            <div class="overflow-x-auto max-h-96">
+            <div class="table-container">
                 <table class="w-full text-left border-collapse">
-                    <thead class="sticky top-0 bg-slate-900/90 backdrop-blur text-xs text-gray-400 uppercase font-bold">
-                        <tr class="border-b border-gray-700">
+                    <thead class="text-xs text-gray-300 uppercase font-bold shadow-lg">
+                        <tr>
+                            <th class="p-3 text-center w-12">#</th>
                             <th class="p-3">Data/Hora</th>
                             <th class="p-3">Natureza</th>
                             <th class="p-3">Bairro</th>
-                            <th class="p-3">Guarnição (OBM)</th>
-                            <th class="p-3 text-right">Nº Oc.</th>
+                            <th class="p-3">Viatura</th>
+                            <th class="p-3 text-center">Localização</th>
+                            <th class="p-3 text-right">Nº ID</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaBody" class="text-sm text-gray-200 font-mono">
@@ -145,9 +155,18 @@
 
     <script>
         // =========================================================
-        // DADOS PRÉ-PROCESSADOS DE DEZEMBRO/2025 (Do seu arquivo)
+        // PALETA DE CORES (Para garantir cores diferentes em cada barra)
         // =========================================================
-        const dadosDezembro = {
+        const colorsPalette = [
+            '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', 
+            '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#64748B', '#A8A29E',
+            '#84CC16', '#14B8A6', '#0EA5E9', '#D946EF', '#E11D48', '#71717A'
+        ];
+
+        // =========================================================
+        // DADOS PADRÃO (Dezembro 2025) - Com Latitude/Longitude/Viaturas
+        // =========================================================
+        const dadosIniciais = {
             total: 1384,
             pelotoes: {
                 labels: ["2ª Cia Passo D'Areia", "1ª Cia Teresópolis", "1ª Cia Açorianos", "2ª Cia Floresta", "2ª Cia Partenon", "1ª Cia Restinga", "1ª Cia Assunção", "1ª Cia Belém Novo", "Outros"],
@@ -157,103 +176,89 @@
                 labels: ["Manejo de Insetos", "Incêndio", "Busca e Resgate", "Pré-Hospitalar", "Preventivas", "Corte de Árvore", "Não Atendida", "Prod. Perigosos", "Trote"],
                 data: [408, 329, 163, 159, 157, 99, 44, 14, 9]
             },
-            // Amostra das últimas ocorrências do dia 31/12/2025
-            recentes: [
-                { id: '855851', data: '31/12/2025 - 23:50', nat: 'AÇÕES PREVENTIVAS', bairro: 'JARDIM ITU SABARÁ', vtr: '2ª Cia Partenon' },
-                { id: '855846', data: '31/12/2025 - 22:54', nat: 'PRODUTOS PERIGOSOS', bairro: 'PRAIA DE BELAS', vtr: '1ª Cia Açorianos' },
-                { id: '855835', data: '31/12/2025 - 22:01', nat: 'OCORRÊNCIA NÃO ATENDIDA', bairro: 'CIDADE BAIXA', vtr: '1ª Cia Açorianos' },
-                { id: '855816', data: '31/12/2025 - 21:14', nat: 'ATENDIMENTO PRÉ-HOSPITALAR', bairro: 'ABERTA DOS MORROS', vtr: '1ª Cia Teresópolis' },
-                { id: '855810', data: '31/12/2025 - 20:56', nat: 'INCÊNDIO', bairro: 'CAMAQUÃ', vtr: '1ª Cia Assunção' },
-                { id: '855803', data: '31/12/2025 - 20:36', nat: 'SALVAMENTO/BUSCA/RESGATE', bairro: 'SARANDI', vtr: '2ª Cia Passo D\'Areia' },
-                { id: '855800', data: '31/12/2025 - 20:19', nat: 'ATENDIMENTO PRÉ-HOSPITALAR', bairro: 'CRISTAL', vtr: '1ª Cia Teresópolis' },
-                { id: '855786', data: '31/12/2025 - 19:57', nat: 'AVERIGUAÇÃO/MANEJO DE INSETOS', bairro: 'CAVALHADA', vtr: '1ª Cia Assunção' },
-                { id: '855780', data: '31/12/2025 - 19:49', nat: 'AVERIGUAÇÃO/MANEJO DE INSETOS', bairro: 'PONTA GROSSA', vtr: '1ª Cia Belém Novo' },
-                { id: '855773', data: '31/12/2025 - 19:37', nat: 'PRODUTOS PERIGOSOS', bairro: 'INDEPENDÊNCIA', vtr: '1ª Cia Açorianos' }
+            // Pequena amostra para demonstração inicial (com Lat/Lon e Viatura)
+            lista: [
+                { id: '855851', data: '31/12/2025 - 23:50', nat: 'AÇÕES PREVENTIVAS', bairro: 'JARDIM ITU', vtr: 'ABT-1365', lat: '-30.036', lon: '-51.185' },
+                { id: '855846', data: '31/12/2025 - 22:54', nat: 'PRODUTOS PERIGOSOS', bairro: 'PRAIA DE BELAS', vtr: 'ABT-1364', lat: '-30.045', lon: '-51.228' },
+                { id: '855835', data: '31/12/2025 - 22:01', nat: 'OCORRÊNCIA NÃO ATENDIDA', bairro: 'CIDADE BAIXA', vtr: 'ABT-1364', lat: '-30.040', lon: '-51.219' },
+                { id: '855816', data: '31/12/2025 - 21:14', nat: 'ATENDIMENTO PRÉ-HOSPITALAR', bairro: 'ABERTA MORROS', vtr: 'AR-0766', lat: '-30.150', lon: '-51.200' },
+                { id: '855810', data: '31/12/2025 - 20:56', nat: 'INCÊNDIO', bairro: 'CAMAQUÃ', vtr: 'ABT-0596', lat: '-30.100', lon: '-51.240' },
+                { id: '855803', data: '31/12/2025 - 20:36', nat: 'SALVAMENTO/BUSCA/RESGATE', bairro: 'SARANDI', vtr: 'ABT-0600', lat: '-30.000', lon: '-51.130' },
+                { id: '855800', data: '31/12/2025 - 20:19', nat: 'ATENDIMENTO PRÉ-HOSPITALAR', bairro: 'CRISTAL', vtr: 'AR-0766', lat: '-30.080', lon: '-51.245' },
+                { id: '855786', data: '31/12/2025 - 19:57', nat: 'AVERIGUAÇÃO DE INSETOS', bairro: 'CAVALHADA', vtr: 'ABT-0596', lat: '-30.110', lon: '-51.220' },
+                { id: '855780', data: '31/12/2025 - 19:49', nat: 'AVERIGUAÇÃO DE INSETOS', bairro: 'PONTA GROSSA', vtr: 'ABT-0599', lat: '-30.180', lon: '-51.190' },
+                { id: '855773', data: '31/12/2025 - 19:37', nat: 'PRODUTOS PERIGOSOS', bairro: 'INDEPENDÊNCIA', vtr: 'ABT-1364', lat: '-30.030', lon: '-51.210' }
             ]
         };
 
-        // Variáveis globais dos gráficos
+        // Chart instances
         let chartP = null;
         let chartN = null;
 
-        // Configuração Chart.js
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
         Chart.defaults.font.family = 'Inter';
 
-        // --- INICIALIZAÇÃO ---
         window.onload = function() {
-            // Carrega os dados de Dezembro direto
-            atualizarDashboard(dadosDezembro);
+            atualizarDashboard(dadosIniciais);
         };
 
-        // --- FUNÇÃO PRINCIPAL: ATUALIZA TUDO ---
+        // --- ATUALIZA TELA ---
         function atualizarDashboard(dados) {
-            // 1. Atualiza Totais
             document.getElementById('totalDisplay').innerText = dados.total;
             
-            // 2. Destrói gráficos antigos se existirem
+            // Destruir gráficos anteriores
             if(chartP) chartP.destroy();
             if(chartN) chartN.destroy();
 
-            // 3. Renderiza Gráfico Pizza (Pelotões)
-            const ctxP = document.getElementById('chartPelotoes').getContext('2d');
-            chartP = new Chart(ctxP, {
-                type: 'doughnut',
+            // GRÁFICO 1: PELOTÕES (BARRA)
+            chartP = new Chart(document.getElementById('chartPelotoes'), {
+                type: 'bar',
                 data: {
                     labels: dados.pelotoes.labels,
                     datasets: [{
+                        label: 'Ocorrências',
                         data: dados.pelotoes.data,
-                        backgroundColor: [
-                            '#f59e0b', '#ef4444', '#3b82f6', '#10b981', 
-                            '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#64748b'
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 15
+                        backgroundColor: colorsPalette, // Cores diferentes
+                        borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'right', labels: { boxWidth: 12, padding: 15, font: {size: 11} } }
-                    },
-                    cutout: '65%'
+                    plugins: { legend: { display: false } }, // Esconde legenda pois cada barra já tem label
+                    scales: { y: { beginAtZero: true } }
                 }
             });
 
-            // 4. Renderiza Gráfico Barras (Natureza)
-            const ctxN = document.getElementById('chartNatureza').getContext('2d');
-            chartN = new Chart(ctxN, {
+            // GRÁFICO 2: NATUREZA (BARRA)
+            chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
                 data: {
                     labels: dados.natureza.labels,
                     datasets: [{
                         label: 'Ocorrências',
                         data: dados.natureza.data,
-                        backgroundColor: '#DC2626',
-                        borderRadius: 4,
-                        barThickness: 'flex',
-                        maxBarThickness: 40
+                        backgroundColor: colorsPalette, // Cores diferentes
+                        borderRadius: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } } }
+                    scales: { y: { beginAtZero: true } }
                 }
             });
 
-            // 5. Renderiza Tabela
-            renderTable(dados.recentes);
+            renderTable(dados.lista);
         }
 
         function renderTable(lista) {
             const tbody = document.getElementById('tabelaBody');
             tbody.innerHTML = '';
             
-            lista.forEach(oc => {
+            lista.forEach((oc, index) => {
                 let cor = 'text-white';
                 let icon = 'fa-bell';
                 let tipo = oc.nat ? oc.nat.toUpperCase() : "OUTROS";
@@ -265,13 +270,31 @@
                 else if(tipo.includes('APH') || tipo.includes('HOSPITALAR')) { cor = 'text-red-500'; icon = 'fa-ambulance'; }
                 else { cor = 'text-bombeiros-orange'; icon = 'fa-exclamation-triangle'; }
 
+                // Montar link do Maps
+                let mapsLink = '#';
+                let mapsClass = 'text-gray-600 cursor-not-allowed';
+                let target = '';
+                
+                if(oc.lat && oc.lon) {
+                    // Link direto para Google Maps com pin na coordenada
+                    mapsLink = `https://www.google.com/maps/search/?api=1&query=${oc.lat},${oc.lon}`;
+                    mapsClass = 'text-blue-400 hover:text-blue-300 hover:scale-110 transition-transform cursor-pointer';
+                    target = '_blank';
+                }
+
                 const row = `
-                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
-                        <td class="p-3 font-mono opacity-80">${oc.data}</td>
-                        <td class="p-3 font-bold ${cor}"><i class="fas ${icon} w-5 text-center"></i> ${oc.nat}</td>
-                        <td class="p-3 uppercase text-xs tracking-wider">${oc.bairro}</td>
-                        <td class="p-3"><span class="bg-slate-700/50 text-slate-300 px-2 py-1 rounded text-xs border border-white/10">${oc.vtr}</span></td>
-                        <td class="p-3 text-right font-mono opacity-50">#${oc.id}</td>
+                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5 odd:bg-white/5 even:bg-transparent">
+                        <td class="p-3 text-center font-bold text-gray-500 text-xs">${index + 1}</td>
+                        <td class="p-3 font-mono opacity-80 whitespace-nowrap">${oc.data}</td>
+                        <td class="p-3 font-bold ${cor} text-xs"><i class="fas ${icon} w-4 text-center"></i> ${oc.nat}</td>
+                        <td class="p-3 uppercase text-xs tracking-wider text-gray-300">${oc.bairro}</td>
+                        <td class="p-3"><span class="bg-slate-700 text-white px-2 py-1 rounded text-xs font-mono border border-white/10">${oc.vtr || 'N/D'}</span></td>
+                        <td class="p-3 text-center">
+                            <a href="${mapsLink}" target="${target}" class="${mapsClass} inline-block" title="Ver no Mapa">
+                                <i class="fas fa-map-marker-alt text-lg"></i>
+                            </a>
+                        </td>
+                        <td class="p-3 text-right font-mono opacity-50 text-xs">#${oc.id}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -279,7 +302,7 @@
         }
 
         // =========================================================
-        // LÓGICA DE IMPORTAÇÃO DE ARQUIVO (CSV)
+        // PROCESSAMENTO DO ARQUIVO (CSV/XLSX)
         // =========================================================
         document.getElementById('csvInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -295,19 +318,17 @@
         });
 
         function processarCSV(data) {
-            // Verifica se as colunas essenciais existem
+            // Verifica colunas essenciais
             if (!data[0].hasOwnProperty('Emergência') || !data[0].hasOwnProperty('Obm.')) {
-                alert("Erro: O arquivo não parece estar no formato correto (Colunas 'Emergência' e 'Obm.' não encontradas).");
+                alert("Erro: Arquivo incompatível. Verifique se é o relatório padrão (Colunas 'Emergência', 'Obm', 'Viaturas', etc).");
                 return;
             }
 
-            // Variáveis de contagem
             const countPelotao = {};
             const countNatureza = {};
+            const listaCompleta = [];
             let total = 0;
-            const recentes = [];
 
-            // Helper para identificar pelotão
             const mapearPelotao = (obm) => {
                 const s = obm ? obm.toUpperCase() : "";
                 if(s.includes("AÇORIANOS")) return "1ª Cia Açorianos";
@@ -321,55 +342,58 @@
                 return "Outros";
             };
 
-            // Processa linha a linha
             data.forEach(row => {
                 total++;
                 
-                // Pelotão
+                // Contagem Pelotão
                 const pel = mapearPelotao(row['Obm.']);
                 countPelotao[pel] = (countPelotao[pel] || 0) + 1;
 
-                // Natureza (simplificada)
+                // Contagem Natureza
                 let nat = row['Emergência'] || "Outros";
-                // Agrupamentos simples
+                // Agrupamentos básicos para limpar o gráfico
                 if(nat.includes("INSETO")) nat = "Manejo de Insetos";
-                if(nat.includes("INCÊNDIO")) nat = "Incêndio";
-                if(nat.includes("SALVAMENTO") || nat.includes("BUSCA")) nat = "Busca e Resgate";
+                else if(nat.includes("INCÊNDIO")) nat = "Incêndio";
+                else if(nat.includes("SALVAMENTO") || nat.includes("BUSCA")) nat = "Busca e Resgate";
+                else if(nat.includes("ÁRVORE")) nat = "Corte de Árvore";
+                else if(nat.includes("PREVENTIVA")) nat = "Ações Preventivas";
                 
                 countNatureza[nat] = (countNatureza[nat] || 0) + 1;
 
-                // Lista de Recentes (pega os primeiros 20 do arquivo)
-                if (recentes.length < 20) {
-                    recentes.push({
-                        id: row['Nº Oc.'],
-                        data: row['Data'],
-                        nat: row['Emergência'],
-                        bairro: row['Bairro'],
-                        vtr: pel // Usando o pelotão no lugar da VTR para ficar mais legível
-                    });
-                }
+                // Adiciona à lista
+                listaCompleta.push({
+                    id: row['Nº Oc.'],
+                    data: row['Data'],
+                    nat: row['Emergência'],
+                    bairro: row['Bairro'],
+                    vtr: row['Viaturas'] || '---',
+                    lat: row['Latitude'],
+                    lon: row['Longitude']
+                });
             });
 
-            // Prepara objeto final
+            // Ordena lista por Pelotão e Natureza para os gráficos
+            // (Aqui converte os objetos de contagem em arrays ordenados por quantidade)
+            const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
+            const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
+
             const novoDataset = {
                 total: total,
                 pelotoes: {
-                    labels: Object.keys(countPelotao),
-                    data: Object.values(countPelotao)
+                    labels: sortedPelotao.map(x => x[0]),
+                    data: sortedPelotao.map(x => x[1])
                 },
                 natureza: {
-                    labels: Object.keys(countNatureza),
-                    data: Object.values(countNatureza)
+                    labels: sortedNatureza.map(x => x[0]),
+                    data: sortedNatureza.map(x => x[1])
                 },
-                recentes: recentes
+                lista: listaCompleta // Lista completa para a tabela
             };
 
-            // Atualiza a tela
             atualizarDashboard(novoDataset);
             document.getElementById('labelMes').innerText = "DADOS IMPORTADOS";
-            alert("Dados carregados com sucesso!");
+            alert("Sucesso! " + total + " ocorrências carregadas.");
         }
-
     </script>
 </body>
 </html>
