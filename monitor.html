@@ -35,36 +35,30 @@
         /* CAMADA 1: O BRASÃO COMO MARCA D'ÁGUA */
         .hero-background::before { 
             content: '';
-            position: fixed; /* Fixo para não rolar com a página */
-            
-            /* POSICIONAMENTO: Ocupa da linha do cabeçalho para baixo */
+            position: fixed;
             left: 5%;
             right: 5%;
             bottom: 20px;
             
-            /* AJUSTE FEITO AQUI: Aumentei o 'top' para empurrar mais para baixo no Desktop */
+            /* Posição do Logo de Fundo (Ajustado para baixo) */
             top: 320px; 
             
-            /* URL do Brasão */
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
             
-            /* Centralização e Tamanho */
-            background-position: center top; /* Centralizado horizontalmente, alinhado ao topo do container */
+            background-position: center top; 
             background-repeat: no-repeat;
-            background-size: contain; /* Garante que o brasão caiba inteiro sem cortar */
+            background-size: contain; 
             
             z-index: 0;
 
-            /* EFEITOS VISUAIS */
             opacity: 0.15; 
             filter: grayscale(100%); 
             pointer-events: none; 
         }
 
-        /* AJUSTE PARA CELULAR (Quando o cabeçalho fica mais alto) */
+        /* AJUSTE PARA CELULAR */
         @media (max-width: 768px) {
             .hero-background::before {
-                /* AJUSTE FEITO AQUI: Aumentei o 'top' para empurrar mais para baixo no Mobile */
                 top: 550px; 
                 opacity: 0.1; 
             }
@@ -156,8 +150,9 @@
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
         <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6 relative z-20">
+            
             <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
             </div>
 
             <div class="text-center px-4 flex-grow">
@@ -181,7 +176,7 @@
             </div>
 
             <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
         </header>
 
@@ -299,7 +294,7 @@
                                         <div class="mb-2">
                                             <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
                                             <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
-                                                <div class="text-xl text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
+                                                <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
                                             </div>
                                         </div>
 
