@@ -123,7 +123,6 @@
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
         <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
-            
             <div class="flex-shrink-0">
                 <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
@@ -148,7 +147,7 @@
                 </div>
             </div>
 
-            <div class="flex-shrink-0">
+            <div class="flex-shrink-0 opacity-90">
                  <img src="https://github.com/ciabm-1bbm/site/blob/main/images/transferir.png?raw=true" alt="Logo Direito" class="h-24 md:h-28 drop-shadow-lg">
             </div>
         </header>
@@ -227,14 +226,17 @@
                 filtrados.forEach(oc => {
                     const style = analisarTipo(oc.tipo);
 
+                    // --- QUEBRA DE LINHA DO TIPO (MANTENDO O ESTILO) ---
                     let tipoPrincipal = oc.tipo;
                     let tipoDetalhe = "";
 
                     if (oc.tipo.includes("/")) {
                         const partes = oc.tipo.split("/");
                         tipoPrincipal = partes[0].trim();
+                        // O restante (detalhe) vai para baixo, mantendo a barra como separador visual
                         tipoDetalhe = "/" + partes.slice(1).join("/").trim(); 
                     }
+                    // ---------------------------------------------------
 
                     let vtrsHtml = 'Aguardando';
                     if(oc.viaturas && oc.viaturas.length > 0) {
@@ -245,6 +247,7 @@
                         ).join('');
                     }
 
+                    // --- URL UNIVERSAL DO GOOGLE MAPS ---
                     const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
@@ -308,5 +311,3 @@
     </script>
 </body>
 </html>
-
-```
