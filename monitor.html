@@ -68,6 +68,14 @@
         .border-hazmat { border-left: 6px solid #ffffff; }
         .color-vistoria { color: #38bdf8; } 
         .border-vistoria { border-left: 6px solid #38bdf8; }
+        
+        /* Botão Pulsante */
+        .btn-estado {
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            transition: transform 0.2s;
+        }
+        .btn-estado:hover { transform: scale(1.05); }
 
     </style>
 </head>
@@ -118,6 +126,10 @@
                     <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
                         Iniciando sistema...
                     </div>
+                    
+                    <a href="monitor.cbmrs.html" class="btn-estado px-6 py-2 rounded-full text-xs font-bold uppercase text-white border border-blue-400 flex items-center mt-2 shadow-lg hover:shadow-blue-500/50">
+                        <i class="fas fa-map-marked-alt mr-2"></i> VER OCORRÊNCIAS NO RS
+                    </a>
                 </div>
             </div>
 
