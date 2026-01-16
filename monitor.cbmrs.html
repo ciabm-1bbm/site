@@ -95,10 +95,10 @@
 
     </style>
 </head>
-<body class="hero-background min-h-screen font-sans">
+<body class="hero-background min-h-screen font-sans flex flex-col">
     
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyE87A4oUxy6XdwMIYMW2zQLM4xqx2x7pxxp6axlMTgbCU6ZwY-ltT4ilpk9hTyOQP7FQ/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwC9slTL0Ua4i0jaOW1c1rbQKLpFNxrVMwC-snOvg0oPIsCoe_IlJr7yT_Y42iu2OiBuQ/exec"; 
         
         const frotaMap = {
             "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
@@ -123,6 +123,7 @@
     <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
         
         <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6">
+            
             <div class="flex-shrink-0">
                 <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
@@ -163,7 +164,13 @@
             <p class="text-gray-400 mt-2">Nenhuma ocorrência encontrada nos filtros atuais.</p>
         </div>
 
-        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-10"></div>
+        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl pb-10"></div>
+
+        <footer class="w-full text-center py-8 mt-auto border-t border-white/5">
+            <p style="font-family: Arial, sans-serif;" class="text-white text-[10px] md:text-xs opacity-70 tracking-wide">
+                © 2026 Companhia de Bombeiro Militar - 1º BBM. Site Desenvolvido por Gustavo Medeiros.
+            </p>
+        </footer>
 
     </div>
 
@@ -226,17 +233,14 @@
                 filtrados.forEach(oc => {
                     const style = analisarTipo(oc.tipo);
 
-                    // --- QUEBRA DE LINHA DO TIPO (MANTENDO O ESTILO) ---
                     let tipoPrincipal = oc.tipo;
                     let tipoDetalhe = "";
 
                     if (oc.tipo.includes("/")) {
                         const partes = oc.tipo.split("/");
                         tipoPrincipal = partes[0].trim();
-                        // O restante (detalhe) vai para baixo, mantendo a barra como separador visual
                         tipoDetalhe = "/" + partes.slice(1).join("/").trim(); 
                     }
-                    // ---------------------------------------------------
 
                     let vtrsHtml = 'Aguardando';
                     if(oc.viaturas && oc.viaturas.length > 0) {
@@ -247,7 +251,6 @@
                         ).join('');
                     }
 
-                    // --- URL UNIVERSAL DO GOOGLE MAPS ---
                     const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
                     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
