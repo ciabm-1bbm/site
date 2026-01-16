@@ -31,9 +31,9 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* CARD COM DESIGN PREMIUM */
+        /* CARD FIXO COM ZOOM E BORDA */
         .guarnicao-card {
-            background: rgba(30, 41, 59, 0.95); /* Fundo base */
+            background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
@@ -110,6 +110,7 @@
 </div>
 
 <script>
+    // DADOS 15/01/2026
     const guarnicoesData = {
         "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "OFICIAL SV", n: "A CONFIRMAR"}, {f: "MOT. DIA", n: "A CONFIRMAR"}], t: "24h" }],
         "AÇORIANOS": [
@@ -186,8 +187,8 @@
             else if(secao.includes("COBOM")) iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>';
             else if(secao.includes("AQUÁTICA")) iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>';
             else if(secao.includes("CANIL")) iconHtml = '<i class="fas fa-dog text-amber-600 text-3xl"></i>';
-            // AQUI ESTÁ A MÁGICA: mix-blend-multiply para remover o fundo branco
-            else iconHtml = '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnMRNHx6ZTxgCuKv0qPRhGLt8FRRjwNjOrMQ&s" class="w-12 h-12 object-contain mix-blend-multiply filter contrast-125">';
+            // MUDANÇA AQUI: Ícone de caminhão vermelho via Font Awesome
+            else iconHtml = '<i class="fas fa-truck text-fire-red text-3xl"></i>';
 
             let guarnicaoHtml = guarnicoesData[secao].map(v => `
                 <div class="px-3 mb-3">
