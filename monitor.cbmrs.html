@@ -26,13 +26,10 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; }
         
+        /* AJUSTE 1: REMOVIDA A IMAGEM DE FUNDO */
         .hero-background { 
-            background-image: url('https://img.freepik.com/free-photo/firefighters-operation_155003-755.jpg?t=st=1736886000~exp=1736889600~hmac=fake_url_placeholder'); 
-            background-size: cover; background-position: center; background-attachment: fixed; position: relative; 
-        }
-        .hero-background::before { 
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%); z-index: 0; 
+            background-color: #0f172a; 
+            position: relative; 
         }
         .content-wrapper { position: relative; z-index: 10; }
 
@@ -86,15 +83,25 @@
             background: rgba(0,0,0,0.6);
         }
 
+        /* Botão de Link */
+        .btn-link-poa {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            transition: all 0.2s;
+        }
+        .btn-link-poa:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
     </style>
 </head>
 <body class="hero-background min-h-screen font-sans">
     
     <script>
-        // ATENÇÃO: SUBSTITUA PELA API QUE RETORNA O ESTADO TODO SE FOR DIFERENTE
         const API_URL = "https://script.google.com/macros/s/AKfycbwC9slTL0Ua4i0jaOW1c1rbQKLpFNxrVMwC-snOvg0oPIsCoe_IlJr7yT_Y42iu2OiBuQ/exec"; 
         
-        // Mantemos o mapeamento de POA, caso apareçam viaturas da capital
+        // Mantemos o mapeamento caso seja necessário, mas a lógica priorizará a cidade
         const frotaMap = {
             "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
             "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
@@ -130,11 +137,15 @@
                     RIO GRANDE DO SUL
                 </h2>
                 
-                <div class="flex flex-col items-center justify-center gap-2 mt-4">
+                <div class="flex flex-col items-center justify-center gap-3 mt-4">
                     <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
                         Iniciando sistema...
                     </div>
                     <input type="text" id="searchInput" onkeyup="filtrarCidades()" placeholder="🔍 Filtrar por cidade..." class="search-input">
+                    
+                    <a href="monitor.html" class="btn-link-poa px-4 py-1.5 rounded-full text-xs font-bold uppercase text-blue-400 flex items-center mt-1">
+                        <i class="fas fa-city mr-2"></i> Ver Porto Alegre
+                    </a>
                 </div>
             </div>
 
@@ -159,7 +170,7 @@
     </div>
 
     <script>
-        let dadosGlobais = []; // Armazena dados para a busca
+        let dadosGlobais = []; 
 
         function analisarTipo(tipoRaw) {
             const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
@@ -174,29 +185,11 @@
             return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
         }
 
-        // LÓGICA ADAPTADA PARA O ESTADO
-        function descobrirGuarnicao(viaturasArray, cidade) {
-            if (!viaturasArray || viaturasArray.length === 0) {
-                // Se não tem viatura, mas tem cidade, mostra a guarnição da cidade
-                return cidade ? `GUARNIÇÃO DE ${cidade.toUpperCase()}` : "AGUARDANDO EMPENHO";
-            }
-            
-            // Tenta achar no mapa (POA)
-            for (let v of viaturasArray) {
-                let prefixo = v.prefixo.trim().toUpperCase();
-                if (frotaMap[prefixo]) {
-                    return frotaMap[prefixo];
-                }
-            }
-            // Se não achar no mapa (Interior), retorna a cidade
-            return `GUARNIÇÃO DE ${cidade.toUpperCase()}`;
-        }
-
         async function carregar() {
             try {
                 const req = await fetch(API_URL);
                 const dadosRaw = await req.json();
-                dadosGlobais = dadosRaw; // Salva para filtro local
+                dadosGlobais = dadosRaw; 
                 renderizar(dadosGlobais);
             } catch(e) {
                 console.error(e);
@@ -214,7 +207,7 @@
             loading.classList.add('hidden');
             grid.innerHTML = '';
 
-            // Filtro Local (Barra de Pesquisa)
+            // Filtro Local
             let filtrados = lista.filter(oc => {
                 const textoCompleto = (oc.cidade + " " + oc.tipo + " " + oc.endereco).toUpperCase();
                 return textoCompleto.includes(termoBusca);
@@ -236,8 +229,6 @@
 
                 filtrados.forEach(oc => {
                     const style = analisarTipo(oc.tipo);
-                    // Usa a nova lógica: Mapa ou Cidade
-                    const nomeGuarnicao = descobrirGuarnicao(oc.viaturas, oc.cidade);
 
                     let vtrsHtml = 'Aguardando';
                     if(oc.viaturas && oc.viaturas.length > 0) {
@@ -265,16 +256,19 @@
                                     <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300">
                                         <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
                                     </p>
-                                    <p class="text-sm text-gray-400 font-bold uppercase mt-2 ml-5 border-l-2 border-gray-600 pl-2">${oc.cidade}</p>
-                                </div>
+                                    
+                                    </div>
 
                                 <div class="flex flex-col items-end pl-4 min-w-[35%]">
                                     <div class="text-right">
+                                        
                                         <div class="mb-2">
-                                            <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded text-right">
-                                                <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${nomeGuarnicao}</div>
+                                            <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">GUARNIÇÃO DO CB</div>
+                                            <div class="text-xl font-bold text-bombeiros-orange uppercase leading-none text-right">
+                                                ${oc.cidade}
                                             </div>
                                         </div>
+
                                         <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Viaturas</div>
                                         <div class="flex flex-wrap justify-end gap-1">
                                             ${vtrsHtml}
@@ -295,7 +289,6 @@
             statusDiv.innerHTML = `<i class="fas fa-satellite-dish mr-1 animate-pulse text-green-500"></i> Atualizado às ${horaString}`;
         }
 
-        // Função chamada ao digitar na busca
         function filtrarCidades() {
             renderizar(dadosGlobais);
         }
