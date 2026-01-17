@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições 1º BBM</title>
+    <title>Guarnições 1º BBM - Automático</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -17,6 +17,9 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
                     }
                 }
             }
@@ -35,6 +38,7 @@
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.9) 100%); z-index: 0; 
         }
         
+        /* CARD */
         .guarnicao-card {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
@@ -47,6 +51,9 @@
         }
         .status-bar { height: 4px; background: linear-gradient(to right, #FF8C00, #FFD700); width: 100%; }
         
+        /* SCROLL E TOOLTIPS */
+        .card-scroll::-webkit-scrollbar { width: 4px; }
+        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
@@ -56,15 +63,14 @@
             max-height: 250px; overflow-y: auto;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
-        .card-scroll::-webkit-scrollbar { width: 4px; }
-        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
 
-        /* LOADING */
+        /* LOADING & ERROR */
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.98); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
+        .hidden-force { display: none !important; }
     </style>
 </head>
 <body class="hero-background min-h-screen flex flex-col">
@@ -72,28 +78,27 @@
     <div id="loading-overlay">
         <div id="loading-content" class="text-center">
             <i class="fas fa-cog fa-spin text-6xl text-bombeiros-yellow mb-4"></i>
-            <h2 class="text-xl font-bold text-white animate-pulse">Atualizando Escala de Serviço...</h2>
-            <p class="text-sm text-gray-400 mt-2" id="loading-details">Conectando...</p>
+            <h2 class="text-xl font-bold text-white animate-pulse">Atualizando Escala de Serviço de hoje...</h2>
+            <p class="text-sm text-gray-400 mt-2" id="loading-details">Acessando Banco de Dados...</p>
         </div>
         
-        <div id="error-content" class="hidden text-center max-w-md px-4">
-            <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
-            <h2 class="text-xl font-bold text-white mb-2">Não foi possível carregar a escala automática</h2>
-            <div class="bg-black/50 p-4 rounded text-left text-xs font-mono text-gray-300 mb-4 border border-red-500/30">
-                <p>O sistema procurou por:</p>
-                <p class="text-yellow-400 font-bold" id="error-filename">...</p>
-                <p class="mt-2">Verifique se:</p>
-                <ul class="list-disc ml-4">
-                    <li>A pasta se chama <b>escalas</b> (minúsculo)</li>
-                    <li>O nome do arquivo está EXATO (Maiúsculas importam)</li>
-                    <li>Você fez o upload no GitHub</li>
+        <div id="error-content" class="hidden-force text-center max-w-lg px-6">
+            <i class="fas fa-satellite-dish text-5xl text-red-500 mb-4 opacity-80"></i>
+            <h2 class="text-2xl font-black text-white mb-2 uppercase">Arquivo não encontrado</h2>
+            <div class="bg-slate-900/80 p-6 rounded-lg text-left text-sm font-mono text-gray-300 mb-6 border-l-4 border-red-500 shadow-2xl">
+                <p class="mb-2 text-gray-400">O sistema buscou automaticamente por:</p>
+                <p class="text-yellow-400 font-bold text-lg mb-4" id="error-filename">...</p>
+                
+                <p class="text-gray-400 border-b border-gray-700 pb-1 mb-2">Checklist de Correção:</p>
+                <ul class="list-disc ml-4 space-y-1">
+                    <li>A pasta no GitHub se chama <b class="text-white">escalas</b> (minúsculo)?</li>
+                    <li>O nome do arquivo respeita maiúsculas/minúsculas?</li>
+                    <li>O arquivo está no formato <b>.pdf</b>?</li>
                 </ul>
             </div>
-            <label class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg flex items-center justify-center gap-2">
-                <i class="fas fa-folder-open"></i> Carregar PDF do Computador
-                <input type="file" class="hidden" accept="application/pdf" onchange="handleManualUpload(this)">
-            </label>
-            <button onclick="location.reload()" class="mt-4 text-gray-400 underline text-xs">Tentar conectar novamente</button>
+            <button onclick="location.reload()" class="bg-bombeiros-orange hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition shadow-lg transform hover:scale-105">
+                <i class="fas fa-sync-alt mr-2"></i> Tentar Novamente
+            </button>
         </div>
     </div>
 
@@ -103,7 +108,7 @@
                 <div class="flex items-center gap-4">
                     <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
                     <div>
-                        <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - PORTO ALEGRE - GUARNIÇÕES DE SERVIÇO</h1>
+                        <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase tracking-tight">1º BBM - PORTO ALEGRE - GUARNIÇÕES DE SERVIÇO</h1>
                     </div>
                 </div>
             </div>
@@ -141,77 +146,76 @@
 
 <script>
     let guarnicoesDB = {};
+    // Ordem de varredura dos pelotões
     const combatStationsOrder = ["TERESÓPOLIS", "ASSUNÇÃO", "FLORESTA", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", "AÇORIANOS", "PARTENON"];
     const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
+    // --- MÁGICA DE INICIALIZAÇÃO ---
     window.addEventListener('load', async () => {
         const hoje = new Date();
         const dia = String(hoje.getDate()).padStart(2, '0');
         const mesStr = meses[hoje.getMonth()];
-        const opcoesData = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         
+        // Data na Tela
+        const opcoesData = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('display-date').innerText = hoje.toLocaleDateString('pt-BR', opcoesData);
 
-        // NOME EXATO DO ARQUIVO: Escala17Jan.pdf
+        // NOME DO ARQUIVO (AUTOMÁTICO)
+        // Ex: Se hoje é 17/01, busca: Escala17Jan.pdf
         const nomeArquivo = `Escala${dia}${mesStr}.pdf`;
         
-        // TRUQUE DO TIMESTAMP: ?v=123123 para evitar cache e forçar atualização
-        const urlArquivo = `escalas/${nomeArquivo}?v=${new Date().getTime()}`;
+        // Cache Buster: Adiciona ?t=123456 para forçar o GitHub a entregar a versão nova e não a velha do cache
+        const urlArquivo = `escalas/${nomeArquivo}?t=${new Date().getTime()}`;
 
-        document.getElementById('loading-details').innerText = `Buscando: ${nomeArquivo}`;
+        document.getElementById('loading-details').innerText = `Buscando: escalas/${nomeArquivo}`;
 
         try {
+            // Tenta buscar o arquivo
             const response = await fetch(urlArquivo);
-            if (!response.ok) throw new Error("404");
             
+            // Se der erro 404 (Não achou)
+            if (!response.ok) throw new Error("Arquivo não encontrado no servidor.");
+            
+            // Se achou, processa
             const blob = await response.blob();
             const arrayBuffer = await blob.arrayBuffer();
             await processPDF(arrayBuffer);
             
-            // Sucesso: esconde loading
+            // Sucesso: some com a tela de carregamento
             setTimeout(() => {
-                document.getElementById('loading-overlay').style.opacity = '0';
-                setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
-            }, 500);
+                const overlay = document.getElementById('loading-overlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+            }, 800);
         
         } catch (error) {
-            console.error("Erro ao buscar escala:", error);
-            // Mostra erro na tela
-            document.getElementById('loading-content').classList.add('hidden');
-            document.getElementById('error-content').classList.remove('hidden');
+            console.error("Erro Crítico:", error);
+            // Mostra o painel de erro
+            document.getElementById('loading-content').classList.add('hidden-force');
+            document.getElementById('error-content').classList.remove('hidden-force');
             document.getElementById('error-filename').innerText = `escalas/${nomeArquivo}`;
         }
     });
 
-    // Upload Manual (Plano B)
-    async function handleManualUpload(input) {
-        if (input.files && input.files[0]) {
-            // Volta para loading
-            document.getElementById('error-content').classList.add('hidden');
-            document.getElementById('loading-content').classList.remove('hidden');
-            
-            const file = input.files[0];
-            const arrayBuffer = await file.arrayBuffer();
-            await processPDF(arrayBuffer);
-
-            // Esconde loading
-            document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
-        }
-    }
-
+    // --- LEITURA DO PDF (PARSER) ---
     async function processPDF(data) {
         const pdf = await pdfjsLib.getDocument(data).promise;
         let fullText = "";
+
+        // Lê todas as páginas
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
+            // Une o texto usando um separador único |
             fullText += textContent.items.map(item => item.str).join(" | ") + " | ";
         }
+
         parseData(fullText);
     }
 
+    // --- INTELIGÊNCIA DE DADOS ---
     function parseData(text) {
+        // Zera o banco de dados
         guarnicoesDB = {
             "OFICIAL DE DIA": { mil: [] },
             "CANIL / BBS": { mil: [] },
@@ -221,6 +225,7 @@
         };
         combatStationsOrder.forEach(st => guarnicoesDB[st] = { mil: [] });
 
+        // Limpa o texto e cria um array de itens
         const items = text.split("|").map(s => s.trim()).filter(s => s.length > 2);
         
         let currentStationIndex = 0;
@@ -229,14 +234,17 @@
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             
+            // Regex Hacker: Procura por Patentes no início da string
             if (isMilitar(item)) {
                 let militar = { n: item, f: "GU" };
-                // Pega contexto (palavras antes e depois)
-                let context = (items[i-1]||"") + " " + (items[i+1]||"") + " " + (items[i+2]||"") + " " + (items[i+3]||"");
+                
+                // Varredura de Contexto: Olha 2 itens para trás e 3 para frente procurando a função
+                let context = (items[i-2]||"") + " " + (items[i-1]||"") + " " + (items[i+1]||"") + " " + (items[i+2]||"") + " " + (items[i+3]||"");
                 militar.f = mapFuncao(context);
 
                 const ctxUpper = context.toUpperCase();
 
+                // Lógica de Distribuição
                 if (ctxUpper.includes("CINOTÉCNICO")) {
                     guarnicoesDB["CANIL / BBS"].mil.push(militar);
                 } 
@@ -246,25 +254,28 @@
                 else if (ctxUpper.includes("NAVAL") || ctxUpper.includes("CONDUTOR DE EMBARCAÇÃO")) {
                     guarnicoesDB["AQUÁTICA / BBS"].mil.push(militar);
                 }
-                else if (ctxUpper.includes("COBOM") || ctxUpper.includes("CCOB")) {
+                else if (ctxUpper.includes("COBOM") || ctxUpper.includes("CCOB") || ctxUpper.includes("SALA DE OPERAÇÕES")) {
                     guarnicoesDB["COBOM - SALA DE OPERAÇÕES"].mil.push(militar);
                 }
-                else if (ctxUpper.includes("OFICIAL") || ctxUpper.includes("SUPERVISOR")) {
+                else if (ctxUpper.includes("OFICIAL") || ctxUpper.includes("SUPERVISOR") || ctxUpper.includes("MOTORISTA DE DIA")) {
                     guarnicoesDB["OFICIAL DE DIA"].mil.push(militar);
                 }
                 else {
-                    // Lógica de Pelotões
+                    // É Pelotão de Incêndio
+                    // Se achou um Comandante, avança o índice para o próximo quartel
                     if (militar.f === "CMT GU") {
                         if (currentStationIndex < combatStationsOrder.length) {
+                            // Só avança se o quartel anterior já tiver gente (evita pular quartéis vazios por erro)
                             if (lastAssignedStation && guarnicoesDB[lastAssignedStation].mil.length >= 2) {
                                 currentStationIndex++;
                             }
                             lastAssignedStation = combatStationsOrder[currentStationIndex];
                         }
                     }
+                    // Se não tem quartel definido, joga no primeiro
                     if (!lastAssignedStation) lastAssignedStation = combatStationsOrder[0];
                     
-                    // Evita duplicatas
+                    // Evita duplicatas (nomes repetidos no mesmo quartel)
                     const exists = guarnicoesDB[lastAssignedStation].mil.some(m => m.n === militar.n);
                     if (!exists) guarnicoesDB[lastAssignedStation].mil.push(militar);
                 }
@@ -275,8 +286,13 @@
         processarEfetivo();
     }
 
-    function isMilitar(str) { return /^(SD|1° SGT|2° SGT|2 SGT|1 SGT|CAP|MAJ|TEN|ST)\s/.test(str); }
+    // Validador de Militar (Regex Poderoso)
+    function isMilitar(str) { 
+        // Aceita: SD FULANO, 1° SGT BELTRANO, CAP CICLANO, etc.
+        return /^(SD|1° SGT|2° SGT|1 SGT|2 SGT|3° SGT|SGT|CAP|MAJ|TEN|1° TEN|2° TEN|ST)\s/i.test(str); 
+    }
     
+    // Mapeador de Funções
     function mapFuncao(str) {
         str = str.toUpperCase();
         if (str.includes("COMANDANTE")) return "CMT GU";
@@ -288,16 +304,18 @@
         if (str.includes("COBOM")) return "OP COBOM";
         if (str.includes("CCOB")) return "OP CCOB";
         if (str.includes("OFICIAL")) return "SUP";
+        if (str.includes("MOTORISTA")) return "MOT";
         return "GU";
     }
 
+    // --- RENDERIZAÇÃO (VISUAL) ---
     function renderCards() {
         const grid = document.getElementById('guarnicoes-grid');
         grid.innerHTML = "";
         
         Object.keys(guarnicoesDB).forEach(secao => {
             const data = guarnicoesDB[secao];
-            if (data.mil.length === 0) return;
+            if (data.mil.length === 0) return; // Esconde cards vazios
 
             const card = document.createElement('div');
             card.className = "guarnicao-card shadow-xl";
@@ -305,6 +323,7 @@
             let iconHtml = '';
             let vtrsText = "VTR PRONTA";
 
+            // Ícones e VTRs personalizadas
             if(secao.includes("OFICIAL")) { iconHtml = '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>'; vtrsText = "ATP-0640"; }
             else if(secao.includes("COBOM")) { iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>'; vtrsText = "193 / CCOB"; }
             else if(secao.includes("AQUÁTICA") || secao.includes("MERGULHO")) { iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>'; vtrsText = "EMBARCAÇÕES"; }
@@ -315,9 +334,9 @@
             }
 
             let guarnicaoHtml = data.mil.map(m => `
-                <div class="flex justify-between text-xs mb-2 leading-tight border-b border-white/5 pb-1">
-                    <span class="text-gray-400 font-bold uppercase tracking-tight">${m.f}:</span>
-                    <span class="font-bold text-white text-right ml-2">${m.n}</span>
+                <div class="flex justify-between text-xs mb-2 leading-tight border-b border-white/5 pb-1 hover:bg-white/5 transition px-1 rounded">
+                    <span class="text-gray-400 font-bold uppercase tracking-tight text-[10px] pt-0.5">${m.f}:</span>
+                    <span class="font-bold text-white text-right ml-2 text-xs">${m.n}</span>
                 </div>
             `).join('');
 
@@ -350,7 +369,7 @@
             mil.forEach(m => {
                 s.total++;
                 if(m.n.includes("CAP") || m.n.includes("MAJ")) s.cap.push(m.n);
-                else if(m.n.includes("SGT")) s.sgt.push(m.n);
+                else if(m.n.includes("SGT") || m.n.includes("ST")) s.sgt.push(m.n);
                 else s.sd.push(m.n);
             });
         });
