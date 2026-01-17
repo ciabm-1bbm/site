@@ -163,10 +163,11 @@
             '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#64748B', '#A8A29E'
         ];
 
-        // --- ESTILOS VISUAIS DAS NATUREZAS ---
+        // --- ESTILOS VISUAIS DAS NATUREZAS (Mapeamento Completo de Cor e Ícone) ---
+        // As cores aqui serão usadas tanto na barra quanto na FONTE DO EIXO.
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow", cssIcon: "fa-fire" },
-            "MANEJO DE INSETOS": { color: "#FEF08A", icon: "🐝", cssClass: "text-yellow-200", cssIcon: "fa-bug" },
+            "MANEJO DE INSETOS": { color: "#FDE047", icon: "🐝", cssClass: "text-yellow-200", cssIcon: "fa-bug" }, // Amarelo claro
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500", cssIcon: "fa-life-ring" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400", cssIcon: "fa-tree" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400", cssIcon: "fa-shield-alt" },
@@ -269,7 +270,6 @@
             const countPelotao = {};
             const countNatureza = {};
             const countSubgrupo = {}; 
-            const subgrupoNaturezaMap = {}; 
             const lista = [];
             let total = 0;
 
@@ -313,9 +313,9 @@
 
                 if (subValor && subValor !== "N/A" && subValor.trim() !== "") {
                     let subText = subValor.trim();
+                    // FORMATO CHAVE: NATUREZA___SUBGRUPO
                     let subKey = `${nat}___${subText}`; 
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
-                    subgrupoNaturezaMap[subKey] = nat;
                 }
 
                 lista.push({
@@ -333,21 +333,23 @@
             // Preparação dos Gráficos
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             
+            // NATUREZA: Preparar labels (com ícone) e cores (texto e barra)
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
             const natLabels = sortedNatureza.map(x => {
                 const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
-                return `${style.icon} ${x[0]}`;
+                return `${style.icon} ${x[0]}`; // Label com Emoji
             });
             const natColors = sortedNatureza.map(x => {
                 const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
-                return style.color;
+                return style.color; // Cor mapeada
             });
 
-            // --- FILTRO DE SUBGRUPOS (ACIMA DE 1 OCORRÊNCIA) ---
+            // SUBGRUPOS: Filtro > 1
             const sortedSubgrupo = Object.entries(countSubgrupo)
-                .filter(([key, count]) => count > 1) // Apenas > 1
+                .filter(([key, count]) => count > 1) 
                 .sort((a,b) => b[1] - a[1]);
 
+            // Montagem dos Labels do Subgrupo: "🔥 INCÊNDIO [Lixo]"
             const subLabels = sortedSubgrupo.map(item => {
                 const parts = item[0].split('___');
                 const natPai = parts[0];
@@ -356,6 +358,7 @@
                 return `${style.icon} ${natPai} [${subNome}]`;
             });
 
+            // Cores dos Subgrupos (Baseadas no pai)
             const subColors = sortedSubgrupo.map(item => {
                 const natPai = item[0].split('___')[0];
                 const style = naturezasStyle[natPai] || naturezasStyle["OUTROS"];
@@ -368,12 +371,12 @@
                 natureza: { 
                     labels: natLabels, 
                     data: sortedNatureza.map(x=>x[1]), 
-                    colors: natColors
+                    colors: natColors // Passando as cores para usar no eixo
                 },
                 subgrupos: { 
                     labels: subLabels, 
                     data: sortedSubgrupo.map(x=>x[1]),
-                    colors: subColors
+                    colors: subColors // Passando as cores para usar no eixo
                 },
                 lista: lista
             });
@@ -436,6 +439,7 @@
                             ticks: {
                                 font: { size: 12, weight: 'bold' },
                                 autoSkip: false,
+                                // COR MÁGICA: Define a cor de cada label do eixo Y
                                 color: dados.natureza.colors 
                             }
                         }
@@ -444,11 +448,8 @@
             });
 
             // 3. Gráfico Subgrupos (Altura Dinâmica)
-            
-            // Ajuste dinâmico da altura do container antes de renderizar
             const subContainer = document.getElementById('subgrupoContainer');
             if(subContainer && dados.subgrupos.labels.length > 0) {
-                 // 35px por barra, mínimo 600px
                  const dynamicHeight = Math.max(600, dados.subgrupos.labels.length * 35);
                  subContainer.style.height = dynamicHeight + 'px';
             }
@@ -473,6 +474,7 @@
                             ticks: {
                                 font: { size: 11, weight: 'bold' },
                                 autoSkip: false,
+                                // COR MÁGICA: Define a cor do label baseada na natureza pai
                                 color: dados.subgrupos.colors 
                             }
                         }
