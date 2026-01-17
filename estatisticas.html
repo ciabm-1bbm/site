@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESTATÍSTICAS DE OCORRÊNCIAS - 1º BBM (2025)</title>
+    <title>SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -36,13 +36,24 @@
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* Otimização de GPU para background */
-        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
+        /* --- BACKGROUND OTIMIZADO E POSICIONADO --- */
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        
         .hero-bg::before {
-            content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
+            content: ''; 
+            position: absolute; 
+            /* AJUSTE AQUI: Empurrado para baixo (340px) para ficar abaixo dos botões */
+            top: 340px; 
+            left: 10%; 
+            right: 10%; 
+            bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
-            background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
+            background-size: contain; 
+            opacity: 0.08; 
+            filter: grayscale(100%); 
+            pointer-events: none;
         }
+        
         .hero-bg::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.95) 100%);
@@ -74,7 +85,6 @@
         }
         @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
-        /* Scroll Otimizado */
         .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
@@ -101,10 +111,10 @@
             
             <div class="text-center flex-1">
                 <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
-                    ESTATÍSTICAS DE OCORRÊNCIAS
+                    SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS
                 </h1>
                 <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
-                    1º BBM (<span id="anoTitulo">2025</span>)
+                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
                 </h2>
                 <div class="mt-2 text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Aguardando seleção.</div>
             </div>
@@ -235,13 +245,12 @@
                 container.appendChild(btn);
             });
 
-            // Listeners para filtros
             ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
                 document.getElementById(id).addEventListener('change', aplicarFiltros);
             });
         });
 
-        // ================= PROGRESS BAR & DOWNLOAD =================
+        // ================= GERENCIADOR DE PROCESSO =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -264,21 +273,19 @@
         async function iniciarProcesso(mesId, mesNome, btnElement) {
             mesSelecionadoNome = mesNome;
 
-            // UI Feedback
             document.querySelectorAll('.btn-mes').forEach(b => {
                 b.classList.remove('active');
                 b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
             });
             btnElement.classList.add('active');
             
-            // Oculta dashboard para recarregar
             const dashboard = document.getElementById('dashboardArea');
             dashboard.classList.add('hidden');
             dashboard.classList.remove('opacity-100');
             dashboard.classList.add('opacity-0');
 
             try {
-                updateProgress(10, `Conectando...`);
+                updateProgress(10, `Conectando ao servidor...`);
                 const url = `${GITHUB_BASE_URL}/dados/${mesId}_${ANO_ATUAL}.csv`;
                 
                 const response = await fetch(url);
@@ -289,10 +296,9 @@
                 
                 updateProgress(60, "Processando CSV...");
 
-                // Pequeno delay para a UI atualizar a barra antes de travar no processamento
                 setTimeout(() => {
                     parseAndRender(csvText);
-                }, 50);
+                }, 100);
 
             } catch (error) {
                 console.error(error);
@@ -309,16 +315,13 @@
                 encoding: "UTF-8",
                 complete: function(results) {
                     if (results.data && results.data.length > 0) {
-                        updateProgress(80, "Organizando...");
-                        
+                        updateProgress(80, "Organizando Gráficos...");
                         setTimeout(() => {
                             try {
                                 processarDadosOtimizado(results.data);
                                 updateProgress(100, "Concluído!");
-                                
                                 const dashboard = document.getElementById('dashboardArea');
                                 dashboard.classList.remove('hidden');
-                                // Animação de entrada suave
                                 requestAnimationFrame(() => {
                                     dashboard.classList.remove('opacity-0');
                                     dashboard.classList.add('opacity-100');
@@ -335,11 +338,10 @@
             });
         }
 
-        // ================= PROCESSAMENTO (OTIMIZADO) =================
+        // ================= LÓGICA DE DADOS (CORE) =================
         function processarDadosOtimizado(data) {
             dadosGlobais = [];
 
-            // Detecta colunas
             const chaves = Object.keys(data[0]);
             const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
             const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
@@ -350,7 +352,6 @@
 
             let total = 0;
 
-            // Loop de Processamento (1 Passada)
             data.forEach((row, index) => {
                 total++;
                 const obmValor = row[colObm];
@@ -358,7 +359,7 @@
                 const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // --- REGRA DE PELOTÕES ---
+                // --- 1. LÓGICA DE PELOTÕES (Incluindo BBS) ---
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
@@ -384,7 +385,7 @@
                     if(pel === "") pel = "OUTROS";
                 }
 
-                // --- REGRA DE NATUREZA ---
+                // --- 2. LÓGICA DE NATUREZA ---
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
                 
@@ -416,11 +417,9 @@
             });
 
             popularFiltros();
-            // Chama a função de renderização única
-            requestAnimationFrame(() => renderizarTabelaEGraficos(dadosGlobais));
+            renderizarTabelaEGraficos(dadosGlobais);
         }
 
-        // --- FILTROS ---
         function popularFiltros() {
             const naturezas = new Set();
             const subgrupos = new Set();
@@ -475,7 +474,6 @@
             renderizarTabelaEGraficos(dadosGlobais);
         }
 
-        // --- RENDERIZAÇÃO (SINGLE PASS) ---
         function renderizarTabelaEGraficos(dados, isFiltrado = false) {
             const total = dados.length;
             const totalGlobal = dadosGlobais.length;
@@ -486,7 +484,6 @@
             const textoLinhas = isFiltrado ? `${total} (Filtrado de ${totalGlobal})` : total;
             document.getElementById('totalLista').innerText = textoLinhas;
 
-            // Agregadores para os gráficos
             const countPelotao = {};
             const countNatureza = {};
             const countSubgrupo = {}; 
@@ -494,7 +491,6 @@
             let tableRowsHTML = "";
 
             dados.forEach((d, index) => {
-                // Agregar dados (sem loop extra)
                 countPelotao[d.pel] = (countPelotao[d.pel] || 0) + 1;
                 countNatureza[d.nat] = (countNatureza[d.nat] || 0) + 1;
                 
@@ -503,7 +499,6 @@
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
 
-                // Construção HTML
                 const style = naturezasStyle[d.nat] || { color: "#94A3B8", icon: "📄", cssClass: "text-slate-400" };
                 
                 let lat = d.lat;
@@ -530,13 +525,10 @@
                 `;
             });
 
-            // Atualiza Tabela
             document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
 
-            // Atualiza Gráficos (somente se houver dados)
             if (total > 0) {
-                // RequestAnimationFrame para não travar a UI enquanto renderiza os gráficos
-                requestAnimationFrame(() => prepararGraficos(countPelotao, countNatureza, countSubgrupo));
+                prepararGraficos(countPelotao, countNatureza, countSubgrupo);
             }
         }
 
@@ -548,14 +540,14 @@
                 .filter(([key, count]) => count >= 1)
                 .sort((a,b) => b[1] - a[1]);
 
-            // Cores Pelotão
+            // Cor Degradê Pelotão
             const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
             const pelotoesColors = sortedPelotao.map(([nome, val]) => {
                 const intensity = 0.3 + (0.7 * (val / maxVal)); 
                 return `rgba(77, 124, 15, ${intensity})`; 
             });
 
-            // Labels Natureza (Com quebra de linha para Vistoria)
+            // Labels Natureza (Quebra de Linha Vistoria)
             const natLabels = sortedNatureza.map(x => {
                 const name = x[0];
                 const style = naturezasStyle[name] || { color: "#94A3B8", icon: "📄" };
@@ -585,7 +577,6 @@
         }
 
         function renderizarGraficos(dados) {
-            // Fonte Mono nos Gráficos
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
@@ -594,7 +585,7 @@
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 0 }, // Zero animação para performance máxima
+                animation: { duration: 500 },
                 layout: { padding: { right: 40 } },
                 plugins: { 
                     legend: { display: false },
@@ -614,12 +605,10 @@
                 }
             };
 
-            // Destruição segura
             if(chartP) chartP.destroy();
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // 1. Pelotões
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
                 data: {
@@ -633,7 +622,6 @@
                 options: commonOptions
             });
 
-            // 2. Natureza
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
                 data: {
@@ -658,7 +646,6 @@
                 }
             });
 
-            // 3. Subgrupos
             const containerS = document.getElementById('subgrupoContainer');
             if(dados.subgrupos.labels.length > 0) {
                 const height = Math.max(600, dados.subgrupos.labels.length * 30);
