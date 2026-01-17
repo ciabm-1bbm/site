@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Guarnições 1º BBM - 16/01/2026</title>
+    <title>Gestão de Guarnições 1º BBM - Automático</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
+        // Configuração do PDF.js Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -19,6 +24,7 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
         .hero-background { 
@@ -31,7 +37,6 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* CARD FIXO, JUSTIFICADO E COM ZOOM */
         .guarnicao-card {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
@@ -55,7 +60,6 @@
             width: 100%;
         }
 
-        /* TOOLTIPS DO RESUMO */
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
@@ -68,19 +72,38 @@
         
         .card-scroll::-webkit-scrollbar { width: 4px; }
         .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
+
+        /* Botão de Upload Personalizado */
+        .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .btn-upload {
+            border: 1px solid #FFD700; color: #FFD700; background-color: transparent;
+            padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;
+            transition: all 0.3s; display: flex; items-center; gap: 8px;
+        }
+        .btn-upload:hover { background-color: #FFD700; color: black; }
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;
+        }
     </style>
 </head>
-<body class="hero-background min-h-screen">
+<body class="hero-background min-h-screen flex flex-col">
 
-<div class="content-wrapper flex flex-col min-h-screen">
     <header class="py-4 bg-black/60 backdrop-blur-md border-b border-white/10 shrink-0">
         <div class="container mx-auto px-4 flex justify-between items-center">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
-            <div class="text-center">
-                <h1 class="text-2xl font-black text-bombeiros-yellow italic uppercase">1º BBM - Porto Alegre</h1>
-                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escala Operacional - 16/01/2026</p>
+            <div class="flex items-center gap-4">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
+                <div class="hidden md:block">
+                    <h1 class="text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - Porto Alegre</h1>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-widest" id="data-escala">Aguardando arquivo...</p>
+                </div>
             </div>
-            <img src="images/brasao_1BBM_PARA_site.png" class="h-12">
+
+            <div class="upload-btn-wrapper">
+                <button class="btn-upload">
+                    <i class="fas fa-file-pdf"></i> Carregar Escala (PDF)
+                </button>
+                <input type="file" id="file-upload" accept="application/pdf" onchange="handleFileUpload(this)">
+            </div>
         </div>
     </header>
 
@@ -88,14 +111,16 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6 relative z-50 shrink-0">
             <div class="lg:col-span-3 bg-fire-red/20 border-l-4 border-fire-red p-4 rounded-r-xl flex flex-col justify-center shadow-lg">
                 <span class="text-fire-red font-black text-[10px] uppercase tracking-widest">Prontidão</span>
-                <h2 class="text-xl font-black text-white leading-tight">Sexta-feira, 16/01/2026</h2>
+                <h2 class="text-xl font-black text-white leading-tight" id="dia-semana">--</h2>
             </div>
 
             <div class="lg:col-span-6 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
                 <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 border-b border-white/10 pb-1 flex items-center gap-2">
                     <i class="fas fa-users"></i> EFETIVO ESCALADO:
                 </h3>
-                <div id="stats-militares" class="grid grid-cols-4 gap-3"></div>
+                <div id="stats-militares" class="grid grid-cols-4 gap-3 text-center text-sm text-gray-500">
+                    Aguardando processamento do PDF...
+                </div>
             </div>
 
             <div class="lg:col-span-3 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
@@ -106,61 +131,232 @@
             </div>
         </div>
 
-        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 justify-items-stretch"></div>
+        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 justify-items-stretch">
+            <div class="col-span-full text-center py-20 text-gray-500">
+                <i class="fas fa-cloud-upload-alt text-4xl mb-4"></i>
+                <p>Por favor, carregue o arquivo PDF da escala no botão acima.</p>
+            </div>
+        </div>
     </main>
 
     <footer class="py-4 text-center text-xs text-white opacity-80 shrink-0 border-t border-white/10 bg-black/40" style="font-family: Arial, sans-serif;">
         &copy; 2026 Companhia de Bombeiro Militar - 1º BBM. Site Desenvolvido por Gustavo Medeiros.
     </footer>
-</div>
 
 <script>
-    [cite_start]// DADOS 16/01/2026 [cite: 57, 66]
-    const guarnicoesData = {
-        "OFICIAL DE DIA": [{ vtr: "ATP-0640", mil: [{f: "OFICIAL SV", n: "A CONFIRMAR"}, {f: "MOT. DIA", n: "A CONFIRMAR"}], t: "24h" }],
-        "AÇORIANOS": [
-            { vtr: "ABT-1364", mil: [{f: "CMT SOC", n: "1º SGT PME ARAGÃO"}, {f: "COV", n: "SD MUNDEL"}, {f: "LINHA", n: "SD TEIXEIRA"}], t: "24h" },
-            { vtr: "AEM-0482", mil: [{f: "COV", n: "SD BOTTINI"}], t: "24h" }
-        ],
-        "TERESÓPOLIS": [
-            { vtr: "ABT-0594", mil: [{f: "CMT GU", n: "2º SGT CARGNELUTTI"}, {f: "COV", n: "SD ZEMPER"}, {f: "LINHA", n: "SD TEMP CARDOSO"}], t: "24h" },
-            { vtr: "AR-0766", mil: [{f: "CMT GU", n: "SD LOPES"}, {f: "COV (08-20h)", n: "SD ROSEANNE"}, {f: "COV (20-08h)", n: "SD ARAUJO"}], t: "24h" }
-        ],
-        "ASSUNÇÃO": [{ vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT JUNIOR"}, {f: "COV", n: "SD RAUBACH"}, {f: "LINHA", n: "SD DIEIQUE"}], t: "24h" }],
-        "FLORESTA": [{ vtr: "ABT-0597", mil: [{f: "CMT GU", n: "SD CRISTIANO"}, {f: "COV", n: "SD SIQUEIRA"}, {f: "LINHA", n: "SD KINGESKI"}], t: "24h" }],
-        "RESTINGA": [{ vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV", n: "SD FINGER"}, {f: "LINHA", n: "SD ASSUNÇÃO"}], t: "24h" }],
-        "BELÉM NOVO": [{ vtr: "ABT-0599", mil: [{f: "CMT GU", n: "SD DETONI"}, {f: "COV", n: "SD MARTINEZ"}, {f: "LINHA", n: "SD COSME"}], t: "24h" }],
-        "PASSO D'AREIA": [{ vtr: "ABT-0600", mil: [{f: "CMT GU", n: "SD PEDRO"}, {f: "COV (08-20h)", n: "SD ISMAEL"}, {f: "COV (20-08h)", n: "SD TEMP PAULINO"}, {f: "LINHA", n: "SD TEMP SOARES"}], t: "24h" }],
-        "PARTENON": [{ vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD PATRICK"}, {f: "COV", n: "SD BRUNO EDUARDO"}, {f: "LINHA", n: "SD TEMP ZANETTI"}], t: "24h" }],
-        "CANIL / BBS": [{ vtr: "ABC-792", mil: [{f: "CINOTÉCNICO", n: "SD EUGENIO"}, {f: "CINOTÉCNICO", n: "SD LOPES"}], t: "24h" }],
-        "AQUÁTICA / BBS": [
-            { vtr: "EABS", mil: [{f: "CMT GU", n: "A CONFIRMAR"}, {f: "CONDUTOR", n: "A CONFIRMAR"}], t: "24h" }
-        ],
-        "MERGULHO / BBS": [
-            { vtr: "ATP-1190", mil: [{f: "CMT", n: "2º SGT SIMAS"}, {f: "MERG", n: "2º SGT MAURO"}, {f: "MERG", n: "SD DAMIEL"}], t: "12h" }
-        ],
-        "COBOM - SALA DE OPERAÇÕES": [
-            { vtr: "CCOB", mil: [{f: "OP", n: "SD MUNHOZ"}], t: "24h" },
-            { vtr: "COBOM", mil: [{f: "OP", n: "A CONFIRMAR"}], t: "12h" }
-        ]
-    };
+    // Estrutura Base para popular
+    let guarnicoesDB = {};
+
+    // Mapeamento da Ordem dos Pelotões (Baseado no padrão do PDF)
+    // O algoritmo vai preencher esses "baldes" conforme encontra "Comandante de Guarnição"
+    const combatStationsOrder = [
+        "TERESÓPOLIS",
+        "ASSUNÇÃO",
+        "FLORESTA",
+        "RESTINGA",
+        "BELÉM NOVO",
+        "PASSO D'AREIA",
+        "AÇORIANOS", // Em algumas escalas aparece antes ou depois, mas vamos manter a lógica sequencial
+        "PARTENON"
+    ];
+
+    async function handleFileUpload(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const arrayBuffer = await file.arrayBuffer();
+            
+            // Atualizar data
+            const hoje = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+            document.getElementById('dia-semana').innerText = hoje.toLocaleDateString('pt-BR', options);
+            document.getElementById('data-escala').innerText = "Arquivo: " + file.name;
+
+            processPDF(arrayBuffer);
+        }
+    }
+
+    async function processPDF(data) {
+        const loadingDiv = document.getElementById('guarnicoes-grid');
+        loadingDiv.innerHTML = '<div class="col-span-full text-center text-yellow-400"><i class="fas fa-spinner fa-spin text-3xl"></i><br>Processando Inteligência Artificial...</div>';
+
+        const pdf = await pdfjsLib.getDocument(data).promise;
+        let fullText = "";
+
+        // Extrair texto de todas as páginas
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(" | "); // Pipe separator
+            fullText += pageText + " | ";
+        }
+
+        parseData(fullText);
+    }
+
+    function parseData(text) {
+        // Reiniciar DB
+        guarnicoesDB = {
+            "OFICIAL DE DIA": { vtr: "VTR OFICIAL", mil: [] },
+            "CANIL / BBS": { vtr: "ABC-792", mil: [] },
+            "MERGULHO / BBS": { vtr: "VIATURA MERGULHO", mil: [] },
+            "AQUÁTICA / BBS": { vtr: "EMBARCAÇÃO", mil: [] },
+            "COBOM - SALA DE OPERAÇÕES": { vtr: "SALA DE OP", mil: [] }
+        };
+        // Inicializar Pelotões
+        combatStationsOrder.forEach(st => guarnicoesDB[st] = { vtr: "ABT/AR", mil: [] });
+
+        // Limpeza básica e split
+        const items = text.split("|").map(s => s.trim()).filter(s => s.length > 2);
+        
+        let currentStationIndex = 0;
+        let lastAssignedStation = null;
+
+        // Lógica de Varredura
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const nextItem = items[i+1] || "";
+            const prevItem = items[i-1] || "";
+
+            // Detectar Nome e Graduação
+            if (isMilitar(item)) {
+                let militar = { n: item, f: "GU" }; // Padrão
+
+                // Tentar achar a função próxima
+                let funcaoContexto = "";
+                if (isFuncao(prevItem)) funcaoContexto = prevItem;
+                else if (isFuncao(nextItem)) funcaoContexto = nextItem;
+                else if (isFuncao(items[i+2])) funcaoContexto = items[i+2];
+
+                militar.f = mapFuncao(funcaoContexto);
+
+                // LÓGICA DE DISTRIBUIÇÃO
+                if (funcaoContexto.includes("CINOTÉCNICO")) {
+                    guarnicoesDB["CANIL / BBS"].mil.push(militar);
+                } 
+                else if (funcaoContexto.includes("MERGULHADOR")) {
+                    guarnicoesDB["MERGULHO / BBS"].mil.push(militar);
+                }
+                else if (funcaoContexto.includes("NAVAL")) {
+                    guarnicoesDB["AQUÁTICA / BBS"].mil.push(militar);
+                }
+                else if (funcaoContexto.includes("COBOM") || funcaoContexto.includes("CCOB")) {
+                    guarnicoesDB["COBOM - SALA DE OPERAÇÕES"].mil.push(militar);
+                }
+                else if (funcaoContexto.includes("OFICIAL") || funcaoContexto.includes("SUPERVISOR")) {
+                    guarnicoesDB["OFICIAL DE DIA"].mil.push(militar);
+                }
+                else {
+                    // É COMBATE (Pelotões)
+                    // Se for Comandante de Guarnição, avança para o próximo pelotão da lista
+                    if (funcaoContexto.includes("COMANDANTE DE GUARNIÇÃO") || funcaoContexto.includes("CMT GU")) {
+                        if (currentStationIndex < combatStationsOrder.length) {
+                            lastAssignedStation = combatStationsOrder[currentStationIndex];
+                            // Verifica se já tem gente nesse posto, se tiver e for muito, avança (evita agrupar errados)
+                            if (guarnicoesDB[lastAssignedStation].mil.length >= 3) {
+                                currentStationIndex++;
+                                if(currentStationIndex < combatStationsOrder.length) lastAssignedStation = combatStationsOrder[currentStationIndex];
+                            }
+                        }
+                    }
+                    
+                    // Se ainda não definimos onde jogar, joga no primeiro
+                    if (!lastAssignedStation) lastAssignedStation = combatStationsOrder[0];
+                    
+                    // Adiciona ao pelotão atual
+                    guarnicoesDB[lastAssignedStation].mil.push(militar);
+                }
+            }
+        }
+        
+        // Renderizar
+        renderCards();
+        processarEfetivo();
+    }
+
+    function isMilitar(str) {
+        return /^(SD|1° SGT|2° SGT|2 SGT|1 SGT|CAP|MAJ|TEN)\s/.test(str);
+    }
+
+    function isFuncao(str) {
+        if (!str) return false;
+        const keywords = ["COMANDANTE", "CONDUTOR", "LINHA", "COV", "CINOTÉCNICO", "MERGULHADOR", "OPERADOR", "OFICIAL", "SUPERVISOR"];
+        return keywords.some(k => str.toUpperCase().includes(k));
+    }
+
+    function mapFuncao(str) {
+        str = str.toUpperCase();
+        if (str.includes("COMANDANTE")) return "CMT GU";
+        if (str.includes("CONDUTOR") || str.includes("COV")) return "COV/MOT";
+        if (str.includes("LINHA")) return "LINHA";
+        if (str.includes("CINOTÉCNICO")) return "CINO";
+        if (str.includes("MERGULHADOR")) return "MERG";
+        if (str.includes("NAVAL")) return "COND NAVAL";
+        if (str.includes("COBOM")) return "OP COBOM";
+        if (str.includes("CCOB")) return "OP CCOB";
+        if (str.includes("OFICIAL")) return "SUP";
+        return "GU";
+    }
+
+    // --- FUNÇÕES DE RENDERIZAÇÃO (IGUAIS AO ANTERIOR) ---
+    function renderCards() {
+        const grid = document.getElementById('guarnicoes-grid');
+        grid.innerHTML = "";
+        
+        Object.keys(guarnicoesDB).forEach(secao => {
+            const data = guarnicoesDB[secao];
+            if (data.mil.length === 0) return; // Não mostra cards vazios
+
+            const card = document.createElement('div');
+            card.className = "guarnicao-card shadow-xl";
+            
+            let iconHtml = '';
+            if(secao.includes("OFICIAL")) iconHtml = '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>';
+            else if(secao.includes("COBOM")) iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>';
+            else if(secao.includes("AQUÁTICA") || secao.includes("MERGULHO")) iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>';
+            else if(secao.includes("CANIL")) iconHtml = '<i class="fas fa-dog text-amber-600 text-3xl"></i>';
+            else iconHtml = '<i class="fas fa-truck text-fire-red text-3xl"></i>';
+
+            let guarnicaoHtml = data.mil.map(m => `
+                <div class="flex justify-between text-xs mb-1 leading-tight border-b border-white/5 pb-1">
+                    <span class="text-gray-400 font-bold uppercase tracking-tight">${m.f}:</span>
+                    <span class="font-bold text-white text-right ml-2">${m.n}</span>
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="status-bar"></div>
+                <div class="p-4 border-b border-white/10 flex flex-col items-center bg-slate-800/40">
+                    <div class="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 border-white/10 overflow-hidden shadow-inner">
+                        ${iconHtml}
+                    </div>
+                    <h3 class="text-sm font-black uppercase tracking-tight leading-tight text-center">${secao}</h3>
+                </div>
+                <div class="card-scroll overflow-y-auto p-4 flex-grow">
+                    ${guarnicaoHtml}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
     function processarEfetivo() {
-        let s = { cap: [], sgt: [], sd: [], abt: [], ar: [], total: 0 };
-        Object.values(guarnicoesData).flat().forEach(v => {
-            if(v.vtr.includes("ABT")) s.abt.push(v.vtr);
-            if(v.vtr.includes("AR")) s.ar.push(v.vtr);
-            v.mil.forEach(m => {
-                if(m.n !== "A CONFIRMAR") {
-                    s.total++;
-                    if(m.n.includes("CAP")) s.cap.push(m.n);
-                    else if(m.n.includes("SGT")) s.sgt.push(m.n);
-                    else s.sd.push(m.n);
-                }
+        let s = { cap: [], sgt: [], sd: [], total: 0, abt: 0, ar: 0 };
+        
+        Object.keys(guarnicoesDB).forEach(key => {
+            const mil = guarnicoesDB[key].mil;
+            if(mil.length > 0) {
+                if (key.includes("TERESÓPOLIS")) s.ar = 1; // AR Fixa
+                if (!key.includes("OFICIAL") && !key.includes("COBOM")) s.abt++;
+            }
+
+            mil.forEach(m => {
+                s.total++;
+                if(m.n.includes("CAP")) s.cap.push(m.n);
+                else if(m.n.includes("SGT")) s.sgt.push(m.n);
+                else s.sd.push(m.n);
             });
         });
         
-        // Efetivo - COR TOTAL VERDE LIMÃO
         document.getElementById('stats-militares').innerHTML = `
             ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
@@ -168,10 +364,9 @@
             ${renderStat('TOTAL', s.total, 'text-lime-400', ['Efetivo Total Escalado'])}
         `;
         
-        // Meios - COR AR VERMELHA
         document.getElementById('stats-meios').innerHTML = `
-            ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
-            ${renderStat('AR', s.ar.length, 'text-red-500', s.ar)}
+            ${renderStat('ABT', s.abt, 'text-red-500', ['Estimado'])}
+            ${renderStat('AR', s.ar, 'text-red-500', ['AR-0766'])}
         `;
     }
 
@@ -183,51 +378,6 @@
             <div class="tooltip-list font-bold">${items}</div>
         </div>`;
     }
-
-    function renderCards() {
-        const grid = document.getElementById('guarnicoes-grid');
-        Object.keys(guarnicoesData).forEach(secao => {
-            const vtrs = guarnicoesData[secao].map(v => v.vtr).join(' / ');
-            const card = document.createElement('div');
-            card.className = "guarnicao-card shadow-xl";
-            
-            let iconHtml = '';
-            if(secao.includes("OFICIAL")) iconHtml = '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>';
-            else if(secao.includes("COBOM")) iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>';
-            else if(secao.includes("AQUÁTICA") || secao.includes("MERGULHO")) iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>';
-            else if(secao.includes("CANIL")) iconHtml = '<i class="fas fa-dog text-amber-600 text-3xl"></i>';
-            // CAMINHÃO VERMELHO para os Pelotões
-            else iconHtml = '<i class="fas fa-truck text-fire-red text-3xl"></i>';
-
-            let guarnicaoHtml = guarnicoesData[secao].map(v => `
-                <div class="px-3 mb-3">
-                    <div class="text-[10px] font-black text-bombeiros-yellow border-b border-white/10 mb-1 flex justify-between uppercase tracking-wider">
-                        <span>${v.vtr}</span><span class="text-fire-red">${v.t}</span>
-                    </div>
-                    ${v.mil.map(m => `<div class="flex justify-between text-xs mb-1 leading-tight">
-                        <span class="text-gray-400 font-bold uppercase tracking-tight">${m.f}:</span>
-                        <span class="font-bold text-white text-right ml-2">${m.n}</span>
-                    </div>`).join('')}
-                </div>
-            `).join('');
-
-            card.innerHTML = `
-                <div class="status-bar"></div>
-                <div class="p-4 border-b border-white/10 flex flex-col items-center bg-slate-800/40">
-                    <div class="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 border-white/10 overflow-hidden shadow-inner">
-                        ${iconHtml}
-                    </div>
-                    <h3 class="text-sm font-black uppercase tracking-tight leading-tight text-center">${secao}</h3>
-                    <span class="text-[10px] text-gray-400 font-bold italic mt-1">(${vtrs})</span>
-                </div>
-                <div class="card-scroll overflow-y-auto p-2 flex-grow">
-                    ${guarnicaoHtml}
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-    processarEfetivo(); renderCards();
 </script>
 </body>
 </html>
