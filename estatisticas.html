@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS</title>
+    <title>ESTATÍSTICAS DE OCORRÊNCIAS - 1º BBM (2025)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -36,7 +36,8 @@
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        /* Otimização de GPU para background */
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
         .hero-bg::before {
             content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
@@ -54,6 +55,8 @@
             backdrop-filter: blur(10px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            /* Otimização de renderização */
+            contain: content; 
         }
 
         .btn-mes { transition: all 0.2s ease-in-out; border: 1px solid rgba(255,255,255,0.1); }
@@ -71,6 +74,7 @@
         }
         @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
+        /* Scroll Otimizado */
         .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
@@ -97,10 +101,10 @@
             
             <div class="text-center flex-1">
                 <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
-                    SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS
+                    ESTATÍSTICAS DE OCORRÊNCIAS
                 </h1>
                 <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
-                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
+                    1º BBM (<span id="anoTitulo">2025</span>)
                 </h2>
                 <div class="mt-2 text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Aguardando seleção.</div>
             </div>
@@ -194,7 +198,7 @@
         
         Chart.register(ChartDataLabels);
 
-        // --- PALETA DE CORES E ÍCONES ---
+        // --- MAPA DE ESTILOS (CORES/ÍCONES) ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
             "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
@@ -231,12 +235,13 @@
                 container.appendChild(btn);
             });
 
+            // Listeners para filtros
             ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
                 document.getElementById(id).addEventListener('change', aplicarFiltros);
             });
         });
 
-        // ================= GERENCIADOR DE PROCESSO =================
+        // ================= PROGRESS BAR & DOWNLOAD =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -259,19 +264,21 @@
         async function iniciarProcesso(mesId, mesNome, btnElement) {
             mesSelecionadoNome = mesNome;
 
+            // UI Feedback
             document.querySelectorAll('.btn-mes').forEach(b => {
                 b.classList.remove('active');
                 b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
             });
             btnElement.classList.add('active');
             
+            // Oculta dashboard para recarregar
             const dashboard = document.getElementById('dashboardArea');
             dashboard.classList.add('hidden');
             dashboard.classList.remove('opacity-100');
             dashboard.classList.add('opacity-0');
 
             try {
-                updateProgress(10, `Conectando ao servidor...`);
+                updateProgress(10, `Conectando...`);
                 const url = `${GITHUB_BASE_URL}/dados/${mesId}_${ANO_ATUAL}.csv`;
                 
                 const response = await fetch(url);
@@ -282,9 +289,10 @@
                 
                 updateProgress(60, "Processando CSV...");
 
+                // Pequeno delay para a UI atualizar a barra antes de travar no processamento
                 setTimeout(() => {
                     parseAndRender(csvText);
-                }, 100);
+                }, 50);
 
             } catch (error) {
                 console.error(error);
@@ -301,13 +309,16 @@
                 encoding: "UTF-8",
                 complete: function(results) {
                     if (results.data && results.data.length > 0) {
-                        updateProgress(80, "Organizando Gráficos...");
+                        updateProgress(80, "Organizando...");
+                        
                         setTimeout(() => {
                             try {
                                 processarDadosOtimizado(results.data);
                                 updateProgress(100, "Concluído!");
+                                
                                 const dashboard = document.getElementById('dashboardArea');
                                 dashboard.classList.remove('hidden');
+                                // Animação de entrada suave
                                 requestAnimationFrame(() => {
                                     dashboard.classList.remove('opacity-0');
                                     dashboard.classList.add('opacity-100');
@@ -324,10 +335,11 @@
             });
         }
 
-        // ================= LÓGICA DE DADOS (CORE) =================
+        // ================= PROCESSAMENTO (OTIMIZADO) =================
         function processarDadosOtimizado(data) {
             dadosGlobais = [];
 
+            // Detecta colunas
             const chaves = Object.keys(data[0]);
             const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
             const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
@@ -338,6 +350,7 @@
 
             let total = 0;
 
+            // Loop de Processamento (1 Passada)
             data.forEach((row, index) => {
                 total++;
                 const obmValor = row[colObm];
@@ -345,18 +358,15 @@
                 const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // --- 1. LÓGICA DE PELOTÕES (Incluindo BBS) ---
+                // --- REGRA DE PELOTÕES ---
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
 
-                // Regras BBS (Prioridade)
                 if (s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                 else if (s.includes("CANIL")) pel = "BBS (POA) - CANIL";
                 else if (s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
                 else if (s.includes("TERRESTRE") || (s.includes("BBS") && !s.includes("1º BBM"))) pel = "BBS (POA) - TERRESTRE";
-                
-                // 1º BBM
                 else if (s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
                 else if (s.includes("FLORESTA")) pel = "FLORESTA";
                 else if (s.includes("PASSO")) pel = "PASSO D'AREIA";
@@ -364,19 +374,17 @@
                 else if (s.includes("PARTENON")) pel = "PARTENON";
                 else if (s.includes("BELÉM") || s.includes("BELEM")) pel = "BELÉM NOVO";
                 else if (s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
-                // Regra Teresópolis (ABT vs AR)
                 else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) {
                     if (v.includes("AR") || s.includes("RESGATE")) pel = "AUTO RESGATE";
                     else pel = "TERESÓPOLIS";
                 }
                 else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
                 else {
-                    // Limpeza de "Outros"
                     pel = s.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").trim();
                     if(pel === "") pel = "OUTROS";
                 }
 
-                // --- 2. LÓGICA DE NATUREZA ---
+                // --- REGRA DE NATUREZA ---
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
                 
@@ -408,9 +416,11 @@
             });
 
             popularFiltros();
-            renderizarTabelaEGraficos(dadosGlobais);
+            // Chama a função de renderização única
+            requestAnimationFrame(() => renderizarTabelaEGraficos(dadosGlobais));
         }
 
+        // --- FILTROS ---
         function popularFiltros() {
             const naturezas = new Set();
             const subgrupos = new Set();
@@ -465,6 +475,7 @@
             renderizarTabelaEGraficos(dadosGlobais);
         }
 
+        // --- RENDERIZAÇÃO (SINGLE PASS) ---
         function renderizarTabelaEGraficos(dados, isFiltrado = false) {
             const total = dados.length;
             const totalGlobal = dadosGlobais.length;
@@ -475,6 +486,7 @@
             const textoLinhas = isFiltrado ? `${total} (Filtrado de ${totalGlobal})` : total;
             document.getElementById('totalLista').innerText = textoLinhas;
 
+            // Agregadores para os gráficos
             const countPelotao = {};
             const countNatureza = {};
             const countSubgrupo = {}; 
@@ -482,6 +494,7 @@
             let tableRowsHTML = "";
 
             dados.forEach((d, index) => {
+                // Agregar dados (sem loop extra)
                 countPelotao[d.pel] = (countPelotao[d.pel] || 0) + 1;
                 countNatureza[d.nat] = (countNatureza[d.nat] || 0) + 1;
                 
@@ -490,7 +503,7 @@
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
 
-                // Estilo da Natureza
+                // Construção HTML
                 const style = naturezasStyle[d.nat] || { color: "#94A3B8", icon: "📄", cssClass: "text-slate-400" };
                 
                 let lat = d.lat;
@@ -517,10 +530,13 @@
                 `;
             });
 
+            // Atualiza Tabela
             document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
 
+            // Atualiza Gráficos (somente se houver dados)
             if (total > 0) {
-                prepararGraficos(countPelotao, countNatureza, countSubgrupo);
+                // RequestAnimationFrame para não travar a UI enquanto renderiza os gráficos
+                requestAnimationFrame(() => prepararGraficos(countPelotao, countNatureza, countSubgrupo));
             }
         }
 
@@ -532,14 +548,14 @@
                 .filter(([key, count]) => count >= 1)
                 .sort((a,b) => b[1] - a[1]);
 
-            // Cor Degradê Pelotão
+            // Cores Pelotão
             const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
             const pelotoesColors = sortedPelotao.map(([nome, val]) => {
                 const intensity = 0.3 + (0.7 * (val / maxVal)); 
                 return `rgba(77, 124, 15, ${intensity})`; 
             });
 
-            // Labels e Cores Natureza (QUEBRA DE LINHA para Vistoria)
+            // Labels Natureza (Com quebra de linha para Vistoria)
             const natLabels = sortedNatureza.map(x => {
                 const name = x[0];
                 const style = naturezasStyle[name] || { color: "#94A3B8", icon: "📄" };
@@ -550,7 +566,7 @@
             });
             const natColors = sortedNatureza.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
 
-            // Labels e Cores Subgrupos
+            // Labels Subgrupos
             const subLabels = sortedSubgrupo.map(item => {
                 const [natPai, subNome] = item[0].split('___');
                 const style = naturezasStyle[natPai] || { color: "#94A3B8", icon: "📄" };
@@ -569,6 +585,7 @@
         }
 
         function renderizarGraficos(dados) {
+            // Fonte Mono nos Gráficos
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
@@ -577,7 +594,7 @@
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 500 },
+                animation: { duration: 0 }, // Zero animação para performance máxima
                 layout: { padding: { right: 40 } },
                 plugins: { 
                     legend: { display: false },
@@ -597,10 +614,12 @@
                 }
             };
 
+            // Destruição segura
             if(chartP) chartP.destroy();
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
+            // 1. Pelotões
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
                 data: {
@@ -614,6 +633,7 @@
                 options: commonOptions
             });
 
+            // 2. Natureza
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
                 data: {
@@ -638,6 +658,7 @@
                 }
             });
 
+            // 3. Subgrupos
             const containerS = document.getElementById('subgrupoContainer');
             if(dados.subgrupos.labels.length > 0) {
                 const height = Math.max(600, dados.subgrupos.labels.length * 30);
