@@ -21,7 +21,9 @@
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
                         'dark-bg': '#0f172a',
-                        'cb-green': '#10B981'
+                        'cb-green': '#10B981',
+                        'oliva-start': '#365314', // Verde Oliva Escuro
+                        'oliva-end': '#84cc16'    // Verde Oliva Claro
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -32,7 +34,6 @@
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* Background Otimizado */
         .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .hero-bg::before {
             content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
@@ -48,12 +49,11 @@
         .glass-card {
             background: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px); /* Reduzido de 12px para performance */
+            backdrop-filter: blur(10px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        /* Botões */
         .btn-mes { transition: all 0.2s ease-in-out; border: 1px solid rgba(255,255,255,0.1); }
         .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
         .btn-mes.active { 
@@ -61,10 +61,8 @@
             border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.05);
         }
 
-        /* Barra de Progresso Hacker Style */
-        #progressContainer {
-            transition: opacity 0.3s;
-        }
+        /* Barra de Progresso */
+        #progressContainer { transition: opacity 0.3s; }
         .progress-bar-striped {
             background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
             background-size: 1rem 1rem;
@@ -72,7 +70,6 @@
         }
         @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
-        /* Scrollbar */
         .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
@@ -121,18 +118,18 @@
             
             <div class="flex justify-center mb-8">
                 <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-10 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md">
-                    <p class="text-xs uppercase font-bold tracking-[0.2em] mb-1 text-emerald-200">Total Processado</p>
+                    <p class="text-xs uppercase font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS ATENDIDAS</p>
                     <p class="text-5xl font-black text-white drop-shadow-md" id="totalDisplay">0</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="glass-card p-4">
-                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">Por Subunidade</h3>
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
                     <div class="relative h-[500px]"><canvas id="chartPelotoes"></canvas></div>
                 </div>
                 <div class="glass-card p-4">
-                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">Por Natureza</h3>
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
                     <div class="relative h-[500px]"><canvas id="chartNatureza"></canvas></div>
                 </div>
             </div>
@@ -167,21 +164,15 @@
             </div>
         </div>
 
-        <div class="h-10"></div> </div>
+        <div class="h-10"></div>
+    </div>
 
     <script>
         // ================= CONFIGURAÇÕES AVANÇADAS =================
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
         const ANO_ATUAL = 2025;
         
-        // Plugin de DataLabels
         Chart.register(ChartDataLabels);
-
-        // Paleta Otimizada
-        const colorsPalette = [
-            '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', 
-            '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#64748B', '#A8A29E'
-        ];
 
         // Mapeamento Visual
         const naturezasStyle = {
@@ -196,15 +187,16 @@
         };
 
         const meses = [
-            { id: 'JAN', nome: 'Janeiro' }, { id: 'FEV', nome: 'Fevereiro' },
-            { id: 'MAR', nome: 'Março' }, { id: 'ABR', nome: 'Abril' },
-            { id: 'MAI', nome: 'Maio' }, { id: 'JUN', nome: 'Junho' },
-            { id: 'JUL', nome: 'Julho' }, { id: 'AGO', nome: 'Agosto' },
-            { id: 'SET', nome: 'Setembro' }, { id: 'OUT', nome: 'Outubro' },
-            { id: 'NOV', nome: 'Novembro' }, { id: 'DEZ', nome: 'Dezembro' }
+            { id: 'JAN', nome: 'JANEIRO' }, { id: 'FEV', nome: 'FEVEREIRO' },
+            { id: 'MAR', nome: 'MARÇO' }, { id: 'ABR', nome: 'ABRIL' },
+            { id: 'MAI', nome: 'MAIO' }, { id: 'JUN', nome: 'JUNHO' },
+            { id: 'JUL', nome: 'JULHO' }, { id: 'AGO', nome: 'AGOSTO' },
+            { id: 'SET', nome: 'SETEMBRO' }, { id: 'OUT', nome: 'OUTUBRO' },
+            { id: 'NOV', nome: 'NOVEMBRO' }, { id: 'DEZ', nome: 'DEZEMBRO' }
         ];
 
         let chartP = null, chartN = null, chartS = null;
+        let mesSelecionadoNome = ""; // Guardar nome do mês
 
         // ================= INICIALIZAÇÃO =================
         document.addEventListener('DOMContentLoaded', () => {
@@ -212,13 +204,13 @@
             meses.forEach(m => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
-                btn.innerText = m.id;
-                btn.onclick = () => iniciarProcesso(m.id, btn);
+                btn.innerText = m.id; // Texto curto no botão
+                btn.onclick = () => iniciarProcesso(m.id, m.nome, btn); // Passa nome completo
                 container.appendChild(btn);
             });
         });
 
-        // ================= GERENCIADOR DE PROCESSO (BARRA DE PROGRESSO) =================
+        // ================= GERENCIADOR DE PROCESSO =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -233,42 +225,37 @@
             if (percent >= 100) {
                 setTimeout(() => {
                     container.classList.add('hidden');
-                    // Reset para próxima vez
                     bar.style.width = '0%'; 
                 }, 1500);
             }
         }
 
-        async function iniciarProcesso(mes, btnElement) {
-            // UI Reset
+        async function iniciarProcesso(mesId, mesNome, btnElement) {
+            mesSelecionadoNome = mesNome; // Salva o nome para usar no título
+
             document.querySelectorAll('.btn-mes').forEach(b => {
                 b.classList.remove('active');
                 b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
             });
             btnElement.classList.add('active');
             
-            // Esconde dashboard antigo enquanto carrega
             const dashboard = document.getElementById('dashboardArea');
             dashboard.classList.add('hidden');
             dashboard.classList.remove('opacity-100');
             dashboard.classList.add('opacity-0');
 
             try {
-                // ETAPA 1: DOWNLOAD DO ARQUIVO
-                updateProgress(10, `Conectando ao servidor para baixar ${mes}...`);
-                const url = `${GITHUB_BASE_URL}/dados/${mes}_${ANO_ATUAL}.csv`;
+                updateProgress(10, `Conectando ao servidor...`);
+                const url = `${GITHUB_BASE_URL}/dados/${mesId}_${ANO_ATUAL}.csv`;
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`Arquivo não encontrado: ${url}`);
 
-                // Simulação de progresso de download (fetch não dá progresso exato em GZIP sem header length)
                 updateProgress(40, "Baixando dados...");
                 const csvText = await response.text();
                 
                 updateProgress(60, "Processando CSV...");
 
-                // ETAPA 2: PARSE E ORGANIZAÇÃO (ASSÍNCRONO PARA NÃO TRAVAR)
-                // Usamos setTimeout para dar chance ao navegador de renderizar a barra de progresso
                 setTimeout(() => {
                     parseAndRender(csvText);
                 }, 100);
@@ -288,18 +275,15 @@
                 encoding: "UTF-8",
                 complete: function(results) {
                     if (results.data && results.data.length > 0) {
-                        updateProgress(80, "Organizando Gráficos e Tabelas...");
+                        updateProgress(80, "Organizando Gráficos...");
                         
-                        // Processamento pesado em outra "stack" de tempo
                         setTimeout(() => {
                             try {
                                 processarDadosOtimizado(results.data);
                                 updateProgress(100, "Concluído!");
                                 
-                                // Mostrar Dashboard com Fade In
                                 const dashboard = document.getElementById('dashboardArea');
                                 dashboard.classList.remove('hidden');
-                                // Pequeno delay para a transição CSS funcionar
                                 requestAnimationFrame(() => {
                                     dashboard.classList.remove('opacity-0');
                                     dashboard.classList.add('opacity-100');
@@ -317,9 +301,8 @@
             });
         }
 
-        // ================= PROCESSAMENTO LÓGICO OTIMIZADO =================
+        // ================= PROCESSAMENTO LÓGICO =================
         function processarDadosOtimizado(data) {
-            // Detecção de Colunas
             const chaves = Object.keys(data[0]);
             const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
             const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
@@ -330,14 +313,8 @@
             const countPelotao = {};
             const countNatureza = {};
             const countSubgrupo = {}; 
-            
-            // Array gigante de strings HTML (Muito mais rápido que criar elementos DOM um por um)
             let tableRowsHTML = ""; 
-            
             let total = 0;
-
-            // Regex pré-compilado para performance
-            const regexClean = /[^a-zA-Z0-9\s]/g;
 
             data.forEach((row, index) => {
                 total++;
@@ -345,7 +322,7 @@
                 const natValor = row[colNat];
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // Mapeamento Inline (Mais rápido que chamar função externa muitas vezes)
+                // Mapeamento Pelotões
                 let pel = "OUTROS";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
@@ -368,7 +345,6 @@
                 else if(n.includes("APH") || n.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
                 else if(n.includes("PERIGOSO") || n.includes("HAZMAT")) nat = "PRODUTOS PERIGOSOS";
 
-                // Contagens
                 countPelotao[pel] = (countPelotao[pel] || 0) + 1;
                 countNatureza[nat] = (countNatureza[nat] || 0) + 1;
 
@@ -378,7 +354,7 @@
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
 
-                // Construção da Linha da Tabela (String Concatenation - Super Rápido)
+                // Tabela HTML Otimizada
                 const style = naturezasStyle[nat] || naturezasStyle["OUTROS"];
                 
                 let lat = row['Latitude'] || row['LATITUDE'];
@@ -391,7 +367,6 @@
                     mapsBtn = `<a href="https://www.google.com/maps/search/?api=1&query=$${lat},${lon}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
                 }
 
-                // Usando Template Literal Otimizado
                 tableRowsHTML += `
                     <tr class="hover:bg-white/5 border-b border-gray-800/50 transition-colors odd:bg-white/5 even:bg-transparent">
                         <td class="p-3 text-center font-bold text-gray-500 text-xs">${total}</td>
@@ -399,20 +374,21 @@
                         <td class="p-3 font-bold ${style.cssClass} text-xs whitespace-nowrap"><span class="mr-2">${style.icon}</span>${nat}</td>
                         <td class="p-3 text-xs text-blue-200/80">${subValor}</td>
                         <td class="p-3 uppercase text-xs tracking-wider text-gray-400">${row['Bairro'] || row['BAIRRO'] || '--'}</td>
-                        <td class="p-3"><span class="bg-slate-800 text-gray-300 px-2 py-1 rounded text-[10px] font-mono border border-white/5 whitespace-nowrap">${pel}</span></td>
+                        <td class="p-3"><span class="text-fire-yellow font-bold text-xs whitespace-nowrap">${pel}</span></td>
                         <td class="p-3">${mapsBtn}</td>
                         <td class="p-3 text-right font-mono opacity-30 text-xs">#${row['Nº Oc.'] || row['ID'] || total}</td>
                     </tr>
                 `;
             });
 
-            // ATUALIZAÇÃO DO DOM EM LOTE (A mágica acontece aqui)
-            // Em vez de 2000 atualizações, fazemos apenas estas:
+            // Atualização DOM e Título
             document.getElementById('totalDisplay').innerText = total;
             document.getElementById('totalLista').innerText = total;
             document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
+            
+            // ATUALIZA O TÍTULO DO TOTAL COM O MÊS
+            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${mesSelecionadoNome} ${ANO_ATUAL}`;
 
-            // Preparar dados para gráficos
             prepararGraficos(countPelotao, countNatureza, countSubgrupo);
         }
 
@@ -420,13 +396,22 @@
             // Ordenações
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
-            
-            // Subgrupos (Filtro > 1)
             const sortedSubgrupo = Object.entries(countSubgrupo)
                 .filter(([key, count]) => count > 1)
                 .sort((a,b) => b[1] - a[1]);
 
-            // Mapeamento Visual Gráficos
+            // --- LÓGICA DE COR DEGRADÊ PARA PELOTÕES (VERDE OLIVA) ---
+            // Calcula opacidade ou luminosidade baseada no valor máximo
+            const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
+            const pelotoesColors = sortedPelotao.map(([nome, val]) => {
+                // Calcula uma intensidade entre 0.4 e 1.0 baseada no valor relativo ao máximo
+                const intensity = 0.3 + (0.7 * (val / maxVal)); 
+                // Retorna um tom de verde (HSL 84, 50%, 40%) com opacidade variável
+                // Ou podemos misturar duas cores. Vamos usar opacidade no rgba de um verde oliva forte.
+                // Verde Oliva Forte: #4d7c0f (77, 124, 15)
+                return `rgba(77, 124, 15, ${intensity})`;
+            });
+
             const natLabels = sortedNatureza.map(x => {
                 const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
                 return `${style.icon} ${x[0]}`;
@@ -444,14 +429,13 @@
             });
 
             renderizarGraficos({
-                pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]) },
+                pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]), colors: pelotoesColors },
                 natureza: { labels: natLabels, data: sortedNatureza.map(x=>x[1]), colors: natColors },
                 subgrupos: { labels: subLabels, data: sortedSubgrupo.map(x=>x[1]), colors: subColors }
             });
         }
 
         function renderizarGraficos(dados) {
-            // Configurações Globais Chart.js Otimizadas
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'Inter';
@@ -460,7 +444,7 @@
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 500 }, // Animação mais rápida
+                animation: { duration: 500 },
                 layout: { padding: { right: 40 } },
                 plugins: { 
                     legend: { display: false },
@@ -468,11 +452,6 @@
                         color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
                         font: { weight: 'bold', size: 11 },
                         formatter: Math.round
-                    },
-                    tooltip: {
-                        enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        titleFont: { size: 13 }, bodyFont: { size: 12 }, padding: 10,
-                        borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1
                     }
                 },
                 scales: { 
@@ -481,19 +460,18 @@
                 }
             };
 
-            // Destruir gráficos antigos se existirem
             if(chartP) chartP.destroy();
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // 1. Pelotões
+            // 1. Pelotões (COM COR DEGRADÊ)
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
                 data: {
                     labels: dados.pelotoes.labels,
                     datasets: [{
                         data: dados.pelotoes.data,
-                        backgroundColor: colorsPalette,
+                        backgroundColor: dados.pelotoes.colors, // Cores geradas dinamicamente
                         borderRadius: 3, barPercentage: 0.7
                     }]
                 },
@@ -518,7 +496,7 @@
                         y: {
                             ticks: {
                                 font: { size: 11, weight: 'bold' }, autoSkip: false,
-                                color: dados.natureza.colors // Cor do Eixo
+                                color: dados.natureza.colors
                             }
                         }
                     }
@@ -526,7 +504,6 @@
             });
 
             // 3. Subgrupos
-            // Ajuste de altura dinâmico
             const containerS = document.getElementById('subgrupoContainer');
             if(dados.subgrupos.labels.length > 0) {
                 const height = Math.max(600, dados.subgrupos.labels.length * 30);
@@ -550,7 +527,7 @@
                         y: {
                             ticks: {
                                 font: { size: 11, weight: 'bold' }, autoSkip: false,
-                                color: dados.subgrupos.colors // Cor do Eixo
+                                color: dados.subgrupos.colors
                             }
                         }
                     }
