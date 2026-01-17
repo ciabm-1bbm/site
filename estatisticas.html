@@ -112,22 +112,22 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase">Por Subunidade</h3>
-                    <div class="relative h-[500px]"><canvas id="chartPelotoes"></canvas></div>
+                    <div class="relative h-[550px]"><canvas id="chartPelotoes"></canvas></div>
                 </div>
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase">Por Natureza</h3>
-                    <div class="relative h-[500px]"><canvas id="chartNatureza"></canvas></div>
+                    <div class="relative h-[550px]"><canvas id="chartNatureza"></canvas></div>
                 </div>
             </div>
 
             <div class="glass-card p-6 mb-8">
-                <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">Principais Subgrupos (Top 20)</h3>
-                <div class="relative h-[600px]"><canvas id="chartSubgrupos"></canvas></div>
+                <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">Detalhamento dos Subgrupos (> 1 Ocorrência)</h3>
+                <div id="subgrupoContainer" class="relative" style="height: 600px;"><canvas id="chartSubgrupos"></canvas></div>
             </div>
 
             <div class="glass-card p-1 overflow-hidden">
                 <div class="p-4 border-b border-white/10 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-white border-l-4 border-blue-500 pl-3 uppercase">Detalhamento</h3>
+                    <h3 class="text-lg font-bold text-white border-l-4 border-blue-500 pl-3 uppercase">Detalhamento Completo</h3>
                     <span class="text-xs text-gray-400">Total listado: <span id="totalLista">0</span></span>
                 </div>
                 <div class="table-scroll">
@@ -139,7 +139,8 @@
                                 <th class="p-3">Natureza</th>
                                 <th class="p-3">Subgrupo</th>
                                 <th class="p-3">Bairro</th>
-                                <th class="p-3">Pelotão</th> <th class="p-3 text-center">Local</th>
+                                <th class="p-3">Pelotão</th>
+                                <th class="p-3 text-center">Local</th>
                                 <th class="p-3 text-right">ID</th>
                             </tr>
                         </thead>
@@ -156,21 +157,22 @@
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
         const ANO_ATUAL = 2025;
         
-        // Paleta base para naturezas
+        // Cores padrão para Pelotões
         const colorsPalette = [
             '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', 
             '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#64748B', '#A8A29E'
         ];
 
-        // Mapeamento de Cores por Natureza (Para o gráfico de Subgrupos)
-        const naturezaColors = {
-            "INCÊNDIO": "#EF4444", // Vermelho
-            "MANEJO DE INSETOS": "#F59E0B", // Amarelo/Laranja
-            "BUSCA E RESGATE": "#10B981", // Verde
-            "CORTE DE ÁRVORE": "#22C55E", // Verde Claro
-            "AÇÕES PREVENTIVAS": "#94A3B8", // Cinza
-            "PRÉ-HOSPITALAR": "#F43F5E", // Rosa/Vermelho
-            "OUTROS": "#64748B" // Padrão
+        // --- ESTILOS VISUAIS DAS NATUREZAS ---
+        const naturezasStyle = {
+            "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow", cssIcon: "fa-fire" },
+            "MANEJO DE INSETOS": { color: "#FEF08A", icon: "🐝", cssClass: "text-yellow-200", cssIcon: "fa-bug" },
+            "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500", cssIcon: "fa-life-ring" },
+            "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400", cssIcon: "fa-tree" },
+            "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400", cssIcon: "fa-shield-alt" },
+            "PRÉ-HOSPITALAR": { color: "#EF4444", icon: "🚑", cssClass: "text-red-500", cssIcon: "fa-ambulance" },
+            "PRODUTOS PERIGOSOS": { color: "#FFFFFF", icon: "☢️", cssClass: "text-white", cssIcon: "fa-skull-crossbones" },
+            "OUTROS": { color: "#64748B", icon: "⚠️", cssClass: "text-bombeiros-orange", cssIcon: "fa-exclamation-triangle" }
         };
 
         const meses = [
@@ -267,7 +269,6 @@
             const countPelotao = {};
             const countNatureza = {};
             const countSubgrupo = {}; 
-            // Armazena a natureza do subgrupo para pegar a cor depois
             const subgrupoNaturezaMap = {}; 
             const lista = [];
             let total = 0;
@@ -294,17 +295,16 @@
                 if(n.includes("ÁRVORE") || n.includes("ARVORE")) return "CORTE DE ÁRVORE";
                 if(n.includes("PREVENTIVA")) return "AÇÕES PREVENTIVAS";
                 if(n.includes("APH") || n.includes("HOSPITALAR")) return "PRÉ-HOSPITALAR";
+                if(n.includes("PERIGOSO") || n.includes("HAZMAT")) return "PRODUTOS PERIGOSOS";
                 return "OUTROS";
             };
 
             data.forEach(row => {
                 total++;
-                
                 const obmValor = row[colObm];
                 const natValor = row[colNat];
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // Normalizações
                 const pel = mapearPelotao(obmValor);
                 const nat = mapearNatureza(natValor);
                 
@@ -312,12 +312,10 @@
                 countNatureza[nat] = (countNatureza[nat] || 0) + 1;
 
                 if (subValor && subValor !== "N/A" && subValor.trim() !== "") {
-                    // Limpa e formata: INCÊNDIO [Lixo]
                     let subText = subValor.trim();
-                    let subFull = `${nat} [${subText}]`;
-                    
-                    countSubgrupo[subFull] = (countSubgrupo[subFull] || 0) + 1;
-                    subgrupoNaturezaMap[subFull] = nat; // Salva o pai para colorir depois
+                    let subKey = `${nat}___${subText}`; 
+                    countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
+                    subgrupoNaturezaMap[subKey] = nat;
                 }
 
                 lista.push({
@@ -334,28 +332,48 @@
 
             // Preparação dos Gráficos
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
-            const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
             
-            // Subgrupos (Top 20)
-            const sortedSubgrupo = Object.entries(countSubgrupo)
-                .sort((a,b) => b[1] - a[1])
-                .slice(0, 20);
+            const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
+            const natLabels = sortedNatureza.map(x => {
+                const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
+                return `${style.icon} ${x[0]}`;
+            });
+            const natColors = sortedNatureza.map(x => {
+                const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
+                return style.color;
+            });
 
-            // Gerar array de cores para os subgrupos baseado na natureza pai
-            const subgrupoColors = sortedSubgrupo.map(item => {
-                const nomeCompleto = item[0];
-                const naturezaPai = subgrupoNaturezaMap[nomeCompleto];
-                return naturezaColors[naturezaPai] || "#64748B"; // Cor específica ou cinza padrão
+            // --- FILTRO DE SUBGRUPOS (ACIMA DE 1 OCORRÊNCIA) ---
+            const sortedSubgrupo = Object.entries(countSubgrupo)
+                .filter(([key, count]) => count > 1) // Apenas > 1
+                .sort((a,b) => b[1] - a[1]);
+
+            const subLabels = sortedSubgrupo.map(item => {
+                const parts = item[0].split('___');
+                const natPai = parts[0];
+                const subNome = parts[1];
+                const style = naturezasStyle[natPai] || naturezasStyle["OUTROS"];
+                return `${style.icon} ${natPai} [${subNome}]`;
+            });
+
+            const subColors = sortedSubgrupo.map(item => {
+                const natPai = item[0].split('___')[0];
+                const style = naturezasStyle[natPai] || naturezasStyle["OUTROS"];
+                return style.color;
             });
 
             atualizarDashboard({
                 total: total,
                 pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]) },
-                natureza: { labels: sortedNatureza.map(x=>x[0]), data: sortedNatureza.map(x=>x[1]) },
+                natureza: { 
+                    labels: natLabels, 
+                    data: sortedNatureza.map(x=>x[1]), 
+                    colors: natColors
+                },
                 subgrupos: { 
-                    labels: sortedSubgrupo.map(x=>x[0]), 
+                    labels: subLabels, 
                     data: sortedSubgrupo.map(x=>x[1]),
-                    colors: subgrupoColors // Array de cores correto
+                    colors: subColors
                 },
                 lista: lista
             });
@@ -369,28 +387,19 @@
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'Inter';
 
-            const commonOptions = {
+            // Configuração Base
+            const baseOptions = {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 },
-                        padding: 10,
-                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 1
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: { 
                     x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    y: { ticks: { font: { size: 11, weight: '600' }, color: '#cbd5e1', autoSkip: false } } 
+                    y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
                 }
             };
 
-            // Gráfico Pelotão
+            // 1. Gráfico Pelotões
             if(chartP) chartP.destroy();
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
@@ -403,10 +412,10 @@
                         barPercentage: 0.8
                     }]
                 },
-                options: commonOptions
+                options: baseOptions
             });
 
-            // Gráfico Natureza
+            // 2. Gráfico Natureza
             if(chartN) chartN.destroy();
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
@@ -414,15 +423,36 @@
                     labels: dados.natureza.labels,
                     datasets: [{
                         data: dados.natureza.data,
-                        backgroundColor: colorsPalette,
+                        backgroundColor: dados.natureza.colors,
                         borderRadius: 4,
                         barPercentage: 0.8
                     }]
                 },
-                options: commonOptions
+                options: {
+                    ...baseOptions,
+                    scales: {
+                        ...baseOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 12, weight: 'bold' },
+                                autoSkip: false,
+                                color: dados.natureza.colors 
+                            }
+                        }
+                    }
+                }
             });
 
-            // Gráfico Subgrupos (COM CORES MAPEADAS)
+            // 3. Gráfico Subgrupos (Altura Dinâmica)
+            
+            // Ajuste dinâmico da altura do container antes de renderizar
+            const subContainer = document.getElementById('subgrupoContainer');
+            if(subContainer && dados.subgrupos.labels.length > 0) {
+                 // 35px por barra, mínimo 600px
+                 const dynamicHeight = Math.max(600, dados.subgrupos.labels.length * 35);
+                 subContainer.style.height = dynamicHeight + 'px';
+            }
+
             if(chartS) chartS.destroy();
             chartS = new Chart(document.getElementById('chartSubgrupos'), {
                 type: 'bar',
@@ -430,12 +460,24 @@
                     labels: dados.subgrupos.labels,
                     datasets: [{
                         data: dados.subgrupos.data,
-                        backgroundColor: dados.subgrupos.colors, // Aplica cores dinâmicas
+                        backgroundColor: dados.subgrupos.colors,
                         borderRadius: 4,
                         barPercentage: 0.8
                     }]
                 },
-                options: commonOptions
+                options: {
+                    ...baseOptions,
+                    scales: {
+                        ...baseOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' },
+                                autoSkip: false,
+                                color: dados.subgrupos.colors 
+                            }
+                        }
+                    }
+                }
             });
 
             renderTable(dados.lista);
@@ -446,17 +488,8 @@
             tbody.innerHTML = '';
 
             lista.forEach((oc, index) => {
-                let cor = 'text-white';
-                let icon = 'fa-bell';
-                let tipo = oc.nat; // Já vem normalizado
-
-                if(tipo.includes('INCÊNDIO')) { cor = 'text-fire-yellow'; icon = 'fa-fire'; }
-                else if(tipo.includes('PREVENTIVA')) { cor = 'text-gray-400'; icon = 'fa-shield-alt'; }
-                else if(tipo.includes('ÁRVORE')) { cor = 'text-green-400'; icon = 'fa-tree'; }
-                else if(tipo.includes('INSETO')) { cor = 'text-yellow-200'; icon = 'fa-bug'; }
-                else if(tipo.includes('HOSPITALAR')) { cor = 'text-red-500'; icon = 'fa-ambulance'; }
-                else { cor = 'text-bombeiros-orange'; icon = 'fa-exclamation-triangle'; }
-
+                const style = naturezasStyle[oc.nat] || naturezasStyle["OUTROS"];
+                
                 let mapsLink = '';
                 if(oc.lat && oc.lon) {
                     const lat = String(oc.lat).replace(',', '.');
@@ -467,12 +500,13 @@
                     mapsLink = `<span class="text-gray-600 cursor-not-allowed"><i class="fas fa-map-marker-slash"></i></span>`;
                 }
 
-                // Linha da Tabela
                 const tr = `
                     <tr class="hover:bg-white/5 transition-colors border-b border-white/5 odd:bg-white/5 even:bg-transparent">
                         <td class="p-3 text-center font-bold text-gray-500 text-xs">${index + 1}</td>
                         <td class="p-3 font-mono opacity-80 whitespace-nowrap text-xs">${oc.data}</td>
-                        <td class="p-3 font-bold ${cor} text-xs"><i class="fas ${icon} w-4 text-center"></i> ${oc.nat}</td>
+                        <td class="p-3 font-bold ${style.cssClass} text-xs">
+                            <i class="fas ${style.cssIcon} w-4 text-center mr-1"></i> ${oc.nat}
+                        </td>
                         <td class="p-3 text-xs text-blue-200">${oc.sub || '-'}</td>
                         <td class="p-3 uppercase text-xs tracking-wider text-gray-300">${oc.bairro}</td>
                         <td class="p-3"><span class="bg-slate-700 text-white px-2 py-1 rounded text-xs font-mono border border-white/10 whitespace-nowrap">${oc.vtr}</span></td>
