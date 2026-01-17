@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Guarnições 1º BBM - Automático</title>
+    <title>Guarnições 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -17,9 +17,6 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                    },
-                    animation: {
-                        'spin-slow': 'spin 3s linear infinite',
                     }
                 }
             }
@@ -38,7 +35,7 @@
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.9) 100%); z-index: 0; 
         }
         
-        /* CARD PADRÃO */
+        /* CARD */
         .guarnicao-card {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
@@ -51,7 +48,9 @@
         }
         .status-bar { height: 4px; background: linear-gradient(to right, #FF8C00, #FFD700); width: 100%; }
         
-        /* TOOLTIPS */
+        /* SCROLL E TOOLTIPS */
+        .card-scroll::-webkit-scrollbar { width: 4px; }
+        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
@@ -61,13 +60,11 @@
             max-height: 250px; overflow-y: auto;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
-        .card-scroll::-webkit-scrollbar { width: 4px; }
-        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
 
-        /* TELA DE CARREGAMENTO */
+        /* LOADING */
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.95); z-index: 9999;
+            background: rgba(15, 23, 42, 0.98); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
     </style>
@@ -77,7 +74,7 @@
     <div id="loading-overlay">
         <i class="fas fa-cog fa-spin text-6xl text-bombeiros-yellow mb-4"></i>
         <h2 class="text-xl font-bold text-white animate-pulse">Atualizando Escala de Serviço de hoje...</h2>
-        <p class="text-sm text-gray-400 mt-2" id="loading-text">Buscando arquivo no servidor...</p>
+        <p class="text-sm text-gray-400 mt-2" id="loading-details">Conectando ao servidor...</p>
     </div>
 
     <div class="relative z-10 flex flex-col min-h-screen w-full">
@@ -86,16 +83,8 @@
                 <div class="flex items-center gap-4">
                     <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
                     <div>
-                        <h1 class="text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - Porto Alegre</h1>
-                        <p class="text-xs text-gray-400 font-bold uppercase tracking-widest" id="data-header">Escala Operacional</p>
+                        <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - PORTO ALEGRE - GUARNIÇÕES DE SERVIÇO</h1>
                     </div>
-                </div>
-                
-                <div class="hidden md:block">
-                    <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 px-3 rounded border border-white/20 transition flex items-center gap-2">
-                        <i class="fas fa-cloud-upload-alt"></i> Upload Manual
-                        <input type="file" class="hidden" accept="application/pdf" onchange="handleManualUpload(this)">
-                    </label>
                 </div>
             </div>
         </header>
@@ -104,7 +93,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6 relative z-50 shrink-0">
                 <div class="lg:col-span-3 bg-fire-red/20 border-l-4 border-fire-red p-4 rounded-r-xl flex flex-col justify-center shadow-lg">
                     <span class="text-fire-red font-black text-[10px] uppercase tracking-widest">Prontidão</span>
-                    <h2 class="text-xl font-black text-white leading-tight" id="display-date">--/--/----</h2>
+                    <h2 class="text-xl font-black text-white leading-tight" id="display-date">--</h2>
                 </div>
 
                 <div class="lg:col-span-6 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
@@ -131,60 +120,47 @@
     </div>
 
 <script>
-    // Configurações Globais
     let guarnicoesDB = {};
     const combatStationsOrder = ["TERESÓPOLIS", "ASSUNÇÃO", "FLORESTA", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", "AÇORIANOS", "PARTENON"];
     const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-    // 1. INICIALIZAÇÃO AO CARREGAR A PÁGINA
+    // INICIALIZAÇÃO
     window.addEventListener('load', async () => {
         const hoje = new Date();
         const dia = String(hoje.getDate()).padStart(2, '0');
         const mesStr = meses[hoje.getMonth()];
-        const nomeArquivo = `Escala${dia}${mesStr}.pdf`; // Ex: Escala17Jan.pdf
-        const urlArquivo = `escalas/${nomeArquivo}`; // Caminho relativo: pasta 'escalas' no mesmo nível
+        const ano = hoje.getFullYear();
+        
+        // Formata data para exibição
+        const opcoesData = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('display-date').innerText = hoje.toLocaleDateString('pt-BR', opcoesData);
 
-        // Atualiza UI
-        document.getElementById('display-date').innerText = hoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('data-header').innerText = `Escala: ${nomeArquivo}`;
-        document.getElementById('loading-text').innerText = `Buscando: ${urlArquivo}`;
+        // Define nome do arquivo: Ex: Escala17Jan.pdf
+        const nomeArquivo = `Escala${dia}${mesStr}.pdf`;
+        const urlArquivo = `escalas/${nomeArquivo}`;
+
+        document.getElementById('loading-details').innerText = `Buscando escala: ${nomeArquivo}`;
 
         try {
-            // Tenta buscar o arquivo
             const response = await fetch(urlArquivo);
-            if (!response.ok) throw new Error("Arquivo não encontrado");
+            if (!response.ok) throw new Error(`Arquivo ${nomeArquivo} não encontrado.`);
             
             const blob = await response.blob();
             const arrayBuffer = await blob.arrayBuffer();
             await processPDF(arrayBuffer);
         
         } catch (error) {
-            console.warn(error);
+            console.error(error);
             document.getElementById('loading-overlay').innerHTML = `
-                <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
-                <h2 class="text-lg font-bold text-white">Escala de hoje (${nomeArquivo}) não encontrada.</h2>
-                <p class="text-sm text-gray-400 mt-2 mb-4">Certifique-se de que o arquivo está na pasta 'escalas/'.</p>
-                <label class="cursor-pointer bg-bombeiros-orange hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition">
-                    Carregar PDF Manualmente
-                    <input type="file" class="hidden" accept="application/pdf" onchange="handleManualUpload(this)">
-                </label>
+                <i class="fas fa-times-circle text-6xl text-red-500 mb-4"></i>
+                <h2 class="text-xl font-bold text-white">Escala não encontrada</h2>
+                <p class="text-sm text-gray-400 mt-2">Verifique se o arquivo <b>${nomeArquivo}</b> está na pasta <b>escalas/</b>.</p>
+                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-slate-700 rounded hover:bg-slate-600 transition">Tentar Novamente</button>
             `;
         }
     });
 
-    // Função para Upload Manual (Caso a busca automática falhe)
-    async function handleManualUpload(input) {
-        if (input.files && input.files[0]) {
-            document.getElementById('loading-overlay').style.display = 'flex';
-            document.getElementById('loading-overlay').innerHTML = `<i class="fas fa-cog fa-spin text-6xl text-bombeiros-yellow mb-4"></i><h2 class="text-xl font-bold text-white">Processando Arquivo...</h2>`;
-            
-            const file = input.files[0];
-            const arrayBuffer = await file.arrayBuffer();
-            await processPDF(arrayBuffer);
-        }
-    }
-
-    // 2. PROCESSAMENTO DO PDF (Inteligência Artificial Simples)
+    // PROCESSAMENTO PDF
     async function processPDF(data) {
         const pdf = await pdfjsLib.getDocument(data).promise;
         let fullText = "";
@@ -192,24 +168,21 @@
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            // Junta o texto com um separador único para facilitar a quebra
             fullText += textContent.items.map(item => item.str).join(" | ") + " | ";
         }
 
         parseData(fullText);
         
-        // Remove o overlay de carregamento após terminar
+        // Remove loading
         setTimeout(() => {
-            document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('loading-overlay').style.display = 'none';
-            }, 500);
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
         }, 800);
     }
 
-    // 3. INTERPRETAÇÃO DOS DADOS (Parser)
+    // PARSER DE DADOS
     function parseData(text) {
-        // Reiniciar Banco de Dados
         guarnicoesDB = {
             "OFICIAL DE DIA": { mil: [] },
             "CANIL / BBS": { mil: [] },
@@ -219,7 +192,6 @@
         };
         combatStationsOrder.forEach(st => guarnicoesDB[st] = { mil: [] });
 
-        // Limpa e divide o texto em blocos
         const items = text.split("|").map(s => s.trim()).filter(s => s.length > 2);
         
         let currentStationIndex = 0;
@@ -228,15 +200,11 @@
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             
-            // Se encontrou um militar (SD, SGT, CAP, etc)
             if (isMilitar(item)) {
-                let militar = { n: item, f: "GU" }; // Função padrão
-
-                // Procura contexto de função nas linhas próximas
+                let militar = { n: item, f: "GU" };
                 let context = (items[i-1] || "") + " " + (items[i+1] || "") + " " + (items[i+2] || "");
                 militar.f = mapFuncao(context);
 
-                // Lógica de Distribuição por Palavras-Chave
                 if (context.toUpperCase().includes("CINOTÉCNICO")) {
                     guarnicoesDB["CANIL / BBS"].mil.push(militar);
                 } 
@@ -253,21 +221,17 @@
                     guarnicoesDB["OFICIAL DE DIA"].mil.push(militar);
                 }
                 else {
-                    // É Combate (Pelotões)
-                    // Se achou um Comandante, assume que mudou de pelotão (sequencialmente)
+                    // Distribuição Pelotões
                     if (militar.f === "CMT GU") {
                         if (currentStationIndex < combatStationsOrder.length) {
-                            // Verifica se o pelotão atual já está cheio (proteção contra erro de leitura)
                             if (lastAssignedStation && guarnicoesDB[lastAssignedStation].mil.length >= 3) {
                                 currentStationIndex++;
                             }
                             lastAssignedStation = combatStationsOrder[currentStationIndex];
                         }
                     }
-                    
                     if (!lastAssignedStation) lastAssignedStation = combatStationsOrder[0];
                     
-                    // Evita duplicatas exatas no mesmo pelotão
                     const exists = guarnicoesDB[lastAssignedStation].mil.some(m => m.n === militar.n);
                     if (!exists) guarnicoesDB[lastAssignedStation].mil.push(militar);
                 }
@@ -278,10 +242,8 @@
         processarEfetivo();
     }
 
-    // Auxiliares de Parsing
-    function isMilitar(str) {
-        return /^(SD|1° SGT|2° SGT|2 SGT|1 SGT|CAP|MAJ|TEN|ST)\s/.test(str);
-    }
+    function isMilitar(str) { return /^(SD|1° SGT|2° SGT|2 SGT|1 SGT|CAP|MAJ|TEN|ST)\s/.test(str); }
+    
     function mapFuncao(str) {
         str = str.toUpperCase();
         if (str.includes("COMANDANTE")) return "CMT GU";
@@ -296,7 +258,7 @@
         return "GU";
     }
 
-    // 4. RENDERIZAÇÃO NA TELA
+    // RENDERIZAÇÃO
     function renderCards() {
         const grid = document.getElementById('guarnicoes-grid');
         grid.innerHTML = "";
