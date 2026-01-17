@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnições 1º BBM - Automático</title>
-    
+    <title>Gestão de Guarnições 1º BBM - 17/01/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
         tailwind.config = {
             theme: {
                 extend: {
@@ -17,16 +13,12 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                    },
-                    animation: {
-                        'spin-slow': 'spin 3s linear infinite',
                     }
                 }
             }
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
         .hero-background { 
@@ -37,23 +29,33 @@
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.9) 100%); z-index: 0; 
         }
+        .content-wrapper { position: relative; z-index: 10; }
         
-        /* CARD */
+        /* CARD FIXO, JUSTIFICADO E COM ZOOM */
         .guarnicao-card {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
-            display: flex; flex-direction: column; height: 100%; width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
         }
         .guarnicao-card:hover {
-            transform: scale(1.03); z-index: 40; border-color: #FF8C00; box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transform: scale(1.03);
+            z-index: 40;
+            border-color: #FF8C00;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
         }
-        .status-bar { height: 4px; background: linear-gradient(to right, #FF8C00, #FFD700); width: 100%; }
-        
-        /* SCROLL E TOOLTIPS */
-        .card-scroll::-webkit-scrollbar { width: 4px; }
-        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
+
+        .status-bar {
+            height: 4px;
+            background: linear-gradient(to right, #FF8C00, #FFD700);
+            width: 100%;
+        }
+
+        /* TOOLTIPS DO RESUMO */
         .stat-box { position: relative; cursor: help; z-index: 100; }
         .stat-box .tooltip-list {
             visibility: hidden; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
@@ -63,326 +65,127 @@
             max-height: 250px; overflow-y: auto;
         }
         .stat-box:hover .tooltip-list { visibility: visible; opacity: 1; }
-
-        /* LOADING & ERROR */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.98); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .hidden-force { display: none !important; }
+        
+        .card-scroll::-webkit-scrollbar { width: 4px; }
+        .card-scroll::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
     </style>
 </head>
 <body class="hero-background min-h-screen flex flex-col">
 
-    <div id="loading-overlay">
-        <div id="loading-content" class="text-center">
-            <i class="fas fa-cog fa-spin text-6xl text-bombeiros-yellow mb-4"></i>
-            <h2 class="text-xl font-bold text-white animate-pulse">Atualizando Escala de Serviço de hoje...</h2>
-            <p class="text-sm text-gray-400 mt-2" id="loading-details">Acessando Banco de Dados...</p>
+<div class="content-wrapper flex flex-col min-h-screen w-full">
+    <header class="py-4 bg-black/60 backdrop-blur-md border-b border-white/10 shrink-0">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
+            <div class="text-center">
+                <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - Porto Alegre</h1>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escala Operacional - 17/01/2026</p>
+            </div>
+            <img src="images/brasao_1BBM_PARA_site.png" class="h-12">
         </div>
-        
-        <div id="error-content" class="hidden-force text-center max-w-lg px-6">
-            <i class="fas fa-satellite-dish text-5xl text-red-500 mb-4 opacity-80"></i>
-            <h2 class="text-2xl font-black text-white mb-2 uppercase">Arquivo não encontrado</h2>
-            <div class="bg-slate-900/80 p-6 rounded-lg text-left text-sm font-mono text-gray-300 mb-6 border-l-4 border-red-500 shadow-2xl">
-                <p class="mb-2 text-gray-400">O sistema buscou automaticamente por:</p>
-                <p class="text-yellow-400 font-bold text-lg mb-4" id="error-filename">...</p>
-                
-                <p class="text-gray-400 border-b border-gray-700 pb-1 mb-2">Checklist de Correção:</p>
-                <ul class="list-disc ml-4 space-y-1">
-                    <li>A pasta no GitHub se chama <b class="text-white">escalas</b> (minúsculo)?</li>
-                    <li>O nome do arquivo respeita maiúsculas/minúsculas?</li>
-                    <li>O arquivo está no formato <b>.pdf</b>?</li>
-                </ul>
+    </header>
+
+    <main class="py-6 px-4 w-full flex-grow flex flex-col container mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6 relative z-50 shrink-0">
+            <div class="lg:col-span-3 bg-fire-red/20 border-l-4 border-fire-red p-4 rounded-r-xl flex flex-col justify-center shadow-lg">
+                <span class="text-fire-red font-black text-[10px] uppercase tracking-widest">Prontidão</span>
+                <h2 class="text-xl font-black text-white leading-tight">Sábado, 17/01/2026</h2>
             </div>
-            <button onclick="location.reload()" class="bg-bombeiros-orange hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition shadow-lg transform hover:scale-105">
-                <i class="fas fa-sync-alt mr-2"></i> Tentar Novamente
-            </button>
+
+            <div class="lg:col-span-6 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
+                <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 border-b border-white/10 pb-1 flex items-center gap-2">
+                    <i class="fas fa-users"></i> EFETIVO ESCALADO:
+                </h3>
+                <div id="stats-militares" class="grid grid-cols-4 gap-3"></div>
+            </div>
+
+            <div class="lg:col-span-3 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
+                <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 border-b border-white/10 pb-1 flex items-center gap-2">
+                    <i class="fas fa-truck"></i> VIATURAS EM SERVIÇO:
+                </h3>
+                <div id="stats-meios" class="grid grid-cols-2 gap-3"></div>
+            </div>
         </div>
-    </div>
 
-    <div class="relative z-10 flex flex-col min-h-screen w-full">
-        <header class="py-4 bg-black/60 backdrop-blur-md border-b border-white/10 shrink-0">
-            <div class="container mx-auto px-4 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
-                    <div>
-                        <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase tracking-tight">1º BBM - PORTO ALEGRE - GUARNIÇÕES DE SERVIÇO</h1>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 justify-items-stretch"></div>
+    </main>
 
-        <main class="py-6 px-4 w-full flex-grow flex flex-col container mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6 relative z-50 shrink-0">
-                <div class="lg:col-span-3 bg-fire-red/20 border-l-4 border-fire-red p-4 rounded-r-xl flex flex-col justify-center shadow-lg">
-                    <span class="text-fire-red font-black text-[10px] uppercase tracking-widest">Prontidão</span>
-                    <h2 class="text-xl font-black text-white leading-tight" id="display-date">--</h2>
-                </div>
-
-                <div class="lg:col-span-6 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
-                    <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 border-b border-white/10 pb-1 flex items-center gap-2">
-                        <i class="fas fa-users"></i> EFETIVO ESCALADO:
-                    </h3>
-                    <div id="stats-militares" class="grid grid-cols-4 gap-3"></div>
-                </div>
-
-                <div class="lg:col-span-3 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
-                    <h3 class="font-black text-[10px] uppercase text-gray-400 mb-3 border-b border-white/10 pb-1 flex items-center gap-2">
-                        <i class="fas fa-truck"></i> VIATURAS EM SERVIÇO:
-                    </h3>
-                    <div id="stats-meios" class="grid grid-cols-2 gap-3"></div>
-                </div>
-            </div>
-
-            <div id="guarnicoes-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 justify-items-stretch"></div>
-        </main>
-
-        <footer class="py-4 text-center text-xs text-white opacity-80 shrink-0 border-t border-white/10 bg-black/40" style="font-family: Arial, sans-serif;">
-            &copy; 2026 Companhia de Bombeiro Militar - 1º BBM. Site Desenvolvido por Gustavo Medeiros.
-        </footer>
-    </div>
+    <footer class="py-4 text-center text-xs text-white opacity-80 shrink-0 border-t border-white/10 bg-black/40" style="font-family: Arial, sans-serif;">
+        &copy; 2026 Companhia de Bombeiro Militar - 1º BBM. Site Desenvolvido por Gustavo Medeiros.
+    </footer>
+</div>
 
 <script>
-    let guarnicoesDB = {};
-    // Ordem de varredura dos pelotões
-    const combatStationsOrder = ["TERESÓPOLIS", "ASSUNÇÃO", "FLORESTA", "RESTINGA", "BELÉM NOVO", "PASSO D'AREIA", "AÇORIANOS", "PARTENON"];
-    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-    // --- MÁGICA DE INICIALIZAÇÃO ---
-    window.addEventListener('load', async () => {
-        const hoje = new Date();
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        const mesStr = meses[hoje.getMonth()];
-        
-        // Data na Tela
-        const opcoesData = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('display-date').innerText = hoje.toLocaleDateString('pt-BR', opcoesData);
-
-        // NOME DO ARQUIVO (AUTOMÁTICO)
-        // Ex: Se hoje é 17/01, busca: Escala17Jan.pdf
-        const nomeArquivo = `Escala${dia}${mesStr}.pdf`;
-        
-        // Cache Buster: Adiciona ?t=123456 para forçar o GitHub a entregar a versão nova e não a velha do cache
-        const urlArquivo = `escalas/${nomeArquivo}?t=${new Date().getTime()}`;
-
-        document.getElementById('loading-details').innerText = `Buscando: escalas/${nomeArquivo}`;
-
-        try {
-            // Tenta buscar o arquivo
-            const response = await fetch(urlArquivo);
-            
-            // Se der erro 404 (Não achou)
-            if (!response.ok) throw new Error("Arquivo não encontrado no servidor.");
-            
-            // Se achou, processa
-            const blob = await response.blob();
-            const arrayBuffer = await blob.arrayBuffer();
-            await processPDF(arrayBuffer);
-            
-            // Sucesso: some com a tela de carregamento
-            setTimeout(() => {
-                const overlay = document.getElementById('loading-overlay');
-                overlay.style.opacity = '0';
-                setTimeout(() => { overlay.style.display = 'none'; }, 500);
-            }, 800);
-        
-        } catch (error) {
-            console.error("Erro Crítico:", error);
-            // Mostra o painel de erro
-            document.getElementById('loading-content').classList.add('hidden-force');
-            document.getElementById('error-content').classList.remove('hidden-force');
-            document.getElementById('error-filename').innerText = `escalas/${nomeArquivo}`;
-        }
-    });
-
-    // --- LEITURA DO PDF (PARSER) ---
-    async function processPDF(data) {
-        const pdf = await pdfjsLib.getDocument(data).promise;
-        let fullText = "";
-
-        // Lê todas as páginas
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            // Une o texto usando um separador único |
-            fullText += textContent.items.map(item => item.str).join(" | ") + " | ";
-        }
-
-        parseData(fullText);
-    }
-
-    // --- INTELIGÊNCIA DE DADOS ---
-    function parseData(text) {
-        // Zera o banco de dados
-        guarnicoesDB = {
-            "OFICIAL DE DIA": { mil: [] },
-            "CANIL / BBS": { mil: [] },
-            "MERGULHO / BBS": { mil: [] },
-            "AQUÁTICA / BBS": { mil: [] },
-            "COBOM - SALA DE OPERAÇÕES": { mil: [] }
-        };
-        combatStationsOrder.forEach(st => guarnicoesDB[st] = { mil: [] });
-
-        // Limpa o texto e cria um array de itens
-        const items = text.split("|").map(s => s.trim()).filter(s => s.length > 2);
-        
-        let currentStationIndex = 0;
-        let lastAssignedStation = null;
-
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            
-            // Regex Hacker: Procura por Patentes no início da string
-            if (isMilitar(item)) {
-                let militar = { n: item, f: "GU" };
-                
-                // Varredura de Contexto: Olha 2 itens para trás e 3 para frente procurando a função
-                let context = (items[i-2]||"") + " " + (items[i-1]||"") + " " + (items[i+1]||"") + " " + (items[i+2]||"") + " " + (items[i+3]||"");
-                militar.f = mapFuncao(context);
-
-                const ctxUpper = context.toUpperCase();
-
-                // Lógica de Distribuição
-                if (ctxUpper.includes("CINOTÉCNICO")) {
-                    guarnicoesDB["CANIL / BBS"].mil.push(militar);
-                } 
-                else if (ctxUpper.includes("MERGULHADOR")) {
-                    guarnicoesDB["MERGULHO / BBS"].mil.push(militar);
-                }
-                else if (ctxUpper.includes("NAVAL") || ctxUpper.includes("CONDUTOR DE EMBARCAÇÃO")) {
-                    guarnicoesDB["AQUÁTICA / BBS"].mil.push(militar);
-                }
-                else if (ctxUpper.includes("COBOM") || ctxUpper.includes("CCOB") || ctxUpper.includes("SALA DE OPERAÇÕES")) {
-                    guarnicoesDB["COBOM - SALA DE OPERAÇÕES"].mil.push(militar);
-                }
-                else if (ctxUpper.includes("OFICIAL") || ctxUpper.includes("SUPERVISOR") || ctxUpper.includes("MOTORISTA DE DIA")) {
-                    guarnicoesDB["OFICIAL DE DIA"].mil.push(militar);
-                }
-                else {
-                    // É Pelotão de Incêndio
-                    // Se achou um Comandante, avança o índice para o próximo quartel
-                    if (militar.f === "CMT GU") {
-                        if (currentStationIndex < combatStationsOrder.length) {
-                            // Só avança se o quartel anterior já tiver gente (evita pular quartéis vazios por erro)
-                            if (lastAssignedStation && guarnicoesDB[lastAssignedStation].mil.length >= 2) {
-                                currentStationIndex++;
-                            }
-                            lastAssignedStation = combatStationsOrder[currentStationIndex];
-                        }
-                    }
-                    // Se não tem quartel definido, joga no primeiro
-                    if (!lastAssignedStation) lastAssignedStation = combatStationsOrder[0];
-                    
-                    // Evita duplicatas (nomes repetidos no mesmo quartel)
-                    const exists = guarnicoesDB[lastAssignedStation].mil.some(m => m.n === militar.n);
-                    if (!exists) guarnicoesDB[lastAssignedStation].mil.push(militar);
-                }
-            }
-        }
-        
-        renderCards();
-        processarEfetivo();
-    }
-
-    // Validador de Militar (Regex Poderoso)
-    function isMilitar(str) { 
-        // Aceita: SD FULANO, 1° SGT BELTRANO, CAP CICLANO, etc.
-        return /^(SD|1° SGT|2° SGT|1 SGT|2 SGT|3° SGT|SGT|CAP|MAJ|TEN|1° TEN|2° TEN|ST)\s/i.test(str); 
-    }
-    
-    // Mapeador de Funções
-    function mapFuncao(str) {
-        str = str.toUpperCase();
-        if (str.includes("COMANDANTE")) return "CMT GU";
-        if (str.includes("CONDUTOR") || str.includes("COV")) return "COV/MOT";
-        if (str.includes("LINHA") || str.includes("AUXILIAR")) return "LINHA";
-        if (str.includes("CINOTÉCNICO")) return "CINO";
-        if (str.includes("MERGULHADOR")) return "MERG";
-        if (str.includes("NAVAL")) return "COND NAVAL";
-        if (str.includes("COBOM")) return "OP COBOM";
-        if (str.includes("CCOB")) return "OP CCOB";
-        if (str.includes("OFICIAL")) return "SUP";
-        if (str.includes("MOTORISTA")) return "MOT";
-        return "GU";
-    }
-
-    // --- RENDERIZAÇÃO (VISUAL) ---
-    function renderCards() {
-        const grid = document.getElementById('guarnicoes-grid');
-        grid.innerHTML = "";
-        
-        Object.keys(guarnicoesDB).forEach(secao => {
-            const data = guarnicoesDB[secao];
-            if (data.mil.length === 0) return; // Esconde cards vazios
-
-            const card = document.createElement('div');
-            card.className = "guarnicao-card shadow-xl";
-            
-            let iconHtml = '';
-            let vtrsText = "VTR PRONTA";
-
-            // Ícones e VTRs personalizadas
-            if(secao.includes("OFICIAL")) { iconHtml = '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>'; vtrsText = "ATP-0640"; }
-            else if(secao.includes("COBOM")) { iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>'; vtrsText = "193 / CCOB"; }
-            else if(secao.includes("AQUÁTICA") || secao.includes("MERGULHO")) { iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>'; vtrsText = "EMBARCAÇÕES"; }
-            else if(secao.includes("CANIL")) { iconHtml = '<i class="fas fa-dog text-amber-600 text-3xl"></i>'; vtrsText = "ABC-792"; }
-            else { 
-                iconHtml = '<i class="fas fa-truck text-fire-red text-3xl"></i>'; 
-                vtrsText = "ABT / AR";
-            }
-
-            let guarnicaoHtml = data.mil.map(m => `
-                <div class="flex justify-between text-xs mb-2 leading-tight border-b border-white/5 pb-1 hover:bg-white/5 transition px-1 rounded">
-                    <span class="text-gray-400 font-bold uppercase tracking-tight text-[10px] pt-0.5">${m.f}:</span>
-                    <span class="font-bold text-white text-right ml-2 text-xs">${m.n}</span>
-                </div>
-            `).join('');
-
-            card.innerHTML = `
-                <div class="status-bar"></div>
-                <div class="p-4 border-b border-white/10 flex flex-col items-center bg-slate-800/40">
-                    <div class="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 border-white/10 overflow-hidden shadow-inner">
-                        ${iconHtml}
-                    </div>
-                    <h3 class="text-sm font-black uppercase tracking-tight leading-tight text-center">${secao}</h3>
-                    <span class="text-[10px] text-gray-400 font-bold italic mt-1">(${vtrsText})</span>
-                </div>
-                <div class="card-scroll overflow-y-auto p-4 flex-grow">
-                    ${guarnicaoHtml}
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    }
+    // DADOS INSERIDOS MANUALMENTE - ESCALA 17/01/2026
+    const guarnicoesData = {
+        "OFICIAL DE DIA": [
+            { vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP PELLEGRINI"}, {f: "MOT. DIA", n: "SD TELLES"}], t: "24h" }
+        ],
+        "AÇORIANOS": [
+            { vtr: "ABT-1364", mil: [{f: "CMT GU", n: "1º SGT FLÁVIO"}, {f: "COV", n: "SD NATHAN"}, {f: "LINHA", n: "SD TEMP CORREA"}], t: "24h" },
+            { vtr: "SOCORRO", mil: [{f: "COV", n: "2º SGT PESSOTA"}, {f: "AUX", n: "SD BOTTINI"}], t: "24h" }
+        ],
+        "TERESÓPOLIS": [
+            { vtr: "ABT-0594", mil: [{f: "CMT SOC", n: "1º SGT LUCIANO"}, {f: "COV", n: "1º SGT BEN-HUR"}, {f: "LINHA", n: "SD TEMP SPERLING"}, {f: "LINHA", n: "SD BAIGORRA"}], t: "24h" },
+            { vtr: "AR-0766", mil: [{f: "CMT GU", n: "SD VINÍCIUS"}, {f: "COV (08-20h)", n: "SD ARAUJO"}, {f: "COV (20-08h)", n: "SD DORNELES"}], t: "24h" }
+        ],
+        "ASSUNÇÃO": [
+            { vtr: "ABT-0596", mil: [{f: "CMT GU", n: "SD BRUM"}, {f: "COV", n: "SD PETER"}], t: "24h" }
+        ],
+        "FLORESTA": [
+            { vtr: "ABT-0597", mil: [{f: "CMT GU", n: "SD DA SILVA"}, {f: "COV", n: "SD FERREIRA"}, {f: "LINHA", n: "SD ACÁCIO"}], t: "24h" }
+        ],
+        "RESTINGA": [
+            { vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV", n: "1º SGT RONALDO"}, {f: "LINHA", n: "SD TEMP VOLZ"}], t: "24h" }
+        ],
+        "BELÉM NOVO": [
+            { vtr: "ABT-0599", mil: [{f: "CMT (08-20h)", n: "SD DETONI"}, {f: "COV (08-20h)", n: "SD MARTINEZ"}, {f: "CMT (20-08h)", n: "2º SGT MENDES"}, {f: "LINHA", n: "SD COSME"}], t: "24h" }
+        ],
+        "PASSO D'AREIA": [
+            { vtr: "ABT-0600", mil: [{f: "CMT GU", n: "1º SGT MATHEUS"}, {f: "COV", n: "SD ISMAEL"}, {f: "LINHA", n: "SD EIDER"}, {f: "LINHA", n: "SD RAFAEL"}], t: "24h" }
+        ],
+        "PARTENON": [
+            { vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD JONATHAN"}, {f: "COV", n: "2º SGT BARREIRO"}, {f: "LINHA", n: "SD TEMP ZANETTI"}], t: "24h" }
+        ],
+        "CANIL / BBS": [
+            { vtr: "ABC-792", mil: [{f: "CINOTÉCNICO", n: "2º SGT TRINDADE"}, {f: "CINOTÉCNICO", n: "SD BERTAZZO"}], t: "24h" }
+        ],
+        "AQUÁTICA / BBS": [
+            { vtr: "EABS", mil: [{f: "CONDUTOR", n: "1º SGT MARCELO"}, {f: "AUXILIAR", n: "SD CÁSSIO"}], t: "24h" }
+        ],
+        "MERGULHO / BBS": [
+            { vtr: "ATP-1190", mil: [{f: "CMT", n: "2º SGT MENDONÇA"}, {f: "MERG", n: "2º SGT SIMAS"}, {f: "MERG", n: "SD BONAZZA"}], t: "12h" }
+        ],
+        "COBOM - SALA DE OPERAÇÕES": [
+            { vtr: "CCOB", mil: [{f: "OP", n: "2º SGT GABRIELA"}], t: "24h" },
+            { vtr: "COBOM", mil: [{f: "OP", n: "1º SGT MARCZAK"}, {f: "OP", n: "SD GONZALEZ"}], t: "12h" }
+        ]
+    };
 
     function processarEfetivo() {
-        let s = { cap: [], sgt: [], sd: [], total: 0, abt: 0, ar: 0 };
-        
-        Object.keys(guarnicoesDB).forEach(key => {
-            const mil = guarnicoesDB[key].mil;
-            if(mil.length > 0) {
-                if (key.includes("TERESÓPOLIS")) s.ar = 1;
-                if (!key.includes("OFICIAL") && !key.includes("COBOM")) s.abt++;
-            }
-            mil.forEach(m => {
+        let s = { cap: [], sgt: [], sd: [], abt: [], ar: [], total: 0 };
+        Object.values(guarnicoesData).flat().forEach(v => {
+            if(v.vtr.includes("ABT")) s.abt.push(v.vtr);
+            if(v.vtr.includes("AR")) s.ar.push(v.vtr);
+            v.mil.forEach(m => {
                 s.total++;
-                if(m.n.includes("CAP") || m.n.includes("MAJ")) s.cap.push(m.n);
-                else if(m.n.includes("SGT") || m.n.includes("ST")) s.sgt.push(m.n);
+                if(m.n.includes("CAP")) s.cap.push(m.n);
+                else if(m.n.includes("SGT")) s.sgt.push(m.n);
                 else s.sd.push(m.n);
             });
         });
         
+        // COR DO TOTAL: LIME-400 (Verde Limão)
         document.getElementById('stats-militares').innerHTML = `
-            ${renderStat('OFICIAIS', s.cap.length, 'text-orange-500', s.cap)}
+            ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
             ${renderStat('SD', s.sd.length, 'text-blue-400', s.sd)}
             ${renderStat('TOTAL', s.total, 'text-lime-400', ['Efetivo Total Escalado'])}
         `;
+        
+        // COR DA AR: RED-500 (Vermelho)
         document.getElementById('stats-meios').innerHTML = `
-            ${renderStat('ABT', s.abt, 'text-red-500', ['Estimado'])}
-            ${renderStat('AR', s.ar, 'text-red-500', ['AR-0766'])}
+            ${renderStat('ABT', s.abt.length, 'text-red-500', s.abt)}
+            ${renderStat('AR', 1, 'text-red-500', ['AR-0766'])}
         `;
     }
 
@@ -394,6 +197,52 @@
             <div class="tooltip-list font-bold">${items}</div>
         </div>`;
     }
+
+    function renderCards() {
+        const grid = document.getElementById('guarnicoes-grid');
+        Object.keys(guarnicoesData).forEach(secao => {
+            const vtrs = guarnicoesData[secao].map(v => v.vtr).join(' / ');
+            const card = document.createElement('div');
+            card.className = "guarnicao-card shadow-xl";
+            
+            // ÍCONES PERSONALIZADOS
+            let iconHtml = '';
+            if(secao.includes("OFICIAL")) iconHtml = '<i class="fas fa-star text-bombeiros-yellow text-3xl"></i>';
+            else if(secao.includes("COBOM")) iconHtml = '<i class="fas fa-desktop text-blue-400 text-3xl"></i>';
+            else if(secao.includes("AQUÁTICA") || secao.includes("MERGULHO")) iconHtml = '<i class="fas fa-anchor text-cyan-400 text-3xl"></i>';
+            else if(secao.includes("CANIL")) iconHtml = '<i class="fas fa-dog text-amber-600 text-3xl"></i>';
+            // CAMINHÃO VERMELHO para Pelotões
+            else iconHtml = '<i class="fas fa-truck text-fire-red text-3xl"></i>';
+
+            let guarnicaoHtml = guarnicoesData[secao].map(v => `
+                <div class="px-3 mb-3">
+                    <div class="text-[10px] font-black text-bombeiros-yellow border-b border-white/10 mb-1 flex justify-between uppercase tracking-wider">
+                        <span>${v.vtr}</span><span class="text-fire-red">${v.t}</span>
+                    </div>
+                    ${v.mil.map(m => `<div class="flex justify-between text-xs mb-1 leading-tight">
+                        <span class="text-gray-400 font-bold uppercase tracking-tight">${m.f}:</span>
+                        <span class="font-bold text-white text-right ml-2">${m.n}</span>
+                    </div>`).join('')}
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="status-bar"></div>
+                <div class="p-4 border-b border-white/10 flex flex-col items-center bg-slate-800/40">
+                    <div class="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mb-2 border-2 border-white/10 overflow-hidden shadow-inner">
+                        ${iconHtml}
+                    </div>
+                    <h3 class="text-sm font-black uppercase tracking-tight leading-tight text-center">${secao}</h3>
+                    <span class="text-[10px] text-gray-400 font-bold italic mt-1">(${vtrs})</span>
+                </div>
+                <div class="card-scroll overflow-y-auto p-2 flex-grow">
+                    ${guarnicaoHtml}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+    processarEfetivo(); renderCards();
 </script>
 </body>
 </html>
