@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estatísticas 1º BBM - 2025</title>
+    <title>Estatísticas 1º BBM - Porto Alegre</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -18,7 +18,8 @@
                         'fire-red': '#DC2626',
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
-                        'dark-bg': '#0f172a'
+                        'dark-bg': '#0f172a',
+                        'cb-green': '#10B981'
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -48,17 +49,19 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* Botões de Mês */
+        /* Botões de Mês - VERDE quando ativo */
         .btn-mes {
             transition: all 0.2s;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #F97316; }
+        .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
+        
         .btn-mes.active { 
-            background: linear-gradient(45deg, #DC2626, #B91C1C); 
+            background: linear-gradient(45deg, #10B981, #059669);
             color: white; 
-            border-color: #FFD700;
-            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+            border-color: #A7F3D0;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            transform: scale(1.05);
         }
 
         /* Scrollbar Tabela */
@@ -82,10 +85,10 @@
             
             <div class="text-center flex-1">
                 <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-2 leading-none">
-                    Estatísticas de Atendimento
+                    Estatísticas de Ocorrências
                 </h1>
                 <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
-                    1º BBM (<span id="anoTitulo">2025</span>)
+                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
                 </h2>
                 <div class="mt-2 text-sm text-gray-400" id="statusMsg">Selecione um mês para carregar os dados</div>
             </div>
@@ -101,7 +104,7 @@
         <div id="dashboardArea" class="opacity-50 pointer-events-none transition-opacity duration-500">
             
             <div class="flex justify-center mb-8">
-                <div class="bg-blue-600/20 border border-blue-500 text-blue-300 px-8 py-4 rounded-2xl text-center shadow-lg backdrop-blur-md">
+                <div class="bg-emerald-600/20 border border-emerald-500 text-emerald-300 px-8 py-4 rounded-2xl text-center shadow-lg backdrop-blur-md">
                     <p class="text-sm uppercase font-bold tracking-widest mb-1">Total de Ocorrências</p>
                     <p class="text-5xl font-black text-white" id="totalDisplay">0</p>
                 </div>
@@ -110,12 +113,17 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase">Por Subunidade</h3>
-                    <div class="relative h-72"><canvas id="chartPelotoes"></canvas></div>
+                    <div class="relative h-[350px]"><canvas id="chartPelotoes"></canvas></div>
                 </div>
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase">Por Natureza</h3>
-                    <div class="relative h-72"><canvas id="chartNatureza"></canvas></div>
+                    <div class="relative h-[350px]"><canvas id="chartNatureza"></canvas></div>
                 </div>
+            </div>
+
+            <div class="glass-card p-6 mb-8">
+                <h3 class="text-lg font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">Principais Subgrupos (Top 15)</h3>
+                <div class="relative h-[350px]"><canvas id="chartSubgrupos"></canvas></div>
             </div>
 
             <div class="glass-card p-1 overflow-hidden">
@@ -130,7 +138,7 @@
                                 <th class="p-3 text-center w-12">#</th>
                                 <th class="p-3">Data</th>
                                 <th class="p-3">Natureza</th>
-                                <th class="p-3">Bairro</th>
+                                <th class="p-3">Subgrupo</th> <th class="p-3">Bairro</th>
                                 <th class="p-3">Viatura</th>
                                 <th class="p-3 text-center">Local</th>
                                 <th class="p-3 text-right">ID</th>
@@ -146,11 +154,9 @@
 
     <script>
         // ================= CONFIGURAÇÕES =================
-        // URL PADRÃO MAIS SEGURA (SEM O REFS/HEADS)
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
         const ANO_ATUAL = 2025;
         
-        // Cores para os gráficos
         const colorsPalette = [
             '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', 
             '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#64748B', '#A8A29E'
@@ -158,6 +164,7 @@
 
         let chartP = null;
         let chartN = null;
+        let chartS = null; // Chart Subgrupos
 
         // ================= INICIALIZAÇÃO =================
         const meses = [
@@ -184,9 +191,7 @@
             });
         }
 
-        // ================= CARREGAMENTO DE DADOS =================
         async function carregarDados(mes, btnElement) {
-            // UI Feedback
             document.querySelectorAll('.btn-mes').forEach(b => b.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
             
@@ -194,24 +199,18 @@
             msg.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Buscando dados de ${mes}/${ANO_ATUAL}...`;
             msg.className = "mt-2 text-sm text-yellow-400";
 
-            // Montagem da URL
             const url = `${GITHUB_BASE_URL}/dados/${mes}_${ANO_ATUAL}.csv`;
-            console.log("Tentando baixar:", url);
+            console.log("Baixando:", url);
 
             try {
                 const response = await fetch(url);
+                if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+                const csvText = await response.text();
                 
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP ${response.status}: Arquivo não encontrado no GitHub.`);
-                }
-
-                const csvText = await response.text(); // Pega o texto puro
-                
-                // Parse CSV com Detecção Automática de Separador (Vírgula ou Ponto e Vírgula)
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
-                    encoding: "UTF-8", // Tenta forçar UTF-8
+                    encoding: "UTF-8",
                     complete: function(results) {
                         if (results.data && results.data.length > 0) {
                             try {
@@ -221,11 +220,10 @@
                                 document.getElementById('dashboardArea').classList.remove('opacity-50', 'pointer-events-none');
                             } catch (e) {
                                 console.error(e);
-                                alert("Erro ao processar planilha: " + e.message);
-                                msg.innerHTML = "Erro no processamento dos dados.";
+                                alert("Erro processando dados: " + e.message);
                             }
                         } else {
-                            alert("O arquivo foi encontrado, mas parece estar vazio.");
+                            alert("Arquivo vazio.");
                         }
                     }
                 });
@@ -238,49 +236,47 @@
             }
         }
 
-        // ================= PROCESSAMENTO =================
         function processarDados(data) {
-            // --- TRATAMENTO DE ACENTUAÇÃO ---
-            // Às vezes o Excel exporta "Emergência" como "Emergencia" ou caracteres estranhos.
-            // Vamos procurar qual é a chave correta.
             const chaves = Object.keys(data[0]);
             
-            // Procura a coluna de Natureza (Emergência)
-            const colNat = chaves.find(k => k.includes("Emerg") || k.includes("EMERG") || k.includes("Natureza"));
-            // Procura a coluna de OBM
-            const colObm = chaves.find(k => k.includes("Obm") || k.includes("OBM") || k.includes("Guarni"));
+            // Busca dinâmica de colunas
+            const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
+            const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
+            // Procura coluna de Subgrupo (todos_subgrupos ou Subgrupo)
+            const colSub = chaves.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i) || k.match(/tipo/i));
 
             if (!colNat || !colObm) {
-                throw new Error(`Colunas não encontradas!\nO sistema procurou por 'Emergência' e 'Obm.'\nColunas encontradas no arquivo: ${chaves.join(", ")}`);
+                throw new Error("Colunas obrigatórias (Emergência/OBM) não encontradas.");
             }
 
             const countPelotao = {};
             const countNatureza = {};
+            const countSubgrupo = {};
             const lista = [];
             let total = 0;
 
             const mapearPelotao = (obmRaw) => {
                 const s = obmRaw ? String(obmRaw).toUpperCase() : "";
-                if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) return "1ª Cia Açorianos";
-                if(s.includes("FLORESTA")) return "2ª Cia Floresta";
-                if(s.includes("PASSO")) return "2ª Cia Passo D'Areia";
-                if(s.includes("RESTINGA")) return "1ª Cia Restinga";
-                if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) return "1ª Cia Teresópolis";
-                if(s.includes("PARTENON")) return "2ª Cia Partenon";
-                if(s.includes("BELÉM") || s.includes("BELEM")) return "1ª Cia Belém Novo";
-                if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) return "1ª Cia Assunção";
-                return "Outros";
+                if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) return "AÇORIANOS";
+                if(s.includes("FLORESTA")) return "FLORESTA";
+                if(s.includes("PASSO")) return "PASSO D'AREIA";
+                if(s.includes("RESTINGA")) return "RESTINGA";
+                if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) return "TERESÓPOLIS";
+                if(s.includes("PARTENON")) return "PARTENON";
+                if(s.includes("BELÉM") || s.includes("BELEM")) return "BELÉM NOVO";
+                if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) return "ASSUNÇÃO";
+                if(s.includes("RESGATE") || s.includes("GBS")) return "AUTO RESGATE";
+                return "OUTROS";
             };
 
             data.forEach(row => {
                 total++;
                 
-                // Pega o valor usando a coluna que encontramos dinamicamente
+                // Extração dos valores
                 const obmValor = row[colObm];
                 const natValor = row[colNat];
-                const dataValor = row['Data'] || row['DATA'] || '---';
-                const bairroValor = row['Bairro'] || row['BAIRRO'] || '---';
-                const vtrValor = row['Viaturas'] || row['VIATURAS'] || '---';
+                // Subgrupo: Se não tiver a coluna, deixa vazio
+                let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
                 // Contagem Pelotão
                 const pel = mapearPelotao(obmValor);
@@ -288,129 +284,70 @@
 
                 // Contagem Natureza
                 let nat = natValor ? String(natValor).toUpperCase() : "OUTROS";
-                if(nat.includes("INSETO")) nat = "Manejo de Insetos";
-                else if(nat.includes("INCÊNDIO") || nat.includes("INCENDIO")) nat = "Incêndio";
-                else if(nat.includes("SALVAMENTO") || nat.includes("BUSCA")) nat = "Busca e Resgate";
-                else if(nat.includes("ÁRVORE") || nat.includes("ARVORE")) nat = "Corte de Árvore";
-                else if(nat.includes("PREVENTIVA")) nat = "Ações Preventivas";
+                if(nat.includes("INSETO")) nat = "MANEJO DE INSETOS";
+                else if(nat.includes("INCÊNDIO") || nat.includes("INCENDIO")) nat = "INCÊNDIO";
+                else if(nat.includes("SALVAMENTO") || nat.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                else if(nat.includes("ÁRVORE") || nat.includes("ARVORE")) nat = "CORTE DE ÁRVORE";
+                else if(nat.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
+                else if(nat.includes("APH") || nat.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
                 
                 countNatureza[nat] = (countNatureza[nat] || 0) + 1;
 
-                // Lista
+                // Contagem Subgrupo (Ignora N/A e vazios para o gráfico)
+                if (subValor && subValor !== "N/A" && subValor.trim() !== "") {
+                    // Limpeza básica do texto
+                    let subClean = String(subValor).toUpperCase().trim();
+                    countSubgrupo[subClean] = (countSubgrupo[subClean] || 0) + 1;
+                }
+
                 lista.push({
                     id: row['Nº Oc.'] || row['ID'] || total,
-                    data: dataValor,
+                    data: row['Data'] || row['DATA'] || '---',
                     nat: natValor,
-                    bairro: bairroValor,
-                    vtr: vtrValor,
+                    sub: subValor, // Armazena para a tabela
+                    bairro: row['Bairro'] || row['BAIRRO'] || '---',
+                    vtr: mapearPelotao(obmValor),
                     lat: row['Latitude'] || row['LATITUDE'],
                     lon: row['Longitude'] || row['LONGITUDE']
                 });
             });
 
+            // Ordenações
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
+            
+            // Top 15 Subgrupos (para o gráfico não ficar gigante)
+            const sortedSubgrupo = Object.entries(countSubgrupo)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, 15);
 
             atualizarDashboard({
                 total: total,
                 pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]) },
                 natureza: { labels: sortedNatureza.map(x=>x[0]), data: sortedNatureza.map(x=>x[1]) },
+                subgrupos: { labels: sortedSubgrupo.map(x=>x[0]), data: sortedSubgrupo.map(x=>x[1]) },
                 lista: lista
             });
         }
 
-        // ================= ATUALIZAÇÃO UI =================
         function atualizarDashboard(dados) {
             document.getElementById('totalDisplay').innerText = dados.total;
             document.getElementById('totalLista').innerText = dados.total;
 
-            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.color = '#e2e8f0';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+            Chart.defaults.font.family = 'Inter';
 
-            if(chartP) chartP.destroy();
-            chartP = new Chart(document.getElementById('chartPelotoes'), {
-                type: 'bar',
-                data: {
-                    labels: dados.pelotoes.labels,
-                    datasets: [{
-                        label: 'Ocorrências',
-                        data: dados.pelotoes.data,
-                        backgroundColor: colorsPalette,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            if(chartN) chartN.destroy();
-            chartN = new Chart(document.getElementById('chartNatureza'), {
-                type: 'bar',
-                data: {
-                    labels: dados.natureza.labels,
-                    datasets: [{
-                        label: 'Ocorrências',
-                        data: dados.natureza.data,
-                        backgroundColor: colorsPalette,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            renderTable(dados.lista);
-        }
-
-        function renderTable(lista) {
-            const tbody = document.getElementById('tabelaBody');
-            tbody.innerHTML = '';
-
-            lista.forEach((oc, index) => {
-                let cor = 'text-white';
-                let icon = 'fa-bell';
-                let tipo = oc.nat ? String(oc.nat).toUpperCase() : "OUTROS";
-
-                if(tipo.includes('INCÊNDIO') || tipo.includes('INCENDIO')) { cor = 'text-fire-yellow'; icon = 'fa-fire'; }
-                else if(tipo.includes('PREVENTIVA') || tipo.includes('VISTORIA')) { cor = 'text-gray-400'; icon = 'fa-shield-alt'; }
-                else if(tipo.includes('ÁRVORE') || tipo.includes('ARVORE')) { cor = 'text-green-400'; icon = 'fa-tree'; }
-                else if(tipo.includes('INSETO')) { cor = 'text-yellow-200'; icon = 'fa-bug'; }
-                else if(tipo.includes('APH') || tipo.includes('HOSPITALAR')) { cor = 'text-red-500'; icon = 'fa-ambulance'; }
-                else { cor = 'text-bombeiros-orange'; icon = 'fa-exclamation-triangle'; }
-
-                let mapsLink = '';
-                if(oc.lat && oc.lon) {
-                    const lat = String(oc.lat).replace(',', '.');
-                    const lon = String(oc.lon).replace(',', '.');
-                    const urlMap = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                    mapsLink = `<a href="${urlMap}" target="_blank" class="text-blue-400 hover:text-white transition-colors"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
-                } else {
-                    mapsLink = `<span class="text-gray-600 cursor-not-allowed"><i class="fas fa-map-marker-slash"></i></span>`;
-                }
-
-                const tr = `
-                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5 odd:bg-white/5 even:bg-transparent">
-                        <td class="p-3 text-center font-bold text-gray-500 text-xs">${index + 1}</td>
-                        <td class="p-3 font-mono opacity-80 whitespace-nowrap text-xs">${oc.data}</td>
-                        <td class="p-3 font-bold ${cor} text-xs"><i class="fas ${icon} w-4 text-center"></i> ${oc.nat}</td>
-                        <td class="p-3 uppercase text-xs tracking-wider text-gray-300">${oc.bairro}</td>
-                        <td class="p-3"><span class="bg-slate-700 text-white px-2 py-1 rounded text-xs font-mono border border-white/10">${oc.vtr}</span></td>
-                        <td class="p-3 text-center">${mapsLink}</td>
-                        <td class="p-3 text-right font-mono opacity-50 text-xs">#${oc.id}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += tr;
-            });
-        }
-    </script>
-
-</body>
-</html>
+            const commonOptions = {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 10,
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
