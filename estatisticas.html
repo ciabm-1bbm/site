@@ -536,4 +536,542 @@
         }
     </script>
 </body>
+</html>!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema E-193 | Estatísticas 1º BBM</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fire-red': '#DC2626',
+                        'fire-yellow': '#FFD700',
+                        'bombeiros-orange': '#F97316',
+                        'dark-bg': '#0f172a',
+                        'cb-green': '#10B981',
+                        'oliva-start': '#365314', // Verde Oliva Escuro
+                        'oliva-end': '#84cc16'    // Verde Oliva Claro
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .hero-bg::before {
+            content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
+            background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
+            background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
+        }
+        .hero-bg::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.95) 100%);
+            pointer-events: none;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-mes { transition: all 0.2s ease-in-out; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
+        .btn-mes.active { 
+            background: linear-gradient(45deg, #10B981, #059669); color: white; 
+            border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.05);
+        }
+
+        /* Barra de Progresso */
+        #progressContainer { transition: opacity 0.3s; }
+        .progress-bar-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
+
+        .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        
+        thead th { position: sticky; top: 0; z-index: 10; background-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <div class="hero-bg"></div>
+
+    <div class="container mx-auto px-4 py-6 relative z-10 flex-grow">
+        
+        <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6 glass-card p-6">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 drop-shadow-lg opacity-90">
+            
+            <div class="text-center flex-1">
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
+                    Estatísticas de Ocorrências
+                </h1>
+                <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
+                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
+                </h2>
+                <div class="mt-2 text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Aguardando seleção.</div>
+            </div>
+
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 drop-shadow-lg opacity-90">
+        </header>
+
+        <div id="progressContainer" class="hidden mb-6 glass-card p-4">
+            <div class="flex justify-between mb-1">
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Inicializando Sistema E-193...</span>
+                <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-4 border border-gray-600">
+                <div id="progressBar" class="bg-blue-500 h-3.5 rounded-full progress-bar-striped transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="glass-card p-4 mb-6">
+            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2" id="mesesContainer"></div>
+        </div>
+
+        <div id="dashboardArea" class="hidden opacity-0 transition-opacity duration-700">
+            
+            <div class="flex justify-center mb-8">
+                <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-10 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md">
+                    <p class="text-xs uppercase font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS ATENDIDAS</p>
+                    <p class="text-5xl font-black text-white drop-shadow-md" id="totalDisplay">0</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="glass-card p-4">
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
+                    <div class="relative h-[500px]"><canvas id="chartPelotoes"></canvas></div>
+                </div>
+                <div class="glass-card p-4">
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
+                    <div class="relative h-[500px]"><canvas id="chartNatureza"></canvas></div>
+                </div>
+            </div>
+
+            <div class="glass-card p-4 mb-6">
+                <h3 class="text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">Detalhamento dos Subgrupos (> 1 Ocorrência)</h3>
+                <div id="subgrupoContainer" class="relative" style="height: 600px;"><canvas id="chartSubgrupos"></canvas></div>
+            </div>
+
+            <div class="glass-card p-1 overflow-hidden">
+                <div class="p-4 border-b border-white/10 flex justify-between items-center bg-black/20">
+                    <h3 class="text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase">Registro de Ocorrências</h3>
+                    <span class="text-xs text-gray-400 font-mono">Linhas: <span id="totalLista">0</span></span>
+                </div>
+                <div class="table-scroll">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="text-xs text-gray-400 uppercase font-bold bg-slate-900">
+                            <tr>
+                                <th class="p-3 text-center w-12 border-b border-gray-700">#</th>
+                                <th class="p-3 border-b border-gray-700">Data</th>
+                                <th class="p-3 border-b border-gray-700">Natureza</th>
+                                <th class="p-3 border-b border-gray-700">Subgrupo</th>
+                                <th class="p-3 border-b border-gray-700">Bairro</th>
+                                <th class="p-3 border-b border-gray-700">Pelotão</th>
+                                <th class="p-3 text-center border-b border-gray-700">Map</th>
+                                <th class="p-3 text-right border-b border-gray-700">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaBody" class="text-sm text-gray-300 font-mono"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-10"></div>
+    </div>
+
+    <script>
+        // ================= CONFIGURAÇÕES AVANÇADAS =================
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
+        const ANO_ATUAL = 2025;
+        
+        Chart.register(ChartDataLabels);
+
+        // Mapeamento Visual
+        const naturezasStyle = {
+            "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
+            "MANEJO DE INSETOS": { color: "#FDE047", icon: "🐝", cssClass: "text-yellow-200" },
+            "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
+            "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
+            "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
+            "PRÉ-HOSPITALAR": { color: "#EF4444", icon: "🚑", cssClass: "text-red-500" },
+            "PRODUTOS PERIGOSOS": { color: "#FFFFFF", icon: "☢️", cssClass: "text-white" },
+            "OUTROS": { color: "#64748B", icon: "⚠️", cssClass: "text-bombeiros-orange" }
+        };
+
+        const meses = [
+            { id: 'JAN', nome: 'JANEIRO' }, { id: 'FEV', nome: 'FEVEREIRO' },
+            { id: 'MAR', nome: 'MARÇO' }, { id: 'ABR', nome: 'ABRIL' },
+            { id: 'MAI', nome: 'MAIO' }, { id: 'JUN', nome: 'JUNHO' },
+            { id: 'JUL', nome: 'JULHO' }, { id: 'AGO', nome: 'AGOSTO' },
+            { id: 'SET', nome: 'SETEMBRO' }, { id: 'OUT', nome: 'OUTUBRO' },
+            { id: 'NOV', nome: 'NOVEMBRO' }, { id: 'DEZ', nome: 'DEZEMBRO' }
+        ];
+
+        let chartP = null, chartN = null, chartS = null;
+        let mesSelecionadoNome = ""; // Guardar nome do mês
+
+        // ================= INICIALIZAÇÃO =================
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('mesesContainer');
+            meses.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
+                btn.innerText = m.id; // Texto curto no botão
+                btn.onclick = () => iniciarProcesso(m.id, m.nome, btn); // Passa nome completo
+                container.appendChild(btn);
+            });
+        });
+
+        // ================= GERENCIADOR DE PROCESSO =================
+        function updateProgress(percent, text) {
+            const bar = document.getElementById('progressBar');
+            const txt = document.getElementById('progressText');
+            const per = document.getElementById('progressPercent');
+            const container = document.getElementById('progressContainer');
+
+            container.classList.remove('hidden');
+            bar.style.width = percent + '%';
+            txt.innerText = text;
+            per.innerText = Math.floor(percent) + '%';
+
+            if (percent >= 100) {
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                    bar.style.width = '0%'; 
+                }, 1500);
+            }
+        }
+
+        async function iniciarProcesso(mesId, mesNome, btnElement) {
+            mesSelecionadoNome = mesNome; // Salva o nome para usar no título
+
+            document.querySelectorAll('.btn-mes').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+            });
+            btnElement.classList.add('active');
+            
+            const dashboard = document.getElementById('dashboardArea');
+            dashboard.classList.add('hidden');
+            dashboard.classList.remove('opacity-100');
+            dashboard.classList.add('opacity-0');
+
+            try {
+                updateProgress(10, `Conectando ao servidor...`);
+                const url = `${GITHUB_BASE_URL}/dados/${mesId}_${ANO_ATUAL}.csv`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+
+                updateProgress(40, "Baixando dados...");
+                const csvText = await response.text();
+                
+                updateProgress(60, "Processando CSV...");
+
+                setTimeout(() => {
+                    parseAndRender(csvText);
+                }, 100);
+
+            } catch (error) {
+                console.error(error);
+                updateProgress(0, "Erro fatal.");
+                document.getElementById('statusMsg').innerHTML = `<span class="text-red-500">Erro: ${error.message}</span>`;
+                alert(error.message);
+            }
+        }
+
+        function parseAndRender(csvText) {
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                encoding: "UTF-8",
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        updateProgress(80, "Organizando Gráficos...");
+                        
+                        setTimeout(() => {
+                            try {
+                                processarDadosOtimizado(results.data);
+                                updateProgress(100, "Concluído!");
+                                
+                                const dashboard = document.getElementById('dashboardArea');
+                                dashboard.classList.remove('hidden');
+                                requestAnimationFrame(() => {
+                                    dashboard.classList.remove('opacity-0');
+                                    dashboard.classList.add('opacity-100');
+                                });
+                                
+                                document.getElementById('statusMsg').innerText = "Dados carregados com sucesso.";
+                            } catch (e) {
+                                alert("Erro no processamento: " + e.message);
+                            }
+                        }, 50);
+                    } else {
+                        alert("Arquivo vazio.");
+                    }
+                }
+            });
+        }
+
+        // ================= PROCESSAMENTO LÓGICO =================
+        function processarDadosOtimizado(data) {
+            const chaves = Object.keys(data[0]);
+            const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
+            const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
+            const colSub = chaves.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i) || k.match(/tipo/i));
+
+            if (!colNat || !colObm) throw new Error("Colunas obrigatórias não encontradas.");
+
+            const countPelotao = {};
+            const countNatureza = {};
+            const countSubgrupo = {}; 
+            let tableRowsHTML = ""; 
+            let total = 0;
+
+            data.forEach((row, index) => {
+                total++;
+                const obmValor = row[colObm];
+                const natValor = row[colNat];
+                let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
+                
+                // Mapeamento Pelotões
+                let pel = "OUTROS";
+                const s = obmValor ? String(obmValor).toUpperCase() : "";
+                if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
+                else if(s.includes("FLORESTA")) pel = "FLORESTA";
+                else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
+                else if(s.includes("RESTINGA")) pel = "RESTINGA";
+                else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) pel = "TERESÓPOLIS";
+                else if(s.includes("PARTENON")) pel = "PARTENON";
+                else if(s.includes("BELÉM") || s.includes("BELEM")) pel = "BELÉM NOVO";
+                else if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
+                else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
+
+                let nat = "OUTROS";
+                const n = natValor ? String(natValor).toUpperCase() : "OUTROS";
+                if(n.includes("INSETO")) nat = "MANEJO DE INSETOS";
+                else if(n.includes("INCÊNDIO") || n.includes("INCENDIO")) nat = "INCÊNDIO";
+                else if(n.includes("SALVAMENTO") || n.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                else if(n.includes("ÁRVORE") || n.includes("ARVORE")) nat = "CORTE DE ÁRVORE";
+                else if(n.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
+                else if(n.includes("APH") || n.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
+                else if(n.includes("PERIGOSO") || n.includes("HAZMAT")) nat = "PRODUTOS PERIGOSOS";
+
+                countPelotao[pel] = (countPelotao[pel] || 0) + 1;
+                countNatureza[nat] = (countNatureza[nat] || 0) + 1;
+
+                if (subValor && subValor !== "N/A" && subValor.trim() !== "") {
+                    let subText = subValor.trim();
+                    let subKey = `${nat}___${subText}`; 
+                    countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
+                }
+
+                // Tabela HTML Otimizada
+                const style = naturezasStyle[nat] || naturezasStyle["OUTROS"];
+                
+                let lat = row['Latitude'] || row['LATITUDE'];
+                let lon = row['Longitude'] || row['LONGITUDE'];
+                let mapsBtn = `<span class="text-gray-600 cursor-not-allowed text-center block opacity-30"><i class="fas fa-map-marker-slash"></i></span>`;
+                
+                if(lat && lon) {
+                    lat = String(lat).replace(',', '.');
+                    lon = String(lon).replace(',', '.');
+                    mapsBtn = `<a href="https://www.google.com/maps/search/?api=1&query=$${lat},${lon}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
+                }
+
+                tableRowsHTML += `
+                    <tr class="hover:bg-white/5 border-b border-gray-800/50 transition-colors odd:bg-white/5 even:bg-transparent">
+                        <td class="p-3 text-center font-bold text-gray-500 text-xs">${total}</td>
+                        <td class="p-3 font-mono text-gray-400 whitespace-nowrap text-xs">${row['Data'] || row['DATA'] || '--'}</td>
+                        <td class="p-3 font-bold ${style.cssClass} text-xs whitespace-nowrap"><span class="mr-2">${style.icon}</span>${nat}</td>
+                        <td class="p-3 text-xs text-blue-200/80">${subValor}</td>
+                        <td class="p-3 uppercase text-xs tracking-wider text-gray-400">${row['Bairro'] || row['BAIRRO'] || '--'}</td>
+                        <td class="p-3"><span class="text-fire-yellow font-bold text-xs whitespace-nowrap">${pel}</span></td>
+                        <td class="p-3">${mapsBtn}</td>
+                        <td class="p-3 text-right font-mono opacity-30 text-xs">#${row['Nº Oc.'] || row['ID'] || total}</td>
+                    </tr>
+                `;
+            });
+
+            // Atualização DOM e Título
+            document.getElementById('totalDisplay').innerText = total;
+            document.getElementById('totalLista').innerText = total;
+            document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
+            
+            // ATUALIZA O TÍTULO DO TOTAL COM O MÊS
+            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${mesSelecionadoNome} ${ANO_ATUAL}`;
+
+            prepararGraficos(countPelotao, countNatureza, countSubgrupo);
+        }
+
+        function prepararGraficos(countPelotao, countNatureza, countSubgrupo) {
+            // Ordenações
+            const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
+            const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
+            const sortedSubgrupo = Object.entries(countSubgrupo)
+                .filter(([key, count]) => count > 1)
+                .sort((a,b) => b[1] - a[1]);
+
+            // --- LÓGICA DE COR DEGRADÊ PARA PELOTÕES (VERDE OLIVA) ---
+            // Calcula opacidade ou luminosidade baseada no valor máximo
+            const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
+            const pelotoesColors = sortedPelotao.map(([nome, val]) => {
+                // Calcula uma intensidade entre 0.4 e 1.0 baseada no valor relativo ao máximo
+                const intensity = 0.3 + (0.7 * (val / maxVal)); 
+                // Retorna um tom de verde (HSL 84, 50%, 40%) com opacidade variável
+                // Ou podemos misturar duas cores. Vamos usar opacidade no rgba de um verde oliva forte.
+                // Verde Oliva Forte: #4d7c0f (77, 124, 15)
+                return `rgba(77, 124, 15, ${intensity})`;
+            });
+
+            const natLabels = sortedNatureza.map(x => {
+                const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
+                return `${style.icon} ${x[0]}`;
+            });
+            const natColors = sortedNatureza.map(x => (naturezasStyle[x[0]] || naturezasStyle["OUTROS"]).color);
+
+            const subLabels = sortedSubgrupo.map(item => {
+                const [natPai, subNome] = item[0].split('___');
+                const style = naturezasStyle[natPai] || naturezasStyle["OUTROS"];
+                return `${style.icon} ${natPai} [${subNome}]`;
+            });
+            const subColors = sortedSubgrupo.map(item => {
+                const natPai = item[0].split('___')[0];
+                return (naturezasStyle[natPai] || naturezasStyle["OUTROS"]).color;
+            });
+
+            renderizarGraficos({
+                pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]), colors: pelotoesColors },
+                natureza: { labels: natLabels, data: sortedNatureza.map(x=>x[1]), colors: natColors },
+                subgrupos: { labels: subLabels, data: sortedSubgrupo.map(x=>x[1]), colors: subColors }
+            });
+        }
+
+        function renderizarGraficos(dados) {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+            Chart.defaults.font.family = 'Inter';
+
+            const commonOptions = {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 500 },
+                layout: { padding: { right: 40 } },
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: {
+                        color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: Math.round
+                    }
+                },
+                scales: { 
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
+                    y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
+                }
+            };
+
+            if(chartP) chartP.destroy();
+            if(chartN) chartN.destroy();
+            if(chartS) chartS.destroy();
+
+            // 1. Pelotões (COM COR DEGRADÊ)
+            chartP = new Chart(document.getElementById('chartPelotoes'), {
+                type: 'bar',
+                data: {
+                    labels: dados.pelotoes.labels,
+                    datasets: [{
+                        data: dados.pelotoes.data,
+                        backgroundColor: dados.pelotoes.colors, // Cores geradas dinamicamente
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // 2. Natureza
+            chartN = new Chart(document.getElementById('chartNatureza'), {
+                type: 'bar',
+                data: {
+                    labels: dados.natureza.labels,
+                    datasets: [{
+                        data: dados.natureza.data,
+                        backgroundColor: dados.natureza.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' }, autoSkip: false,
+                                color: dados.natureza.colors
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 3. Subgrupos
+            const containerS = document.getElementById('subgrupoContainer');
+            if(dados.subgrupos.labels.length > 0) {
+                const height = Math.max(600, dados.subgrupos.labels.length * 30);
+                containerS.style.height = height + 'px';
+            }
+
+            chartS = new Chart(document.getElementById('chartSubgrupos'), {
+                type: 'bar',
+                data: {
+                    labels: dados.subgrupos.labels,
+                    datasets: [{
+                        data: dados.subgrupos.data,
+                        backgroundColor: dados.subgrupos.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' }, autoSkip: false,
+                                color: dados.subgrupos.colors
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
 </html>
