@@ -146,8 +146,8 @@
 
     <script>
         // ================= CONFIGURAÇÕES =================
-        // URL AJUSTADA COM A PASTA "refs/heads/main" CORRETA
-        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/refs/heads/main'; 
+        // URL PADRÃO MAIS SEGURA (SEM O REFS/HEADS)
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
         const ANO_ATUAL = 2025;
         
         // Cores para os gráficos
@@ -171,8 +171,6 @@
 
         window.onload = () => {
             gerarBotoes();
-            // Se quiser carregar JAN automaticamente ao abrir, descomente abaixo:
-            // carregarDados('JAN'); 
         };
 
         function gerarBotoes() {
@@ -196,54 +194,64 @@
             msg.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Buscando dados de ${mes}/${ANO_ATUAL}...`;
             msg.className = "mt-2 text-sm text-yellow-400";
 
-            // Montagem da URL Final: .../main/dados/JAN_2025.csv
+            // Montagem da URL
             const url = `${GITHUB_BASE_URL}/dados/${mes}_${ANO_ATUAL}.csv`;
-            console.log("URL de busca:", url); // Debug
+            console.log("Tentando baixar:", url);
 
             try {
                 const response = await fetch(url);
                 
                 if (!response.ok) {
-                    throw new Error(`Erro ${response.status}: Arquivo não encontrado`);
+                    throw new Error(`Erro HTTP ${response.status}: Arquivo não encontrado no GitHub.`);
                 }
 
-                const csvText = await response.text();
+                const csvText = await response.text(); // Pega o texto puro
                 
-                // Processar CSV
+                // Parse CSV com Detecção Automática de Separador (Vírgula ou Ponto e Vírgula)
                 Papa.parse(csvText, {
                     header: true,
                     skipEmptyLines: true,
+                    encoding: "UTF-8", // Tenta forçar UTF-8
                     complete: function(results) {
                         if (results.data && results.data.length > 0) {
-                            processarDados(results.data);
-                            msg.innerHTML = `<i class="fas fa-check"></i> Dados de ${mes} carregados com sucesso.`;
-                            msg.className = "mt-2 text-sm text-green-400";
-                            
-                            // Mostra o dashboard
-                            const dash = document.getElementById('dashboardArea');
-                            dash.classList.remove('opacity-50', 'pointer-events-none');
+                            try {
+                                processarDados(results.data);
+                                msg.innerHTML = `<i class="fas fa-check"></i> Dados de ${mes} carregados com sucesso.`;
+                                msg.className = "mt-2 text-sm text-green-400";
+                                document.getElementById('dashboardArea').classList.remove('opacity-50', 'pointer-events-none');
+                            } catch (e) {
+                                console.error(e);
+                                alert("Erro ao processar planilha: " + e.message);
+                                msg.innerHTML = "Erro no processamento dos dados.";
+                            }
                         } else {
-                            throw new Error("O arquivo CSV está vazio ou inválido.");
+                            alert("O arquivo foi encontrado, mas parece estar vazio.");
                         }
                     }
                 });
 
             } catch (error) {
                 console.error(error);
-                msg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Dados não encontrados para ${mes}/${ANO_ATUAL}. Verifique se o arquivo <b>${mes}_${ANO_ATUAL}.csv</b> está na pasta 'dados'.`;
+                msg.innerHTML = `<i class="fas fa-times-circle"></i> Erro: ${error.message}`;
                 msg.className = "mt-2 text-sm text-red-400";
-                
-                // Oculta dashboard se der erro
                 document.getElementById('dashboardArea').classList.add('opacity-50', 'pointer-events-none');
             }
         }
 
         // ================= PROCESSAMENTO =================
         function processarDados(data) {
-            // Validação simples
-            if (!data[0].hasOwnProperty('Emergência') || !data[0].hasOwnProperty('Obm.')) {
-                alert("O arquivo não possui as colunas 'Emergência' e 'Obm.'. Verifique se é a planilha correta.");
-                return;
+            // --- TRATAMENTO DE ACENTUAÇÃO ---
+            // Às vezes o Excel exporta "Emergência" como "Emergencia" ou caracteres estranhos.
+            // Vamos procurar qual é a chave correta.
+            const chaves = Object.keys(data[0]);
+            
+            // Procura a coluna de Natureza (Emergência)
+            const colNat = chaves.find(k => k.includes("Emerg") || k.includes("EMERG") || k.includes("Natureza"));
+            // Procura a coluna de OBM
+            const colObm = chaves.find(k => k.includes("Obm") || k.includes("OBM") || k.includes("Guarni"));
+
+            if (!colNat || !colObm) {
+                throw new Error(`Colunas não encontradas!\nO sistema procurou por 'Emergência' e 'Obm.'\nColunas encontradas no arquivo: ${chaves.join(", ")}`);
             }
 
             const countPelotao = {};
@@ -251,50 +259,55 @@
             const lista = [];
             let total = 0;
 
-            // Helper de nomes
-            const mapearPelotao = (obm) => {
-                const s = obm ? obm.toUpperCase() : "";
-                if(s.includes("AÇORIANOS")) return "1ª Cia Açorianos";
+            const mapearPelotao = (obmRaw) => {
+                const s = obmRaw ? String(obmRaw).toUpperCase() : "";
+                if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) return "1ª Cia Açorianos";
                 if(s.includes("FLORESTA")) return "2ª Cia Floresta";
                 if(s.includes("PASSO")) return "2ª Cia Passo D'Areia";
                 if(s.includes("RESTINGA")) return "1ª Cia Restinga";
-                if(s.includes("TERESÓPOLIS")) return "1ª Cia Teresópolis";
+                if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) return "1ª Cia Teresópolis";
                 if(s.includes("PARTENON")) return "2ª Cia Partenon";
-                if(s.includes("BELÉM NOVO")) return "1ª Cia Belém Novo";
-                if(s.includes("ASSUNÇÃO")) return "1ª Cia Assunção";
+                if(s.includes("BELÉM") || s.includes("BELEM")) return "1ª Cia Belém Novo";
+                if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) return "1ª Cia Assunção";
                 return "Outros";
             };
 
             data.forEach(row => {
                 total++;
                 
+                // Pega o valor usando a coluna que encontramos dinamicamente
+                const obmValor = row[colObm];
+                const natValor = row[colNat];
+                const dataValor = row['Data'] || row['DATA'] || '---';
+                const bairroValor = row['Bairro'] || row['BAIRRO'] || '---';
+                const vtrValor = row['Viaturas'] || row['VIATURAS'] || '---';
+                
                 // Contagem Pelotão
-                const pel = mapearPelotao(row['Obm.']);
+                const pel = mapearPelotao(obmValor);
                 countPelotao[pel] = (countPelotao[pel] || 0) + 1;
 
-                // Contagem Natureza (Agrupamento)
-                let nat = row['Emergência'] || "Outros";
+                // Contagem Natureza
+                let nat = natValor ? String(natValor).toUpperCase() : "OUTROS";
                 if(nat.includes("INSETO")) nat = "Manejo de Insetos";
-                else if(nat.includes("INCÊNDIO")) nat = "Incêndio";
+                else if(nat.includes("INCÊNDIO") || nat.includes("INCENDIO")) nat = "Incêndio";
                 else if(nat.includes("SALVAMENTO") || nat.includes("BUSCA")) nat = "Busca e Resgate";
-                else if(nat.includes("ÁRVORE")) nat = "Corte de Árvore";
+                else if(nat.includes("ÁRVORE") || nat.includes("ARVORE")) nat = "Corte de Árvore";
                 else if(nat.includes("PREVENTIVA")) nat = "Ações Preventivas";
                 
                 countNatureza[nat] = (countNatureza[nat] || 0) + 1;
 
-                // Lista Detalhada
+                // Lista
                 lista.push({
-                    id: row['Nº Oc.'],
-                    data: row['Data'],
-                    nat: row['Emergência'],
-                    bairro: row['Bairro'],
-                    vtr: row['Viaturas'] || '---',
-                    lat: row['Latitude'],
-                    lon: row['Longitude']
+                    id: row['Nº Oc.'] || row['ID'] || total,
+                    data: dataValor,
+                    nat: natValor,
+                    bairro: bairroValor,
+                    vtr: vtrValor,
+                    lat: row['Latitude'] || row['LATITUDE'],
+                    lon: row['Longitude'] || row['LONGITUDE']
                 });
             });
 
-            // Ordenar estatísticas (Maior para menor)
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
 
@@ -314,7 +327,6 @@
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 
-            // Gráfico Pelotão
             if(chartP) chartP.destroy();
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
@@ -335,7 +347,6 @@
                 }
             });
 
-            // Gráfico Natureza
             if(chartN) chartN.destroy();
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
@@ -366,24 +377,23 @@
             lista.forEach((oc, index) => {
                 let cor = 'text-white';
                 let icon = 'fa-bell';
-                let tipo = oc.nat ? oc.nat.toUpperCase() : "OUTROS";
+                let tipo = oc.nat ? String(oc.nat).toUpperCase() : "OUTROS";
 
-                if(tipo.includes('INCÊNDIO')) { cor = 'text-fire-yellow'; icon = 'fa-fire'; }
+                if(tipo.includes('INCÊNDIO') || tipo.includes('INCENDIO')) { cor = 'text-fire-yellow'; icon = 'fa-fire'; }
                 else if(tipo.includes('PREVENTIVA') || tipo.includes('VISTORIA')) { cor = 'text-gray-400'; icon = 'fa-shield-alt'; }
-                else if(tipo.includes('ÁRVORE')) { cor = 'text-green-400'; icon = 'fa-tree'; }
+                else if(tipo.includes('ÁRVORE') || tipo.includes('ARVORE')) { cor = 'text-green-400'; icon = 'fa-tree'; }
                 else if(tipo.includes('INSETO')) { cor = 'text-yellow-200'; icon = 'fa-bug'; }
                 else if(tipo.includes('APH') || tipo.includes('HOSPITALAR')) { cor = 'text-red-500'; icon = 'fa-ambulance'; }
                 else { cor = 'text-bombeiros-orange'; icon = 'fa-exclamation-triangle'; }
 
                 let mapsLink = '';
                 if(oc.lat && oc.lon) {
-                    // Garante ponto decimal para o Google Maps
                     const lat = String(oc.lat).replace(',', '.');
                     const lon = String(oc.lon).replace(',', '.');
                     const urlMap = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                    mapsLink = `<a href="${urlMap}" target="_blank" class="text-blue-400 hover:text-white transition-colors" title="Ver no Mapa"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
+                    mapsLink = `<a href="${urlMap}" target="_blank" class="text-blue-400 hover:text-white transition-colors"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
                 } else {
-                    mapsLink = `<span class="text-gray-600 cursor-not-allowed" title="Sem GPS"><i class="fas fa-map-marker-slash"></i></span>`;
+                    mapsLink = `<span class="text-gray-600 cursor-not-allowed"><i class="fas fa-map-marker-slash"></i></span>`;
                 }
 
                 const tr = `
@@ -401,5 +411,6 @@
             });
         }
     </script>
+
 </body>
 </html>
