@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema E-193 | Estatísticas 1º BBM</title>
+    <title>SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -97,7 +97,7 @@
             
             <div class="text-center flex-1">
                 <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
-                    Estatísticas de Ocorrências
+                    SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS
                 </h1>
                 <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
                     1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
@@ -110,7 +110,7 @@
 
         <div id="progressContainer" class="hidden mb-6 glass-card p-4">
             <div class="flex justify-between mb-1">
-                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Carregando...</span>
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Inicializando...</span>
                 <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-4 border border-gray-600">
@@ -194,13 +194,14 @@
         
         Chart.register(ChartDataLabels);
 
-        // --- PALETA DE CORES (Base para Naturezas) ---
+        // --- PALETA DE CORES E ÍCONES ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, // Marrom/Cobre
+            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
+            "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO": { color: "#60A5FA", icon: "📋", cssClass: "text-blue-400" },
             "PRÉ-HOSPITALAR": { color: "#EF4444", icon: "🚑", cssClass: "text-red-500" },
             "PRODUTOS PERIGOSOS": { color: "#FFFFFF", icon: "☢️", cssClass: "text-white" },
             "OUTROS": { color: "#64748B", icon: "⚠️", cssClass: "text-bombeiros-orange" }
@@ -331,7 +332,6 @@
             const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
             const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
             const colSub = chaves.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i) || k.match(/tipo/i));
-            // Precisamos da coluna Viaturas para a regra do Teresópolis
             const colVtr = chaves.find(k => k.match(/Viatura/i) || k.match(/Prefixo/i));
 
             if (!colNat || !colObm) throw new Error("Colunas obrigatórias não encontradas.");
@@ -342,37 +342,41 @@
                 total++;
                 const obmValor = row[colObm];
                 const natValor = row[colNat];
-                const vtrValor = colVtr ? (row[colVtr] || "") : ""; // Lê a viatura
+                const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // --- 1. LÓGICA DE PELOTÕES AVANÇADA ---
+                // --- 1. LÓGICA DE PELOTÕES (Incluindo BBS) ---
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
 
-                if (s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
-                else if(s.includes("FLORESTA")) pel = "FLORESTA";
-                else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
-                else if(s.includes("RESTINGA")) pel = "RESTINGA";
-                else if(s.includes("PARTENON")) pel = "PARTENON";
-                else if(s.includes("BELÉM") || s.includes("BELEM")) pel = "BELÉM NOVO";
-                else if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
-                // LÓGICA DO TERESÓPOLIS (DIVISÃO AR vs ABT)
+                // Regras BBS (Prioridade)
+                if (s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
+                else if (s.includes("CANIL")) pel = "BBS (POA) - CANIL";
+                else if (s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
+                else if (s.includes("TERRESTRE") || (s.includes("BBS") && !s.includes("1º BBM"))) pel = "BBS (POA) - TERRESTRE";
+                
+                // 1º BBM
+                else if (s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
+                else if (s.includes("FLORESTA")) pel = "FLORESTA";
+                else if (s.includes("PASSO")) pel = "PASSO D'AREIA";
+                else if (s.includes("RESTINGA")) pel = "RESTINGA";
+                else if (s.includes("PARTENON")) pel = "PARTENON";
+                else if (s.includes("BELÉM") || s.includes("BELEM")) pel = "BELÉM NOVO";
+                else if (s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
+                // Regra Teresópolis (ABT vs AR)
                 else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) {
-                    if (v.includes("AR") || s.includes("RESGATE")) {
-                        pel = "AUTO RESGATE";
-                    } else {
-                        pel = "TERESÓPOLIS";
-                    }
+                    if (v.includes("AR") || s.includes("RESGATE")) pel = "AUTO RESGATE";
+                    else pel = "TERESÓPOLIS";
                 }
                 else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
                 else {
-                    // SEPARANDO "OUTROS": Usa o nome real, limpando prefixos comuns
+                    // Limpeza de "Outros"
                     pel = s.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").trim();
                     if(pel === "") pel = "OUTROS";
                 }
 
-                // --- 2. LÓGICA DE NATUREZA (SEPARANDO OUTROS) ---
+                // --- 2. LÓGICA DE NATUREZA ---
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
                 
@@ -383,9 +387,8 @@
                 else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
                 else if(nRaw.includes("APH") || nRaw.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
                 else if(nRaw.includes("PERIGOSO") || nRaw.includes("HAZMAT")) nat = "PRODUTOS PERIGOSOS";
+                else if(nRaw.includes("VISTORIA") && nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
                 else {
-                    // Se não cair nos grupos acima, usa o nome real (ex: VISTORIA)
-                    // Isso elimina o "OUTROS" genérico e mostra o dado real.
                     nat = nRaw.trim(); 
                 }
 
@@ -487,7 +490,7 @@
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
 
-                // Estilo da Natureza (se não estiver no mapa, cria um estilo genérico cinza)
+                // Estilo da Natureza
                 const style = naturezasStyle[d.nat] || { color: "#94A3B8", icon: "📄", cssClass: "text-slate-400" };
                 
                 let lat = d.lat;
@@ -529,21 +532,25 @@
                 .filter(([key, count]) => count >= 1)
                 .sort((a,b) => b[1] - a[1]);
 
-            // --- COR DEGRADÊ PARA PELOTÕES (Verde Oliva) ---
+            // Cor Degradê Pelotão
             const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
             const pelotoesColors = sortedPelotao.map(([nome, val]) => {
                 const intensity = 0.3 + (0.7 * (val / maxVal)); 
                 return `rgba(77, 124, 15, ${intensity})`; 
             });
 
-            // --- LABELS E CORES NATUREZA ---
+            // Labels e Cores Natureza (QUEBRA DE LINHA para Vistoria)
             const natLabels = sortedNatureza.map(x => {
-                const style = naturezasStyle[x[0]] || { color: "#94A3B8", icon: "📄" };
-                return `${style.icon} ${x[0]}`;
+                const name = x[0];
+                const style = naturezasStyle[name] || { color: "#94A3B8", icon: "📄" };
+                if (name === "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO") {
+                    return [`${style.icon} VISTORIA DE SEGURANÇA`, "CONTRA INCÊNDIO"];
+                }
+                return `${style.icon} ${name}`;
             });
             const natColors = sortedNatureza.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
 
-            // --- LABELS E CORES SUBGRUPOS ---
+            // Labels e Cores Subgrupos
             const subLabels = sortedSubgrupo.map(item => {
                 const [natPai, subNome] = item[0].split('___');
                 const style = naturezasStyle[natPai] || { color: "#94A3B8", icon: "📄" };
@@ -562,7 +569,6 @@
         }
 
         function renderizarGraficos(dados) {
-            // Configuração global da fonte Mono
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
@@ -595,7 +601,6 @@
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // 1. Pelotões
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
                 data: {
@@ -609,7 +614,6 @@
                 options: commonOptions
             });
 
-            // 2. Natureza (Cores no Eixo Y)
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
                 data: {
@@ -634,7 +638,6 @@
                 }
             });
 
-            // 3. Subgrupos (Altura Dinâmica + Cores no Eixo Y)
             const containerS = document.getElementById('subgrupoContainer');
             if(dados.subgrupos.labels.length > 0) {
                 const height = Math.max(600, dados.subgrupos.labels.length * 30);
