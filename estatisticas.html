@@ -7,7 +7,10 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <script>
@@ -49,7 +52,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* Botões de Mês - VERDE quando ativo */
+        /* Botões de Mês */
         .btn-mes {
             transition: all 0.2s;
             border: 1px solid rgba(255,255,255,0.1);
@@ -157,17 +160,19 @@
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
         const ANO_ATUAL = 2025;
         
+        // Ativando o Plugin de DataLabels globalmente
+        Chart.register(ChartDataLabels);
+
         // Cores padrão para Pelotões
         const colorsPalette = [
             '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', 
             '#6366F1', '#8B5CF6', '#EC4899', '#F43F5E', '#64748B', '#A8A29E'
         ];
 
-        // --- ESTILOS VISUAIS DAS NATUREZAS (Mapeamento Completo de Cor e Ícone) ---
-        // As cores aqui serão usadas tanto na barra quanto na FONTE DO EIXO.
+        // --- ESTILOS VISUAIS DAS NATUREZAS ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow", cssIcon: "fa-fire" },
-            "MANEJO DE INSETOS": { color: "#FDE047", icon: "🐝", cssClass: "text-yellow-200", cssIcon: "fa-bug" }, // Amarelo claro
+            "MANEJO DE INSETOS": { color: "#FDE047", icon: "🐝", cssClass: "text-yellow-200", cssIcon: "fa-bug" },
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500", cssIcon: "fa-life-ring" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400", cssIcon: "fa-tree" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400", cssIcon: "fa-shield-alt" },
@@ -221,10 +226,15 @@
             msg.className = "mt-2 text-sm text-yellow-400";
 
             const url = `${GITHUB_BASE_URL}/dados/${mes}_${ANO_ATUAL}.csv`;
-            
+            console.log("Tentando baixar:", url);
+
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`Arquivo não encontrado (${response.status})`);
+                
+                if (!response.ok) {
+                    throw new Error(`Arquivo não encontrado.\nLink tentado: ${url}`);
+                }
+
                 const csvText = await response.text();
                 
                 Papa.parse(csvText, {
@@ -240,19 +250,20 @@
                                 document.getElementById('dashboardArea').classList.remove('opacity-50', 'pointer-events-none');
                             } catch (e) {
                                 console.error(e);
-                                alert("Erro: " + e.message);
+                                alert("Erro ao processar dados da planilha: " + e.message);
                             }
                         } else {
-                            alert("Arquivo vazio.");
+                            alert("O arquivo foi encontrado, mas está vazio.");
                         }
                     }
                 });
 
             } catch (error) {
                 console.error(error);
-                msg.innerHTML = `<i class="fas fa-times-circle"></i> Erro: Arquivo ${mes}_${ANO_ATUAL}.csv não encontrado.`;
+                msg.innerHTML = `<i class="fas fa-times-circle"></i> Erro ao carregar arquivo.`;
                 msg.className = "mt-2 text-sm text-red-400";
                 document.getElementById('dashboardArea').classList.add('opacity-50', 'pointer-events-none');
+                alert(error.message);
             }
         }
 
@@ -264,7 +275,7 @@
             const colSub = chaves.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i) || k.match(/tipo/i));
 
             if (!colNat || !colObm) {
-                throw new Error("Colunas obrigatórias não encontradas.");
+                throw new Error("Colunas 'Emergência' e 'Obm' não encontradas no CSV.");
             }
 
             const countPelotao = {};
@@ -313,7 +324,6 @@
 
                 if (subValor && subValor !== "N/A" && subValor.trim() !== "") {
                     let subText = subValor.trim();
-                    // FORMATO CHAVE: NATUREZA___SUBGRUPO
                     let subKey = `${nat}___${subText}`; 
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
@@ -333,23 +343,21 @@
             // Preparação dos Gráficos
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             
-            // NATUREZA: Preparar labels (com ícone) e cores (texto e barra)
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
             const natLabels = sortedNatureza.map(x => {
                 const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
-                return `${style.icon} ${x[0]}`; // Label com Emoji
+                return `${style.icon} ${x[0]}`;
             });
             const natColors = sortedNatureza.map(x => {
                 const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
-                return style.color; // Cor mapeada
+                return style.color;
             });
 
-            // SUBGRUPOS: Filtro > 1
+            // SUBGRUPOS (Filtro > 1)
             const sortedSubgrupo = Object.entries(countSubgrupo)
                 .filter(([key, count]) => count > 1) 
                 .sort((a,b) => b[1] - a[1]);
 
-            // Montagem dos Labels do Subgrupo: "🔥 INCÊNDIO [Lixo]"
             const subLabels = sortedSubgrupo.map(item => {
                 const parts = item[0].split('___');
                 const natPai = parts[0];
@@ -358,7 +366,6 @@
                 return `${style.icon} ${natPai} [${subNome}]`;
             });
 
-            // Cores dos Subgrupos (Baseadas no pai)
             const subColors = sortedSubgrupo.map(item => {
                 const natPai = item[0].split('___')[0];
                 const style = naturezasStyle[natPai] || naturezasStyle["OUTROS"];
@@ -371,12 +378,12 @@
                 natureza: { 
                     labels: natLabels, 
                     data: sortedNatureza.map(x=>x[1]), 
-                    colors: natColors // Passando as cores para usar no eixo
+                    colors: natColors 
                 },
                 subgrupos: { 
                     labels: subLabels, 
                     data: sortedSubgrupo.map(x=>x[1]),
-                    colors: subColors // Passando as cores para usar no eixo
+                    colors: subColors
                 },
                 lista: lista
             });
@@ -390,12 +397,23 @@
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'Inter';
 
-            // Configuração Base
+            // Configuração Base dos Gráficos
             const baseOptions = {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                layout: { padding: { right: 50 } }, // Espaço para o número
+                plugins: { 
+                    legend: { display: false },
+                    // PLUGIN DATALABELS (Mostra número ao lado da barra)
+                    datalabels: {
+                        color: '#cbd5e1',
+                        anchor: 'end',
+                        align: 'end',
+                        font: { weight: 'bold', size: 12 },
+                        formatter: Math.round
+                    }
+                },
                 scales: { 
                     x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
                     y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
@@ -439,7 +457,7 @@
                             ticks: {
                                 font: { size: 12, weight: 'bold' },
                                 autoSkip: false,
-                                // COR MÁGICA: Define a cor de cada label do eixo Y
+                                // Cores dos Eixos
                                 color: dados.natureza.colors 
                             }
                         }
@@ -474,7 +492,7 @@
                             ticks: {
                                 font: { size: 11, weight: 'bold' },
                                 autoSkip: false,
-                                // COR MÁGICA: Define a cor do label baseada na natureza pai
+                                // Cores dos Eixos
                                 color: dados.subgrupos.colors 
                             }
                         }
