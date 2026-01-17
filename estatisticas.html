@@ -22,10 +22,12 @@
                         'bombeiros-orange': '#F97316',
                         'dark-bg': '#0f172a',
                         'cb-green': '#10B981',
-                        'oliva-start': '#365314',
-                        'oliva-end': '#84cc16'
+                        'insect-brown': '#D97706' // Nova cor para Insetos
                     },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace']
+                    }
                 }
             }
         }
@@ -77,7 +79,6 @@
         
         thead th { position: sticky; top: 0; z-index: 10; background-color: #0f172a; }
 
-        /* Estilo dos Selects de Filtro */
         .filter-select {
             background-color: #1e293b;
             color: #e2e8f0;
@@ -154,23 +155,14 @@
             </div>
 
             <div class="glass-card p-1 overflow-hidden">
-                
                 <div class="p-4 bg-black/30 border-b border-white/10">
                     <h3 class="text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
-                        <select id="filterNatureza" class="filter-select">
-                            <option value="">Todas as Naturezas</option>
-                        </select>
-                        <select id="filterSubgrupo" class="filter-select">
-                            <option value="">Todos os Subgrupos</option>
-                        </select>
-                        <select id="filterBairro" class="filter-select">
-                            <option value="">Todos os Bairros</option>
-                        </select>
-                        <select id="filterPelotao" class="filter-select">
-                            <option value="">Todos os Pelotões</option>
-                        </select>
+                        <select id="filterNatureza" class="filter-select"><option value="">Todas as Naturezas</option></select>
+                        <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
+                        <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
+                        <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
                         <button onclick="resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center">
                             <i class="fas fa-undo mr-2"></i> Limpar Filtros
                         </button>
@@ -205,16 +197,17 @@
     </div>
 
     <script>
-        // ================= CONFIGURAÇÕES AVANÇADAS =================
+        // ================= CONFIGURAÇÕES =================
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
         const ANO_ATUAL = 2025;
         
         Chart.register(ChartDataLabels);
 
-        // Mapeamento Visual
+        // --- DEFINIÇÃO DE CORES E ESTILOS ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#FDE047", icon: "🐝", cssClass: "text-yellow-200" },
+            // MUDANÇA: Cor Marrom/Cobre para Insetos
+            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
@@ -234,8 +227,6 @@
 
         let chartP = null, chartN = null, chartS = null;
         let mesSelecionadoNome = "";
-        
-        // VARIÁVEL GLOBAL PARA ARMAZENAR OS DADOS BRUTOS (PARA FILTRAGEM)
         let dadosGlobais = [];
 
         // ================= INICIALIZAÇÃO =================
@@ -249,7 +240,6 @@
                 container.appendChild(btn);
             });
 
-            // Listeners para os filtros
             ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
                 document.getElementById(id).addEventListener('change', aplicarFiltros);
             });
@@ -348,7 +338,6 @@
 
         // ================= PROCESSAMENTO LÓGICO =================
         function processarDadosOtimizado(data) {
-            // Reinicia dados globais
             dadosGlobais = [];
 
             const chaves = Object.keys(data[0]);
@@ -360,14 +349,12 @@
 
             let total = 0;
 
-            // 1. Processa e armazena em dadosGlobais (Limpeza)
             data.forEach((row, index) => {
                 total++;
                 const obmValor = row[colObm];
                 const natValor = row[colNat];
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // Mapeamento Pelotões
                 let pel = "OUTROS";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
@@ -380,7 +367,6 @@
                 else if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
                 else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
 
-                // Mapeamento Natureza
                 let nat = "OUTROS";
                 const n = natValor ? String(natValor).toUpperCase() : "OUTROS";
                 if(n.includes("INSETO")) nat = "MANEJO DE INSETOS";
@@ -391,11 +377,9 @@
                 else if(n.includes("APH") || n.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
                 else if(n.includes("PERIGOSO") || n.includes("HAZMAT")) nat = "PRODUTOS PERIGOSOS";
 
-                // Limpeza do Subgrupo
                 if (!subValor || subValor === "N/A") subValor = "";
                 else subValor = subValor.trim();
 
-                // Objeto Normalizado
                 dadosGlobais.push({
                     id: row['Nº Oc.'] || row['ID'] || total,
                     data: row['Data'] || row['DATA'] || '--',
@@ -408,10 +392,7 @@
                 });
             });
 
-            // 2. Popula os Filtros (Dropdowns)
             popularFiltros();
-
-            // 3. Renderiza Tudo (Sem Filtro Inicial)
             renderizarTabelaEGraficos(dadosGlobais);
         }
 
@@ -430,7 +411,6 @@
 
             const fillSelect = (id, set) => {
                 const sel = document.getElementById(id);
-                // Mantém apenas a primeira opção (Todos...)
                 sel.innerHTML = sel.options[0].outerHTML; 
                 Array.from(set).sort().forEach(val => {
                     const opt = document.createElement('option');
@@ -471,7 +451,6 @@
         }
 
         function renderizarTabelaEGraficos(dados, isFiltrado = false) {
-            // A. Atualiza Texto do Total
             const total = dados.length;
             const totalGlobal = dadosGlobais.length;
             
@@ -483,7 +462,6 @@
                 : total;
             document.getElementById('totalLista').innerText = textoLinhas;
 
-            // B. Recalcula Contagens para Gráficos
             const countPelotao = {};
             const countNatureza = {};
             const countSubgrupo = {}; 
@@ -491,7 +469,6 @@
             let tableRowsHTML = "";
 
             dados.forEach((d, index) => {
-                // Contagens
                 countPelotao[d.pel] = (countPelotao[d.pel] || 0) + 1;
                 countNatureza[d.nat] = (countNatureza[d.nat] || 0) + 1;
                 
@@ -500,7 +477,6 @@
                     countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
 
-                // HTML da Tabela
                 const style = naturezasStyle[d.nat] || naturezasStyle["OUTROS"];
                 
                 let lat = d.lat;
@@ -515,12 +491,12 @@
 
                 tableRowsHTML += `
                     <tr class="hover:bg-white/5 border-b border-gray-800/50 transition-colors odd:bg-white/5 even:bg-transparent">
-                        <td class="p-3 text-center font-bold text-gray-500 text-xs">${index + 1}</td>
+                        <td class="p-3 text-center font-bold text-gray-500 text-xs font-mono">${index + 1}</td>
                         <td class="p-3 font-mono text-gray-400 whitespace-nowrap text-xs">${d.data}</td>
-                        <td class="p-3 font-bold ${style.cssClass} text-xs whitespace-nowrap"><span class="mr-2">${style.icon}</span>${d.nat}</td>
-                        <td class="p-3 text-xs text-blue-200/80">${d.sub}</td>
-                        <td class="p-3 uppercase text-xs tracking-wider text-gray-400">${d.bairro}</td>
-                        <td class="p-3"><span class="text-fire-yellow font-bold text-xs whitespace-nowrap">${d.pel}</span></td>
+                        <td class="p-3 font-bold ${style.cssClass} text-xs whitespace-nowrap font-mono"><span class="mr-2">${style.icon}</span>${d.nat}</td>
+                        <td class="p-3 text-xs text-blue-200/80 font-mono">${d.sub}</td>
+                        <td class="p-3 uppercase text-xs tracking-wider text-gray-400 font-mono">${d.bairro}</td>
+                        <td class="p-3"><span class="text-fire-yellow font-bold text-xs whitespace-nowrap font-mono">${d.pel}</span></td>
                         <td class="p-3">${mapsBtn}</td>
                         <td class="p-3 text-right font-mono opacity-30 text-xs">#${d.id}</td>
                     </tr>
@@ -529,7 +505,6 @@
 
             document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
 
-            // C. Atualiza Gráficos (somente se houver dados, senão limpa)
             if (total > 0) {
                 prepararGraficos(countPelotao, countNatureza, countSubgrupo);
             }
@@ -539,19 +514,16 @@
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
             
-            // Subgrupos >= 1
             const sortedSubgrupo = Object.entries(countSubgrupo)
                 .filter(([key, count]) => count >= 1)
                 .sort((a,b) => b[1] - a[1]);
 
-            // Lógica de Cor Degradê (Verde Oliva)
             const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
             const pelotoesColors = sortedPelotao.map(([nome, val]) => {
                 const intensity = 0.3 + (0.7 * (val / maxVal)); 
-                return `rgba(77, 124, 15, ${intensity})`; // Verde Oliva
+                return `rgba(77, 124, 15, ${intensity})`; 
             });
 
-            // Mapeamento Labels e Cores
             const natLabels = sortedNatureza.map(x => {
                 const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
                 return `${style.icon} ${x[0]}`;
@@ -576,9 +548,10 @@
         }
 
         function renderizarGraficos(dados) {
+            // AJUSTE: Fonte Monoespaçada Global para Gráficos
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
-            Chart.defaults.font.family = 'Inter';
+            Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
             const commonOptions = {
                 indexAxis: 'y',
@@ -608,7 +581,6 @@
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // 1. Pelotões
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
                 data: {
@@ -622,7 +594,6 @@
                 options: commonOptions
             });
 
-            // 2. Natureza
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
                 data: {
@@ -647,7 +618,6 @@
                 }
             });
 
-            // 3. Subgrupos (Altura Dinâmica)
             const containerS = document.getElementById('subgrupoContainer');
             if(dados.subgrupos.labels.length > 0) {
                 const height = Math.max(600, dados.subgrupos.labels.length * 30);
