@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESTATÍSTICAS - 1º BBM (2025)</title>
+    <title>SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -22,7 +22,7 @@
                         'bombeiros-orange': '#F97316',
                         'dark-bg': '#0f172a',
                         'cb-green': '#10B981',
-                        'insect-brown': '#D97706'
+                        'insect-brown': '#8B4513'
                     },
                     fontFamily: { 
                         sans: ['Inter', 'sans-serif'],
@@ -55,7 +55,6 @@
             backdrop-filter: blur(10px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            /* Importante para Mobile: Containment */
             contain: content; 
         }
 
@@ -64,6 +63,17 @@
         .btn-mes.active { 
             background: linear-gradient(45deg, #10B981, #059669); color: white; 
             border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.05);
+        }
+
+        /* BOTÃO ANUAL (AMARELO) */
+        .btn-anual { transition: all 0.2s ease-in-out; border: 1px solid rgba(253, 224, 71, 0.3); color: #fef08a; }
+        .btn-anual:hover { background: rgba(253, 224, 71, 0.1); border-color: #FACC15; }
+        .btn-anual.active {
+            background: linear-gradient(45deg, #CA8A04, #EAB308);
+            color: white;
+            border-color: #FEF08A;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+            transform: scale(1.05);
         }
 
         #progressContainer { transition: opacity 0.3s; }
@@ -88,17 +98,8 @@
         }
         .filter-select:focus { border-color: #F97316; }
 
-        /* CORREÇÃO MOBILE PARA CANVAS */
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        .chart-container-fix {
-            position: relative;
-            width: 100%;
-            /* Altura mínima para garantir renderização no mobile */
-            min-height: 300px; 
-        }
+        canvas { width: 100% !important; height: 100% !important; }
+        .chart-container-fix { position: relative; width: 100%; min-height: 300px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -112,12 +113,12 @@
             
             <div class="text-center flex-1">
                 <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
-                    ESTATÍSTICAS - 1º BBM
+                    SITE DA CIA - ESTATÍSTICAS DE OCORRÊNCIAS
                 </h1>
                 <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">
-                    PORTO ALEGRE (<span id="anoTitulo">2025</span>)
+                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
                 </h2>
-                <div class="mt-2 text-xs md:text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Selecione um mês.</div>
+                <div class="mt-2 text-xs md:text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Selecione um mês ou Anual.</div>
             </div>
 
             <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 drop-shadow-lg opacity-90">
@@ -125,7 +126,7 @@
 
         <div id="progressContainer" class="hidden mb-6 glass-card p-4">
             <div class="flex justify-between mb-1">
-                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Carregando...</span>
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Inicializando...</span>
                 <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-4 border border-gray-600">
@@ -208,6 +209,10 @@
         <div class="h-10"></div>
     </div>
 
+    <footer class="w-full text-center py-6 text-gray-500 text-xs border-t border-white/5 mt-auto bg-black/20 backdrop-blur-sm">
+        <p>© Companhia de Bombeiro Militar do 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
+    </footer>
+
     <script>
         // ================= CONFIGURAÇÕES GLOBAIS =================
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
@@ -218,7 +223,7 @@
         // --- MAPA DE ESTILOS ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
+            "MANEJO DE INSETOS": { color: "#8B4513", icon: "🐝", cssClass: "text-brown-custom" }, 
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
@@ -228,6 +233,7 @@
             "OUTROS": { color: "#64748B", icon: "⚠️", cssClass: "text-bombeiros-orange" }
         };
 
+        // LISTA DE MESES (Sem Anual, adicionaremos logicamente)
         const meses = [
             { id: 'JAN', nome: 'JANEIRO' }, { id: 'FEV', nome: 'FEVEREIRO' },
             { id: 'MAR', nome: 'MARÇO' }, { id: 'ABR', nome: 'ABRIL' },
@@ -244,6 +250,8 @@
         // ================= INICIALIZAÇÃO =================
         document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('mesesContainer');
+            
+            // 1. Botões Mensais
             meses.forEach(m => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
@@ -252,12 +260,20 @@
                 container.appendChild(btn);
             });
 
+            // 2. Botão ANUAL (Dourado)
+            const btnAnual = document.createElement('button');
+            btnAnual.className = 'btn-anual bg-yellow-900/20 text-yellow-100 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-yellow-600/30';
+            btnAnual.innerText = 'ANUAL';
+            btnAnual.onclick = () => carregarAnual(btnAnual);
+            container.appendChild(btnAnual);
+
+            // Listeners Filtros
             ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
                 document.getElementById(id).addEventListener('change', aplicarFiltros);
             });
         });
 
-        // ================= GERENCIADOR DE PROCESSO =================
+        // ================= GERENCIADOR DE PROGRESSO =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -277,10 +293,89 @@
             }
         }
 
+        // ================= LÓGICA ANUAL (AUTO CONSOLIDADO) =================
+        async function carregarAnual(btnElement) {
+            mesSelecionadoNome = "ANUAL";
+            
+            // Reset UI
+            document.querySelectorAll('button').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+            });
+            btnElement.classList.add('active');
+
+            const dashboard = document.getElementById('dashboardArea');
+            dashboard.classList.add('hidden');
+            dashboard.classList.remove('opacity-100');
+            dashboard.classList.add('opacity-0');
+
+            updateProgress(5, "Iniciando compilação anual...");
+
+            let totalArquivos = meses.length;
+            let processados = 0;
+            let dadosCombinados = []; // Array cru dos CSVs
+
+            // Busca paralela de todos os meses
+            const promises = meses.map(async (m) => {
+                const url = `${GITHUB_BASE_URL}/dados/${m.id}_${ANO_ATUAL}.csv`;
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const text = await response.text();
+                        return new Promise(resolve => {
+                            Papa.parse(text, {
+                                header: true,
+                                skipEmptyLines: true,
+                                encoding: "UTF-8",
+                                complete: (res) => {
+                                    resolve(res.data);
+                                }
+                            });
+                        });
+                    }
+                } catch (e) {
+                    console.warn(`Mês ${m.id} não encontrado ou erro. Ignorando.`);
+                }
+                return [];
+            });
+
+            // Gerencia progresso
+            updateProgress(30, "Baixando dados mensais...");
+            
+            const results = await Promise.all(promises);
+            
+            updateProgress(70, "Consolidando dados...");
+
+            results.forEach(mesData => {
+                if (mesData && mesData.length > 0) {
+                    dadosCombinados = dadosCombinados.concat(mesData);
+                }
+            });
+
+            updateProgress(90, "Gerando estatísticas...");
+
+            setTimeout(() => {
+                if (dadosCombinados.length > 0) {
+                    processarDadosOtimizado(dadosCombinados);
+                    updateProgress(100, "Concluído!");
+                    dashboard.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                        dashboard.classList.remove('opacity-0');
+                        dashboard.classList.add('opacity-100');
+                    });
+                    document.getElementById('statusMsg').innerText = "Consolidado Anual carregado com sucesso.";
+                } else {
+                    updateProgress(0, "Nenhum dado encontrado.");
+                    alert("Nenhum arquivo mensal foi encontrado para gerar o anual.");
+                }
+            }, 100);
+        }
+
+        // ================= LÓGICA MENSAL =================
         async function iniciarProcesso(mesId, mesNome, btnElement) {
             mesSelecionadoNome = mesNome;
 
-            document.querySelectorAll('.btn-mes').forEach(b => {
+            document.querySelectorAll('button').forEach(b => {
                 b.classList.remove('active');
                 b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
             });
@@ -345,9 +440,11 @@
             });
         }
 
-        // ================= LÓGICA DE DADOS (CORE) =================
+        // ================= PROCESSAMENTO E RENDERIZAÇÃO =================
         function processarDadosOtimizado(data) {
             dadosGlobais = [];
+
+            if (!data || data.length === 0) return;
 
             const chaves = Object.keys(data[0]);
             const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
@@ -366,7 +463,7 @@
                 const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // --- 1. LÓGICA DE PELOTÕES (Incluindo BBS) ---
+                // LÓGICA DE PELOTÕES
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
@@ -392,7 +489,7 @@
                     if(pel === "") pel = "OUTROS";
                 }
 
-                // --- 2. LÓGICA DE NATUREZA ---
+                // LÓGICA NATUREZA
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
                 
@@ -486,7 +583,9 @@
             const totalGlobal = dadosGlobais.length;
             
             document.getElementById('totalDisplay').innerText = total;
-            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${mesSelecionadoNome} ${ANO_ATUAL}`;
+            // Ajuste gramatical para Anual vs Mês
+            const prep = mesSelecionadoNome === 'ANUAL' ? 'EM' : 'EM';
+            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${prep} ${mesSelecionadoNome} ${ANO_ATUAL}`;
             
             const textoLinhas = isFiltrado ? `${total} (Filtrado de ${totalGlobal})` : total;
             document.getElementById('totalLista').innerText = textoLinhas;
@@ -542,19 +641,17 @@
         function prepararGraficos(countPelotao, countNatureza, countSubgrupo) {
             const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
             const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
-            
             const sortedSubgrupo = Object.entries(countSubgrupo)
                 .filter(([key, count]) => count >= 1)
                 .sort((a,b) => b[1] - a[1]);
 
-            // Cor Degradê Pelotão
+            // Cores
             const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
             const pelotoesColors = sortedPelotao.map(([nome, val]) => {
                 const intensity = 0.3 + (0.7 * (val / maxVal)); 
                 return `rgba(77, 124, 15, ${intensity})`; 
             });
 
-            // Labels Natureza (Com quebra de linha para Vistoria)
             const natLabels = sortedNatureza.map(x => {
                 const name = x[0];
                 const style = naturezasStyle[name] || { color: "#94A3B8", icon: "📄" };
@@ -565,7 +662,6 @@
             });
             const natColors = sortedNatureza.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
 
-            // Labels Subgrupos
             const subLabels = sortedSubgrupo.map(item => {
                 const [natPai, subNome] = item[0].split('___');
                 const style = naturezasStyle[natPai] || { color: "#94A3B8", icon: "📄" };
@@ -592,8 +688,6 @@
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                // AJUSTE MOBILE: Atraso na renderização para evitar crash
-                resizeDelay: 200, 
                 animation: { duration: 500 },
                 layout: { padding: { right: 40 } },
                 plugins: { 
@@ -655,7 +749,6 @@
                 }
             });
 
-            // Altura Dinâmica Subgrupos
             const containerS = document.getElementById('subgrupoContainer');
             if(dados.subgrupos.labels.length > 0) {
                 const height = Math.max(600, dados.subgrupos.labels.length * 30);
