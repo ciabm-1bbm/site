@@ -6,11 +6,11 @@
     <title>ESTATÍSTICAS DE OCORRÊNCIAS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -98,6 +98,7 @@
         }
         .filter-select:focus { border-color: #F97316; }
 
+        /* Ajuste crítico para Mobile */
         canvas { width: 100% !important; height: 100% !important; }
         .chart-container-fix { position: relative; width: 100%; min-height: 300px; }
     </style>
@@ -126,7 +127,7 @@
 
         <div id="progressContainer" class="hidden mb-6 glass-card p-4">
             <div class="flex justify-between mb-1">
-                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Carregando...</span>
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Inicializando...</span>
                 <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-4 border border-gray-600">
@@ -135,8 +136,8 @@
         </div>
 
         <div class="glass-card p-4 mb-6">
-            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="mesesContainer"></div>
-            <div class="flex justify-center border-t border-white/10 pt-4">
+            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2" id="mesesContainer"></div>
+            <div class="flex justify-center border-t border-white/10 pt-4 mt-4">
                 <button id="btnAnual" class="btn-anual bg-yellow-900/20 text-yellow-100 py-3 px-6 rounded-lg text-sm font-bold uppercase tracking-wider border border-yellow-600/30">
                     ANUAL 2025
                 </button>
@@ -269,17 +270,15 @@
                 container.appendChild(btn);
             });
 
-            // Botão Anual
             const btnAnual = document.getElementById('btnAnual');
             btnAnual.onclick = () => carregarAnual(btnAnual);
 
-            // Listeners Filtros
             ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
                 document.getElementById(id).addEventListener('change', aplicarFiltros);
             });
         });
 
-        // ================= GERENCIADOR DE PROGRESSO =================
+        // ================= PROGRESSO & LÓGICA =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -303,6 +302,7 @@
             startLoadingEffect();
 
             let dadosCombinados = [];
+            // Carrega todos os meses individualmente para compilar o anual
             const promises = meses.map(async (m) => {
                 const url = `${GITHUB_BASE_URL}/dados/${m.id}_${ANO_ATUAL}.csv`;
                 try {
@@ -376,7 +376,7 @@
             }
         }
 
-        // ================= PROCESSAMENTO OTIMIZADO =================
+        // ================= PROCESSAMENTO (Single Pass) =================
         function processarDadosOtimizado(data) {
             dadosGlobais = [];
             const chaves = Object.keys(data[0]);
@@ -396,6 +396,7 @@
                 const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
+                // Pelotões
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
@@ -421,6 +422,7 @@
                     if(pel === "") pel = "OUTROS";
                 }
 
+                // Natureza
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
                 if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
@@ -492,9 +494,9 @@
             
             document.getElementById('totalDisplay').innerText = total.toLocaleString('pt-BR');
             
-            // Lógica do Título Anual vs Mensal
+            // Título Dinâmico
             let labelTitulo = "";
-            if (mesSelecionadoNome.includes('ANUAL')) {
+            if (mesSelecionadoNome === 'ANUAL 2025') {
                 labelTitulo = "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025";
             } else {
                 labelTitulo = `TOTAL DE OCORRÊNCIAS ATENDIDAS EM ${mesSelecionadoNome} ${ANO_ATUAL}`;
@@ -518,7 +520,7 @@
                 if(d.lat && d.lon) {
                     const cleanLat = String(d.lat).replace(',', '.').trim();
                     const cleanLon = String(d.lon).replace(',', '.').trim();
-                    // Link corrigido para pino exato
+                    // Link corrigido do Google Maps
                     const url = `https://www.google.com/maps/search/?api=1&query=${cleanLat},${cleanLon}`;
                     mapBtn = `<a href="${url}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
                 }
@@ -541,20 +543,22 @@
             if (total > 0) requestAnimationFrame(() => prepararGraficos(counts));
         }
 
+        // --- PREPARAÇÃO SEGURA ---
         function prepararGraficos(counts) {
             const sort = (obj) => Object.entries(obj).sort((a,b) => b[1] - a[1]);
             const pSorted = sort(counts.p);
             const nSorted = sort(counts.n);
             const sSorted = Object.entries(counts.s).filter(x => x[1] >= 1).sort((a,b) => b[1] - a[1]);
 
-            // --- LÓGICA DE COR E TAMANHO PARA PELOTÕES ---
-            // Verde para POA, Cinza para o resto
-            const pColors = pSorted.map(x => poaPlatoons.includes(x[0]) ? '#10B981' : '#64748B'); 
+            // DADOS PARA RENDER
+            const pLabels = pSorted.map(x=>x[0]);
+            const pData = pSorted.map(x=>x[1]);
             
             const nLabels = nSorted.map(x => {
                 const s = naturezasStyle[x[0]] || { color: "#94A3B8", icon: "📄" };
                 return x[0] === "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO" ? [`${s.icon} VISTORIA DE SEGURANÇA`, "CONTRA INCÊNDIO"] : `${s.icon} ${x[0]}`;
             });
+            const nData = nSorted.map(x=>x[1]);
             const nColors = nSorted.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
 
             const sLabels = sSorted.map(x => {
@@ -562,53 +566,21 @@
                 const st = naturezasStyle[p] || { color: "#94A3B8", icon: "📄" };
                 return `${st.icon} ${p} [${s}]`;
             });
+            const sData = sSorted.map(x=>x[1]);
             const sColors = sSorted.map(x => {
                 const [p] = x[0].split('___');
                 return (naturezasStyle[p] || { color: "#94A3B8" }).color;
             });
 
             renderizarGraficos({
-                p: { l: pSorted.map(x=>x[0]), d: pSorted.map(x=>x[1]), c: pColors },
-                n: { l: nLabels, d: nSorted.map(x=>x[1]), c: nColors },
-                s: { l: sLabels, d: sSorted.map(x=>x[1]), c: sColors }
+                p: { l: pLabels, d: pData },
+                n: { l: nLabels, d: nData, c: nColors },
+                s: { l: sLabels, d: sData, c: sColors }
             });
         }
 
-        // --- FÁBRICA DE OPÇÕES (SOLUÇÃO DO BUG) ---
-        function createCommonOptions() {
-            return {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                resizeDelay: 200,
-                animation: { duration: 0 }, // Zero animação para performance máxima
-                layout: { padding: { right: 40 } },
-                plugins: { 
-                    legend: { display: false },
-                    datalabels: {
-                        color: '#e2e8f0',
-                        anchor: 'end',
-                        align: 'end',
-                        offset: 4,
-                        font: { weight: 'bold', size: 11 },
-                        formatter: (v) => v.toLocaleString('pt-BR') // Separador de milhar
-                    },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderWidth: 1
-                    }
-                },
-                scales: { 
-                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
-                    y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
-                }
-            };
-        }
-
+        // --- RENDERIZAÇÃO BLINDADA ---
         function renderizarGraficos(d) {
-            // Define fonte global mono
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
@@ -617,82 +589,72 @@
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // 1. PELOTÕES (Fonte Dinâmica via Callback Direto)
+            // 1. PELOTÕES
             const pOpts = createCommonOptions();
-            
-            // Lógica de Fonte Dinâmica
-            pOpts.scales.y.ticks.font = (ctx) => {
-                const label = chartP.data.labels[ctx.index];
+            // Lógica SEGURA de Fonte/Cor usando contexto direto
+            pOpts.scales.y.ticks.font = function(context) {
+                const label = this.getLabelForValue(context.tick.value);
                 const isPOA = poaPlatoons.includes(label);
-                // Dobrei o tamanho para POA (16px vs 10px para outros)
-                return { 
-                    size: isPOA ? 16 : 10, 
-                    weight: isPOA ? '900' : '400', 
-                    family: 'monospace' 
-                }; 
+                return { size: isPOA ? 14 : 10, weight: isPOA ? 'bold' : 'normal', family: 'monospace' };
             };
-            // Lógica de Cor Dinâmica
-            pOpts.scales.y.ticks.color = (ctx) => {
-                const label = chartP.data.labels[ctx.index];
-                // Verde ou Cinza
-                return poaPlatoons.includes(label) ? '#10B981' : '#64748B'; 
+            pOpts.scales.y.ticks.color = function(context) {
+                const label = this.getLabelForValue(context.tick.value);
+                return poaPlatoons.includes(label) ? '#10B981' : '#64748B';
             };
+
+            // Cores das barras (Verde ou Cinza)
+            const pBarColors = d.p.l.map(l => poaPlatoons.includes(l) ? '#10B981' : '#475569');
 
             chartP = new Chart(document.getElementById('chartPelotoes'), {
                 type: 'bar',
-                data: {
-                    labels: d.p.l,
-                    datasets: [{
-                        data: d.p.d,
-                        backgroundColor: d.p.c,
-                        borderRadius: 3,
-                        barPercentage: 0.7
-                    }]
-                },
+                data: { labels: d.p.l, datasets: [{ data: d.p.d, backgroundColor: pBarColors, borderRadius: 3, barPercentage: 0.7 }] },
                 options: pOpts
             });
 
             // 2. NATUREZA
             const nOpts = createCommonOptions();
-            nOpts.scales.y.ticks.color = d.n.c; // Cores do eixo Y
-            
+            nOpts.scales.y.ticks.color = d.n.c;
             chartN = new Chart(document.getElementById('chartNatureza'), {
                 type: 'bar',
-                data: {
-                    labels: d.n.l,
-                    datasets: [{
-                        data: d.n.d,
-                        backgroundColor: d.n.c,
-                        borderRadius: 3,
-                        barPercentage: 0.7
-                    }]
-                },
+                data: { labels: d.n.l, datasets: [{ data: d.n.d, backgroundColor: d.n.c, borderRadius: 3, barPercentage: 0.7 }] },
                 options: nOpts
             });
 
             // 3. SUBGRUPOS
             const containerS = document.getElementById('subgrupoContainer');
-            if(d.s.l.length > 0) {
-                const height = Math.max(600, d.s.l.length * 30);
-                containerS.style.height = height + 'px';
-            }
-            
+            if(d.s.l.length > 0) containerS.style.height = Math.max(600, d.s.l.length * 30) + 'px';
             const sOpts = createCommonOptions();
-            sOpts.scales.y.ticks.color = d.s.c; // Cores do eixo Y
-
+            sOpts.scales.y.ticks.color = d.s.c;
             chartS = new Chart(document.getElementById('chartSubgrupos'), {
                 type: 'bar',
-                data: {
-                    labels: d.s.l,
-                    datasets: [{
-                        data: d.s.d,
-                        backgroundColor: d.s.c,
-                        borderRadius: 3,
-                        barPercentage: 0.7
-                    }]
-                },
+                data: { labels: d.s.l, datasets: [{ data: d.s.d, backgroundColor: d.s.c, borderRadius: 3, barPercentage: 0.7 }] },
                 options: sOpts
             });
+        }
+
+        // Fábrica de Opções (Evita referência circular)
+        function createCommonOptions() {
+            return {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 200,
+                animation: { duration: 0 },
+                layout: { padding: { right: 40 } },
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: {
+                        color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: (v) => v.toLocaleString('pt-BR')
+                    },
+                    tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)' }
+                },
+                scales: { 
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
+                    y: { ticks: { autoSkip: false } } 
+                }
+            };
         }
     </script>
 </body>
