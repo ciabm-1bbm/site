@@ -39,8 +39,7 @@
         .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .hero-bg::before {
             content: ''; position: absolute; 
-            top: 380px; /* Empurrado mais para baixo por causa do botão Anual */
-            left: 10%; right: 10%; bottom: 0;
+            top: 380px; left: 10%; right: 10%; bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
             background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
         }
@@ -127,7 +126,7 @@
 
         <div id="progressContainer" class="hidden mb-6 glass-card p-4">
             <div class="flex justify-between mb-1">
-                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Inicializando...</span>
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Carregando...</span>
                 <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-4 border border-gray-600">
@@ -280,7 +279,7 @@
             });
         });
 
-        // ================= PROGRESSO & LÓGICA =================
+        // ================= GERENCIADOR DE PROGRESSO =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -377,7 +376,7 @@
             }
         }
 
-        // ================= PROCESSAMENTO =================
+        // ================= PROCESSAMENTO OTIMIZADO =================
         function processarDadosOtimizado(data) {
             dadosGlobais = [];
             const chaves = Object.keys(data[0]);
@@ -397,7 +396,6 @@
                 const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // Lógica Pelotões
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
@@ -423,7 +421,6 @@
                     if(pel === "") pel = "OUTROS";
                 }
 
-                // Lógica Natureza
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
                 if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
@@ -493,11 +490,11 @@
             const total = dados.length;
             const totalGlobal = dadosGlobais.length;
             
-            // FORMATAÇÃO DE NÚMEROS (Ponto no milhar)
             document.getElementById('totalDisplay').innerText = total.toLocaleString('pt-BR');
             
+            // Lógica do Título Anual vs Mensal
             let labelTitulo = "";
-            if (mesSelecionadoNome === 'ANUAL 2025') {
+            if (mesSelecionadoNome.includes('ANUAL')) {
                 labelTitulo = "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025";
             } else {
                 labelTitulo = `TOTAL DE OCORRÊNCIAS ATENDIDAS EM ${mesSelecionadoNome} ${ANO_ATUAL}`;
@@ -517,11 +514,11 @@
 
                 const style = naturezasStyle[d.nat] || { color: "#94A3B8", icon: "📄", cssClass: "text-slate-400" };
                 
-                // GOOGLE MAPS FIX
                 let mapBtn = `<span class="text-gray-600 opacity-30 cursor-not-allowed"><i class="fas fa-map-marker-slash"></i></span>`;
                 if(d.lat && d.lon) {
                     const cleanLat = String(d.lat).replace(',', '.').trim();
                     const cleanLon = String(d.lon).replace(',', '.').trim();
+                    // Link corrigido para pino exato
                     const url = `https://www.google.com/maps/search/?api=1&query=${cleanLat},${cleanLon}`;
                     mapBtn = `<a href="${url}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
                 }
@@ -550,17 +547,16 @@
             const nSorted = sort(counts.n);
             const sSorted = Object.entries(counts.s).filter(x => x[1] >= 1).sort((a,b) => b[1] - a[1]);
 
-            // CORES E FONTES PELOTÕES
-            const pColors = pSorted.map(x => poaPlatoons.includes(x[0]) ? '#10B981' : '#64748B'); // Verde vs Cinza
+            // --- LÓGICA DE COR E TAMANHO PARA PELOTÕES ---
+            // Verde para POA, Cinza para o resto
+            const pColors = pSorted.map(x => poaPlatoons.includes(x[0]) ? '#10B981' : '#64748B'); 
             
-            // Labels Natureza
             const nLabels = nSorted.map(x => {
                 const s = naturezasStyle[x[0]] || { color: "#94A3B8", icon: "📄" };
                 return x[0] === "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO" ? [`${s.icon} VISTORIA DE SEGURANÇA`, "CONTRA INCÊNDIO"] : `${s.icon} ${x[0]}`;
             });
             const nColors = nSorted.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
 
-            // Subgrupos
             const sLabels = sSorted.map(x => {
                 const [p, s] = x[0].split('___');
                 const st = naturezasStyle[p] || { color: "#94A3B8", icon: "📄" };
@@ -578,59 +574,123 @@
             });
         }
 
-        function renderizarGraficos(d) {
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
-            Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
-
-            const opts = {
-                indexAxis: 'y', responsive: true, maintainAspectRatio: false, resizeDelay: 200, animation: { duration: 500 },
+        // --- FÁBRICA DE OPÇÕES (SOLUÇÃO DO BUG) ---
+        function createCommonOptions() {
+            return {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 200,
+                animation: { duration: 0 }, // Zero animação para performance máxima
                 layout: { padding: { right: 40 } },
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4, font: { weight: 'bold', size: 11 }, formatter: (v) => v.toLocaleString('pt-BR') },
-                    tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)' }
+                    datalabels: {
+                        color: '#e2e8f0',
+                        anchor: 'end',
+                        align: 'end',
+                        offset: 4,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: (v) => v.toLocaleString('pt-BR') // Separador de milhar
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }
                 },
-                scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } }, y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } }
+                scales: { 
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
+                    y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
+                }
             };
+        }
+
+        function renderizarGraficos(d) {
+            // Define fonte global mono
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+            Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
             if(chartP) chartP.destroy();
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // GRÁFICO PELOTÕES (Fonte Dinâmica)
-            const pOpts = JSON.parse(JSON.stringify(opts));
+            // 1. PELOTÕES (Fonte Dinâmica via Callback Direto)
+            const pOpts = createCommonOptions();
+            
+            // Lógica de Fonte Dinâmica
             pOpts.scales.y.ticks.font = (ctx) => {
                 const label = chartP.data.labels[ctx.index];
                 const isPOA = poaPlatoons.includes(label);
-                return { size: isPOA ? 16 : 11, weight: 'bold', family: 'monospace' }; // Dobro visualmente
+                // Dobrei o tamanho para POA (16px vs 10px para outros)
+                return { 
+                    size: isPOA ? 16 : 10, 
+                    weight: isPOA ? '900' : '400', 
+                    family: 'monospace' 
+                }; 
             };
+            // Lógica de Cor Dinâmica
             pOpts.scales.y.ticks.color = (ctx) => {
                 const label = chartP.data.labels[ctx.index];
-                return poaPlatoons.includes(label) ? '#10B981' : '#64748B';
+                // Verde ou Cinza
+                return poaPlatoons.includes(label) ? '#10B981' : '#64748B'; 
             };
 
             chartP = new Chart(document.getElementById('chartPelotoes'), {
-                type: 'bar', data: { labels: d.p.l, datasets: [{ data: d.p.d, backgroundColor: d.p.c, borderRadius: 3, barPercentage: 0.7 }] },
+                type: 'bar',
+                data: {
+                    labels: d.p.l,
+                    datasets: [{
+                        data: d.p.d,
+                        backgroundColor: d.p.c,
+                        borderRadius: 3,
+                        barPercentage: 0.7
+                    }]
+                },
                 options: pOpts
             });
 
-            // GRÁFICO NATUREZA (Cores no Eixo)
-            const nOpts = JSON.parse(JSON.stringify(opts));
-            nOpts.scales.y.ticks.color = d.n.c;
+            // 2. NATUREZA
+            const nOpts = createCommonOptions();
+            nOpts.scales.y.ticks.color = d.n.c; // Cores do eixo Y
+            
             chartN = new Chart(document.getElementById('chartNatureza'), {
-                type: 'bar', data: { labels: d.n.l, datasets: [{ data: d.n.d, backgroundColor: d.n.c, borderRadius: 3, barPercentage: 0.7 }] },
+                type: 'bar',
+                data: {
+                    labels: d.n.l,
+                    datasets: [{
+                        data: d.n.d,
+                        backgroundColor: d.n.c,
+                        borderRadius: 3,
+                        barPercentage: 0.7
+                    }]
+                },
                 options: nOpts
             });
 
-            // GRÁFICO SUBGRUPOS
+            // 3. SUBGRUPOS
             const containerS = document.getElementById('subgrupoContainer');
-            if(d.s.l.length > 0) containerS.style.height = Math.max(600, d.s.l.length * 30) + 'px';
+            if(d.s.l.length > 0) {
+                const height = Math.max(600, d.s.l.length * 30);
+                containerS.style.height = height + 'px';
+            }
             
-            const sOpts = JSON.parse(JSON.stringify(opts));
-            sOpts.scales.y.ticks.color = d.s.c;
+            const sOpts = createCommonOptions();
+            sOpts.scales.y.ticks.color = d.s.c; // Cores do eixo Y
+
             chartS = new Chart(document.getElementById('chartSubgrupos'), {
-                type: 'bar', data: { labels: d.s.l, datasets: [{ data: d.s.d, backgroundColor: d.s.c, borderRadius: 3, barPercentage: 0.7 }] },
+                type: 'bar',
+                data: {
+                    labels: d.s.l,
+                    datasets: [{
+                        data: d.s.d,
+                        backgroundColor: d.s.c,
+                        borderRadius: 3,
+                        barPercentage: 0.7
+                    }]
+                },
                 options: sOpts
             });
         }
