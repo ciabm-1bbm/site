@@ -9,18 +9,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'fire-red': '#DC2626',
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
-                        'dark-bg': '#0f172a',
                         'cb-green': '#10B981',
                         'insect-brown': '#8B4513'
                     },
@@ -35,7 +33,8 @@
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
+        /* BACKGROUND FIXO */
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .hero-bg::before {
             content: ''; position: absolute; 
             top: 380px; left: 10%; right: 10%; bottom: 0;
@@ -48,33 +47,43 @@
             pointer-events: none;
         }
 
+        /* CARDS DE VIDRO */
         .glass-card {
-            background: rgba(30, 41, 59, 0.65);
+            background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
+        /* BOTÕES MESES */
         .btn-mes { transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-mes:active, .btn-mes.active { 
-            background: linear-gradient(45deg, #10B981, #059669); color: white; border-color: #A7F3D0; transform: scale(1.02);
-        }
-        
-        .btn-anual { border: 1px solid rgba(253, 224, 71, 0.3); color: #fef08a; }
-        .btn-anual:active, .btn-anual.active {
-            background: linear-gradient(45deg, #CA8A04, #EAB308); color: white; border-color: #FEF08A; transform: scale(1.02);
+        .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
+        .btn-mes.active { 
+            background: linear-gradient(45deg, #10B981, #059669); color: white; 
+            border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.05);
         }
 
+        /* BOTÃO ANUAL */
+        .btn-anual { transition: all 0.2s; border: 1px solid rgba(253, 224, 71, 0.3); color: #fef08a; }
+        .btn-anual:hover { background: rgba(253, 224, 71, 0.1); border-color: #FACC15; }
+        .btn-anual.active {
+            background: linear-gradient(45deg, #CA8A04, #EAB308); color: white;
+            border-color: #FEF08A; box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); transform: scale(1.05);
+        }
+
+        /* LOADER */
         #progressContainer { transition: opacity 0.3s; }
-        .progress-striped {
+        .progress-bar-striped {
             background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
             background-size: 1rem 1rem; animation: p-stripes 1s linear infinite;
         }
         @keyframes p-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
-        .table-scroll { max-height: 600px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        ::-webkit-scrollbar { width: 6px; }
+        /* SCROLL TABELA */
+        .table-scroll { max-height: 600px; overflow-y: auto; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         thead th { position: sticky; top: 0; z-index: 10; background-color: #0f172a; }
 
@@ -83,70 +92,70 @@
             padding: 0.5rem; border-radius: 0.5rem; width: 100%; outline: none;
         }
 
-        /* Container do Gráfico Fixo para Mobile */
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 350px;
-        }
-        @media (min-width: 768px) {
-            .chart-wrapper { height: 550px; }
-        }
+        /* FIX MOBILE CHART */
+        .chart-wrapper { position: relative; width: 100%; height: 350px; }
+        @media (min-width: 768px) { .chart-wrapper { height: 500px; } }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="min-h-screen flex flex-col">
 
     <div class="hero-bg"></div>
 
     <div class="container mx-auto px-4 py-6 flex-grow z-10">
         
-        <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4 glass-card p-6">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
+        <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6 glass-card p-6">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 opacity-90">
+            
             <div class="text-center flex-1">
-                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-tight">ESTATÍSTICAS - 1º BBM (2025)</h1>
-                <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">PORTO ALEGRE</h2>
+                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
+                    ESTATÍSTICAS - 1º BBM (2025)
+                </h1>
+                <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">
+                    PORTO ALEGRE
+                </h2>
                 <div class="mt-2 text-xs md:text-sm text-gray-400 font-mono" id="statusMsg">Sistema pronto. Selecione um período.</div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90">
+
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 opacity-90">
         </header>
 
         <div id="progressContainer" class="hidden mb-6 glass-card p-4">
-            <div class="flex justify-between text-xs font-mono font-bold mb-1">
-                <span class="text-blue-400" id="progressText">Carregando...</span>
-                <span class="text-white" id="progressPercent">0%</span>
+            <div class="flex justify-between mb-1">
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Carregando...</span>
+                <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
             </div>
-            <div class="w-full bg-gray-700 rounded-full h-2">
-                <div id="progressBar" class="bg-blue-500 h-2 rounded-full progress-striped transition-all duration-300" style="width: 0%"></div>
+            <div class="w-full bg-gray-700 rounded-full h-3">
+                <div id="progressBar" class="bg-blue-500 h-3 rounded-full progress-bar-striped transition-all duration-300" style="width: 0%"></div>
             </div>
         </div>
 
         <div class="glass-card p-4 mb-6">
-            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="mesesContainer"></div>
-            <div class="flex justify-center border-t border-white/10 pt-4">
-                <button id="btnAnual" class="btn-anual bg-yellow-900/20 py-3 px-8 rounded-lg text-sm font-bold uppercase tracking-wider w-full md:w-auto hover:bg-yellow-900/40">
+            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2" id="mesesContainer"></div>
+            <div class="flex justify-center border-t border-white/10 pt-4 mt-4">
+                <button id="btnAnual" class="btn-anual bg-yellow-900/20 text-yellow-100 py-3 px-8 rounded-lg text-sm font-bold uppercase tracking-wider border border-yellow-600/30 w-full md:w-auto">
                     ANUAL 2025
                 </button>
             </div>
         </div>
 
-        <div id="dashboardArea" class="hidden opacity-0 transition-opacity duration-500">
+        <div id="dashboardArea" class="hidden opacity-0 transition-opacity duration-700">
             
             <div class="flex justify-center mb-8">
                 <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-8 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md w-full md:w-auto">
-                    <p class="text-xs font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS</p>
-                    <p class="text-4xl md:text-5xl font-black text-white" id="totalDisplay">0</p>
+                    <p class="text-xs uppercase font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS</p>
+                    <p class="text-4xl md:text-5xl font-black text-white drop-shadow-md" id="totalDisplay">0</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="glass-card p-4">
-                    <h3 class="text-sm font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
+                    <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
                     <div class="chart-wrapper">
                         <canvas id="chartPelotoes"></canvas>
                     </div>
                 </div>
                 <div class="glass-card p-4">
-                    <h3 class="text-sm font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
+                    <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
                     <div class="chart-wrapper">
                         <canvas id="chartNatureza"></canvas>
                     </div>
@@ -154,7 +163,7 @@
             </div>
 
             <div class="glass-card p-4 mb-6">
-                <h3 class="text-sm font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS (>= 1 Ocorrência)</h3>
+                <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
                 <div id="subgrupoContainer" class="chart-wrapper" style="height: 500px; min-height: 500px;">
                     <canvas id="chartSubgrupos"></canvas>
                 </div>
@@ -162,16 +171,18 @@
 
             <div class="glass-card p-1 overflow-hidden">
                 <div class="p-4 bg-black/30 border-b border-white/10">
-                    <h3 class="text-sm font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2 text-xs">
+                    <h3 class="text-sm md:text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
                         <select id="filterNatureza" class="filter-select"><option value="">Todas as Naturezas</option></select>
                         <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
                         <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
                         <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
-                        <button onclick="app.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded flex items-center justify-center"><i class="fas fa-undo mr-1"></i> LIMPAR</button>
+                        <button onclick="resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center text-sm">
+                            <i class="fas fa-undo mr-2"></i> Limpar
+                        </button>
                     </div>
-                    <div class="mt-2 text-xs text-right text-gray-400 font-mono">
-                        Linhas: <span id="totalLista" class="text-white font-bold">0</span>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-xs text-gray-400 font-mono">Linhas: <span id="totalLista" class="text-white font-bold">0</span></span>
                     </div>
                 </div>
 
@@ -179,41 +190,39 @@
                     <table class="w-full text-left border-collapse">
                         <thead class="text-xs text-gray-400 uppercase font-bold bg-slate-900">
                             <tr>
-                                <th class="p-3 text-center w-12">#</th>
-                                <th class="p-3">Data</th>
-                                <th class="p-3">Natureza</th>
-                                <th class="p-3">Subgrupo</th>
-                                <th class="p-3">Bairro</th>
-                                <th class="p-3">Pelotão</th>
-                                <th class="p-3 text-center">Map</th>
-                                <th class="p-3 text-right">ID</th>
+                                <th class="p-3 text-center w-12 border-b border-gray-700">#</th>
+                                <th class="p-3 border-b border-gray-700">Data</th>
+                                <th class="p-3 border-b border-gray-700">Natureza</th>
+                                <th class="p-3 border-b border-gray-700">Subgrupo</th>
+                                <th class="p-3 border-b border-gray-700">Bairro</th>
+                                <th class="p-3 border-b border-gray-700">Pelotão</th>
+                                <th class="p-3 text-center border-b border-gray-700">Map</th>
+                                <th class="p-3 text-right border-b border-gray-700">ID</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelaBody" class="text-xs text-gray-300 font-mono"></tbody>
+                        <tbody id="tabelaBody" class="text-sm text-gray-300 font-mono"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div class="h-8"></div>
+        <div class="h-10"></div>
     </div>
 
-    <footer class="w-full text-center py-6 text-gray-500 text-xs border-t border-white/5 bg-black/40 backdrop-blur-sm">
+    <footer class="w-full text-center py-6 text-gray-500 text-xs border-t border-white/5 mt-auto bg-black/20 backdrop-blur-sm">
         <p>© Companhia de Bombeiro Militar do 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
     </footer>
 
     <script>
-        // CONFIGURAÇÃO
-        const CONFIG = {
-            repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2025,
-            months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
-            poaPlatoons: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
-        };
+        // --- CONFIGURAÇÃO ---
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
+        const ANO_ATUAL = 2025;
+        
+        Chart.register(ChartDataLabels);
 
         const STYLES = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", class: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#8B4513", icon: "🐝", class: "text-insect-brown" },
+            "MANEJO DE INSETOS": { color: "#8B4513", icon: "🐝", class: "text-insect-brown" }, 
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", class: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", class: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", class: "text-gray-400" },
@@ -223,398 +232,396 @@
             "OUTROS": { color: "#64748B", icon: "⚠️", class: "text-bombeiros-orange" }
         };
 
-        // APLICAÇÃO
-        const app = {
-            data: [],
-            charts: {},
-            labelContext: "",
+        const POA_PLATOONS = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"];
+        const MESES = [
+            { id: 'JAN', nome: 'JANEIRO' }, { id: 'FEV', nome: 'FEVEREIRO' }, { id: 'MAR', nome: 'MARÇO' }, 
+            { id: 'ABR', nome: 'ABRIL' }, { id: 'MAI', nome: 'MAIO' }, { id: 'JUN', nome: 'JUNHO' }, 
+            { id: 'JUL', nome: 'JULHO' }, { id: 'AGO', nome: 'AGOSTO' }, { id: 'SET', nome: 'SETEMBRO' }, 
+            { id: 'OUT', nome: 'OUTUBRO' }, { id: 'NOV', nome: 'NOVEMBRO' }, { id: 'DEZ', nome: 'DEZEMBRO' }
+        ];
 
-            init: function() {
-                // Registro seguro dos plugins
-                Chart.register(ChartDataLabels);
+        let chartP = null, chartN = null, chartS = null;
+        let mesSelecionado = "";
+        let dadosGlobais = [];
 
-                const container = document.getElementById('mesesContainer');
-                CONFIG.months.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
-                    btn.innerText = m;
-                    btn.onclick = () => this.loadData(m);
-                    container.appendChild(btn);
-                });
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('mesesContainer');
+            MESES.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
+                btn.innerText = m.id;
+                btn.onclick = () => carregarMes(m.id, m.nome, btn);
+                container.appendChild(btn);
+            });
 
-                document.getElementById('btnAnual').onclick = () => this.loadAnnual();
+            const btnAnual = document.getElementById('btnAnual');
+            btnAnual.onclick = () => carregarAnual(btnAnual);
 
-                ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
-                    document.getElementById(id).addEventListener('change', () => this.applyFilters());
-                });
-            },
+            ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
+                document.getElementById(id).addEventListener('change', aplicarFiltros);
+            });
+        });
 
-            uiLoading: function(active, text="", pct=0) {
-                const p = document.getElementById('progressContainer');
-                const d = document.getElementById('dashboardArea');
+        // --- SISTEMA DE CARREGAMENTO ---
+        function updateProgress(percent, text) {
+            const el = document.getElementById('progressContainer');
+            el.classList.remove('hidden');
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressText').innerText = text;
+            document.getElementById('progressPercent').innerText = Math.floor(percent) + '%';
+            if (percent >= 100) setTimeout(() => el.classList.add('hidden'), 800);
+        }
+
+        function resetUI(btn) {
+            document.querySelectorAll('button').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+            });
+            btn.classList.add('active');
+            
+            const dash = document.getElementById('dashboardArea');
+            dash.classList.add('hidden');
+            dash.classList.remove('opacity-100');
+            dash.classList.add('opacity-0');
+        }
+
+        async function carregarMes(id, nome, btn) {
+            mesSelecionado = nome;
+            resetUI(btn);
+            updateProgress(10, "Iniciando...");
+
+            try {
+                const res = await fetch(`${GITHUB_BASE_URL}/dados/${id}_${ANO_ATUAL}.csv`);
+                if(!res.ok) throw new Error("Arquivo não encontrado");
                 
-                if(active) {
-                    p.classList.remove('hidden');
-                    d.classList.add('hidden');
-                    d.classList.remove('opacity-100');
-                    document.getElementById('progressText').innerText = text;
-                    document.getElementById('progressPercent').innerText = pct + '%';
-                    document.getElementById('progressBar').style.width = pct + '%';
-                } else {
-                    setTimeout(() => {
-                        p.classList.add('hidden');
-                        d.classList.remove('hidden');
-                        requestAnimationFrame(() => d.classList.add('opacity-100'));
-                    }, 300);
-                }
-            },
-
-            resetButtons: function() {
-                document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            },
-
-            loadData: async function(month) {
-                this.resetButtons();
-                Array.from(document.querySelectorAll('.btn-mes')).find(b => b.innerText === month)?.classList.add('active');
+                updateProgress(50, "Baixando...");
+                const text = await res.text();
                 
-                this.labelContext = `EM ${month} ${CONFIG.year}`;
-                this.uiLoading(true, "Conectando...", 10);
+                updateProgress(70, "Lendo dados...");
+                Papa.parse(text, {
+                    header: true, skipEmptyLines: true, encoding: "UTF-8",
+                    complete: (result) => processarDados(result.data)
+                });
+            } catch(e) {
+                updateProgress(0, "Erro");
+                alert("Erro ao carregar mês: " + e.message);
+            }
+        }
 
+        async function carregarAnual(btn) {
+            mesSelecionado = "ANUAL 2025";
+            resetUI(btn);
+            updateProgress(5, "Iniciando Anual...");
+
+            let combined = [];
+            let processed = 0;
+
+            const promises = MESES.map(async m => {
                 try {
-                    const res = await fetch(`${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv`);
-                    if(!res.ok) throw new Error("Mês indisponível.");
-                    
-                    this.uiLoading(true, "Baixando...", 50);
-                    const text = await res.text();
-                    this.parse(text);
-                } catch(e) {
-                    this.uiLoading(false);
-                    alert(e.message);
+                    const res = await fetch(`${GITHUB_BASE_URL}/dados/${m.id}_${ANO_ATUAL}.csv`);
+                    if(res.ok) {
+                        const txt = await res.text();
+                        return new Promise(resolve => {
+                            Papa.parse(txt, {
+                                header: true, skipEmptyLines: true, encoding: "UTF-8",
+                                complete: (r) => resolve(r.data)
+                            });
+                        });
+                    }
+                } catch(e) {}
+                return [];
+            });
+
+            updateProgress(30, "Baixando múltiplos arquivos...");
+            const results = await Promise.all(promises);
+            
+            results.forEach(data => {
+                if(data && data.length) combined = combined.concat(data);
+                processed++;
+                updateProgress(30 + (processed/12)*40, "Compilando...");
+            });
+
+            if(combined.length > 0) processarDados(combined);
+            else {
+                updateProgress(0, "Vazio");
+                alert("Nenhum dado encontrado para o ano.");
+            }
+        }
+
+        // --- PROCESSAMENTO ---
+        function processarDados(data) {
+            updateProgress(80, "Organizando...");
+            dadosGlobais = [];
+
+            if(!data || !data[0]) return;
+
+            // Detecção Inteligente de Colunas (Ignora Case e Espaços)
+            const keys = Object.keys(data[0]);
+            const findKey = (term) => keys.find(k => k.toLowerCase().includes(term));
+            
+            const cNat = findKey('natureza') || findKey('emerg');
+            const cObm = findKey('obm') || findKey('guarni');
+            const cSub = findKey('subgrupo') || findKey('detalhe');
+            const cVtr = findKey('viatura') || findKey('prefixo');
+
+            if(!cNat || !cObm) { alert("Erro de colunas no CSV."); return; }
+
+            let total = 0;
+            data.forEach(row => {
+                if(!row[cNat] && !row[cObm]) return; // Pula linha vazia
+                total++;
+
+                const s = String(row[cObm] || "").toUpperCase();
+                const v = String(cVtr ? row[cVtr] : "").toUpperCase();
+                const nRaw = String(row[cNat] || "N/A").toUpperCase();
+
+                // Lógica Pelotão
+                let pel = "OUTROS";
+                if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
+                else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
+                else if(s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
+                else if(s.includes("TERRESTRE")) pel = "BBS (POA) - TERRESTRE";
+                else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
+                else if(s.includes("FLORESTA")) pel = "FLORESTA";
+                else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
+                else if(s.includes("RESTINGA")) pel = "RESTINGA";
+                else if(s.includes("PARTENON")) pel = "PARTENON";
+                else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
+                else if(s.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
+                else if(s.includes("TERESÓPOLIS")) pel = (v.includes("AR") || s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
+                else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
+                else {
+                    const clean = s.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").trim();
+                    if(clean.length > 2) pel = clean;
                 }
-            },
 
-            loadAnnual: async function() {
-                this.resetButtons();
-                document.getElementById('btnAnual').classList.add('active');
-                this.labelContext = `NO ANO DE ${CONFIG.year}`;
-                this.uiLoading(true, "Iniciando...", 5);
+                // Lógica Natureza
+                let nat = nRaw.trim();
+                if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
+                else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
+                else if(nRaw.includes("SALVAMENTO") || nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                else if(nRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
+                else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
+                else if(nRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
+                else if(nRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
+                else if(nRaw.includes("VISTORIA") && nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
 
-                let combined = [];
-                let processed = 0;
+                let sub = row[cSub] ? row[cSub].trim() : "";
+                if(sub === "N/A" || sub === "0") sub = "";
 
-                const promises = CONFIG.months.map(async m => {
-                    try {
-                        const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv`);
-                        if(res.ok) return await res.text();
-                    } catch(e) {}
-                    return null;
-                });
-
-                const results = await Promise.all(promises);
-                results.forEach(csv => {
-                    if(csv) {
-                        const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true });
-                        if(parsed.data) combined = combined.concat(parsed.data);
-                    }
-                    processed++;
-                    this.uiLoading(true, "Consolidando...", Math.round((processed/12)*80));
-                });
-
-                if(combined.length) this.process(combined);
-                else { this.uiLoading(false); alert("Nenhum dado encontrado."); }
-            },
-
-            parse: function(csv) {
-                this.uiLoading(true, "Lendo...", 70);
-                Papa.parse(csv, {
-                    header: true, 
-                    skipEmptyLines: true,
-                    encoding: "UTF-8", // Garante encoding correto
-                    complete: (res) => this.process(res.data)
-                });
-            },
-
-            process: function(rawData) {
-                this.uiLoading(true, "Organizando...", 90);
-                this.data = [];
-
-                if(!rawData || !rawData[0]) return;
-
-                // DETECÇÃO ROBUSTA DE COLUNAS
-                // Normaliza as chaves removendo espaços e acentos para comparar
-                const normalize = str => str.trim().toLowerCase();
-                const keys = Object.keys(rawData[0]);
-                
-                const cNat = keys.find(k => normalize(k).includes('emerg') || normalize(k).includes('natureza'));
-                const cObm = keys.find(k => normalize(k).includes('obm') || normalize(k).includes('guarni'));
-                const cSub = keys.find(k => normalize(k).includes('subgrupo') || normalize(k).includes('detalhe'));
-                const cVtr = keys.find(k => normalize(k).includes('viatura') || normalize(k).includes('prefixo'));
-
-                if(!cNat || !cObm) { 
-                    this.uiLoading(false); 
-                    return alert("Erro: Colunas obrigatórias não encontradas no arquivo."); 
+                let map = null;
+                if(row['Latitude'] && row['Longitude']) {
+                    const la = String(row['Latitude']).replace(',','.').trim();
+                    const lo = String(row['Longitude']).replace(',','.').trim();
+                    map = `https://www.google.com/maps?q=${la},${lo}`;
                 }
 
-                let id = 1;
-                rawData.forEach(row => {
-                    // Proteção contra linhas vazias
-                    if (!row[cNat] && !row[cObm]) return;
-
-                    const obm = String(row[cObm] || "").toUpperCase();
-                    const vtr = String(cVtr ? (row[cVtr] || "") : "").toUpperCase();
-                    const natRaw = String(row[cNat] || "N/A").toUpperCase();
-                    
-                    // Pelotão
-                    let pel = "OUTROS";
-                    if(obm.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
-                    else if(obm.includes("CANIL")) pel = "BBS (POA) - CANIL";
-                    else if(obm.includes("AQUATICA") || obm.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
-                    else if(obm.includes("TERRESTRE") || (obm.includes("BBS") && !obm.includes("1º"))) pel = "BBS (POA) - TERRESTRE";
-                    else if(obm.includes("AÇORIANOS")) pel = "AÇORIANOS";
-                    else if(obm.includes("FLORESTA")) pel = "FLORESTA";
-                    else if(obm.includes("PASSO")) pel = "PASSO D'AREIA";
-                    else if(obm.includes("RESTINGA")) pel = "RESTINGA";
-                    else if(obm.includes("PARTENON")) pel = "PARTENON";
-                    else if(obm.includes("BELÉM")) pel = "BELÉM NOVO";
-                    else if(obm.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
-                    else if(obm.includes("TERESÓPOLIS") || obm.includes("TERESOPOLIS")) {
-                        pel = (vtr.includes("AR") || obm.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
-                    }
-                    else if(obm.includes("RESGATE") || obm.includes("GBS")) pel = "AUTO RESGATE";
-                    else {
-                        const clean = obm.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").trim();
-                        if(clean.length > 2) pel = clean;
-                    }
-
-                    // Natureza
-                    let nat = natRaw.trim();
-                    if(natRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
-                    else if(natRaw.includes("INCÊNDIO") || natRaw.includes("INCENDIO")) nat = "INCÊNDIO";
-                    else if(natRaw.includes("SALVAMENTO") || natRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
-                    else if(natRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
-                    else if(natRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
-                    else if(natRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
-                    else if(natRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
-                    else if(natRaw.includes("VISTORIA") && natRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-
-                    let sub = row[cSub] ? row[cSub].trim() : "";
-                    if(sub === "N/A" || sub === "0") sub = "";
-
-                    let map = null;
-                    if(row['Latitude'] && row['Longitude']) {
-                        const la = String(row['Latitude']).replace(',','.').trim();
-                        const lo = String(row['Longitude']).replace(',','.').trim();
-                        map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
-                    }
-
-                    this.data.push({
-                        id: row['Nº Oc.'] || id++,
-                        data: row['Data'] || '--',
-                        nat, sub, pel,
-                        bairro: (row['Bairro'] || '--').toUpperCase(),
-                        map
-                    });
+                dadosGlobais.push({
+                    id: row['Nº Oc.'] || total,
+                    data: row['Data'] || '--',
+                    nat, sub, pel, map,
+                    bairro: (row['Bairro'] || '--').toUpperCase()
                 });
+            });
 
-                this.populateFilters();
-                this.render(this.data);
-                this.uiLoading(false);
-            },
+            popularFiltros();
+            
+            updateProgress(100, "Pronto!");
+            const dash = document.getElementById('dashboardArea');
+            dash.classList.remove('hidden');
+            setTimeout(() => {
+                dash.classList.remove('opacity-0');
+                dash.classList.add('opacity-100');
+                renderizar(dadosGlobais);
+            }, 100);
+        }
 
-            populateFilters: function() {
-                const sets = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                this.data.forEach(d => {
-                    sets.n.add(d.nat); 
-                    if(d.sub) sets.s.add(d.sub);
-                    if(d.bairro !== '--') sets.b.add(d.bairro);
-                    sets.p.add(d.pel);
-                });
+        function popularFiltros() {
+            const sets = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
+            dadosGlobais.forEach(d => {
+                sets.n.add(d.nat); 
+                if(d.sub) sets.s.add(d.sub);
+                if(d.bairro !== '--') sets.b.add(d.bairro);
+                sets.p.add(d.pel);
+            });
 
-                const fill = (id, set) => {
-                    const el = document.getElementById(id);
-                    const label = el.options[0].text;
-                    el.innerHTML = `<option value="">${label}</option>`;
-                    Array.from(set).sort().forEach(v => el.add(new Option(v, v)));
-                };
-                fill('selNat', sets.n); fill('selSub', sets.s);
-                fill('selBai', sets.b); fill('selPel', sets.p);
-            },
+            const fill = (id, set) => {
+                const el = document.getElementById(id);
+                el.innerHTML = el.options[0].outerHTML;
+                Array.from(set).sort().forEach(v => el.add(new Option(v, v)));
+            };
+            fill('filterNatureza', sets.n); fill('filterSubgrupo', sets.s);
+            fill('filterBairro', sets.b); fill('filterPelotao', sets.p);
+        }
 
-            applyFilters: function() {
-                const f = {
-                    n: document.getElementById('selNat').value,
-                    s: document.getElementById('selSub').value,
-                    b: document.getElementById('selBai').value,
-                    p: document.getElementById('selPel').value
-                };
-                const res = this.data.filter(d => 
-                    (f.n==="" || d.nat===f.n) && (f.s==="" || d.sub===f.s) &&
-                    (f.b==="" || d.bairro===f.b) && (f.p==="" || d.pel===f.p)
-                );
-                this.render(res, true);
-            },
+        function aplicarFiltros() {
+            const f = {
+                n: document.getElementById('filterNatureza').value,
+                s: document.getElementById('filterSubgrupo').value,
+                b: document.getElementById('filterBairro').value,
+                p: document.getElementById('filterPelotao').value
+            };
+            const res = dadosGlobais.filter(d => 
+                (f.n==="" || d.nat===f.n) && (f.s==="" || d.sub===f.s) &&
+                (f.b==="" || d.bairro===f.b) && (f.p==="" || d.pel===f.p)
+            );
+            renderizar(res, true);
+        }
 
-            resetFilters: function() {
-                document.querySelectorAll('select').forEach(s => s.value = "");
-                this.render(this.data);
-            },
+        function resetFilters() {
+            document.querySelectorAll('select').forEach(s => s.value = "");
+            renderizar(dadosGlobais);
+        }
 
-            render: function(data, isFiltered=false) {
-                // 1. Atualizar contadores
-                const total = data.length;
-                const totalGlobal = this.data.length;
-                document.getElementById('totalDisplay').innerText = total.toLocaleString('pt-BR');
-                document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${this.labelContext}`;
-                document.getElementById('totalLista').innerText = isFiltered ? `${total.toLocaleString('pt-BR')} (de ${totalGlobal.toLocaleString('pt-BR')})` : total.toLocaleString('pt-BR');
+        // --- RENDERIZAÇÃO ---
+        function renderizar(data, filtrado=false) {
+            // Textos
+            const tot = data.length;
+            document.getElementById('totalDisplay').innerText = tot.toLocaleString('pt-BR');
+            const label = mesSelecionado.includes("ANUAL") ? "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025" : `TOTAL DE OCORRÊNCIAS ATENDIDAS EM ${mesSelecionado} ${ANO_ATUAL}`;
+            document.getElementById('tituloTotalLabel').innerText = label;
+            document.getElementById('totalLista').innerText = filtrado ? `${tot} (de ${dadosGlobais.length})` : tot;
 
-                // 2. Renderizar Tabela (Fragmentada para não travar)
-                const tbody = document.getElementById('tabelaBody');
-                tbody.innerHTML = "";
+            // Tabela (Limitada para performance)
+            const tbody = document.getElementById('tabelaBody');
+            let html = "";
+            data.slice(0, 1000).forEach((d, i) => {
+                const st = STYLES[d.nat] || { icon: "📄", class: "text-slate-400" };
+                const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white"><i class="fas fa-map-marker-alt"></i></a>` : '';
                 
-                const viewData = data.slice(0, 1000); // Limite de visualização para performance
-                let html = "";
-                
-                viewData.forEach((d, i) => {
-                    const st = STYLES[d.nat] || { icon: "📄", class: "text-slate-400" };
-                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white"><i class="fas fa-map-marker-alt"></i></a>` : '<span class="text-gray-600"><i class="fas fa-map-marker-slash"></i></span>';
-                    
-                    html += `<tr class="hover:bg-white/5 border-b border-gray-800/50 odd:bg-white/5">
-                        <td class="p-3 text-center">${i+1}</td>
-                        <td class="p-3 whitespace-nowrap">${d.data}</td>
-                        <td class="p-3 font-bold ${st.class} whitespace-nowrap"><span class="mr-2">${st.icon}</span>${d.nat}</td>
-                        <td class="p-3 text-blue-200/80">${d.sub}</td>
-                        <td class="p-3">${d.bairro}</td>
-                        <td class="p-3"><span class="text-fire-yellow font-bold">${d.pel}</span></td>
-                        <td class="p-3 text-center">${mapBtn}</td>
-                        <td class="p-3 text-right text-gray-500">#${d.id}</td>
-                    </tr>`;
-                });
-                tbody.innerHTML = html;
+                html += `<tr class="hover:bg-white/5 border-b border-gray-800/50 odd:bg-white/5">
+                    <td class="p-3 text-center">${i+1}</td>
+                    <td class="p-3 whitespace-nowrap">${d.data}</td>
+                    <td class="p-3 font-bold ${st.class} whitespace-nowrap"><span class="mr-2">${st.icon}</span>${d.nat}</td>
+                    <td class="p-3 text-blue-200/80">${d.sub}</td>
+                    <td class="p-3">${d.bairro}</td>
+                    <td class="p-3"><span class="text-fire-yellow font-bold">${d.pel}</span></td>
+                    <td class="p-3 text-center">${mapBtn}</td>
+                    <td class="p-3 text-right opacity-50">#${d.id}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
 
-                // 3. Renderizar Gráficos com Delay (Fix para Mobile)
-                if(total > 0) {
-                    setTimeout(() => this.renderCharts(data), 100);
-                }
-            },
+            // Gráficos
+            if(tot > 0) gerarGraficos(data);
+        }
 
-            renderCharts: function(data) {
-                // Preparação dos dados
-                const c = { p: {}, n: {}, s: {} };
-                data.forEach(d => {
-                    c.p[d.pel] = (c.p[d.pel] || 0) + 1;
-                    c.n[d.nat] = (c.n[d.nat] || 0) + 1;
-                    if(d.sub) c.s[`${d.nat}___${d.sub}`] = (c.s[`${d.nat}___${d.sub}`] || 0) + 1;
-                });
+        function gerarGraficos(data) {
+            const counts = { p: {}, n: {}, s: {} };
+            data.forEach(d => {
+                counts.p[d.pel] = (counts.p[d.pel] || 0) + 1;
+                counts.n[d.nat] = (counts.n[d.nat] || 0) + 1;
+                if(d.sub) counts.s[`${d.nat}___${d.sub}`] = (counts.s[`${d.nat}___${d.sub}`] || 0) + 1;
+            });
 
-                const sort = o => Object.entries(o).sort((a,b) => b[1] - a[1]);
-                const pData = sort(c.p);
-                const nData = sort(c.n);
-                const sData = sort(c.s).filter(x => x[1] >= 1);
+            const sort = o => Object.entries(o).sort((a,b) => b[1] - a[1]);
+            const pD = sort(counts.p);
+            const nD = sort(counts.n);
+            const sD = sort(counts.s).filter(x => x[1] >= 1);
 
-                this.drawChart('chartPelotoes', 'p', pData);
-                this.drawChart('chartNatureza', 'n', nData);
-                this.drawChart('chartSubgrupos', 's', sData);
-            },
+            renderChart('chartPelotoes', 'p', pD);
+            renderChart('chartNatureza', 'n', nD);
+            renderChart('chartSubgrupos', 's', sD);
+        }
 
-            drawChart: function(id, type, dataArr) {
-                if(this.charts[id]) this.charts[id].destroy();
+        function renderChart(id, type, dataset) {
+            if (id === 'chartPelotoes' && chartP) chartP.destroy();
+            if (id === 'chartNatureza' && chartN) chartN.destroy();
+            if (id === 'chartSubgrupos' && chartS) chartS.destroy();
 
-                const ctx = document.getElementById(id).getContext('2d');
-                
-                // Labels e Cores
-                const labels = dataArr.map(x => {
-                    if(type === 'n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
-                    if(type === 's') {
-                        const [n, s] = x[0].split('___');
-                        const icon = (STYLES[n] || { icon: "📄" }).icon;
-                        return `${icon} ${n} [${s}]`;
-                    }
-                    if(type === 'n') {
-                        const icon = (STYLES[x[0]] || { icon: "📄" }).icon;
-                        return `${icon} ${x[0]}`;
-                    }
-                    return x[0];
-                });
-
-                const values = dataArr.map(x => x[1]);
-                
-                // Altura Dinâmica
+            const ctx = document.getElementById(id).getContext('2d');
+            
+            // Labels & Cores
+            const labels = dataset.map(x => {
+                if(type === 'n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
                 if(type === 's') {
-                    const h = Math.max(500, values.length * 25);
-                    document.getElementById('subgrupoContainer').style.height = h + 'px';
+                    const [n,s] = x[0].split('___');
+                    const icon = (STYLES[n] || { icon: "📄" }).icon;
+                    return `${icon} ${n} [${s}]`;
                 }
+                if(type === 'n') {
+                    const icon = (STYLES[x[0]] || { icon: "📄" }).icon;
+                    return `${icon} ${x[0]}`;
+                }
+                return x[0];
+            });
 
-                // Opções Robustas
-                this.charts[id] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            borderRadius: 4,
-                            barPercentage: 0.7,
-                            backgroundColor: (c) => {
-                                const i = c.dataIndex;
-                                if(type === 'p') return CONFIG.poaPlatoons.includes(dataArr[i][0]) ? '#10B981' : '#64748B';
-                                if(type === 'n') return (STYLES[dataArr[i][0]] || { color: "#94A3B8" }).color;
-                                if(type === 's') {
-                                    const n = dataArr[i][0].split('___')[0];
-                                    return (STYLES[n] || { color: "#94A3B8" }).color;
-                                }
-                                return '#3B82F6';
-                            }
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: false,
-                        layout: { padding: { right: 45 } },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: true },
-                            datalabels: {
-                                color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
-                                font: { weight: 'bold', size: 11 },
-                                formatter: (v) => v.toLocaleString('pt-BR')
-                            }
+            const data = dataset.map(x => x[1]);
+            const colors = dataset.map(x => {
+                if(type === 'p') return POA_PLATOONS.includes(x[0]) ? '#10B981' : '#64748B';
+                const key = type === 's' ? x[0].split('___')[0] : x[0];
+                return (STYLES[key] || { color: "#94A3B8" }).color;
+            });
+
+            // Altura Dinâmica
+            if(type === 's') {
+                document.getElementById('subgrupoContainer').style.height = Math.max(500, data.length * 25) + 'px';
+            }
+
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        // Efeito de Borda no Hover
+                        hoverBorderWidth: 2,
+                        hoverBorderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    layout: { padding: { right: 50 } },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: (ctx) => ctx.active ? '#ffffff' : '#e2e8f0', // Zoom Cor
+                            anchor: 'end', align: 'end', offset: 4,
+                            font: (ctx) => ({ 
+                                weight: 'bold', 
+                                size: ctx.active ? 14 : 11 // Zoom Tamanho
+                            }),
+                            formatter: (v) => v.toLocaleString('pt-BR')
                         },
-                        scales: {
-                            x: { display: false },
-                            y: {
-                                ticks: {
-                                    autoSkip: false,
-                                    font: (c) => {
-                                        if(type === 'p') {
-                                            const l = this.charts[id].data.labels[c.index];
-                                            if(CONFIG.poaPlatoons.includes(l)) return { size: 14, weight: 'bold', family: 'monospace' };
-                                        }
-                                        return { size: 10, family: 'monospace' };
-                                    },
-                                    color: (c) => {
-                                        if(type === 'p') {
-                                            const l = this.charts[id].data.labels[c.index];
-                                            return CONFIG.poaPlatoons.includes(l) ? '#10B981' : '#64748B';
-                                        }
-                                        if(type === 'n') return (STYLES[dataArr[c.index][0]] || { color: "#94A3B8" }).color;
-                                        if(type === 's') {
-                                            const n = dataArr[c.index][0].split('___')[0];
-                                            return (STYLES[n] || { color: "#94A3B8" }).color;
-                                        }
-                                        return '#94a3b8';
+                        tooltip: { enabled: true, backgroundColor: 'rgba(0,0,0,0.9)' }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            ticks: {
+                                autoSkip: false,
+                                font: (ctx) => {
+                                    if(type === 'p') {
+                                        const l = chart.data.labels[ctx.index];
+                                        if(POA_PLATOONS.includes(l)) return { size: 14, weight: 'bold', family: 'monospace' };
                                     }
+                                    return { size: 10, family: 'monospace' };
                                 },
-                                grid: { color: 'rgba(255,255,255,0.02)' }
-                            }
+                                color: (ctx) => {
+                                    if(type === 'p') {
+                                        const l = chart.data.labels[ctx.index];
+                                        return POA_PLATOONS.includes(l) ? '#10B981' : '#64748B';
+                                    }
+                                    return colors[ctx.index];
+                                }
+                            },
+                            grid: { color: 'rgba(255,255,255,0.02)' }
                         }
                     }
-                });
-            }
-        };
+                }
+            });
 
-        // Iniciar
-        document.addEventListener('DOMContentLoaded', () => app.init());
+            if (id === 'chartPelotoes') chartP = chart;
+            if (id === 'chartNatureza') chartN = chart;
+            if (id === 'chartSubgrupos') chartS = chart;
+        }
     </script>
 </body>
 </html>
