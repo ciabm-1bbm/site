@@ -118,13 +118,20 @@
                 </div>
                 
                 <div class="mt-3 max-w-4xl mx-auto flex flex-col md:flex-row gap-3 px-4">
-                    <div id="widget-aniversarios-dia" class="w-full md:w-1/2 p-2 bg-black/60 border border-bombeiros-yellow/50 rounded-lg hidden text-left backdrop-blur-md">
-                        <h3 class="font-bold text-bombeiros-yellow text-xs uppercase flex items-center"><i class="fas fa-birthday-cake mr-2"></i>Aniversariantes do Dia <span id="data-atual" class="ml-auto text-[10px] text-gray-300 normal-case"></span></h3>
+                    
+                    <div id="widget-aniversarios-dia" class="w-full md:w-1/2 p-2 bg-black/60 border border-bombeiros-yellow/50 rounded-lg hidden text-center backdrop-blur-md">
+                        <h3 class="font-bold text-bombeiros-yellow text-xs uppercase flex items-center justify-center">
+                            <i class="fas fa-birthday-cake mr-2"></i>Aniversariantes do Dia
+                        </h3>
+                        <span id="data-atual" class="block text-[10px] text-gray-300 normal-case mb-1"></span>
                         <p class="text-xs mt-1 text-white" id="lista-aniversariantes-dia"></p>
                     </div>
-                    <div id="widget-aniversarios-mes" class="w-full md:w-1/2 p-2 bg-black/60 border border-bombeiros-orange/50 rounded-lg hidden text-left backdrop-blur-md">
-                        <h3 class="font-bold text-bombeiros-yellow text-xs uppercase flex items-center"><i class="fas fa-calendar-alt mr-2"></i>Mês de <span id="mes-atual-nome" class="ml-1"></span></h3>
-                        <div class="text-[10px] mt-1 text-white" id="lista-aniversariantes-mes"></div>
+
+                    <div id="widget-aniversarios-mes" class="w-full md:w-1/2 p-2 bg-black/60 border border-bombeiros-orange/50 rounded-lg hidden backdrop-blur-md">
+                        <h3 class="font-bold text-bombeiros-yellow text-xs uppercase flex items-center justify-center text-center">
+                            <i class="fas fa-calendar-alt mr-2"></i>Aniversariantes de <span id="mes-atual-nome" class="ml-1"></span>
+                        </h3>
+                        <div class="text-[10px] mt-1 text-white text-justify leading-relaxed" id="lista-aniversariantes-mes"></div>
                     </div>
                 </div>
             </div>
@@ -141,7 +148,7 @@
                         </div>
                     </a>
 
-                    <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button">
+                    <a href="https://drive.google.com/drive/u/0/folders/16xwGaJhYzP0T1D5ICf_0JysvvZ0owIqf" target="_blank" class="shortcut-button">
                         <div class="flip-card-inner">
                             <div class="flip-card-front"><i class="fas fa-users text-2xl"></i><span class="button-text">Mapa Etapa / HE</span></div>
                             <div class="flip-card-back"><p class="flip-card-back-text">Mapa de alimentação e horas extras.</p></div>
@@ -639,18 +646,21 @@
             const meses = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
             const diaF = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}`;
             
+            // Dados da Data Atual no Widget
             const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
             document.getElementById('data-atual').textContent = `${String(hoje.getDate()).padStart(2,'0')}/${meses[hoje.getMonth()]}/${hoje.getFullYear()} - ${diasSemana[hoje.getDay()]}`;
 
+            // Checar Dia
             const niverHoje = [];
             for (const id in efetivoAniversarios) {
                 if (efetivoAniversarios[id].nascimento === diaF) niverHoje.push(efetivoAniversarios[id].nomeGuerra);
             }
             if (niverHoje.length > 0) {
-                document.getElementById('lista-aniversariantes-dia').innerHTML = "Parabéns: <span class='font-bold'>" + niverHoje.join(', ') + "</span>!";
+                document.getElementById('lista-aniversariantes-dia').innerHTML = "Parabéns: <span class='font-bold text-green-400'>" + niverHoje.join(', ') + "</span>!";
                 document.getElementById('widget-aniversarios-dia').classList.remove('hidden');
             }
 
+            // Checar Mês
             document.getElementById('mes-atual-nome').textContent = meses[hoje.getMonth()];
             const niverMes = [];
             for (const id in efetivoAniversarios) {
@@ -663,7 +673,10 @@
             }
             if (niverMes.length > 0) {
                 niverMes.sort((a,b) => a.d - b.d);
-                document.getElementById('lista-aniversariantes-mes').innerHTML = niverMes.map(p => `${p.n} (${p.d})`).join(' &bull; ');
+                // Gera a lista com o efeito hover verde
+                document.getElementById('lista-aniversariantes-mes').innerHTML = niverMes.map(p => 
+                    `<span class="hover:text-green-400 transition-colors cursor-pointer" title="Aniversário">${p.n} (${String(p.d).padStart(2, '0')})</span>`
+                ).join(' &bull; ');
                 document.getElementById('widget-aniversarios-mes').classList.remove('hidden');
             }
         }
