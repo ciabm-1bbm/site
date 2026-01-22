@@ -37,7 +37,7 @@
         }
         .hero-background::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.75); z-index: -1; /* Um pouco mais escuro para destacar o amarelo */
+            background: rgba(0, 0, 0, 0.7); z-index: -1;
         }
 
         /* Botão App */
@@ -49,83 +49,27 @@
         }
         @keyframes pulse { 0% {transform: translateX(-50%) scale(1);} 50% {transform: translateX(-50%) scale(1.05);} 100% {transform: translateX(-50%) scale(1);} }
 
-        /* --- CARDS DE LINKS (Laranja Translúcido) --- */
-        .shortcut-button { background-color: transparent; height: 85px; perspective: 1000px; text-decoration: none; display: block; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 0.75rem; }
+        /* --- CARDS PADRÃO (Laranja Transparente) --- */
+        .shortcut-button { background-color: transparent; height: 100px; perspective: 1000px; text-decoration: none; display: block; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; border-radius: 0.5rem; }
         .shortcut-button:hover .flip-card-inner { transform: rotateX(180deg); }
         
         .flip-card-front, .flip-card-back { 
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 5px; border-radius: 0.75rem; 
-            
-            /* Visual Vidro Laranja */
-            border: 1px solid rgba(255, 140, 0, 0.3); 
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            padding: 8px; border-radius: 0.5rem; 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .flip-card-front { background-color: rgba(255, 140, 0, 0.35); backdrop-filter: blur(5px); }
-        .flip-card-back { transform: rotateX(180deg); background-color: rgba(255, 140, 0, 0.35); backdrop-filter: blur(5px); }
+        /* FRENTE E VERSO: LARANJA TRANSPARENTE */
+        .flip-card-front { background-color: rgba(255, 140, 0, 0.5); }
+        .flip-card-back { transform: rotateX(180deg); background-color: rgba(255, 140, 0, 0.5); backdrop-filter: blur(4px); padding: 12px; }
 
-        /* TEXTOS DOS LINKS */
-        .button-text { 
-            font-size: 9px; font-weight: 800; color: #FFD700; 
-            line-height: 1.1; text-align: center; margin-top: 4px; text-transform: uppercase; 
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
-        }
-        .flip-card-back-text { 
-            font-size: 9px; color: #FFD700; text-align: center; font-weight: 600; 
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
-        }
-        /* Ícones dos Links */
-        .shortcut-button i { color: #FFD700 !important; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        /* --- NOVO ESTILO: CARDS DE ANIVERSÁRIO 3D --- */
-        .birthday-wrapper {
-            perspective: 1000px;
-            margin-bottom: 20px;
-        }
-        .birthday-card {
-            background: rgba(0, 0, 0, 0.6); /* Fundo escuro vidro */
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 215, 0, 0.4); /* Borda Dourada */
-            border-radius: 16px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        /* Efeito de brilho ao passar o mouse */
-        .birthday-card:hover {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 15px 40px rgba(255, 140, 0, 0.3); /* Brilho Laranja */
-            border-color: rgba(255, 215, 0, 0.8);
-        }
-        .birthday-title {
-            color: #FFD700;
-            text-transform: uppercase;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-        }
-        .birthday-content {
-            color: white;
-            font-size: 13px;
-            line-height: 1.6;
-            text-shadow: 1px 1px 1px black;
-        }
-        /* Destaque Hover no Nome */
-        .aniver-name:hover {
-            color: #4ade80; /* Verde brilhante */
-            text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
+        .button-text { font-size: 11px; font-weight: 700; color: white; line-height: 1.2; text-align: center; margin-top: 4px; hyphens: auto; word-break: break-word; }
+        .flip-card-back-text { font-size: 11px; color: white; text-align: center; line-height: 1.3; font-weight: 500; }
+        
+        i { color: #FFD700 !important; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="text-white">
@@ -133,328 +77,307 @@
     <button id="install-button"><i class="fas fa-download mr-2"></i> INSTALAR APP</button>
 
     <div class="hero-background">
-        <header class="py-5 text-center z-10">
+        <header class="py-4 shadow-lg z-10 text-center">
             <div class="container mx-auto px-4">
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
-                    <div class="bg-blue-900/40 p-2 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg">
-                        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 w-auto" alt="Logo CBMRS">
-                    </div>
-                    <div>
-                        <h1 class="text-xl md:text-3xl font-extrabold text-bombeiros-yellow uppercase drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">
-                            1º BATALHÃO DE BOMBEIRO MILITAR
-                        </h1>
-                        <h2 class="text-sm md:text-lg font-bold text-white tracking-widest uppercase drop-shadow-md mt-1">
-                            Companhia de Porto Alegre
-                        </h2>
-                    </div>
-                    <div class="bg-blue-900/40 p-2 rounded-lg backdrop-blur-sm border border-white/20 shadow-lg">
-                        <img src="images/brasao_1BBM_PARA_site.png" class="h-16 w-auto" alt="Brasão">
-                    </div>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <div class="bg-cbmrs-blue p-2 rounded-lg"><img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 w-auto"></div>
+                    <h1 class="text-xl md:text-2xl font-extrabold text-bombeiros-yellow">COMPANHIA DE BOMBEIRO MILITAR do 1º BBM</h1>
+                    <div class="bg-cbmrs-blue p-2 rounded-lg"><img src="images/brasao_1BBM_PARA_site.png" class="h-16 md:h-20 w-auto"></div>
                 </div>
 
-                <div class="mb-6">
-                    <div class="inline-block bg-black/40 backdrop-blur-sm px-6 py-2 rounded-full border border-bombeiros-orange/30">
-                        <p class="text-sm md:text-base text-gray-200">
-                            Bem-vindo, <span class="text-bombeiros-orange font-bold">Guerreiro do Fogo!</span> Acesse abaixo as ferramentas da CIA.
-                        </p>
-                    </div>
+                <div class="mt-3">
+                    <h2 class="text-lg md:text-xl font-bold text-white">Bem-vindo, <span class="text-bombeiros-orange">Guerreiro do Fogo!</span></h2>
+                    <p class="text-sm text-gray-300 max-w-2xl mx-auto mt-1">Aqui tu poderás acessar as principais ferramentas criadas pelos membros da CIA para facilitar o acesso às demandas administrativas, otimizando teu tempo e o nosso trabalho em prol da sociedade. Avante CBMRS!</p>
                 </div>
                 
-                <div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-4 px-2 birthday-wrapper">
-                    
-                    <div id="widget-aniversarios-dia" class="w-full md:w-1/3 birthday-card hidden flex flex-col justify-center items-center">
-                        <div class="birthday-title w-full text-center">
-                            <i class="fas fa-birthday-cake mr-2"></i>Aniversariantes do Dia
-                        </div>
-                        <span id="data-atual" class="text-[10px] text-gray-400 uppercase tracking-wide mb-2 block"></span>
-                        <div class="birthday-content text-center text-lg font-bold" id="lista-aniversariantes-dia"></div>
+                <div class="mt-4 max-w-4xl mx-auto flex flex-col md:flex-row gap-4">
+                    <div id="widget-aniversarios-dia" class="w-full md:w-1/2 p-3 bg-black/50 border border-bombeiros-yellow/50 rounded-lg hidden text-left">
+                        <h3 class="font-bold text-bombeiros-yellow flex items-center"><i class="fas fa-birthday-cake mr-2"></i>Aniversariantes do Dia</h3>
+                        <span id="data-atual" class="block text-xs text-gray-400 font-mono mb-2"></span>
+                        <p class="text-sm text-white" id="lista-aniversariantes-dia"></p>
                     </div>
-
-                    <div id="widget-aniversarios-mes" class="w-full md:w-full birthday-card hidden">
-                        <div class="birthday-title text-center">
-                            <i class="fas fa-calendar-alt mr-2"></i>Aniversariantes de <span id="mes-atual-nome" class="text-white"></span>
-                        </div>
-                        <div class="birthday-content text-justify mt-2" id="lista-aniversariantes-mes"></div>
+                    <div id="widget-aniversarios-mes" class="w-full md:w-1/2 p-3 bg-black/50 border border-cbmrs-light-blue/50 rounded-lg hidden text-left">
+                        <h3 class="font-bold text-cbmrs-light-blue flex items-center mb-2"><i class="fas fa-calendar-alt mr-2"></i>Aniversariantes do Mês de <span id="mes-atual-nome" class="ml-1"></span></h3>
+                        <div class="text-xs text-white" id="lista-aniversariantes-mes"></div>
                     </div>
                 </div>
-
             </div>
         </header>
 
-        <main class="py-2 flex-grow">
-            <div class="container mx-auto px-4 pb-10">
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+        <main class="py-6 flex-grow">
+            <div class="container mx-auto px-4 text-center">
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-4 justify-center">
                     
                     <a href="https://docs.google.com/spreadsheets/d/1WoH64SbXEiRleyCudN4hEHdJTDNwvXbdANWN8vupOB4/edit?gid=392855966#gid=392855966" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-calendar-alt text-2xl"></i><span class="button-text">Escala Jan/26</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Escala unificada mensal.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-calendar-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">ESCALA DE SERVIÇO (JANEIRO/2026)</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a escala de serviço unificada para o mês corrente.</p></div>
                         </div>
                     </a>
 
-                    <a href="https://drive.google.com/drive/u/0/folders/16xwGaJhYzP0T1D5ICf_0JysvvZ0owIqf" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-users text-2xl"></i><span class="button-text">Mapa Etapa / HE</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Mapa de alimentação e horas extras.</p></div>
+                    <a href="https://drive.google.com/drive/u/0/folders/1lpicifxUZxNmydzskZRmPkitLS1Px2xR" target="_blank" class="shortcut-button">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">MAPA de ETAPA e HORA EXTRA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte o mapa de etapas (alimentação) e horas extras do efetivo.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/folders/19na5exdsCw863xLLIVTby6AbxWZ02Euq" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-calendar-times text-2xl"></i><span class="button-text">Indisponibilidade</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Atualização de indisponibilidade.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-calendar-times text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">INDISPONIBILIDADE MENSAL DO EFETIVO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Sargenteante, atualize a planilha de indisponibilidade.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1TX74kxfZ9UfjFfMzMFrUAG4MqntYeAiRyKcBnG57J1o/edit?gid=232710291#gid=232710291" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-calendar-check text-2xl"></i><span class="button-text">Confirmação Férias</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Verificar período de férias.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-calendar-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">CONFIRMAÇÃO de FÉRIAS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a planilha para confirmar e verificar o período de férias do mês subsequente.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/13ZiHTHxL9Gl5DRG-Nuhy3MgjuqqYzvVVkUet6xgKRQM/edit?gid=62629923#gid=62629923" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-water text-2xl"></i><span class="button-text">Mergulho / Cães</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Efetivo especializado.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-water text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">MERGULHADORES e<br>CINOTÉCNICOS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Verifique a disponibilidade das equipes especializadas em Mergulho e Busca com Cães do CBMRS.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1pzSKuhnJZe0B0IKhv8J2sTQmz9LgyOkG2dunrA65J1o/edit?gid=163975323#gid=163975323" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-user-tie text-2xl"></i><span class="button-text">Funções Efetivo</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Distribuição de encargos.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-user-tie text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">FUNÇÕES DO EFETIVO DA CIA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte a distribuição atualizada de funções e encargos dos militares da Seção de Comando da CIA.</p></div>
                         </div>
                     </a>
 
                     <a href="https://forms.gle/L4KsYnat3rCkoZwV8" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-clipboard-list text-2xl"></i><span class="button-text">Formulário</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Preenchimento de dados.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">FORMULÁRIO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse o formulário geral (preenchimento obrigatório até 27/Jun/2025).</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/u/1/folders/1_cu1Vqh78hmZ6okQ0wfo0-oOaljT-zPp" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-clock text-2xl"></i><span class="button-text">Previsão Escala</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Previsão para o próximo mês.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-clock text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">PREVISÃO DE ESCALA e MAPA (FEVEREIRO 2026)</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Confira a previsão de escala de serviço para o próximo mês.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1KSonnz8y42uMBflzRYlDkt8BO9OWiTPjd4Das0oPgqY/edit?gid=1086865597#gid=1086865597" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-users text-2xl"></i><span class="button-text">Efetivo Atualizado</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Dados gerais do efetivo.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-users text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">EFETIVO ATUALIZADO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte a planilha atualizada com os dados do efetivo da CIA, organizado por quinzena.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1VugtkWyi2lzNAncGf49zw7qjKMeQ9HEsZv3pln--fMw/edit?gid=1128532433#gid=1128532433" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-plane-departure text-2xl"></i><span class="button-text">Plano Férias 2026</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Cronograma anual de férias.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-plane-departure text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">PLANO de FÉRIAS 2026</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse e atualize se necessário o plano anual de férias previsto para o efetivo.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1NQ31i3W5QChjhg1g5AtjCW4Rx5dAL3r_d0Ayki92e3c/edit?gid=2047429802#gid=2047429802" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-hospital-alt text-2xl"></i><span class="button-text">Afastamentos</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Médicos e licenças HBM.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-hospital-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">AFASTAMENTOS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Verifique a planilha de controle de afastamentos médicos e licenças do HBM.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/11KSqhhZjiUnKAqxfADJ45PwTDfL9Em3K/edit?gid=2014955697#gid=2014955697" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-id-card-alt text-2xl"></i><span class="button-text">Validade CCVTE</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Cursos de Condutor.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-id-card-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">VALIDADE CCVTE</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte a validade dos Cursos de Condutor de Veículo de Transporte em Emergência.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1Uqcm1ATl_i7R5J9BMK6ZZay17bghB3ijXmuR599O0A0/edit?gid=2024029627#gid=2024029927" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-flask text-2xl"></i><span class="button-text">Toxicológico</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Controle de vencimento.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-flask text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">TOXICOLÓGICO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a planilha de controle de vencimento dos exames toxicológicos.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/u/1/folders/1HR8JO24uWEWSOfeUuzphWUFweMeN0XRX" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-file-medical text-2xl"></i><span class="button-text">Ficha Renovação</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Período probatório.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-file-medical text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">FICHA DE RENOVAÇÃO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a pasta com as fichas para renovação ANUAL do efetivo das turmas com menos de 5 anos, em período probatório.</p></div>
                         </div>
                     </a>
 
                     <a href="https://ciabm-1bbm.github.io/troca_fardamento/" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-shirt text-2xl"></i><span class="button-text">Troca Fardamento</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Plataforma de trocas.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-shirt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">PLATAFORMA PARA TROCA<br>DO NOVO FARDAMENTO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a plataforma para solicitar ou oferecer troca do novo fardamento aos colegas que também tem itens para troca.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/u/1/folders/1ykuBSdaPjFAkM0NKExloJZzzvQjc_c_Y" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-triangle-exclamation text-2xl"></i><span class="button-text">Avisos Logística</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Setor de Logística.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-triangle-exclamation text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">AVISOS SETOR<br>DE LOGÍSTICA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Confira os últimos avisos e informações do setor de logística.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1TgsrZ-67BDQs6ruf4aB-T4o1gELk1PTINDH-pocM9_g/edit?gid=1206238668#gid=1206238668" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-clipboard-check text-2xl"></i><span class="button-text">Partes SLOG</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Registro de partes.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-clipboard-list text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">PARTES SLOG</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a planilha de registro e acompanhamento das partes do SLOG.</p></div>
                         </div>
                     </a>
 
-                    <a href="https://ciabm-1bbm.github.io/site/estatisticas.html" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-chart-bar text-2xl"></i><span class="button-text">Estatísticas</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Dados de atendimento.</p></div>
+                    <a href="https://docs.google.com/spreadsheets/d/12l1ckdiRDV8d1RnINcaLvWtpoVVK8Rv4msPR7gLkEy4/edit?gid=2017439007#gid=2017439007" target="_blank" class="shortcut-button">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-chart-bar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">ESTATÍSTICAS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte as planilhas com as estatísticas de atendimento de ocorrências em Porto Alegre, pelos Pelotões da CIA.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1DbFURN7FxvMs_UeSWQkODaMRo1t06LA3Ww6t5B8l0RA/edit?gid=693248110#gid=693248110" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-comment-dots text-2xl"></i><span class="button-text">Msg Expressas</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Controle de numeração.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-comment-dots text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">Nº MSG EXPRESSAS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Planilha com Controle de Numeração e situação das Mensagens Expressas enviadas pela CIA.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/file/d/1QzmPk-RvWS5wl8sR3xPaWpmDAGU1cNET/view?usp=sharing" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-video text-2xl"></i><span class="button-text">Tutorial Diárias</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Passo a passo em vídeo.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-route text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">TUTORIAL DIÁRIAS DE VIAGEM</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse o tutorial em vídeo sobre como dar encaminhamento as solicitações de pagamento de diárias de viagem.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/17UVmvKgC_bgrtR245o07PThuHrduCUK7rI203q2GbG8/edit#gid=0" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-truck text-2xl"></i><span class="button-text">Viaturas 1º BBM</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Frota detalhada.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-truck-moving text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">VIATURAS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte a planilha com informações detalhadas sobre a frota das Viaturas do 1º BBM.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1X2tn-ay7Xc0zOxV9lpJzN24KEelkzzB6JS7ewQzVCwE/edit?gid=926343856#gid=926343856" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-ship text-2xl"></i><span class="button-text">Equipamentos</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Controle nos Pelotões.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-ship text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">EQUIPAMENTOS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a planilha de controle e informações sobre equipamentos nos Pelotões.</p></div>
                         </div>
                     </a>
 
                     <a href="https://gestaodefrotas.planejamento.rs.gov.br/frota/gestao/abastecimento/" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-file-invoice-dollar text-2xl"></i><span class="button-text">Valores Combust.</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Gestão de frotas RS.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-file-invoice-dollar text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">CONSULTA VALORES<br>COMBUSTÍVEL</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Verifique valores de combustível no sistema de Gestão de Frotas, para abastecimento das viaturas.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/spreadsheets/d/1eGyJ9OOvhvVACvd88X2oMfkYi_epj15X6sV9gUDWS8Q/edit?gid=1519715908#gid=1519715908" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-life-ring text-2xl"></i><span class="button-text">Guarda-Vidas</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Situação 2025/2026.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-life-ring text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">SITUAÇÃO GUARDA VIDAS<br>2024/25</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acompanhe a situação e Datas de Recertificação dos Guarda-Vidas 2025/2026 do 1º BBM.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/u/1/folders/16hXVQaxmRfkn9YPNG1-4yTPgdong0UYm" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-gas-pump text-2xl"></i><span class="button-text">Abastecimentos</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Registro de Pelotão.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-gas-pump text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">ABASTECIMENTOS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse e registre os abastecimento das viaturas do eu Pelotão.</p></div>
                         </div>
                     </a>
 
                     <a href="https://docs.google.com/document/d/1DRnUQCHcH__eoh_gcvJxhUUXp_nvavyguV-lyVkW20g/edit?usp=sharing" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-list-check text-2xl"></i><span class="button-text">Checklist Mapas</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Conferência de itens.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-list-check text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">CHECKLIST DOS MAPAS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Verifique os itens corretos para o preenchimento e conferência de mapas.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/folders/1DJm9aKGiudhPhEFBJ94SXQiMRTdV_xXN?usp=sharing" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-folder-open text-2xl"></i><span class="button-text">OS em Vigor</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Ordens de serviço 1º BBM.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">ORDENS DE SERVIÇO EM VIGOR no 1º BBM</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Consulte as Ordens de Serviço (OS) atualmente em vigor no âmbito do Batalhão.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/u/1/folders/1rDz7ecttIN-z7h--wEdSQQO4cLkINZkk" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-file-signature text-2xl"></i><span class="button-text">Modelos Docs</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Documentos funcionais.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-folder-open text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">MODELOS de DOCUMENTOS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse modelos padronizados pela CIA para encaminhamento de documentos funcionais.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/folders/1enYhn1PD-8nBmNKEWDQNjfAJoC6fKxeC?usp=sharing" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-newspaper text-2xl"></i><span class="button-text">Boletim Interno</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Arquivos de BI.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-newspaper text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">BOLETIM INTERNO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a pasta com os arquivos dos Boletins Internos (BI) confeccionados no 1º BBM.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/folders/1wLuQM7gZMsm5iMw3wOOJd7kA8HRmaHRN?usp=sharing" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-file-alt text-2xl"></i><span class="button-text">Notas para BI</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Envio quinzenal.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-file-alt text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">NOTAS PARA BI</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse as pastas para envio de Notas para Boletim Interno, quinzenalmente.</p></div>
                         </div>
                     </a>
 
-                    <a href="https://drive.google.com/drive/u/0/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-book text-2xl"></i><span class="button-text">Material Leitura</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Materiais diversos.</p></div>
+                    <a href="https://drive.google.com/drive/u/0/folders/1HNqrqk7n5lA00IgGvF7rXbcFOTfufJrE" class="shortcut-button" title="Substitua o # pelo link do seu material!">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-book text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">MATERIAL PARA LEITURA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse a pasta com materiais diversos para leitura e consulta pelo efetivo.</p></div>
                         </div>
                     </a>
 
                     <a href="https://drive.google.com/drive/u/1/folders/1CBg3klq4zgWPLRRDQWzCt7brfTDGcNUl" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-certificate text-2xl"></i><span class="button-text">Certidões 2025</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">SENASP / SINESP.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-certificate text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">CERTIDÕES SENASP<br>(2025)</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acesse as Certidões Negativas da SENASP / SINESP para o ano de 2025.</p></div>
                         </div>
                     </a>
 
                     <a href="mailto:portoalegre-acorianos-cia@cbm.rs.gov.br" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-envelope-open-text text-2xl"></i><span class="button-text">E-mail CIA</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Contato oficial.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-envelope-open-text text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">E-MAIL CIA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Endereço de e-mail para envio a Companhia.</p></div>
                         </div>
                     </a>
 
                     <a href="https://wa.me/+5555984423613" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fab fa-whatsapp text-2xl"></i><span class="button-text">WhatsApp CIA</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Contato funcional.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fab fa-whatsapp text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">WHATSAPP CIA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Contato da CIA via WhatsApp Funcional, para dúvidas, consultas, e demais necessidades de contato.</p></div>
                         </div>
                     </a>
 
-                    <a href="https://intranet.cbm.rs.gov.br/" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-desktop text-2xl"></i><span class="button-text">Intranet CBM</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Portal do CBMRS.</p></div>
+                    <a href="https://intranet.cbm.rs.gov.br/" class="shortcut-button">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-desktop text-2xl md:text-4xl text-pure-white mb-2"></i><span class="button-text">INTRANET CBM</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acessar a Intranet oficial do CBMRS.</p></div>
                         </div>
                     </a>
 
                     <a href="https://e193.cbm.rs.gov.br/" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-phone-alt text-2xl"></i><span class="button-text">E-193</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Sistema despacho.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-phone-alt text-2xl md:text-4xl text-pure-white mb-2"></i><span class="button-text">E-193</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acessar o sistema E-193.</p></div>
                         </div>
                     </a>
 
                     <a href="guarnicoes.html" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-users-cog text-2xl"></i><span class="button-text">Guarnições</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Efetivo de serviço.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-users-cog text-2xl md:text-4xl text-pure-white mb-2"></i><span class="button-text">GUARNIÇÕES DE SERVIÇO</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Verificar guarnições de serviço do 1º BBM (podem não estar atualizadas).</p></div>
                         </div>
                     </a>
 
                     <a href="https://ciabm-1bbm.github.io/site/monitor.html" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-tv text-2xl"></i><span class="button-text">Monitor POA</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Ocorrências Porto Alegre.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-tv text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">Monitor Ocorrências - POA</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acompanhamento em tempo real das ocorrências em Porto Alegre.</p></div>
                         </div>
                     </a>
 
                     <a href="https://ciabm-1bbm.github.io/site/monitor.cbmrs.html" target="_blank" class="shortcut-button">
-                        <div class="flip-card-inner card-orange">
-                            <div class="flip-card-front"><i class="fas fa-globe-americas text-2xl"></i><span class="button-text">Monitor RS</span></div>
-                            <div class="flip-card-back"><p class="flip-card-back-text">Ocorrências Estado.</p></div>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front"><i class="fas fa-globe-americas text-2xl md:text-4xl text-bombeiros-yellow mb-2"></i><span class="button-text">Monitor Ocorrências - RS</span></div>
+                            <div class="flip-card-back"><p class="flip-card-back-text">Acompanhamento em tempo real das ocorrências no Estado.</p></div>
                         </div>
                     </a>
 
@@ -700,9 +623,8 @@
                 if (efetivoAniversarios[id].nascimento === diaF) niverHoje.push(efetivoAniversarios[id].nomeGuerra);
             }
             if (niverHoje.length > 0) {
-                document.getElementById('lista-aniversariantes-dia').innerHTML = "Parabéns: <span class='font-bold text-green-400 animate-pulse'>" + niverHoje.join(', ') + "</span>!";
+                document.getElementById('lista-aniversariantes-dia').innerHTML = "Parabéns: <span class='font-bold text-green-400'>" + niverHoje.join(', ') + "</span>!";
                 document.getElementById('widget-aniversarios-dia').classList.remove('hidden');
-                document.getElementById('widget-aniversarios-dia').classList.add('flex'); // Garante flexbox para alinhar
             }
 
             // Checar Mês
@@ -720,8 +642,8 @@
                 niverMes.sort((a,b) => a.d - b.d);
                 // Gera a lista com o efeito hover verde
                 document.getElementById('lista-aniversariantes-mes').innerHTML = niverMes.map(p => 
-                    `<span class="aniver-name inline-block mr-2 mb-1" title="Aniversário">${p.n} (${String(p.d).padStart(2, '0')})</span>`
-                ).join(' • ');
+                    `<span class="hover:text-green-400 transition-colors cursor-pointer" title="Aniversário">${p.n} (${String(p.d).padStart(2, '0')})</span>`
+                ).join(' &bull; ');
                 document.getElementById('widget-aniversarios-mes').classList.remove('hidden');
             }
         }
