@@ -8,9 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -33,7 +33,6 @@
     </script>
 
     <style>
-        /* Otimizações de Renderização */
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
         .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
@@ -55,11 +54,8 @@
             backdrop-filter: blur(8px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            /* Importante para performance mobile */
-            contain: content; 
         }
 
-        /* Botões */
         .btn-mes { transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); }
         .btn-mes:active, .btn-mes.active { 
             background: linear-gradient(45deg, #10B981, #059669); color: white; border-color: #A7F3D0; transform: scale(1.02);
@@ -70,7 +66,6 @@
             background: linear-gradient(45deg, #CA8A04, #EAB308); color: white; border-color: #FEF08A; transform: scale(1.02);
         }
 
-        /* Barra de Progresso */
         #progressContainer { transition: opacity 0.3s; }
         .progress-striped {
             background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
@@ -78,23 +73,21 @@
         }
         @keyframes p-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
-        /* Tabela e Scroll */
         .table-scroll { max-height: 600px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         thead th { position: sticky; top: 0; z-index: 10; background-color: #0f172a; }
 
-        /* Selects */
         .filter-select {
             background-color: #1e293b; color: #e2e8f0; border: 1px solid #475569;
             padding: 0.5rem; border-radius: 0.5rem; width: 100%; outline: none;
         }
 
-        /* FIX CRÍTICO PARA GRÁFICOS MOBILE */
+        /* Container do Gráfico Fixo para Mobile */
         .chart-wrapper {
             position: relative;
             width: 100%;
-            height: 350px; /* Altura mínima garantida */
+            height: 350px;
         }
         @media (min-width: 768px) {
             .chart-wrapper { height: 550px; }
@@ -110,8 +103,8 @@
         <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-4 glass-card p-6">
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
             <div class="text-center flex-1">
-                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-tight">ESTATÍSTICAS DE OCORRÊNCIAS</h1>
-                <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)</h2>
+                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-tight">ESTATÍSTICAS - 1º BBM (2025)</h1>
+                <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">PORTO ALEGRE</h2>
                 <div class="mt-2 text-xs md:text-sm text-gray-400 font-mono" id="statusMsg">Sistema pronto. Selecione um período.</div>
             </div>
             <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90">
@@ -175,7 +168,7 @@
                         <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
                         <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
                         <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
-                        <button onclick="app.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded">LIMPAR</button>
+                        <button onclick="app.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded flex items-center justify-center"><i class="fas fa-undo mr-1"></i> LIMPAR</button>
                     </div>
                     <div class="mt-2 text-xs text-right text-gray-400 font-mono">
                         Linhas: <span id="totalLista" class="text-white font-bold">0</span>
@@ -186,7 +179,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead class="text-xs text-gray-400 uppercase font-bold bg-slate-900">
                             <tr>
-                                <th class="p-3 text-center">#</th>
+                                <th class="p-3 text-center w-12">#</th>
                                 <th class="p-3">Data</th>
                                 <th class="p-3">Natureza</th>
                                 <th class="p-3">Subgrupo</th>
@@ -210,6 +203,7 @@
     </footer>
 
     <script>
+        // CONFIGURAÇÃO
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
             year: 2025,
@@ -219,7 +213,7 @@
 
         const STYLES = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", class: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#8B4513", icon: "🐝", class: "text-insect-brown" }, 
+            "MANEJO DE INSETOS": { color: "#8B4513", icon: "🐝", class: "text-insect-brown" },
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", class: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", class: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", class: "text-gray-400" },
@@ -229,15 +223,16 @@
             "OUTROS": { color: "#64748B", icon: "⚠️", class: "text-bombeiros-orange" }
         };
 
+        // APLICAÇÃO
         const app = {
             data: [],
             charts: {},
             labelContext: "",
 
             init: function() {
+                // Registro seguro dos plugins
                 Chart.register(ChartDataLabels);
-                
-                // Gerar botões
+
                 const container = document.getElementById('mesesContainer');
                 CONFIG.months.forEach(m => {
                     const btn = document.createElement('button');
@@ -269,9 +264,7 @@
                     setTimeout(() => {
                         p.classList.add('hidden');
                         d.classList.remove('hidden');
-                        // Força reflow para animação
-                        void d.offsetWidth; 
-                        d.classList.add('opacity-100');
+                        requestAnimationFrame(() => d.classList.add('opacity-100'));
                     }, 300);
                 }
             },
@@ -282,7 +275,6 @@
 
             loadData: async function(month) {
                 this.resetButtons();
-                // Simples hack para achar o botão clicado e ativar (pela string)
                 Array.from(document.querySelectorAll('.btn-mes')).find(b => b.innerText === month)?.classList.add('active');
                 
                 this.labelContext = `EM ${month} ${CONFIG.year}`;
@@ -335,7 +327,9 @@
             parse: function(csv) {
                 this.uiLoading(true, "Lendo...", 70);
                 Papa.parse(csv, {
-                    header: true, skipEmptyLines: true, encoding: "UTF-8",
+                    header: true, 
+                    skipEmptyLines: true,
+                    encoding: "UTF-8", // Garante encoding correto
                     complete: (res) => this.process(res.data)
                 });
             },
@@ -346,22 +340,31 @@
 
                 if(!rawData || !rawData[0]) return;
 
-                // Detectar colunas
+                // DETECÇÃO ROBUSTA DE COLUNAS
+                // Normaliza as chaves removendo espaços e acentos para comparar
+                const normalize = str => str.trim().toLowerCase();
                 const keys = Object.keys(rawData[0]);
-                const cNat = keys.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
-                const cObm = keys.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
-                const cSub = keys.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i));
-                const cVtr = keys.find(k => k.match(/Viatura/i) || k.match(/Prefixo/i));
+                
+                const cNat = keys.find(k => normalize(k).includes('emerg') || normalize(k).includes('natureza'));
+                const cObm = keys.find(k => normalize(k).includes('obm') || normalize(k).includes('guarni'));
+                const cSub = keys.find(k => normalize(k).includes('subgrupo') || normalize(k).includes('detalhe'));
+                const cVtr = keys.find(k => normalize(k).includes('viatura') || normalize(k).includes('prefixo'));
 
-                if(!cNat || !cObm) { this.uiLoading(false); return alert("Erro colunas."); }
+                if(!cNat || !cObm) { 
+                    this.uiLoading(false); 
+                    return alert("Erro: Colunas obrigatórias não encontradas no arquivo."); 
+                }
 
                 let id = 1;
                 rawData.forEach(row => {
-                    const obm = row[cObm] ? String(row[cObm]).toUpperCase() : "";
-                    const vtr = cVtr && row[cVtr] ? String(row[cVtr]).toUpperCase() : "";
-                    const natRaw = row[cNat] ? String(row[cNat]).toUpperCase() : "N/A";
+                    // Proteção contra linhas vazias
+                    if (!row[cNat] && !row[cObm]) return;
+
+                    const obm = String(row[cObm] || "").toUpperCase();
+                    const vtr = String(cVtr ? (row[cVtr] || "") : "").toUpperCase();
+                    const natRaw = String(row[cNat] || "N/A").toUpperCase();
                     
-                    // Lógica Pelotão
+                    // Pelotão
                     let pel = "OUTROS";
                     if(obm.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                     else if(obm.includes("CANIL")) pel = "BBS (POA) - CANIL";
@@ -380,10 +383,10 @@
                     else if(obm.includes("RESGATE") || obm.includes("GBS")) pel = "AUTO RESGATE";
                     else {
                         const clean = obm.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").trim();
-                        if(clean) pel = clean;
+                        if(clean.length > 2) pel = clean;
                     }
 
-                    // Lógica Natureza
+                    // Natureza
                     let nat = natRaw.trim();
                     if(natRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                     else if(natRaw.includes("INCÊNDIO") || natRaw.includes("INCENDIO")) nat = "INCÊNDIO";
@@ -457,19 +460,18 @@
             },
 
             render: function(data, isFiltered=false) {
-                // Textos
+                // 1. Atualizar contadores
                 const total = data.length;
                 const totalGlobal = this.data.length;
                 document.getElementById('totalDisplay').innerText = total.toLocaleString('pt-BR');
                 document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${this.labelContext}`;
-                document.getElementById('totalLista').innerText = isFiltered ? `${total} (de ${totalGlobal})` : total;
+                document.getElementById('totalLista').innerText = isFiltered ? `${total.toLocaleString('pt-BR')} (de ${totalGlobal.toLocaleString('pt-BR')})` : total.toLocaleString('pt-BR');
 
-                // Tabela (Fragmentada)
+                // 2. Renderizar Tabela (Fragmentada para não travar)
                 const tbody = document.getElementById('tabelaBody');
                 tbody.innerHTML = "";
                 
-                // Limite renderização tabela para mobile
-                const viewData = data.slice(0, 1500); 
+                const viewData = data.slice(0, 1000); // Limite de visualização para performance
                 let html = "";
                 
                 viewData.forEach((d, i) => {
@@ -489,14 +491,14 @@
                 });
                 tbody.innerHTML = html;
 
-                // Renderizar Gráficos (com delay para garantir que o container existe)
+                // 3. Renderizar Gráficos com Delay (Fix para Mobile)
                 if(total > 0) {
-                    setTimeout(() => this.renderCharts(data), 50);
+                    setTimeout(() => this.renderCharts(data), 100);
                 }
             },
 
             renderCharts: function(data) {
-                // Agregação
+                // Preparação dos dados
                 const c = { p: {}, n: {}, s: {} };
                 data.forEach(d => {
                     c.p[d.pel] = (c.p[d.pel] || 0) + 1;
@@ -504,17 +506,14 @@
                     if(d.sub) c.s[`${d.nat}___${d.sub}`] = (c.s[`${d.nat}___${d.sub}`] || 0) + 1;
                 });
 
-                // Helper Sort
                 const sort = o => Object.entries(o).sort((a,b) => b[1] - a[1]);
-                
-                // Dados prontos
-                const pD = sort(c.p);
-                const nD = sort(c.n);
-                const sD = sort(c.s).filter(x => x[1] >= 1);
+                const pData = sort(c.p);
+                const nData = sort(c.n);
+                const sData = sort(c.s).filter(x => x[1] >= 1);
 
-                this.drawChart('chartPelotoes', 'p', pD);
-                this.drawChart('chartNatureza', 'n', nD);
-                this.drawChart('chartSubgrupos', 's', sD);
+                this.drawChart('chartPelotoes', 'p', pData);
+                this.drawChart('chartNatureza', 'n', nData);
+                this.drawChart('chartSubgrupos', 's', sData);
             },
 
             drawChart: function(id, type, dataArr) {
@@ -539,13 +538,13 @@
 
                 const values = dataArr.map(x => x[1]);
                 
-                // Ajuste altura Subgrupos
+                // Altura Dinâmica
                 if(type === 's') {
                     const h = Math.max(500, values.length * 25);
                     document.getElementById('subgrupoContainer').style.height = h + 'px';
                 }
 
-                // Opções específicas para não travar
+                // Opções Robustas
                 this.charts[id] = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -570,7 +569,7 @@
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: false, // Performance
+                        animation: false,
                         layout: { padding: { right: 45 } },
                         plugins: {
                             legend: { display: false },
