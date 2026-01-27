@@ -115,14 +115,21 @@
 </div>
 
 <script>
-    // DADOS 27/01/2026 (BASEADO NO CSV)
+    // DADOS 27/01/2026 - ATUALIZADO
     const guarnicoesData = {
         "OFICIAL DE DIA": [
             { vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP RÂINIERE"}, {f: "MOT. DIA", n: "SD VEIGA"}], t: "24h" }
         ],
         "AÇORIANOS": [
-            { vtr: "ABT-1364", mil: [{f: "CMT (08-20h)", n: "1º SGT DELAVECHIA"}, {f: "CMT (20-08h)", n: "2º SGT KANOFRE"}, {f: "COV", n: "SD BOTTINI"}, {f: "LINHA", n: "SD PIRES"}], t: "24h" },
-            { vtr: "AT-0671/AEM-0582", mil: [{f: "COV", n: "SD VINICIU"}, t: "24h" } 
+            { vtr: "ABT-1364", mil: [
+                {f: "CMT (08-20h)", n: "1º SGT DELAVECHIA"}, 
+                {f: "CMT (20-08h)", n: "2º SGT KANOFRE"}, 
+                {f: "COV", n: "SD BOTTINI"}, 
+                {f: "LINHA (20-08h)", n: "SD PIRES"},
+                {f: "LINHA (20-08h)", n: "SD MEDEIROS"},
+                {f: "LINHA (20-08h)", n: "SD TEMP CORREA"}
+            ], t: "24h" },
+            { vtr: "AEM-0482", mil: [{f: "COV", n: "SD VINICIUS"}], t: "24h" } 
         ],
         "TERESÓPOLIS": [
             { vtr: "ABT-0594", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LINHA", n: "SD TEMP SPERLING"}], t: "24h" },
@@ -248,4 +255,3 @@
 </script>
 </body>
 </html>
-
