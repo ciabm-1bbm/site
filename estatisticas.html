@@ -24,7 +24,7 @@
                         'cb-green': '#10B981',
                         'insect-brown': '#D97706',
                         'olive-drab': '#556B2F', /* Verde Oliva Customizado */
-                        'olive-light': '#6B8E23'
+                        'moss-green': '#556B2F' /* Verde Musgo */
                     },
                     fontFamily: { 
                         sans: ['Inter', 'sans-serif'],
@@ -160,17 +160,17 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="glass-card p-4">
-                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">OCORRÊNCIAS POR PELOTÃO</h3>
                     <div class="relative h-[500px]"><canvas id="chartPelotoes"></canvas></div>
                 </div>
                 <div class="glass-card p-4">
-                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">RELATÓRIO POR TIPO DE OCORRÊNCIA</h3>
                     <div class="relative h-[500px]"><canvas id="chartNatureza"></canvas></div>
                 </div>
             </div>
 
             <div class="glass-card p-4 mb-6">
-                <h3 class="text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">Detalhamento dos Subgrupos (>= 1 Ocorrência)</h3>
+                <h3 class="text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">POR SUBGRUPO</h3>
                 <div id="subgrupoContainer" class="relative" style="height: 600px;"><canvas id="chartSubgrupos"></canvas></div>
             </div>
 
@@ -178,7 +178,7 @@
                 <div class="p-4 bg-black/30 border-b border-white/10">
                     <h3 class="text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
-                        <select id="filterNatureza" class="filter-select"><option value="">Todas as Naturezas</option></select>
+                        <select id="filterNatureza" class="filter-select"><option value="">Todos Tipos de Ocorrências</option></select>
                         <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
                         <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
                         <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
@@ -197,12 +197,12 @@
                             <tr>
                                 <th class="p-3 text-center w-12 border-b border-gray-700">#</th>
                                 <th class="p-3 border-b border-gray-700">Data</th>
-                                <th class="p-3 border-b border-gray-700">Natureza</th>
+                                <th class="p-3 border-b border-gray-700">TIPO DE OCORRÊNCIA</th>
                                 <th class="p-3 border-b border-gray-700">Subgrupo</th>
                                 <th class="p-3 border-b border-gray-700">Bairro</th>
                                 <th class="p-3 border-b border-gray-700">Pelotão</th>
-                                <th class="p-3 text-center border-b border-gray-700">Map</th>
-                                <th class="p-3 text-right border-b border-gray-700">ID</th>
+                                <th class="p-3 text-center border-b border-gray-700">LOCALIZAÇÃO</th>
+                                <th class="p-3 text-right border-b border-gray-700">BA no E-193</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaBody" class="text-sm text-gray-300 font-mono"></tbody>
@@ -211,7 +211,9 @@
             </div>
         </div>
 
-        <div class="h-10"></div>
+        <footer class="text-center py-6 text-gray-500 text-xs font-mono border-t border-white/5 mt-auto">
+            &copy; 2026 Companhia de Bombeiro Militar - 1º BBM. Desenvolvido por Gustavo Medeiros.
+        </footer>
     </div>
 
     <script>
@@ -224,7 +226,7 @@
         // --- MAPA DE ESTILOS (CORES/ÍCONES) ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
+            "MANEJO DE INSETOS": { color: "#556B2F", icon: "🐝", cssClass: "text-moss-green" }, // Verde Musgo Atualizado
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
@@ -319,7 +321,6 @@
             
             // Highlight no botão anual
             const btnAnual = document.getElementById('btnAnual');
-            // Animação leve para feedback
             btnAnual.classList.add('scale-105', 'border-white');
 
             updateProgress(0, "Iniciando Análise Anual...");
@@ -609,7 +610,6 @@
                 if(lat && lon) {
                     lat = String(lat).replace(',', '.');
                     lon = String(lon).replace(',', '.');
-                    // *** CORREÇÃO: LINK PADRÃO GOOGLE MAPS ***
                     mapsBtn = `<a href="https://www.google.com/maps?q=${lat},${lon}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
                 }
 
