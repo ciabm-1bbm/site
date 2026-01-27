@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESTATÍSTICAS DE OCORRÊNCIAS</title>
+    <title>ESTATÍSTICAS DE OCORRÊNCIAS - 1º BBM (2025)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -22,7 +22,7 @@
                         'bombeiros-orange': '#F97316',
                         'dark-bg': '#0f172a',
                         'cb-green': '#10B981',
-                        'insect-brown': '#8B4513'
+                        'insect-brown': '#D97706'
                     },
                     fontFamily: { 
                         sans: ['Inter', 'sans-serif'],
@@ -36,11 +36,10 @@
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        /* Otimização de GPU para background */
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
         .hero-bg::before {
-            content: ''; position: absolute; 
-            top: 380px; /* Empurrado mais para baixo por causa do botão Anual */
-            left: 10%; right: 10%; bottom: 0;
+            content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
             background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
         }
@@ -56,6 +55,7 @@
             backdrop-filter: blur(10px);
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            /* Otimização de renderização */
             contain: content; 
         }
 
@@ -66,17 +66,6 @@
             border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.05);
         }
 
-        /* Botão Anual Centralizado */
-        .btn-anual { transition: all 0.2s ease-in-out; border: 1px solid rgba(253, 224, 71, 0.3); color: #fef08a; width: 100%; max-width: 300px; }
-        .btn-anual:hover { background: rgba(253, 224, 71, 0.1); border-color: #FACC15; }
-        .btn-anual.active {
-            background: linear-gradient(45deg, #CA8A04, #EAB308);
-            color: white;
-            border-color: #FEF08A;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
-            transform: scale(1.05);
-        }
-
         #progressContainer { transition: opacity 0.3s; }
         .progress-bar-striped {
             background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
@@ -85,7 +74,8 @@
         }
         @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
-        .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; -webkit-overflow-scrolling: touch; }
+        /* Scroll Otimizado */
+        .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
@@ -98,9 +88,6 @@
             outline: none; transition: border-color 0.2s;
         }
         .filter-select:focus { border-color: #F97316; }
-
-        canvas { width: 100% !important; height: 100% !important; }
-        .chart-container-fix { position: relative; width: 100%; min-height: 300px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -110,19 +97,19 @@
     <div class="container mx-auto px-4 py-6 relative z-10 flex-grow">
         
         <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6 glass-card p-6">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 drop-shadow-lg opacity-90">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 drop-shadow-lg opacity-90">
             
             <div class="text-center flex-1">
-                <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
                     ESTATÍSTICAS DE OCORRÊNCIAS
                 </h1>
-                <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">
-                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
+                <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
+                    1º BBM (<span id="anoTitulo">2025</span>)
                 </h2>
-                <div class="mt-2 text-xs md:text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Selecione um mês.</div>
+                <div class="mt-2 text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Aguardando seleção.</div>
             </div>
 
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 drop-shadow-lg opacity-90">
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 drop-shadow-lg opacity-90">
         </header>
 
         <div id="progressContainer" class="hidden mb-6 glass-card p-4">
@@ -136,55 +123,44 @@
         </div>
 
         <div class="glass-card p-4 mb-6">
-            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="mesesContainer"></div>
-            <div class="flex justify-center border-t border-white/10 pt-4">
-                <button id="btnAnual" class="btn-anual bg-yellow-900/20 text-yellow-100 py-3 px-6 rounded-lg text-sm font-bold uppercase tracking-wider border border-yellow-600/30">
-                    ANUAL 2025
-                </button>
-            </div>
+            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2" id="mesesContainer"></div>
         </div>
 
         <div id="dashboardArea" class="hidden opacity-0 transition-opacity duration-700">
             
             <div class="flex justify-center mb-8">
-                <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-6 md:px-10 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md w-full md:w-auto">
+                <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-10 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md">
                     <p class="text-xs uppercase font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS ATENDIDAS</p>
-                    <p class="text-4xl md:text-5xl font-black text-white drop-shadow-md" id="totalDisplay">0</p>
+                    <p class="text-5xl font-black text-white drop-shadow-md" id="totalDisplay">0</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="glass-card p-4">
-                    <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
-                    <div class="chart-container-fix h-[300px] md:h-[500px]">
-                        <canvas id="chartPelotoes"></canvas>
-                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
+                    <div class="relative h-[500px]"><canvas id="chartPelotoes"></canvas></div>
                 </div>
                 <div class="glass-card p-4">
-                    <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
-                    <div class="chart-container-fix h-[300px] md:h-[500px]">
-                        <canvas id="chartNatureza"></canvas>
-                    </div>
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
+                    <div class="relative h-[500px]"><canvas id="chartNatureza"></canvas></div>
                 </div>
             </div>
 
             <div class="glass-card p-4 mb-6">
-                <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">Detalhamento dos Subgrupos (>= 1 Ocorrência)</h3>
-                <div id="subgrupoContainer" class="chart-container-fix relative" style="height: 400px; min-height: 400px;">
-                    <canvas id="chartSubgrupos"></canvas>
-                </div>
+                <h3 class="text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">Detalhamento dos Subgrupos (>= 1 Ocorrência)</h3>
+                <div id="subgrupoContainer" class="relative" style="height: 600px;"><canvas id="chartSubgrupos"></canvas></div>
             </div>
 
             <div class="glass-card p-1 overflow-hidden">
                 <div class="p-4 bg-black/30 border-b border-white/10">
-                    <h3 class="text-sm md:text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
+                    <h3 class="text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
                         <select id="filterNatureza" class="filter-select"><option value="">Todas as Naturezas</option></select>
                         <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
                         <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
                         <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
-                        <button onclick="resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center text-sm">
-                            <i class="fas fa-undo mr-2"></i> Limpar
+                        <button onclick="resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center">
+                            <i class="fas fa-undo mr-2"></i> Limpar Filtros
                         </button>
                     </div>
                     <div class="flex justify-between items-center mt-2">
@@ -215,10 +191,6 @@
         <div class="h-10"></div>
     </div>
 
-    <footer class="w-full text-center py-6 text-gray-500 text-xs border-t border-white/5 mt-auto bg-black/20 backdrop-blur-sm">
-        <p>© Companhia de Bombeiro Militar do 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
-    </footer>
-
     <script>
         // ================= CONFIGURAÇÕES GLOBAIS =================
         const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
@@ -226,10 +198,10 @@
         
         Chart.register(ChartDataLabels);
 
-        // --- MAPA DE ESTILOS ---
+        // --- MAPA DE ESTILOS (CORES/ÍCONES) ---
         const naturezasStyle = {
             "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { color: "#8B4513", icon: "🐝", cssClass: "text-brown-custom" }, 
+            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
             "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
             "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
             "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
@@ -238,12 +210,6 @@
             "PRODUTOS PERIGOSOS": { color: "#FFFFFF", icon: "☢️", cssClass: "text-white" },
             "OUTROS": { color: "#64748B", icon: "⚠️", cssClass: "text-bombeiros-orange" }
         };
-
-        // LISTA DOS PELOTÕES DE POA PARA DESTAQUE
-        const poaPlatoons = [
-            "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", 
-            "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"
-        ];
 
         const meses = [
             { id: 'JAN', nome: 'JANEIRO' }, { id: 'FEV', nome: 'FEVEREIRO' },
@@ -261,7 +227,6 @@
         // ================= INICIALIZAÇÃO =================
         document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('mesesContainer');
-            
             meses.forEach(m => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
@@ -270,17 +235,13 @@
                 container.appendChild(btn);
             });
 
-            // Botão Anual
-            const btnAnual = document.getElementById('btnAnual');
-            btnAnual.onclick = () => carregarAnual(btnAnual);
-
-            // Listeners Filtros
+            // Listeners para filtros
             ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
                 document.getElementById(id).addEventListener('change', aplicarFiltros);
             });
         });
 
-        // ================= PROGRESSO & LÓGICA =================
+        // ================= PROGRESS BAR & DOWNLOAD =================
         function updateProgress(percent, text) {
             const bar = document.getElementById('progressBar');
             const txt = document.getElementById('progressText');
@@ -293,111 +254,111 @@
             per.innerText = Math.floor(percent) + '%';
 
             if (percent >= 100) {
-                setTimeout(() => { container.classList.add('hidden'); bar.style.width = '0%'; }, 1500);
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                    bar.style.width = '0%'; 
+                }, 1500);
             }
-        }
-
-        async function carregarAnual(btnElement) {
-            mesSelecionadoNome = "ANUAL 2025";
-            resetBtnUI();
-            btnElement.classList.add('active');
-            startLoadingEffect();
-
-            let dadosCombinados = [];
-            const promises = meses.map(async (m) => {
-                const url = `${GITHUB_BASE_URL}/dados/${m.id}_${ANO_ATUAL}.csv`;
-                try {
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        const text = await response.text();
-                        return new Promise(resolve => {
-                            Papa.parse(text, {
-                                header: true, skipEmptyLines: true, encoding: "UTF-8",
-                                complete: (res) => resolve(res.data)
-                            });
-                        });
-                    }
-                } catch (e) {}
-                return [];
-            });
-
-            updateProgress(30, "Baixando dados...");
-            const results = await Promise.all(promises);
-            results.forEach(d => { if(d && d.length) dadosCombinados = dadosCombinados.concat(d); });
-
-            updateProgress(90, "Processando Anual...");
-            setTimeout(() => finalizeData(dadosCombinados), 100);
         }
 
         async function iniciarProcesso(mesId, mesNome, btnElement) {
             mesSelecionadoNome = mesNome;
-            resetBtnUI();
+
+            // UI Feedback
+            document.querySelectorAll('.btn-mes').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+            });
             btnElement.classList.add('active');
-            startLoadingEffect();
+            
+            // Oculta dashboard para recarregar
+            const dashboard = document.getElementById('dashboardArea');
+            dashboard.classList.add('hidden');
+            dashboard.classList.remove('opacity-100');
+            dashboard.classList.add('opacity-0');
 
             try {
                 updateProgress(10, `Conectando...`);
                 const url = `${GITHUB_BASE_URL}/dados/${mesId}_${ANO_ATUAL}.csv`;
+                
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`Arquivo não encontrado`);
+                if (!response.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+
+                updateProgress(40, "Baixando dados...");
                 const csvText = await response.text();
                 
-                Papa.parse(csvText, {
-                    header: true, skipEmptyLines: true, encoding: "UTF-8",
-                    complete: (results) => finalizeData(results.data)
-                });
+                updateProgress(60, "Processando CSV...");
+
+                // Pequeno delay para a UI atualizar a barra antes de travar no processamento
+                setTimeout(() => {
+                    parseAndRender(csvText);
+                }, 50);
+
             } catch (error) {
-                updateProgress(0, "Erro");
-                alert("Erro ao carregar: " + error.message);
+                console.error(error);
+                updateProgress(0, "Erro fatal.");
+                document.getElementById('statusMsg').innerHTML = `<span class="text-red-500">Erro: ${error.message}</span>`;
+                alert(error.message);
             }
         }
 
-        function resetBtnUI() {
-            document.querySelectorAll('button').forEach(b => {
-                b.classList.remove('active');
-                b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+        function parseAndRender(csvText) {
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                encoding: "UTF-8",
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        updateProgress(80, "Organizando...");
+                        
+                        setTimeout(() => {
+                            try {
+                                processarDadosOtimizado(results.data);
+                                updateProgress(100, "Concluído!");
+                                
+                                const dashboard = document.getElementById('dashboardArea');
+                                dashboard.classList.remove('hidden');
+                                // Animação de entrada suave
+                                requestAnimationFrame(() => {
+                                    dashboard.classList.remove('opacity-0');
+                                    dashboard.classList.add('opacity-100');
+                                });
+                                document.getElementById('statusMsg').innerText = "Dados carregados com sucesso.";
+                            } catch (e) {
+                                alert("Erro no processamento: " + e.message);
+                            }
+                        }, 50);
+                    } else {
+                        alert("Arquivo vazio.");
+                    }
+                }
             });
         }
 
-        function startLoadingEffect() {
-            const d = document.getElementById('dashboardArea');
-            d.classList.add('hidden'); d.classList.remove('opacity-100'); d.classList.add('opacity-0');
-        }
-
-        function finalizeData(data) {
-            if (data && data.length > 0) {
-                processarDadosOtimizado(data);
-                updateProgress(100, "Concluído!");
-                const d = document.getElementById('dashboardArea');
-                d.classList.remove('hidden');
-                requestAnimationFrame(() => { d.classList.remove('opacity-0'); d.classList.add('opacity-100'); });
-                document.getElementById('statusMsg').innerText = "Dados carregados.";
-            } else {
-                alert("Arquivo vazio.");
-            }
-        }
-
-        // ================= PROCESSAMENTO =================
+        // ================= PROCESSAMENTO (OTIMIZADO) =================
         function processarDadosOtimizado(data) {
             dadosGlobais = [];
+
+            // Detecta colunas
             const chaves = Object.keys(data[0]);
             const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
             const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
             const colSub = chaves.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i) || k.match(/tipo/i));
             const colVtr = chaves.find(k => k.match(/Viatura/i) || k.match(/Prefixo/i));
 
-            if (!colNat || !colObm) return;
+            if (!colNat || !colObm) throw new Error("Colunas obrigatórias não encontradas.");
 
             let total = 0;
 
-            data.forEach((row) => {
+            // Loop de Processamento (1 Passada)
+            data.forEach((row, index) => {
                 total++;
                 const obmValor = row[colObm];
                 const natValor = row[colNat];
                 const vtrValor = colVtr ? (row[colVtr] || "") : "";
                 let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
                 
-                // Lógica Pelotões
+                // --- REGRA DE PELOTÕES ---
                 let pel = "INDEFINIDO";
                 const s = obmValor ? String(obmValor).toUpperCase() : "";
                 const v = String(vtrValor).toUpperCase();
@@ -423,9 +384,10 @@
                     if(pel === "") pel = "OUTROS";
                 }
 
-                // Lógica Natureza
+                // --- REGRA DE NATUREZA ---
                 let nat = "OUTROS";
                 let nRaw = natValor ? String(natValor).toUpperCase() : "N/A";
+                
                 if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                 else if(nRaw.includes("INCÊNDIO") || nRaw.includes("INCENDIO")) nat = "INCÊNDIO";
                 else if(nRaw.includes("SALVAMENTO") || nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
@@ -434,7 +396,9 @@
                 else if(nRaw.includes("APH") || nRaw.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
                 else if(nRaw.includes("PERIGOSO") || nRaw.includes("HAZMAT")) nat = "PRODUTOS PERIGOSOS";
                 else if(nRaw.includes("VISTORIA") && nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-                else nat = nRaw.trim(); 
+                else {
+                    nat = nRaw.trim(); 
+                }
 
                 if (!subValor || subValor === "N/A") subValor = "";
                 else subValor = subValor.trim();
@@ -442,7 +406,8 @@
                 dadosGlobais.push({
                     id: row['Nº Oc.'] || row['ID'] || total,
                     data: row['Data'] || row['DATA'] || '--',
-                    nat: nat, sub: subValor,
+                    nat: nat,
+                    sub: subValor,
                     bairro: (row['Bairro'] || row['BAIRRO'] || '--').toUpperCase(),
                     pel: pel,
                     lat: row['Latitude'] || row['LATITUDE'],
@@ -451,187 +416,277 @@
             });
 
             popularFiltros();
+            // Chama a função de renderização única
             requestAnimationFrame(() => renderizarTabelaEGraficos(dadosGlobais));
         }
 
+        // --- FILTROS ---
         function popularFiltros() {
-            const sets = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
+            const naturezas = new Set();
+            const subgrupos = new Set();
+            const bairros = new Set();
+            const pelotoes = new Set();
+
             dadosGlobais.forEach(d => {
-                sets.n.add(d.nat); sets.s.add(d.sub);
-                if(d.bairro !== '--') sets.b.add(d.bairro);
-                sets.p.add(d.pel);
+                if(d.nat) naturezas.add(d.nat);
+                if(d.sub) subgrupos.add(d.sub);
+                if(d.bairro && d.bairro !== '--') bairros.add(d.bairro);
+                if(d.pel) pelotoes.add(d.pel);
             });
-            const fill = (id, set) => {
-                const el = document.getElementById(id);
-                el.innerHTML = el.options[0].outerHTML;
-                Array.from(set).sort().forEach(v => el.add(new Option(v, v)));
+
+            const fillSelect = (id, set) => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = sel.options[0].outerHTML; 
+                Array.from(set).sort().forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerText = val;
+                    sel.appendChild(opt);
+                });
             };
-            fill('filterNatureza', sets.n); fill('filterSubgrupo', sets.s);
-            fill('filterBairro', sets.b); fill('filterPelotao', sets.p);
+
+            fillSelect('filterNatureza', naturezas);
+            fillSelect('filterSubgrupo', subgrupos);
+            fillSelect('filterBairro', bairros);
+            fillSelect('filterPelotao', pelotoes);
         }
 
         function aplicarFiltros() {
-            const vals = {
-                n: document.getElementById('filterNatureza').value,
-                s: document.getElementById('filterSubgrupo').value,
-                b: document.getElementById('filterBairro').value,
-                p: document.getElementById('filterPelotao').value
-            };
-            const fil = dadosGlobais.filter(d => 
-                (vals.n===""||d.nat===vals.n) && (vals.s===""||d.sub===vals.s) &&
-                (vals.b===""||d.bairro===vals.b) && (vals.p===""||d.pel===vals.p)
-            );
-            renderizarTabelaEGraficos(fil, true);
+            const fNat = document.getElementById('filterNatureza').value;
+            const fSub = document.getElementById('filterSubgrupo').value;
+            const fBai = document.getElementById('filterBairro').value;
+            const fPel = document.getElementById('filterPelotao').value;
+
+            const dadosFiltrados = dadosGlobais.filter(d => {
+                return (fNat === "" || d.nat === fNat) &&
+                       (fSub === "" || d.sub === fSub) &&
+                       (fBai === "" || d.bairro === fBai) &&
+                       (fPel === "" || d.pel === fPel);
+            });
+
+            renderizarTabelaEGraficos(dadosFiltrados, true);
         }
 
         function resetFilters() {
-            document.querySelectorAll('select').forEach(s => s.value = "");
+            document.getElementById('filterNatureza').value = "";
+            document.getElementById('filterSubgrupo').value = "";
+            document.getElementById('filterBairro').value = "";
+            document.getElementById('filterPelotao').value = "";
             renderizarTabelaEGraficos(dadosGlobais);
         }
 
+        // --- RENDERIZAÇÃO (SINGLE PASS) ---
         function renderizarTabelaEGraficos(dados, isFiltrado = false) {
             const total = dados.length;
             const totalGlobal = dadosGlobais.length;
             
-            // FORMATAÇÃO DE NÚMEROS (Ponto no milhar)
-            document.getElementById('totalDisplay').innerText = total.toLocaleString('pt-BR');
+            document.getElementById('totalDisplay').innerText = total;
+            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${mesSelecionadoNome} ${ANO_ATUAL}`;
             
-            let labelTitulo = "";
-            if (mesSelecionadoNome === 'ANUAL 2025') {
-                labelTitulo = "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025";
-            } else {
-                labelTitulo = `TOTAL DE OCORRÊNCIAS ATENDIDAS EM ${mesSelecionadoNome} ${ANO_ATUAL}`;
-            }
-            document.getElementById('tituloTotalLabel').innerText = labelTitulo;
-            
-            const txtLinhas = isFiltrado ? `${total.toLocaleString('pt-BR')} (Filtrado de ${totalGlobal.toLocaleString('pt-BR')})` : total.toLocaleString('pt-BR');
-            document.getElementById('totalLista').innerText = txtLinhas;
+            const textoLinhas = isFiltrado ? `${total} (Filtrado de ${totalGlobal})` : total;
+            document.getElementById('totalLista').innerText = textoLinhas;
 
-            const counts = { p: {}, n: {}, s: {} };
-            let html = "";
+            // Agregadores para os gráficos
+            const countPelotao = {};
+            const countNatureza = {};
+            const countSubgrupo = {}; 
 
-            dados.forEach((d, i) => {
-                counts.p[d.pel] = (counts.p[d.pel] || 0) + 1;
-                counts.n[d.nat] = (counts.n[d.nat] || 0) + 1;
-                if(d.sub) counts.s[`${d.nat}___${d.sub}`] = (counts.s[`${d.nat}___${d.sub}`] || 0) + 1;
+            let tableRowsHTML = "";
 
-                const style = naturezasStyle[d.nat] || { color: "#94A3B8", icon: "📄", cssClass: "text-slate-400" };
+            dados.forEach((d, index) => {
+                // Agregar dados (sem loop extra)
+                countPelotao[d.pel] = (countPelotao[d.pel] || 0) + 1;
+                countNatureza[d.nat] = (countNatureza[d.nat] || 0) + 1;
                 
-                // GOOGLE MAPS FIX
-                let mapBtn = `<span class="text-gray-600 opacity-30 cursor-not-allowed"><i class="fas fa-map-marker-slash"></i></span>`;
-                if(d.lat && d.lon) {
-                    const cleanLat = String(d.lat).replace(',', '.').trim();
-                    const cleanLon = String(d.lon).replace(',', '.').trim();
-                    const url = `https://www.google.com/maps/search/?api=1&query=${cleanLat},${cleanLon}`;
-                    mapBtn = `<a href="${url}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
+                if (d.sub) {
+                    let subKey = `${d.nat}___${d.sub}`; 
+                    countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
                 }
 
-                html += `
+                // Construção HTML
+                const style = naturezasStyle[d.nat] || { color: "#94A3B8", icon: "📄", cssClass: "text-slate-400" };
+                
+                let lat = d.lat;
+                let lon = d.lon;
+                let mapsBtn = `<span class="text-gray-600 cursor-not-allowed text-center block opacity-30"><i class="fas fa-map-marker-slash"></i></span>`;
+                
+                if(lat && lon) {
+                    lat = String(lat).replace(',', '.');
+                    lon = String(lon).replace(',', '.');
+                    mapsBtn = `<a href="https://www.google.com/maps/search/?api=1&query=$${lat},${lon}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
+                }
+
+                tableRowsHTML += `
                     <tr class="hover:bg-white/5 border-b border-gray-800/50 transition-colors odd:bg-white/5 even:bg-transparent">
-                        <td class="p-3 text-center font-bold text-gray-500 text-xs font-mono">${i + 1}</td>
+                        <td class="p-3 text-center font-bold text-gray-500 text-xs font-mono">${index + 1}</td>
                         <td class="p-3 font-mono text-gray-400 whitespace-nowrap text-xs">${d.data}</td>
                         <td class="p-3 font-bold ${style.cssClass} text-xs whitespace-nowrap font-mono"><span class="mr-2">${style.icon}</span>${d.nat}</td>
                         <td class="p-3 text-xs text-blue-200/80 font-mono">${d.sub}</td>
                         <td class="p-3 uppercase text-xs tracking-wider text-gray-400 font-mono">${d.bairro}</td>
                         <td class="p-3"><span class="text-fire-yellow font-bold text-xs whitespace-nowrap font-mono">${d.pel}</span></td>
-                        <td class="p-3 text-center">${mapBtn}</td>
+                        <td class="p-3">${mapsBtn}</td>
                         <td class="p-3 text-right font-mono opacity-30 text-xs">#${d.id}</td>
                     </tr>
                 `;
             });
 
-            document.getElementById('tabelaBody').innerHTML = html;
-            if (total > 0) requestAnimationFrame(() => prepararGraficos(counts));
+            // Atualiza Tabela
+            document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
+
+            // Atualiza Gráficos (somente se houver dados)
+            if (total > 0) {
+                // RequestAnimationFrame para não travar a UI enquanto renderiza os gráficos
+                requestAnimationFrame(() => prepararGraficos(countPelotao, countNatureza, countSubgrupo));
+            }
         }
 
-        function prepararGraficos(counts) {
-            const sort = (obj) => Object.entries(obj).sort((a,b) => b[1] - a[1]);
-            const pSorted = sort(counts.p);
-            const nSorted = sort(counts.n);
-            const sSorted = Object.entries(counts.s).filter(x => x[1] >= 1).sort((a,b) => b[1] - a[1]);
-
-            // CORES E FONTES PELOTÕES
-            const pColors = pSorted.map(x => poaPlatoons.includes(x[0]) ? '#10B981' : '#64748B'); // Verde vs Cinza
+        function prepararGraficos(countPelotao, countNatureza, countSubgrupo) {
+            const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
+            const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
             
-            // Labels Natureza
-            const nLabels = nSorted.map(x => {
-                const s = naturezasStyle[x[0]] || { color: "#94A3B8", icon: "📄" };
-                return x[0] === "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO" ? [`${s.icon} VISTORIA DE SEGURANÇA`, "CONTRA INCÊNDIO"] : `${s.icon} ${x[0]}`;
-            });
-            const nColors = nSorted.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
+            const sortedSubgrupo = Object.entries(countSubgrupo)
+                .filter(([key, count]) => count >= 1)
+                .sort((a,b) => b[1] - a[1]);
 
-            // Subgrupos
-            const sLabels = sSorted.map(x => {
-                const [p, s] = x[0].split('___');
-                const st = naturezasStyle[p] || { color: "#94A3B8", icon: "📄" };
-                return `${st.icon} ${p} [${s}]`;
+            // Cores Pelotão
+            const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
+            const pelotoesColors = sortedPelotao.map(([nome, val]) => {
+                const intensity = 0.3 + (0.7 * (val / maxVal)); 
+                return `rgba(77, 124, 15, ${intensity})`; 
             });
-            const sColors = sSorted.map(x => {
-                const [p] = x[0].split('___');
-                return (naturezasStyle[p] || { color: "#94A3B8" }).color;
+
+            // Labels Natureza (Com quebra de linha para Vistoria)
+            const natLabels = sortedNatureza.map(x => {
+                const name = x[0];
+                const style = naturezasStyle[name] || { color: "#94A3B8", icon: "📄" };
+                if (name === "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO") {
+                    return [`${style.icon} VISTORIA DE SEGURANÇA`, "CONTRA INCÊNDIO"];
+                }
+                return `${style.icon} ${name}`;
+            });
+            const natColors = sortedNatureza.map(x => (naturezasStyle[x[0]] || { color: "#94A3B8" }).color);
+
+            // Labels Subgrupos
+            const subLabels = sortedSubgrupo.map(item => {
+                const [natPai, subNome] = item[0].split('___');
+                const style = naturezasStyle[natPai] || { color: "#94A3B8", icon: "📄" };
+                return `${style.icon} ${natPai} [${subNome}]`;
+            });
+            const subColors = sortedSubgrupo.map(item => {
+                const natPai = item[0].split('___')[0];
+                return (naturezasStyle[natPai] || { color: "#94A3B8" }).color;
             });
 
             renderizarGraficos({
-                p: { l: pSorted.map(x=>x[0]), d: pSorted.map(x=>x[1]), c: pColors },
-                n: { l: nLabels, d: nSorted.map(x=>x[1]), c: nColors },
-                s: { l: sLabels, d: sSorted.map(x=>x[1]), c: sColors }
+                pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]), colors: pelotoesColors },
+                natureza: { labels: natLabels, data: sortedNatureza.map(x=>x[1]), colors: natColors },
+                subgrupos: { labels: subLabels, data: sortedSubgrupo.map(x=>x[1]), colors: subColors }
             });
         }
 
-        function renderizarGraficos(d) {
+        function renderizarGraficos(dados) {
+            // Fonte Mono nos Gráficos
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
             Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
 
-            const opts = {
-                indexAxis: 'y', responsive: true, maintainAspectRatio: false, resizeDelay: 200, animation: { duration: 500 },
+            const commonOptions = {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 0 }, // Zero animação para performance máxima
                 layout: { padding: { right: 40 } },
                 plugins: { 
                     legend: { display: false },
-                    datalabels: { color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4, font: { weight: 'bold', size: 11 }, formatter: (v) => v.toLocaleString('pt-BR') },
-                    tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)' }
+                    datalabels: {
+                        color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: Math.round
+                    },
+                    tooltip: {
+                        enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1
+                    }
                 },
-                scales: { x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } }, y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } }
+                scales: { 
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
+                    y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
+                }
             };
 
+            // Destruição segura
             if(chartP) chartP.destroy();
             if(chartN) chartN.destroy();
             if(chartS) chartS.destroy();
 
-            // GRÁFICO PELOTÕES (Fonte Dinâmica)
-            const pOpts = JSON.parse(JSON.stringify(opts));
-            pOpts.scales.y.ticks.font = (ctx) => {
-                const label = chartP.data.labels[ctx.index];
-                const isPOA = poaPlatoons.includes(label);
-                return { size: isPOA ? 16 : 11, weight: 'bold', family: 'monospace' }; // Dobro visualmente
-            };
-            pOpts.scales.y.ticks.color = (ctx) => {
-                const label = chartP.data.labels[ctx.index];
-                return poaPlatoons.includes(label) ? '#10B981' : '#64748B';
-            };
-
+            // 1. Pelotões
             chartP = new Chart(document.getElementById('chartPelotoes'), {
-                type: 'bar', data: { labels: d.p.l, datasets: [{ data: d.p.d, backgroundColor: d.p.c, borderRadius: 3, barPercentage: 0.7 }] },
-                options: pOpts
+                type: 'bar',
+                data: {
+                    labels: dados.pelotoes.labels,
+                    datasets: [{
+                        data: dados.pelotoes.data,
+                        backgroundColor: dados.pelotoes.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: commonOptions
             });
 
-            // GRÁFICO NATUREZA (Cores no Eixo)
-            const nOpts = JSON.parse(JSON.stringify(opts));
-            nOpts.scales.y.ticks.color = d.n.c;
+            // 2. Natureza
             chartN = new Chart(document.getElementById('chartNatureza'), {
-                type: 'bar', data: { labels: d.n.l, datasets: [{ data: d.n.d, backgroundColor: d.n.c, borderRadius: 3, barPercentage: 0.7 }] },
-                options: nOpts
+                type: 'bar',
+                data: {
+                    labels: dados.natureza.labels,
+                    datasets: [{
+                        data: dados.natureza.data,
+                        backgroundColor: dados.natureza.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' }, autoSkip: false,
+                                color: dados.natureza.colors
+                            }
+                        }
+                    }
+                }
             });
 
-            // GRÁFICO SUBGRUPOS
+            // 3. Subgrupos
             const containerS = document.getElementById('subgrupoContainer');
-            if(d.s.l.length > 0) containerS.style.height = Math.max(600, d.s.l.length * 30) + 'px';
-            
-            const sOpts = JSON.parse(JSON.stringify(opts));
-            sOpts.scales.y.ticks.color = d.s.c;
+            if(dados.subgrupos.labels.length > 0) {
+                const height = Math.max(600, dados.subgrupos.labels.length * 30);
+                containerS.style.height = height + 'px';
+            }
+
             chartS = new Chart(document.getElementById('chartSubgrupos'), {
-                type: 'bar', data: { labels: d.s.l, datasets: [{ data: d.s.d, backgroundColor: d.s.c, borderRadius: 3, barPercentage: 0.7 }] },
-                options: sOpts
+                type: 'bar',
+                data: {
+                    labels: dados.subgrupos.labels,
+                    datasets: [{
+                        data: dados.subgrupos.data,
+                        backgroundColor: dados.subgrupos.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' }, autoSkip: false,
+                                color: dados.subgrupos.colors
+                            }
+                        }
+                    }
+                }
             });
         }
     </script>
