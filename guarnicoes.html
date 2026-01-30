@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Guarnições 1º BBM - 27/01/2026</title>
+    <title>Gestão de Guarnições 1º BBM - 30/01/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -78,7 +78,7 @@
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12">
             <div class="text-center">
                 <h1 class="text-lg md:text-xl font-black text-bombeiros-yellow italic uppercase">1º BBM - Porto Alegre</h1>
-                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escala Operacional - 27/01/2026</p>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Escala Operacional - 30/01/2026</p>
             </div>
             <img src="images/brasao_1BBM_PARA_site.png" class="h-12">
         </div>
@@ -88,7 +88,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6 relative z-50 shrink-0">
             <div class="lg:col-span-3 bg-fire-red/20 border-l-4 border-fire-red p-4 rounded-r-xl flex flex-col justify-center shadow-lg">
                 <span class="text-fire-red font-black text-[10px] uppercase tracking-widest">Prontidão</span>
-                <h2 class="text-xl font-black text-white leading-tight">Terça-feira, 27/01/2026</h2>
+                <h2 class="text-xl font-black text-white leading-tight">Sexta-feira, 30/01/2026</h2>
             </div>
 
             <div class="lg:col-span-6 bg-slate-800/90 p-4 rounded-xl border border-white/10 shadow-lg">
@@ -115,56 +115,71 @@
 </div>
 
 <script>
-    // DADOS 27/01/2026 - ATUALIZADO
+    // DADOS 30/01/2026 (BASEADO NO CSV)
     const guarnicoesData = {
         "OFICIAL DE DIA": [
-            { vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP RÂINIERE"}, {f: "MOT. DIA", n: "SD VEIGA"}], t: "24h" }
+            { vtr: "ATP-0640", mil: [{f: "SUPERVISOR", n: "CAP RIBEIRO"}, {f: "MOT. DIA", n: "SD COUTINHO"}], t: "24h" }
         ],
         "AÇORIANOS": [
             { vtr: "ABT-1364", mil: [
-                {f: "CMT (08-20h)", n: "1º SGT DELAVECHIA"}, 
-                {f: "CMT (20-08h)", n: "2º SGT KANOFRE"}, 
-                {f: "COV", n: "SD BOTTINI"}, 
-                {f: "LINHA (20-08h)", n: "SD PIRES"},
-                {f: "LINHA (20-08h)", n: "SD MEDEIROS"},
-                {f: "LINHA (20-08h)", n: "SD TEMP CORREA"}
+                {f: "CMT GU", n: "2º SGT KANOFRE"}, 
+                {f: "COV (08-20h)", n: "1º TEN PME PRADE"}, 
+                {f: "COV (20-08h)", n: "SD BOTTINI"},
+                {f: "LINHA", n: "SD TEMP CORREA"},
+                {f: "LINHA (08-16h)", n: "SD TEIXEIRA"}
             ], t: "24h" },
-            { vtr: "AEM-0482", mil: [{f: "COV", n: "SD VINICIUS"}], t: "24h" } 
+            { vtr: "AEM-0482", mil: [
+                {f: "CMT SOC (08-20h)", n: "1º TEN PME PRADE"},
+                {f: "CMT SOC (20-08h)", n: "SD BOTTINI"},
+                {f: "COV", n: "2º SGT PESSOTA"}
+            ], t: "24h" } 
         ],
         "TERESÓPOLIS": [
-            { vtr: "ABT-0594", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LINHA", n: "SD TEMP SPERLING"}], t: "24h" },
-            { vtr: "AR-1628", mil: [{f: "CMT GU", n: "SD DORNELES"}, {f: "COV (08-20h)", n: "SD SANTOS"}, {f: "COV (20-08h)", n: "SD ARAUJO"}], t: "24h" }
+            { vtr: "ABT-0594", mil: [{f: "CMT GU", n: "SD CASSIANO"}, {f: "COV", n: "SD DEIVID"}, {f: "LINHA", n: "SD TEMP CARDOSO"}], t: "24h" },
+            { vtr: "AR-1628", mil: [{f: "CMT GU", n: "SD ROSEANNE"}, {f: "COV (08-20h)", n: "SD SANTOS"}, {f: "COV (20-08h)", n: "SD ARAUJO"}], t: "24h" }
         ],
         "ASSUNÇÃO": [
-            { vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT LEANDRO"}, {f: "COV", n: "SD TEMP PINTO"}, {f: "LINHA", n: "SD DIEIQUE"}], t: "24h" }
+            { vtr: "ABT-0596", mil: [{f: "CMT GU", n: "2º SGT JUNIOR"}, {f: "COV", n: "SD TEMP PINTO"}, {f: "LINHA", n: "SD PORCELIS"}], t: "24h" }
         ],
         "FLORESTA": [
-            { vtr: "ABT-0597", mil: [{f: "CMT GU", n: "2º SGT SAUL"}, {f: "LINHA", n: "SD CAMPOS"}, {f: "COV", n: "SD TEMP DOTTA"}], t: "24h" }
+            { vtr: "ABT-0597", mil: [
+                {f: "CMT GU", n: "SD CAMPOS"}, 
+                {f: "COV (08-20h)", n: "SD TEMP DOTTA"}, 
+                {f: "COV (20-08h)", n: "SD SIQUEIRA"},
+                {f: "LINHA (08-20h)", n: "SD SIQUEIRA"},
+                {f: "LINHA (20-08h)", n: "SD KINGESKI"}
+            ], t: "24h" }
         ],
         "RESTINGA": [
             { vtr: "ABT-0598", mil: [{f: "CMT GU", n: "SD MARTINS"}, {f: "COV (08-20h)", n: "1º SGT RONALDO"}, {f: "COV (20-08h)", n: "SD CATELAN"}, {f: "LINHA", n: "SD TEMP VOLZ"}], t: "24h" }
         ],
         "BELÉM NOVO": [
-            { vtr: "ABT-0599", mil: [{f: "CMT GU", n: "SD WESTPHALEN"}, {f: "COV", n: "SD MARTINEZ"}, {f: "LINHA", n: "SD TEMP FILIPE"}], t: "24h" }
+            { vtr: "ABT-0599", mil: [
+                {f: "CMT (08-20h)", n: "SD DETONI"}, 
+                {f: "CMT (20-08h)", n: "2º SGT MENDES"},
+                {f: "LINHA (08-20h)", n: "SD COSME"},
+                {f: "LINHA (20-08h)", n: "SD DETONI"},
+                {f: "COV", n: "SD MARTINEZ"}
+            ], t: "24h" }
         ],
         "PASSO D'AREIA": [
-            { vtr: "ABT-1363", mil: [{f: "CMT GU", n: "SD THIAGO"}, {f: "COV", n: "SD ISMAEL"}, {f: "LINHA (08-20h)", n: "SD VOLKWEIS"}, {f: "LINHA (20-08h)", n: "SD EIDER"}], t: "24h" }
+            { vtr: "ABT-1363", mil: [{f: "CMT GU", n: "SD THIAGO"}, {f: "COV", n: "SD TEMP PAULINO"}, {f: "LINHA", n: "SD RAFAEL"}], t: "24h" }
         ],
         "PARTENON": [
-            { vtr: "ATP-1452", mil: [{f: "CMT GU", n: "1º SGT ARIAS"}, {f: "COV", n: "SD BRUNO EDUARDO"}, {f: "LINHA", n: "SD BATISTA"}, {f: "LINHA", n: "SD TEMP RENAN"}], t: "24h" }
+            { vtr: "ABT-1365", mil: [{f: "CMT GU", n: "SD BATISTA"}, {f: "COV", n: "2º SGT BECKER"}, {f: "LINHA", n: "SD TEMP RENAN"}, {f: "LINHA (08-20h)", n: "SD TEMP ZANETTI"}], t: "24h" }
         ],
         "CANIL / BBS": [
-            { vtr: "ABC-792", mil: [{f: "CINOTÉCNICO", n: "2º SGT FARIA"}, {f: "CINOTÉCNICO", n: "SD BRUNO"}], t: "24h" }
+            { vtr: "ABC-792", mil: [{f: "CINOTÉCNICO", n: "SD DE LIMA"}, {f: "CINOTÉCNICO", n: "SD EUGENIO"}], t: "24h" }
         ],
         "AQUÁTICA / BBS": [
-            { vtr: "EMBARCAÇÕES", mil: [{f: "CMT GU", n: "SD BICALHO"}, {f: "CONDUTOR", n: "SD ROBERTO"}, {f: "AUXILIAR", n: "SD CORREA"}], t: "24h" }
+            { vtr: "EMBARCAÇÕES", mil: [{f: "CONDUTOR", n: "SD DENIS"}, {f: "AUXILIAR", n: "SD CORREA"}, {f: "CMT (20-08h)", n: "SD BICALHO"}], t: "24h" }
         ],
         "MERGULHO / BBS": [
-            { vtr: "ATP-0555", mil: [{f: "SITUAÇÃO", n: "A CONFIRMAR"}], t: "12h" }
+            { vtr: "ATP-0555", mil: [{f: "CMT", n: "2º SGT ALVES"}, {f: "MERG", n: "SD DAMIEL"}, {f: "MERG", n: "SD LOURIVAL"}], t: "12h" }
         ],
         "COBOM - SALA DE OPERAÇÕES": [
-            { vtr: "CCOB", mil: [{f: "OP", n: "SD CHESINI"}], t: "24h" },
-            { vtr: "COBOM", mil: [{f: "OP", n: "2º SGT BRUNA"}, {f: "OP", n: "2º SGT BARBARA"}], t: "12h" }
+            { vtr: "CCOB", mil: [{f: "OP", n: "SD MUNHOZ"}], t: "24h" },
+            { vtr: "COBOM", mil: [{f: "OP", n: "1º SGT RIBEIRO"}, {f: "OP", n: "SD ALANA"}], t: "12h" }
         ]
     };
 
@@ -176,7 +191,7 @@
             v.mil.forEach(m => {
                 if (m.n !== "A CONFIRMAR") {
                     s.total++;
-                    if(m.n.includes("CAP")) s.cap.push(m.n);
+                    if(m.n.includes("CAP") || m.n.includes("TEN")) s.cap.push(m.n);
                     else if(m.n.includes("SGT")) s.sgt.push(m.n);
                     else s.sd.push(m.n);
                 }
@@ -185,7 +200,7 @@
         
         // COR DO TOTAL: LIME-400 (Verde Limão)
         document.getElementById('stats-militares').innerHTML = `
-            ${renderStat('CAP', s.cap.length, 'text-orange-500', s.cap)}
+            ${renderStat('OFICIAIS', s.cap.length, 'text-orange-500', s.cap)}
             ${renderStat('SGT', s.sgt.length, 'text-yellow-400', s.sgt)}
             ${renderStat('SD', s.sd.length, 'text-blue-400', s.sd)}
             ${renderStat('TOTAL', s.total, 'text-lime-400', ['Efetivo Total Escalado'])}
