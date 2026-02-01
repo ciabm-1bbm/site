@@ -3,302 +3,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planejador Operacional - 1º BBM</title>
+    <title>SISTEMA DE COMANDO - 1º BBM</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700' } } }
+            theme: { 
+                extend: { 
+                    colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } 
+                } 
+            }
         }
     </script>
+    
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass-panel { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; }
-        .day-card { background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; transition: 0.2s; }
+        /* ESTILOS GERAIS */
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* CARD DO DIA (EDITOR) */
+        .day-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            transition: 0.2s;
+        }
         .day-card:hover { border-color: #FFD700; transform: translateY(-2px); }
-        .role-label { font-size: 10px; font-weight: bold; color: #64748b; uppercase; letter-spacing: 1px; }
-        select { background: #1e293b; border: 1px solid #475569; color: white; width: 100%; font-size: 11px; padding: 4px; border-radius: 4px; }
-        select:disabled { opacity: 0.5; cursor: not-allowed; }
+        .role-label { font-size: 9px; font-weight: bold; color: #94a3b8; letter-spacing: 0.5px; margin-top: 4px; }
+        
+        select { 
+            background: #1e293b; border: 1px solid #475569; color: white; 
+            width: 100%; font-size: 11px; padding: 4px; border-radius: 4px; outline: none;
+        }
+        select:focus { border-color: #FFD700; }
+
+        /* TABELA DE IMPRESSÃO (ESCONDIDA NA TELA DE EDIÇÃO) */
+        .print-view { display: none; }
+
+        /* MODO DE IMPRESSÃO (REGRAS DO PAPEL) */
+        @media print {
+            @page { size: landscape; margin: 5mm; }
+            body { background: white; color: black; -webkit-print-color-adjust: exact; }
+            .no-print, header, .editor-view, #painel-status, #loader-overlay { display: none !important; }
+            .print-view { display: block !important; }
+            
+            table { width: 100%; border-collapse: collapse; font-size: 8pt; font-family: 'Arial', sans-serif; }
+            th, td { border: 1px solid black; padding: 2px; text-align: center; }
+            th.nome-col { text-align: left; width: 180px; padding-left: 5px; }
+            
+            .cell-24 { background: #ddd !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+            .cell-he { background: #aaa !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+            
+            .assinaturas { display: flex; justify-content: space-around; margin-top: 40px; page-break-inside: avoid; }
+            .assinatura-box { border-top: 1px solid black; width: 30%; text-align: center; padding-top: 5px; }
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen pb-20">
+<body class="flex flex-col min-h-screen">
 
-    <header class="bg-slate-900 border-b border-white/10 p-4 sticky top-0 z-50 shadow-xl">
-        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div id="loader-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center">
+        <i class="fas fa-fire-extinguisher text-5xl text-fire-red animate-bounce mb-4"></i>
+        <h2 class="text-xl font-bold text-white">CONECTANDO AO RH...</h2>
+        <p class="text-sm text-gray-400">Buscando efetivo na planilha mestre</p>
+    </div>
+
+    <header class="bg-slate-900 border-b border-white/10 p-4 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <i class="fas fa-fire-extinguisher text-fire-yellow text-2xl"></i>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg" class="h-10">
                 <div>
-                    <h1 class="font-black text-white leading-none">PLANEJADOR OPERACIONAL</h1>
-                    <h2 class="text-xs text-fire-yellow font-bold">1º BBM - GESTÃO DE ESCALAS</h2>
+                    <h1 class="font-black text-white text-lg leading-none">SISTEMA DE ESCALAS 1º BBM</h1>
+                    <h2 class="text-xs text-fire-yellow font-bold tracking-widest">PLANEJAMENTO & GESTÃO</h2>
                 </div>
             </div>
             
-            <div class="flex gap-2 w-full md:w-auto">
-                <select id="sel-pelotao" class="p-2 bg-slate-800 border-fire-red text-white font-bold rounded" onchange="resetarPlanner()">
-                    <option value="">SELECIONE O PELOTÃO...</option>
-                    <option value="AÇORIANOS">AÇORIANOS</option>
-                    <option value="FLORESTA">FLORESTA</option>
-                    <option value="ASSUNÇÃO">ASSUNÇÃO</option>
+            <div class="flex flex-wrap gap-2 items-center bg-slate-800 p-2 rounded-lg">
+                <select id="sel-pelotao" class="p-2 bg-slate-700 border border-slate-600 text-white font-bold rounded w-48" onchange="resetarPlanner()">
+                    <option value="">SELECIONE PELOTÃO...</option>
                     </select>
-                <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold transition flex items-center gap-2">
-                    <i class="fas fa-save"></i> SALVAR
+                
+                <div class="h-6 w-px bg-white/10 mx-2"></div>
+
+                <button onclick="alternarVisao('editor')" id="btn-editor" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-blue-500 transition shadow">
+                    <i class="fas fa-edit mr-1"></i> MONTAR
+                </button>
+                <button onclick="alternarVisao('print')" id="btn-print" class="bg-slate-600 text-gray-300 px-4 py-2 rounded text-xs font-bold hover:bg-slate-500 transition">
+                    <i class="fas fa-table mr-1"></i> VISUALIZAR
+                </button>
+
+                <div class="h-6 w-px bg-white/10 mx-2"></div>
+
+                <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-xs font-bold transition shadow-lg flex items-center gap-2">
+                    <i class="fas fa-save"></i> SALVAR NO DRIVE
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto p-4">
-        
-        <div id="painel-status" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
-            <div class="glass-panel p-4 border-l-4 border-blue-500">
-                <p class="text-xs text-blue-300 font-bold">EFETIVO TOTAL</p>
-                <p class="text-2xl font-black" id="stat-total">0</p>
+    <main class="container mx-auto p-4 flex-grow">
+
+        <div id="painel-status" class="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 hidden">
+            <div class="glass-panel p-3 border-l-4 border-blue-500">
+                <p class="text-[10px] text-blue-300 font-bold uppercase">Efetivo Disponível</p>
+                <p class="text-xl font-black" id="stat-total">0</p>
             </div>
-            <div class="glass-panel p-4 border-l-4 border-green-500">
-                <p class="text-xs text-green-300 font-bold">GUARNIÇÕES COMPLETAS</p>
-                <p class="text-2xl font-black" id="stat-guarnicoes">0</p>
+            <div class="glass-panel p-3 border-l-4 border-green-500">
+                <p class="text-[10px] text-green-300 font-bold uppercase">Dias Preenchidos</p>
+                <p class="text-xl font-black" id="stat-dias">0/31</p>
             </div>
-            <div class="glass-panel p-4 border-l-4 border-red-500">
-                <p class="text-xs text-red-300 font-bold">HORAS EXTRAS GERADAS</p>
-                <p class="text-2xl font-black" id="stat-he">R$ 0,00</p>
+             <div class="glass-panel p-3 border-l-4 border-yellow-500">
+                <p class="text-[10px] text-yellow-300 font-bold uppercase">Previsão Etapas</p>
+                <p class="text-xl font-black" id="stat-etapas">0</p>
+            </div>
+             <div class="glass-panel p-3 border-l-4 border-red-500">
+                <p class="text-[10px] text-red-300 font-bold uppercase">Gasto Extra (R$)</p>
+                <p class="text-xl font-black" id="stat-gse">R$ 0,00</p>
             </div>
         </div>
 
-        <div id="grid-dias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div class="text-center col-span-full py-20 text-gray-500">
-                Selecione um Pelotão para começar o planejamento.
+        <div id="view-editor" class="editor-view hidden">
+            <div id="grid-dias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+                </div>
+            <div id="msg-inicial" class="text-center py-20 text-gray-500">
+                <i class="fas fa-arrow-up text-2xl mb-2 animate-bounce"></i><br>
+                Selecione um Pelotão acima para começar.
+            </div>
+        </div>
+
+        <div id="view-print" class="print-view hidden bg-white text-black p-4 rounded shadow">
+            
+            <div class="text-center mb-4 border-b pb-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg" style="height:40px; margin:0 auto;">
+                <h3 class="font-bold text-sm mt-2">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h3>
+                <h4 class="font-bold text-xs">CORPO DE BOMBEIROS MILITAR - 1º BBM</h4>
+                <p id="titulo-impresso" class="mt-2 text-sm font-bold uppercase">ESCALA DE SERVIÇO - JANEIRO 2026</p>
+            </div>
+
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="nome-col">POSTO / NOME</th>
+                        <script>for(let i=1;i<=31;i++) document.write(`<th>${i}</th>`)</script>
+                    </tr>
+                </thead>
+                <tbody id="tabela-print-body">
+                    </tbody>
+            </table>
+
+            <div class="assinaturas">
+                <div class="assinatura-box">Sargenteante</div>
+                <div class="assinatura-box">Comandante de Pelotão</div>
+                <div class="assinatura-box">Comandante de Companhia</div>
             </div>
         </div>
 
     </main>
 
-    <div id="modal-resultado" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 rounded-lg w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl border border-white/10">
-            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-slate-900 rounded-t-lg">
-                <h3 class="font-bold text-white"><i class="fas fa-list-alt mr-2"></i> RESUMO FINANCEIRO E ESCALA</h3>
-                <button onclick="fecharModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times fa-lg"></i></button>
+    <div id="modal-fin" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 w-full max-w-3xl rounded-lg shadow-2xl border border-white/10 flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-white/10 bg-slate-900 flex justify-between">
+                <h3 class="font-bold text-white"><i class="fas fa-file-invoice-dollar mr-2"></i> MAPA FINANCEIRO</h3>
+                <button onclick="document.getElementById('modal-fin').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-4 overflow-auto flex-grow">
-                <div id="conteudo-resultado">Carregando...</div>
-            </div>
-            <div class="p-4 bg-slate-900 border-t border-white/10 text-right">
-                <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded font-bold mr-2">IMPRIMIR</button>
-                <button onclick="fecharModal()" class="bg-slate-700 text-white px-4 py-2 rounded font-bold">FECHAR</button>
+            <div class="p-4 overflow-auto" id="conteudo-fin"></div>
+            <div class="p-4 bg-slate-900 text-right">
+                <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded font-bold text-xs">IMPRIMIR ESCALA</button>
+                <button onclick="document.getElementById('modal-fin').classList.add('hidden')" class="bg-slate-700 text-white px-4 py-2 rounded font-bold text-xs ml-2">FECHAR</button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "SUA_URL_DO_APPS_SCRIPT_AQUI"; // <--- COLE SUA URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbxqV--XaQBB7vbq0I8p3VhFznrTsoHWwsXHjSEeOgkbDw78ubvr0qVDMUuWHNBPX-8W/exec"; // <--- COLE SUA URL AQUI
 
-        let efetivo = []; // Todos os militares do banco
-        let escalaTemp = {}; // O que o sargenteante está montando: { "dia_1": { CG: "Fulano", COV: "Ciclano"} }
+        let efetivoGlobal = [];
+        let escalaTemp = {}; // Memória do que está sendo editado
 
-        // Inicializa
-        async function carregarEfetivo() {
+        // --- INICIALIZAÇÃO ---
+        async function init() {
             try {
-                // Chama a API com parametro getEfetivo
+                // Carrega Efetivo da Planilha Mestra
                 const res = await fetch(`${API_URL}?action=getEfetivo`);
-                efetivo = await res.json();
-                console.log("Efetivo carregado:", efetivo.length);
+                efetivoGlobal = await res.json();
+                
+                // Popula o Select de Pelotões
+                const pelotoes = [...new Set(efetivoGlobal.map(m => m.pelotao))].sort();
+                const sel = document.getElementById('sel-pelotao');
+                pelotoes.forEach(p => {
+                    if(p !== "GERAL" && p !== "ERRO") {
+                        const opt = document.createElement('option');
+                        opt.value = p; opt.innerText = p;
+                        sel.appendChild(opt);
+                    }
+                });
+
+                document.getElementById('loader-overlay').classList.add('hidden');
             } catch (e) {
-                alert("Erro ao carregar efetivo: " + e);
+                alert("Erro ao conectar: " + e);
             }
         }
 
-        // Gera os cards dos 31 dias
+        // --- LÓGICA DO PLANNER (EDITOR) ---
         function resetarPlanner() {
             const pelotao = document.getElementById('sel-pelotao').value;
             const grid = document.getElementById('grid-dias');
             
             if(!pelotao) {
-                grid.innerHTML = '<div class="text-center col-span-full py-20 text-gray-500">Selecione um Pelotão.</div>';
+                document.getElementById('msg-inicial').classList.remove('hidden');
+                grid.innerHTML = "";
+                document.getElementById('painel-status').classList.add('hidden');
                 return;
             }
 
+            document.getElementById('msg-inicial').classList.add('hidden');
             document.getElementById('painel-status').classList.remove('hidden');
-            grid.innerHTML = ""; // Limpa
+            document.getElementById('view-editor').classList.remove('hidden');
+            alternarVisao('editor');
 
-            // Cria 31 dias
+            grid.innerHTML = "";
+            
+            // Filtra efetivo do pelotão
+            const efetivoPelotao = efetivoGlobal.filter(m => m.pelotao === pelotao);
+            document.getElementById('stat-total').innerText = efetivoPelotao.length;
+
+            // Gera 31 Cards
             for(let i=1; i<=31; i++) {
                 grid.innerHTML += `
-                <div class="day-card p-3 rounded-lg relative">
+                <div class="day-card p-2 rounded relative">
                     <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-1">
-                        <span class="font-bold text-fire-yellow">DIA ${i}</span>
-                        <i class="fas fa-calendar-day text-slate-600"></i>
+                        <span class="font-bold text-fire-yellow text-xs">DIA ${i}</span>
+                        <i class="fas fa-calendar text-slate-600 text-xs"></i>
                     </div>
-                    
-                    <div class="space-y-2">
-                        <div>
-                            <p class="role-label">COMANDANTE (CG)</p>
-                            <select onchange="atualizarEscala(${i}, 'CG', this.value)" id="d${i}-cg" class="inp-escala">
-                                <option value="">-- Selecione --</option>
-                                ${gerarOpcoes(pelotao, i)}
-                            </select>
-                        </div>
-                        <div>
-                            <p class="role-label">MOTORISTA (COV)</p>
-                            <select onchange="atualizarEscala(${i}, 'COV', this.value)" id="d${i}-cov" class="inp-escala">
-                                <option value="">-- Selecione --</option>
-                                ${gerarOpcoes(pelotao, i)}
-                            </select>
-                        </div>
-                        <div>
-                            <p class="role-label">COMBATENTE 1</p>
-                            <select onchange="atualizarEscala(${i}, 'CB1', this.value)" id="d${i}-cb1" class="inp-escala">
-                                <option value="">-- Selecione --</option>
-                                ${gerarOpcoes(pelotao, i)}
-                            </select>
-                        </div>
-                         <div>
-                            <p class="role-label">COMBATENTE 2</p>
-                            <select onchange="atualizarEscala(${i}, 'CB2', this.value)" id="d${i}-cb2" class="inp-escala">
-                                <option value="">-- Selecione --</option>
-                                ${gerarOpcoes(pelotao, i)}
-                            </select>
-                        </div>
+                    <div class="space-y-1">
+                        <div><p class="role-label">CG</p><select id="d${i}-CG" onchange="atualizarMemoria(${i}, 'CG', this.value)"><option value="">-</option>${gerarOpcoes(efetivoPelotao, i)}</select></div>
+                        <div><p class="role-label">COV</p><select id="d${i}-COV" onchange="atualizarMemoria(${i}, 'COV', this.value)"><option value="">-</option>${gerarOpcoes(efetivoPelotao, i)}</select></div>
+                        <div><p class="role-label">CB 1</p><select id="d${i}-CB1" onchange="atualizarMemoria(${i}, 'CB1', this.value)"><option value="">-</option>${gerarOpcoes(efetivoPelotao, i)}</select></div>
+                        <div><p class="role-label">CB 2</p><select id="d${i}-CB2" onchange="atualizarMemoria(${i}, 'CB2', this.value)"><option value="">-</option>${gerarOpcoes(efetivoPelotao, i)}</select></div>
                     </div>
                 </div>`;
             }
-            
-            // Atualiza estatísticas iniciais
-            const doPelotao = efetivo.filter(m => m.pelotao === pelotao);
-            document.getElementById('stat-total').innerText = doPelotao.length;
         }
 
-        // O CÉREBRO: Gera lista filtrando quem trabalhou ontem
-        function gerarOpcoes(pelotao, diaAtual) {
-            // Filtra só do pelotão selecionado
-            let disponiveis = efetivo.filter(m => m.pelotao === pelotao);
+        // Gera <options> escondendo quem trabalhou ontem
+        function gerarOpcoes(lista, dia) {
+            let html = "";
+            // Recupera quem trabalhou ontem (dia-1)
+            let escalaOntem = escalaTemp[dia-1] || {};
+            let nomesOntem = Object.values(escalaOntem);
 
-            // REGRA: Quem trabalhou no dia anterior (Dia - 1) não pode aparecer
-            if (diaAtual > 1) {
-                const diaOntem = diaAtual - 1;
-                // Busca quem está escalado ontem na memória local (escalaTemp)
-                const escalaOntem = escalaTemp[diaOntem] || {};
-                const nomesOntem = Object.values(escalaOntem); // ["Fulano", "Ciclano"]
-
-                // Remove da lista
-                disponiveis = disponiveis.filter(m => !nomesOntem.includes(m.nome));
-            }
-
-            // Gera HTML
-            return disponiveis.map(m => `<option value="${m.nome}">${m.posto} ${m.nome}</option>`).join('');
+            lista.forEach(m => {
+                // Se trabalhou ontem, não adiciona (Regra de Descanso)
+                if(!nomesOntem.includes(m.nome)) {
+                    html += `<option value="${m.nome}">${m.posto} ${m.nome}</option>`;
+                }
+            });
+            return html;
         }
 
-        // Salva na memória local quando o usuário muda um select
-        function atualizarEscala(dia, funcao, nome) {
+        function atualizarMemoria(dia, funcao, nome) {
             if(!escalaTemp[dia]) escalaTemp[dia] = {};
-            
-            // Se escolheu vazio, apaga
             if(nome === "") delete escalaTemp[dia][funcao];
             else escalaTemp[dia][funcao] = nome;
 
-            // Recarrega os selects do DIA SEGUINTE para aplicar a regra de descanso
-            // (Isso é um pouco pesado, em produção faríamos mais otimizado, mas funciona)
+            // Atualiza contador de dias
+            document.getElementById('stat-dias').innerText = Object.keys(escalaTemp).length + "/31";
+
+            // Recarrega dia seguinte (Regra em cascata)
             if(dia < 31) {
-                const diaSeguinte = dia + 1;
+                const diaSeg = dia + 1;
                 const pelotao = document.getElementById('sel-pelotao').value;
+                const lista = efetivoGlobal.filter(m => m.pelotao === pelotao);
                 
-                // Recalcula opções do dia seguinte
-                ['cg', 'cov', 'cb1', 'cb2'].forEach(role => {
-                    const sel = document.getElementById(`d${diaSeguinte}-${role}`);
-                    const valAtual = sel.value; // Tenta manter o valor se possível
-                    sel.innerHTML = '<option value="">-- Selecione --</option>' + gerarOpcoes(pelotao, diaSeguinte);
-                    sel.value = valAtual; // Restaura seleção se o cara ainda estiver disponível
+                ['CG','COV','CB1','CB2'].forEach(role => {
+                    const sel = document.getElementById(`d${diaSeg}-${role}`);
+                    if(sel) {
+                        const val = sel.value;
+                        sel.innerHTML = `<option value="">-</option>${gerarOpcoes(lista, diaSeg)}`;
+                        sel.value = val; // Tenta manter seleção
+                    }
                 });
             }
         }
 
-        // Envia para o Google Planilhas
+        // --- VISUALIZAÇÃO E IMPRESSÃO ---
+        function alternarVisao(modo) {
+            if(modo === 'editor') {
+                document.getElementById('view-editor').classList.remove('hidden');
+                document.getElementById('view-print').classList.add('hidden');
+                document.getElementById('btn-editor').classList.add('bg-blue-600', 'text-white');
+                document.getElementById('btn-editor').classList.remove('bg-slate-600', 'text-gray-300');
+                document.getElementById('btn-print').classList.remove('bg-blue-600', 'text-white');
+                document.getElementById('btn-print').classList.add('bg-slate-600', 'text-gray-300');
+            } else {
+                gerarTabelaImpressao();
+                document.getElementById('view-editor').classList.add('hidden');
+                document.getElementById('view-print').classList.remove('hidden');
+                document.getElementById('btn-print').classList.add('bg-blue-600', 'text-white');
+                document.getElementById('btn-print').classList.remove('bg-slate-600', 'text-gray-300');
+                document.getElementById('btn-editor').classList.remove('bg-blue-600', 'text-white');
+                document.getElementById('btn-editor').classList.add('bg-slate-600', 'text-gray-300');
+            }
+        }
+
+        function gerarTabelaImpressao() {
+            const pelotao = document.getElementById('sel-pelotao').value;
+            const tbody = document.getElementById('tabela-print-body');
+            document.getElementById('titulo-impresso').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotao}`;
+            
+            // Pega lista única de nomes escalados
+            let nomesEscalados = new Set();
+            for(let d=1; d<=31; d++) {
+                if(escalaTemp[d]) Object.values(escalaTemp[d]).forEach(n => nomesEscalados.add(n));
+            }
+            let listaNomes = Array.from(nomesEscalados).sort();
+
+            let html = "";
+            listaNomes.forEach(nome => {
+                let tr = `<tr><td class="nome-col font-bold">${nome}</td>`;
+                for(let d=1; d<=31; d++) {
+                    // Verifica se o nome está no dia
+                    let trabalhou = false;
+                    if(escalaTemp[d]) {
+                        trabalhou = Object.values(escalaTemp[d]).includes(nome);
+                    }
+                    
+                    if(trabalhou) tr += `<td class="cell-24">24</td>`;
+                    else tr += `<td></td>`;
+                }
+                tr += "</tr>";
+                html += tr;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // --- SALVAR E FINALIZAR ---
         async function salvarEscala() {
             const btn = document.querySelector('button[onclick="salvarEscala()"]');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
             btn.disabled = true;
 
-            // Transforma o objeto escalaTemp em lista para o backend
-            // Formato: [{nome: "Fulano", dia: 1, codigo: "24"}]
-            let dadosParaEnviar = [];
-            
-            for (let dia = 1; dia <= 31; dia++) {
-                if (escalaTemp[dia]) {
-                    Object.values(escalaTemp[dia]).forEach(nome => {
-                        dadosParaEnviar.push({
-                            nome: nome,
-                            dia: dia,
-                            codigo: "24" // Por padrão assume 24h na montagem (pode melhorar depois)
-                        });
+            // Prepara dados
+            let payload = [];
+            for(let d=1; d<=31; d++) {
+                if(escalaTemp[d]) {
+                    Object.values(escalaTemp[d]).forEach(nome => {
+                        payload.push({ nome: nome, dia: d, codigo: "24" });
                     });
                 }
             }
 
             try {
-                // Post request
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(dadosParaEnviar)
-                });
+                // 1. Salva (POST)
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                 
-                alert("Escala Salva com Sucesso!");
-                abrirRelatorioFinal(); // Já mostra o resultado
-
-            } catch (e) {
+                // 2. Busca Financeiro Atualizado (GET)
+                const res = await fetch(API_URL);
+                const dados = await res.json();
+                
+                // 3. Mostra Modal
+                mostrarFinanceiro(dados.financeiro);
+                
+            } catch(e) {
                 alert("Erro ao salvar: " + e);
             }
-            
-            btn.innerHTML = '<i class="fas fa-save"></i> SALVAR';
+
+            btn.innerHTML = '<i class="fas fa-save"></i> SALVAR NO DRIVE';
             btn.disabled = false;
         }
 
-        async function abrirRelatorioFinal() {
-            document.getElementById('modal-resultado').classList.remove('hidden');
-            const div = document.getElementById('conteudo-resultado');
-            div.innerHTML = '<div class="text-center py-10"><i class="fas fa-circle-notch fa-spin text-4xl text-blue-500"></i><p>Calculando Financeiro...</p></div>';
+        function mostrarFinanceiro(fin) {
+            const div = document.getElementById('conteudo-fin');
+            document.getElementById('stat-gse').innerText = fin.totais.valorGSE;
+            document.getElementById('stat-etapas').innerText = fin.totais.etapas;
 
-            // Pede os dados atualizados
-            const res = await fetch(API_URL); // Padrão GET retorna financeiro
-            const dados = await res.json();
-            
-            // Monta tabela bonita
             let html = `
             <div class="grid grid-cols-2 gap-4 mb-4">
-                <div class="bg-slate-700 p-4 rounded">
-                    <p class="text-gray-400 text-xs">VALOR TOTAL HE</p>
-                    <p class="text-2xl font-bold text-green-400">${dados.financeiro.totais.valorGSE}</p>
+                <div class="bg-slate-700 p-4 rounded text-center">
+                    <p class="text-xs text-gray-400">TOTAL HE</p>
+                    <p class="text-3xl font-bold text-green-400">${fin.totais.valorGSE}</p>
                 </div>
-                <div class="bg-slate-700 p-4 rounded">
-                    <p class="text-gray-400 text-xs">TOTAL ETAPAS</p>
-                    <p class="text-2xl font-bold text-blue-400">${dados.financeiro.totais.etapas}</p>
+                <div class="bg-slate-700 p-4 rounded text-center">
+                    <p class="text-xs text-gray-400">TOTAL ETAPAS</p>
+                    <p class="text-3xl font-bold text-blue-400">${fin.totais.etapas}</p>
                 </div>
             </div>
             <table class="w-full text-left text-xs text-gray-300">
-                <thead class="bg-slate-900 font-bold uppercase">
-                    <tr><th class="p-2">Nome</th><th class="p-2 text-right">HE</th><th class="p-2 text-right">Etapas</th><th class="p-2 text-right">Valor</th></tr>
+                <thead class="bg-slate-900 uppercase font-bold sticky top-0">
+                    <tr><th class="p-3">Militar</th><th class="p-3 text-right">Horas Extras</th><th class="p-3 text-right">Etapas</th><th class="p-3 text-right">Valor</th></tr>
                 </thead>
-                <tbody class="divide-y divide-gray-700">
-            `;
+                <tbody class="divide-y divide-gray-700 font-mono">`;
             
-            dados.financeiro.lista.forEach(m => {
+            fin.lista.forEach(m => {
                 html += `<tr>
-                    <td class="p-2">${m.nomeCompleto}</td>
-                    <td class="p-2 text-right">${m.horasExtras}h</td>
-                    <td class="p-2 text-right">${m.etapas}</td>
-                    <td class="p-2 text-right font-bold text-green-400">${m.valor}</td>
+                    <td class="p-3">${m.nomeCompleto}</td>
+                    <td class="p-3 text-right text-orange-400">${m.horasExtras}h</td>
+                    <td class="p-3 text-right text-blue-400">${m.etapas}</td>
+                    <td class="p-3 text-right font-bold text-green-400">${m.valor}</td>
                 </tr>`;
             });
+            html += "</tbody></table>";
             
-            html += '</tbody></table>';
             div.innerHTML = html;
+            document.getElementById('modal-fin').classList.remove('hidden');
         }
 
-        function fecharModal() {
-            document.getElementById('modal-resultado').classList.add('hidden');
-        }
-
-        // Inicia carregando o efetivo
-        carregarEfetivo();
-
+        init();
     </script>
 </body>
 </html>
