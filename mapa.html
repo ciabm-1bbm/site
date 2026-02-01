@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala Oficial - 1º BBM</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ESTILO TELA (MODERNO) */
+        @media screen {
+            body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+            .glass-panel {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 0.5rem;
+            }
+            .grid-cell { text-align: center; border: 1px solid rgba(255,255,255,0.05); font-size: 10px; height: 30px; display: flex; align-items: center; justify-content: center; }
+            .grid-header { background: rgba(0,0,0,0.3); font-weight: bold; color: #94a3b8; }
+            .grid-name { text-align: left; padding-left: 10px; font-weight: bold; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            /* Cores dos turnos na tela */
+            .cell-24 { background: #15803d; color: white; border-radius: 4px; width: 90%; height: 80%; }
+            .cell-he { background: #b91c1c; color: white; border-radius: 4px; width: 90%; height: 80%; }
+            .cell-lts { background: #334155; color: #94a3b8; border-radius: 4px; width: 90%; height: 80%; }
+            
+            .print-only { display: none; }
+        }
+
+        /* ESTILO IMPRESSÃO (PDF OFICIAL) */
+        @media print {
+            @page { size: landscape; margin: 5mm; }
+            body { background: white; color: black; font-family: 'Times New Roman', serif; font-size: 10pt; -webkit-print-color-adjust: exact; }
+            
+            /* Esconde elementos do site */
+            .no-print, header button, .layer-bg, footer, #loader { display: none !important; }
+            
+            /* Layout Tabela Impressa */
+            #tabela-container { overflow: visible !important; }
+            table { width: 100%; border-collapse: collapse; border: 1px solid black; }
+            th, td { border: 1px solid black; padding: 2px; text-align: center; height: 18px; font-size: 8pt; }
+            th.nome-col { text-align: left; padding-left: 5px; width: 200px; }
+            
+            /* Cores de Impressão (Escala de Cinza ou Sutil) */
+            .cell-24 { font-weight: bold; background: #ddd; } /* Fundo cinza pra destacar sv */
+            .cell-he { font-weight: bold; background: #aaa; }
+            .cell-lts { font-style: italic; font-size: 7pt; }
+
+            .print-only { display: block; margin-top: 30px; }
+            .assinaturas { display: flex; justify-content: space-around; margin-top: 50px; }
+            .assinatura-box { text-align: center; border-top: 1px solid black; width: 30%; padding-top: 5px; }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <div class="layer-bg fixed inset-0 z-[-1] bg-gradient-to-br from-slate-900 to-slate-800 no-print"></div>
+
+    <main class="container mx-auto p-4 flex-grow w-full max-w-[98%]">
+        
+        <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 glass-panel p-4 no-print">
+            <div class="flex items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg" class="h-10">
+                <div>
+                    <h1 class="text-xl font-bold text-white">ESCALA 1º BBM</h1>
+                    <h2 class="text-xs text-yellow-500 font-bold tracking-widest">JANEIRO 2026</h2>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2" id="botoes-filtro">
+                <button onclick="filtrar('TODOS')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-xs font-bold transition">TODOS</button>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-bold shadow-lg flex items-center">
+                    <i class="fas fa-print mr-2"></i> IMPRIMIR PDF
+                </button>
+            </div>
+        </header>
+
+        <div class="print-only text-center mb-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg" style="height:40px; margin:0 auto;">
+            <h3 style="font-weight:bold; margin:5px 0;">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h3>
+            <h4 style="font-weight:bold;">CORPO DE BOMBEIROS MILITAR - 1º BBM</h4>
+            <p id="titulo-impresso" style="margin-top:5px; font-size:10pt;">ESCALA DE SERVIÇO - JANEIRO 2026 - PELOTÃO GERAL</p>
+        </div>
+
+        <div id="loader" class="text-center py-20">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500"></i>
+            <p class="text-gray-400 mt-2">Carregando Escala...</p>
+        </div>
+
+        <div id="tabela-container" class="glass-panel overflow-x-auto hidden">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-slate-800 text-gray-400 border-b border-gray-700">
+                        <th class="p-2 text-left min-w-[200px] nome-col">POSTO / NOME</th>
+                        <script>
+                            for(let i=1; i<=31; i++) document.write(`<th class="w-8 text-center text-xs border-l border-gray-700">${i}</th>`);
+                        </script>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela" class="text-xs font-mono text-gray-300">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="print-only assinaturas">
+            <div class="assinatura-box">
+                Sargenteante / Responsável
+            </div>
+            <div class="assinatura-box">
+                Comandante de Pelotão
+            </div>
+            <div class="assinatura-box">
+                Comandante de Companhia
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const API_URL = "SUA_URL_DO_APPS_SCRIPT_AQUI"; // <--- COLE SUA URL AQUI
+        
+        let dadosGlobais = [];
+        let pelotaoAtual = "TODOS";
+
+        async function iniciar() {
+            try {
+                const res = await fetch(API_URL);
+                const json = await res.json();
+                dadosGlobais = json.escala;
+                
+                gerarBotoesPelotao();
+                renderizarTabela(dadosGlobais);
+                
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('tabela-container').classList.remove('hidden');
+            } catch (e) {
+                alert("Erro ao carregar: " + e);
+            }
+        }
+
+        function gerarBotoesPelotao() {
+            // Extrai lista única de pelotões
+            const pelotoes = [...new Set(dadosGlobais.map(d => d.pelotao))].sort();
+            const container = document.getElementById('botoes-filtro');
+            
+            pelotoes.forEach(p => {
+                if(p !== "GERAL") {
+                    const btn = document.createElement('button');
+                    btn.className = "bg-slate-700 hover:bg-slate-600 text-gray-300 px-3 py-1 rounded text-xs font-bold transition border border-gray-600";
+                    btn.innerText = p;
+                    btn.onclick = () => filtrar(p);
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function filtrar(pelotao) {
+            pelotaoAtual = pelotao;
+            
+            // Atualiza título da impressão
+            document.getElementById('titulo-impresso').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotao}`;
+
+            if(pelotao === "TODOS") {
+                renderizarTabela(dadosGlobais);
+            } else {
+                const filtrados = dadosGlobais.filter(d => d.pelotao === pelotao);
+                renderizarTabela(filtrados);
+            }
+        }
+
+        function renderizarTabela(lista) {
+            const tbody = document.getElementById('corpo-tabela');
+            let html = '';
+
+            lista.forEach(m => {
+                let linha = `<tr class="border-b border-gray-700/50 hover:bg-white/5">`;
+                linha += `<td class="p-2 border-r border-gray-700 font-bold whitespace-nowrap nome-col">${m.militar}</td>`;
+                
+                // Colunas dos dias
+                m.dias.forEach(d => {
+                    let conteudo = d;
+                    let classe = "";
+                    
+                    // Estilização visual (Bolinhas na tela, texto no papel)
+                    if(d === "24") { 
+                        conteudo = `<div class="cell-24 flex items-center justify-center mx-auto">24</div>`;
+                    } else if (d === "12D" || d === "12N" || d === "A07") {
+                        conteudo = `<div class="cell-he flex items-center justify-center mx-auto">${d}</div>`;
+                    } else if (["LTS","FER"].includes(d)) {
+                        conteudo = `<div class="cell-lts flex items-center justify-center mx-auto">${d}</div>`;
+                    }
+                    
+                    linha += `<td class="text-center border-l border-gray-700/30 p-1">${conteudo}</td>`;
+                });
+
+                linha += `</tr>`;
+                html += linha;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        iniciar();
+    </script>
+</body>
+</html>
