@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGE - 1º BBM (Escala & Mapas)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fire-red': '#b71c1c',
+                        'fire-yellow': '#FFD700',
+                        'dark-bg': '#0f172a',
+                        'glass': 'rgba(30, 41, 59, 0.7)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        
+        /* Fundo com Brasão e Gradiente */
+        .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .layer-bg::before {
+            content: ''; position: absolute; top: 20%; left: 0; right: 0; bottom: 0;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg') no-repeat center center;
+            background-size: 50%; opacity: 0.03; pointer-events: none;
+        }
+        .layer-bg::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at top, rgba(183, 28, 28, 0.15), transparent 70%);
+        }
+
+        /* Efeito de Vidro (Glassmorphism) */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Botões de Navegação */
+        .nav-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: #94a3b8; transition: all 0.3s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-btn.active {
+            background: linear-gradient(135deg, #b71c1c, #d32f2f);
+            color: white; border-color: #ef5350;
+            box-shadow: 0 0 15px rgba(183, 28, 28, 0.5);
+        }
+
+        /* Tags da Escala */
+        .tag-sv { background: #15803d; color: #a7f3d0; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .tag-he { background: #b91c1c; color: #fecaca; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .tag-lts { background: #334155; color: #94a3b8; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+
+        /* Loader */
+        .loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #b71c1c; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <div class="layer-bg"></div>
+
+    <main class="container mx-auto px-4 py-6 flex-grow z-10 space-y-6 max-w-5xl">
+        
+        <header class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6">
+            <div class="flex items-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg" class="h-12 opacity-90">
+                <div>
+                    <h1 class="text-2xl font-black text-white tracking-tighter leading-none">SIGE - 1º BBM</h1>
+                    <h2 class="text-sm font-bold text-fire-yellow tracking-widest">SISTEMA INTEGRADO DE GESTÃO</h2>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="mudarAba('escala')" id="btn-escala" class="nav-btn active px-6 py-2 rounded-lg text-sm font-bold uppercase">
+                    <i class="fas fa-calendar-alt mr-2"></i>Escala
+                </button>
+                <button onclick="mudarAba('financeiro')" id="btn-financeiro" class="nav-btn px-6 py-2 rounded-lg text-sm font-bold uppercase">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i>Financeiro
+                </button>
+            </div>
+        </header>
+
+        <div id="loader" class="glass-panel p-10 text-center">
+            <div class="loader"></div>
+            <p class="text-sm text-gray-400 font-mono animate-pulse">Conectando ao Quartel...</p>
+        </div>
+
+        <div id="view-escala" class="hidden space-y-4">
+            <div class="glass-panel p-4">
+                <h3 class="text-white font-bold mb-4 border-l-4 border-fire-yellow pl-3">ESCALA DE SERVIÇO (JANEIRO)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-gray-400 uppercase font-bold text-xs bg-slate-800/50">
+                            <tr>
+                                <th class="p-3 rounded-l-lg">Militar</th>
+                                <th class="p-3 rounded-r-lg">Dias Escalados</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-escala" class="divide-y divide-white/5 font-mono text-xs">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-financeiro" class="hidden space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-panel p-6 border-t-4 border-emerald-500 bg-slate-900/50">
+                    <p class="text-xs font-bold tracking-widest text-emerald-400 mb-1">TOTAL PREVISTO (GSE)</p>
+                    <p class="text-3xl font-black text-white" id="total-gse">R$ 0,00</p>
+                </div>
+                <div class="glass-panel p-6 border-t-4 border-blue-500 bg-slate-900/50">
+                    <p class="text-xs font-bold tracking-widest text-blue-400 mb-1">TOTAL ETAPAS ALIMENTAÇÃO</p>
+                    <p class="text-3xl font-black text-white" id="total-etapa">0</p>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4">
+                <h3 class="text-white font-bold mb-4 border-l-4 border-fire-red pl-3">MAPA DE PAGAMENTO (PREVISÃO)</h3>
+                
+                <div class="overflow-x-auto max-h-[500px]">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-gray-400 uppercase font-bold text-xs sticky top-0 bg-slate-900 z-10 shadow-lg">
+                            <tr>
+                                <th class="p-3">Militar</th>
+                                <th class="p-3 text-right">Horas Extras</th>
+                                <th class="p-3 text-center">Etapas</th>
+                                <th class="p-3 text-right">Valor GSE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-financeiro" class="divide-y divide-white/5 font-mono">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-6 text-gray-500 text-[10px] uppercase tracking-widest bg-slate-900/80">
+        © 1º BBM - Desenvolvido via Google Apps Script & Tailwind
+    </footer>
+
+    <script>
+        // COLE A URL DO SEU SCRIPT AQUI DENTRO DAS ASPAS:
+        const API_URL = "https://script.google.com/macros/s/AKfycbz7AWEcL36xlohAOCMXKpDfM3CPYVAgasAi2oKZnxCIe4NVKR-QNI0lzKdghkBHc0gH/exec"; 
+
+        async function carregarDados() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                renderizarFinanceiro(data.financeiro);
+                renderizarEscala(data.escala);
+                
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('view-escala').classList.remove('hidden'); // Inicia na escala
+            } catch (error) {
+                document.getElementById('loader').innerHTML = `<p class="text-red-500 font-bold">Erro ao carregar dados.<br>${error}</p>`;
+            }
+        }
+
+        function renderizarFinanceiro(fin) {
+            // Totais
+            document.getElementById('total-gse').innerText = fin.totais.valorGSE;
+            document.getElementById('total-etapa').innerText = fin.totais.etapas;
+
+            // Lista
+            const tbody = document.getElementById('lista-financeiro');
+            let html = '';
+            
+            fin.lista.forEach(m => {
+                // Define cor se tiver hora extra ou não
+                const corValor = m.valor === "R$ 0,00" ? "text-gray-500" : "text-emerald-400 font-bold";
+                
+                html += `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3 font-bold text-gray-200">${m.nomeCompleto}</td>
+                    <td class="p-3 text-right text-orange-300">${m.horasExtras}h</td>
+                    <td class="p-3 text-center text-blue-300">${m.etapas}</td>
+                    <td class="p-3 text-right ${corValor}">${m.valor}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderizarEscala(escala) {
+            const tbody = document.getElementById('lista-escala');
+            let html = '';
+
+            escala.forEach(m => {
+                // Cria as bolinhas dos dias
+                let diasHtml = '<div class="flex flex-wrap gap-1">';
+                m.escala.forEach(d => {
+                    let classe = 'tag-sv'; // Padrão Verde
+                    if(['12D','12N','A07'].includes(d.tipo)) classe = 'tag-he'; // Vermelho para HE/Dobra
+                    if(['LTS','FER'].includes(d.tipo)) classe = 'tag-lts'; // Cinza para Afastamento
+                    
+                    diasHtml += `<span class="${classe}">Dia ${d.dia} (${d.tipo})</span>`;
+                });
+                diasHtml += '</div>';
+
+                html += `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3 font-bold text-gray-200 whitespace-nowrap align-top">${m.militar}</td>
+                    <td class="p-3">${diasHtml}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // Sistema de Abas
+        window.mudarAba = function(aba) {
+            // Esconde tudo
+            document.getElementById('view-escala').classList.add('hidden');
+            document.getElementById('view-financeiro').classList.add('hidden');
+            document.getElementById('btn-escala').classList.remove('active');
+            document.getElementById('btn-financeiro').classList.remove('active');
+
+            // Mostra o selecionado
+            document.getElementById('view-' + aba).classList.remove('hidden');
+            document.getElementById('btn-' + aba).classList.add('active');
+        }
+
+        // Inicia
+        carregarDados();
+    </script>
+</body>
+</html>
