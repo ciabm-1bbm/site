@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA ESCALA 1º BBM</title>
+    <title>ESCALA OFICIAL - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,120 +15,127 @@
     
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
-        .glass-panel { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; margin-bottom: 20px; }
         
-        /* Tabela Editor */
-        .editor-table { width: 100%; border-collapse: separate; border-spacing: 2px; }
-        .editor-table th { background: #1e293b; color: #94a3b8; font-size: 10px; padding: 4px; border-radius: 2px; }
-        .editor-table td { background: #334155; padding: 0; border: 1px solid #475569; position: relative; height: 32px; border-radius: 2px; }
+        /* ESTILO DO EDITOR (TELA) */
+        .glass-panel { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; margin-bottom: 20px; }
         
-        select.cell-in { width: 100%; height: 100%; background: transparent; border: none; color: white; font-size: 10px; text-align: center; cursor: pointer; appearance: none; }
-        select.cell-in option { background: #1e293b; }
-        select.cell-in:focus { background: #000; outline: 2px solid #FFD700; }
+        .tabela-editor { width: 100%; border-collapse: separate; border-spacing: 2px; }
+        .tabela-editor th { background: #1e293b; color: #94a3b8; font-size: 10px; padding: 4px; text-align: center; }
+        .tabela-editor td { background: #334155; padding: 0; height: 35px; border: 1px solid #475569; position: relative; }
+        
+        select.cell-selector { 
+            width: 100%; height: 100%; background: transparent; border: none; color: white; 
+            font-size: 10px; padding-left: 4px; cursor: pointer; appearance: none;
+        }
+        select.cell-selector:focus { background: #000; outline: 2px solid #FFD700; }
+        select.cell-selector option { background: #1e293b; }
 
-        /* Impressão */
+        .row-header { width: 100px; background: #0f172a !important; color: #FFD700; font-weight: bold; font-size: 10px; text-align: right; padding-right: 8px; border: none !important; }
+
+        /* IMPRESSÃO OFICIAL */
         @media print {
             @page { size: landscape; margin: 5mm; }
             body { background: white; color: black; font-family: 'Arial', sans-serif; }
-            .no-print, header, #editor-area, #msg-start { display: none !important; }
+            .no-print, header, #msg-inicial, #loader { display: none !important; }
             #print-area { display: block !important; }
-            table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 20px; page-break-inside: avoid; }
-            th, td { border: 1px solid black; padding: 3px; text-align: center; }
-            .bg-filled { background-color: #ddd !important; -webkit-print-color-adjust: exact; font-weight: bold; }
+
+            .print-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 8pt; page-break-inside: avoid; }
+            .print-table th, .print-table td { border: 1px solid black; padding: 3px; text-align: center; height: 20px; }
+            .print-header { background-color: #f3f4f6 !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+            .header-doc { text-align: center; border-bottom: 2px solid black; margin-bottom: 10px; padding-bottom: 5px; }
+            .assinaturas { display: flex; justify-content: space-around; margin-top: 30px; page-break-inside: avoid; }
+            .assinatura-box { border-top: 1px solid black; width: 30%; text-align: center; padding-top: 5px; font-size: 8pt; }
+            .cell-filled { background-color: #e5e7eb !important; font-weight: bold; -webkit-print-color-adjust: exact; }
         }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <header class="bg-slate-900 border-b border-white/10 p-3 sticky top-0 z-50 shadow-lg no-print">
-        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            
-            <div class="flex items-center gap-3">
-                <i class="fas fa-fire-extinguisher text-fire-yellow text-3xl"></i>
-                <div>
-                    <h1 class="font-black text-white text-lg leading-none">ESCALA 1º BBM</h1>
-                    <h2 class="text-xs text-gray-400 font-bold tracking-widest">SISTEMA INTEGRADO</h2>
-                </div>
+    <header class="h-16 bg-slate-900 border-b border-white/10 flex items-center justify-between px-6 sticky top-0 z-50 shadow-lg no-print">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-fire-extinguisher text-fire-yellow text-3xl"></i>
+            <div>
+                <h1 class="font-black text-white text-lg leading-none">ESCALA 1º BBM</h1>
+                <h2 class="text-xs text-gray-400 font-bold tracking-widest">SISTEMA OFICIAL</h2>
             </div>
-            
-            <div class="flex items-center gap-3 bg-slate-800 p-2 rounded-lg border border-slate-700">
-                
+        </div>
+        
+        <div class="flex items-center gap-4 bg-slate-800 p-2 rounded-lg border border-slate-700">
+            <div class="flex flex-col">
+                <label class="text-[9px] text-gray-400 font-bold uppercase">PELOTÃO</label>
+                <select id="sel-pelotao" class="bg-slate-700 text-white text-sm font-bold border border-slate-600 rounded w-40 h-8 px-2" onchange="carregarPelotao()">
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+
+            <div class="h-10 w-px bg-white/10 mx-2"></div>
+
+            <div class="flex items-end gap-2">
                 <div class="flex flex-col">
-                    <label class="text-[9px] text-gray-400 font-bold uppercase">PELOTÃO</label>
-                    <select id="sel-pelotao" class="bg-slate-700 text-white text-xs font-bold border border-slate-600 rounded w-40 h-7" onchange="carregarPelotao()">
-                        <option value="">Carregando...</option>
-                    </select>
+                    <label class="text-[9px] text-gray-400 font-bold uppercase">CICLO</label>
+                    <select id="sel-ciclo" class="bg-slate-900 text-white text-xs border border-slate-600 rounded h-8 w-28 text-center font-bold">
+                        <option value="4">24x72 (4d)</option>
+                        <option value="3">24x48 (3d)</option> </select>
                 </div>
-
-                <div class="w-px h-8 bg-white/10"></div>
-
-                <div class="flex items-end gap-2">
-                    <div class="flex flex-col">
-                        <label class="text-[9px] text-gray-400 font-bold uppercase">CICLO</label>
-                        <select id="sel-ciclo" class="bg-slate-900 text-white text-xs border border-slate-600 rounded h-7 w-24 text-center">
-                            <option value="4">24x72 (4d)</option>
-                            <option value="2">24x48 (2d)</option>
-                        </select>
-                    </div>
-                    <button onclick="replicarEscala()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded h-7 text-xs font-bold shadow transition flex items-center" title="Preencher mês automaticamente">
-                        <i class="fas fa-bolt mr-1"></i> REPLICAR
-                    </button>
-                </div>
-
-                <div class="w-px h-8 bg-white/10"></div>
-
-                <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-1 rounded h-8 text-xs font-bold transition">
-                    <i class="fas fa-print mr-2"></i> IMPRIMIR
-                </button>
-                <button onclick="salvarDrive()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded h-8 text-xs font-bold shadow-lg transition flex items-center">
-                    <i class="fas fa-save mr-2"></i> SALVAR DRIVE
+                <button onclick="replicarEscala()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded h-8 text-xs font-bold shadow transition flex items-center" title="Preencher mês automaticamente">
+                    <i class="fas fa-bolt mr-1"></i> REPLICAR
                 </button>
             </div>
+
+            <div class="h-10 w-px bg-white/10 mx-2"></div>
+
+            <button onclick="imprimirEscala()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded font-bold shadow-md flex items-center gap-2 transition">
+                <i class="fas fa-print"></i> IMPRIMIR
+            </button>
+            
+            <button onclick="salvarNoDrive()" class="bg-green-600 hover:bg-green-500 text-white px-5 py-2 rounded font-bold shadow-md flex items-center gap-2 transition">
+                <i class="fas fa-cloud-upload-alt"></i> SALVAR
+            </button>
         </div>
     </header>
 
-    <main class="container mx-auto p-4 flex-grow w-full max-w-[98%]">
-        
-        <div id="msg-start" class="text-center py-32 text-gray-500">
+    <main class="container mx-auto p-4 flex-grow max-w-[98%]">
+
+        <div id="msg-inicial" class="text-center py-32 text-gray-500 no-print">
             <i class="fas fa-arrow-up text-5xl mb-4 animate-bounce text-slate-700"></i><br>
             <span class="text-xl font-bold">Selecione o Pelotão acima.</span>
         </div>
 
-        <div id="editor-area" class="hidden no-print space-y-4">
+        <div id="editor-area" class="hidden no-print">
             </div>
 
         <div id="print-area" class="hidden">
-            <div class="text-center border-b-2 border-black pb-2 mb-4">
-                <h2 class="font-bold text-lg">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h2>
-                <h3 class="font-bold text-md">CORPO DE BOMBEIROS MILITAR - 1º BBM</h3>
-                <p class="font-bold text-sm mt-2" id="titulo-imp">ESCALA DE SERVIÇO</p>
+            <div class="header-doc">
+                <h3 style="font-size:12pt; font-weight:bold;">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h3>
+                <h4 style="font-size:10pt;">CORPO DE BOMBEIROS MILITAR - 1º BBM</h4>
+                <p style="font-size:9pt; margin-top:5px; font-weight:bold;" id="titulo-doc">ESCALA DE SERVIÇO</p>
             </div>
-            <div id="tabelas-imp"></div>
-            <div class="flex justify-around mt-10 border-t border-gray-300 pt-8 text-xs">
-                <div class="border-t border-black w-1/3 text-center pt-1">Sargenteante</div>
-                <div class="border-t border-black w-1/3 text-center pt-1">Comandante</div>
+            <div id="tabelas-print"></div>
+            <div class="assinaturas">
+                <div class="assinatura-box">Sargenteante</div>
+                <div class="assinatura-box">Comandante de Pelotão</div>
+                <div class="assinatura-box">Comandante de Companhia</div>
             </div>
         </div>
-
     </main>
 
     <div id="loader" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center">
         <i class="fas fa-spinner fa-spin text-5xl text-fire-yellow mb-4"></i>
-        <p class="text-white font-bold tracking-widest">CARREGANDO DADOS...</p>
+        <p class="text-white font-bold tracking-widest text-lg">CARREGANDO SISTEMA...</p>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwiT5KKzNMjDbocRztRHNoTJmapxV-9KqmYl-9h5BP68izpdc5NEieN_phInkCZk-66/exec"; // <--- COLE SUA URL
 
         let DB = { efetivo: [], escala: {} };
-        let visual = {}; // { 1: {CG:'xxx', COV:'yyy'} }
+        let escalaVisual = {}; 
         let pelotaoAtual = "";
         
         const FUNCOES = [
-            {id:'CG', label:'Cmt. Guarnição'},
-            {id:'COV', label:'Motorista (COV)'},
-            {id:'CB1', label:'Combatente 1'},
-            {id:'CB2', label:'Combatente 2'}
+            { id: 'CG', label: 'Cmt Guarnição' },
+            { id: 'COV', label: 'Motorista (COV)' },
+            { id: 'CB1', label: 'Combatente 1' },
+            { id: 'CB2', label: 'Combatente 2' }
         ];
 
         async function init() {
@@ -136,83 +143,74 @@
                 const res = await fetch(`${API_URL}?action=getInitData`);
                 const dados = await res.json();
                 DB.efetivo = dados.efetivo;
-                // Carrega escala salva se houver
                 if(dados.escalaSalva) {
-                    // Converter de {Nome:{Dia:Cod}} para {Dia:{Func:Nome}}
-                    // Isso requer heurística pois não salvamos a função.
-                    // Para simplificar, iniciamos limpo para montagem manual/replicação
+                   // Lógica futura para carregar escala salva
                 }
-                
-                const sel = document.getElementById('sel-pelotao');
-                const p = [...new Set(DB.efetivo.map(m=>m.pelotao))].sort();
-                sel.innerHTML = '<option value="">SELECIONE...</option>';
-                p.forEach(x => { if(x!=="GERAL") sel.add(new Option(x,x)); });
-                
+                popularSelectPelotoes();
                 document.getElementById('loader').classList.add('hidden');
-            } catch(e) { alert("Erro de conexão."); }
+            } catch (e) { alert("Erro de conexão: " + e); }
+        }
+
+        function popularSelectPelotoes() {
+            const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))].sort();
+            const sel = document.getElementById('sel-pelotao');
+            sel.innerHTML = '<option value="">SELECIONE...</option>';
+            pelotoes.forEach(p => { if(p !== "GERAL" && p !== "ERRO") sel.add(new Option(p, p)); });
         }
 
         function carregarPelotao() {
             pelotaoAtual = document.getElementById('sel-pelotao').value;
             if(!pelotaoAtual) {
-                document.getElementById('msg-start').classList.remove('hidden');
+                document.getElementById('msg-inicial').classList.remove('hidden');
                 document.getElementById('editor-area').classList.add('hidden');
                 return;
             }
-            
-            document.getElementById('msg-start').classList.add('hidden');
+            document.getElementById('msg-inicial').classList.add('hidden');
             document.getElementById('editor-area').classList.remove('hidden');
-            visual = {}; // Reseta visual
+            escalaVisual = {}; 
             renderizarEditor();
         }
 
         function renderizarEditor() {
-            const area = document.getElementById('editor-area');
-            area.innerHTML = "";
+            const container = document.getElementById('editor-area');
+            container.innerHTML = "";
             const semanas = [{i:1, f:8}, {i:9, f:16}, {i:17, f:24}, {i:25, f:31}];
 
             semanas.forEach(sem => {
                 let html = `
                 <div class="glass-panel p-2">
-                    <table class="editor-table">
+                    <table class="tabela-editor">
                         <thead>
                             <tr>
-                                <th style="width:100px; background:transparent"></th>
-                                ${gerarCabecalho(sem.i, sem.f)}
+                                <th style="width:100px; background:transparent;"></th>
+                                ${gerarCabecalhoDias(sem.i, sem.f)}
                             </tr>
                         </thead>
                         <tbody>`;
-                
-                FUNCOES.forEach(f => {
-                    html += `<tr>
-                        <td style="color:#FFD700; font-weight:bold; font-size:9px; text-align:right; padding-right:8px; background:#0f172a; border:none;">${f.label}</td>
-                        ${gerarCelulas(sem.i, sem.f, f.id)}
-                    </tr>`;
+                FUNCOES.forEach(func => {
+                    html += `<tr><td class="row-header">${func.label}</td>${gerarCelulasSelect(sem.i, sem.f, func.id)}</tr>`;
                 });
-                
                 html += `</tbody></table></div>`;
-                area.innerHTML += html;
+                container.innerHTML += html;
             });
         }
 
-        function gerarCabecalho(i, f) {
+        function gerarCabecalhoDias(i, f) {
             let s=""; for(;i<=f;i++) s+=`<th>DIA ${i}</th>`; return s;
         }
 
-        function gerarCelulas(i, f, funcId) {
+        function gerarCelulasSelect(i, f, funcId) {
             let s="";
-            for(;i<=f;i++) {
-                s += `<td>${criarSelect(i, funcId)}</td>`;
-            }
+            for(;i<=f;i++) s += `<td>${criarSelectHTML(i, funcId)}</td>`;
             return s;
         }
 
-        function criarSelect(dia, funcId) {
+        function criarSelectHTML(dia, funcId) {
             let opts = DB.efetivo.filter(m => m.pelotao === pelotaoAtual);
             if(funcId === 'COV') opts = opts.filter(m => m.funcao.includes('COV'));
             opts.sort((a,b) => a.nome.localeCompare(b.nome));
 
-            let html = `<select class="cell-in" id="d${dia}-${funcId}" onchange="atualizar(${dia}, '${funcId}', this.value)">`;
+            let html = `<select class="cell-selector" id="d${dia}-${funcId}" onchange="atualizarMemoria(${dia}, '${funcId}', this.value)">`;
             html += `<option value="">-</option>`;
             opts.forEach(m => {
                 html += `<option value="${m.nome}">${m.posto} ${m.nome}</option>`;
@@ -221,26 +219,32 @@
             return html;
         }
 
-        function atualizar(dia, funcId, nome) {
-            if(!visual[dia]) visual[dia] = {};
-            if(nome) visual[dia][funcId] = nome;
-            else delete visual[dia][funcId];
+        function atualizarMemoria(dia, funcao, nome) {
+            if(!escalaVisual[dia]) escalaVisual[dia] = {};
+            if(nome) escalaVisual[dia][funcao] = nome;
+            else delete escalaVisual[dia][funcao];
         }
 
-        // --- AUTOMAÇÃO: REPLICAR ---
+        // --- AUTOMAÇÃO CORRIGIDA ---
         function replicarEscala() {
             if(!pelotaoAtual) return alert("Selecione um pelotão.");
+            
+            // O value agora é 3 para 24x48
             const ciclo = parseInt(document.getElementById('sel-ciclo').value);
             
+            // Loop começando do dia após o ciclo inicial
             for(let d = ciclo + 1; d <= 31; d++) {
-                const origem = d - ciclo;
-                if(visual[origem]) {
+                const origem = d - ciclo; // Se ciclo é 3, Dia 4 copia do Dia 1
+                
+                if(escalaVisual[origem]) {
                     FUNCOES.forEach(f => {
-                        const nome = visual[origem][f.id];
+                        const nome = escalaVisual[origem][f.id];
                         if(nome) {
                             // Atualiza Memória
-                            if(!visual[d]) visual[d] = {};
-                            visual[d][f.id] = nome;
+                            if(!escalaVisual[d]) escalaVisual[d] = {};
+                            visual_nome = nome;
+                            escalaVisual[d][f.id] = nome;
+                            
                             // Atualiza Tela
                             const el = document.getElementById(`d${d}-${f.id}`);
                             if(el) el.value = nome;
@@ -248,54 +252,46 @@
                     });
                 }
             }
-            alert("Escala replicada com sucesso! Verifique os dias.");
+            alert(`Escala replicada com ciclo de ${ciclo} dias!`);
         }
 
         // --- IMPRESSÃO ---
-        window.onbeforeprint = function() {
-            if(!pelotaoAtual) return;
-            const div = document.getElementById('tabelas-imp');
-            document.getElementById('titulo-imp').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotaoAtual}`;
-            div.innerHTML = "";
-            
+        function imprimirEscala() {
+            if(!pelotaoAtual) return alert("Selecione um pelotão.");
+            const container = document.getElementById('tabelas-print');
+            document.getElementById('titulo-doc').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotaoAtual}`;
+            container.innerHTML = "";
+
             const semanas = [{i:1, f:8}, {i:9, f:16}, {i:17, f:24}, {i:25, f:31}];
             semanas.forEach(sem => {
-                let html = `<table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:15px; page-break-inside:avoid;">
-                    <thead>
-                        <tr style="background:#eee; font-weight:bold;">
-                            <th style="border:1px solid black; width:100px;">TURNO</th>
-                            ${printHeader(sem.i, sem.f)}
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                FUNCOES.forEach(f => {
-                    html += `<tr><td style="border:1px solid black; font-weight:bold; padding:2px;">${f.label}</td>`;
+                let html = `<table class="print-table"><thead><tr class="print-header"><th style="width:100px;">DATA</th>${printHeader(sem.i, sem.f)}</tr><tr><th class="print-header">DIA SEMANA</th>${printHeaderSem(sem.i, sem.f)}</tr><tr><th class="print-header">TURNO</th>${printHeaderTurno(sem.i, sem.f)}</tr></thead><tbody>`;
+                FUNCOES.forEach(func => {
+                    html += `<tr><td class="print-header">${func.label}</td>`;
                     for(let d=sem.i; d<=sem.f; d++) {
-                        let nome = (visual[d] && visual[d][f.id]) || "";
-                        html += `<td style="border:1px solid black; text-align:center; padding:2px; ${nome?'background:#ddd; font-weight:bold;':''}">${nome}</td>`;
+                        let nome = (escalaVisual[d] && escalaVisual[d][func.id]) || "";
+                        html += `<td class="${nome ? 'cell-filled' : ''}">${nome}</td>`;
                     }
                     html += `</tr>`;
                 });
                 html += `</tbody></table>`;
-                div.innerHTML += html;
+                container.innerHTML += html;
             });
-        };
-        function printHeader(i,f) { let s=""; for(;i<=f;i++) s+=`<th style="border:1px solid black;">${i}/01</th>`; return s; }
+            window.print();
+        }
+        function printHeader(i,f) { let s=""; for(;i<=f;i++) s+=`<th>${i}/01</th>`; return s; }
+        function printHeaderSem(i,f) { const ds=["dom","seg","ter","qua","qui","sex","sáb"]; let s=""; for(;i<=f;i++) s+=`<th>${ds[new Date(2026,0,i).getDay()]}</th>`; return s; }
+        function printHeaderTurno(i,f) { let s=""; for(;i<=f;i++) s+=`<th>08h-08h</th>`; return s; }
 
-        // --- SALVAR NO DRIVE ---
-        async function salvarDrive() {
+        // --- SALVAR ---
+        async function salvarNoDrive() {
             if(!pelotaoAtual) return alert("Selecione um pelotão.");
-            const btn = document.querySelector('button[onclick="salvarDrive()"]');
-            const txt = btn.innerHTML;
-            btn.innerHTML = "SALVANDO..."; btn.disabled = true;
+            const btn = document.querySelector('button[onclick="salvarNoDrive()"]');
+            const txt = btn.innerHTML; btn.innerHTML = "SALVANDO..."; btn.disabled = true;
 
-            // Prepara Payload Completo
             let payload = [];
             for(let d=1; d<=31; d++) {
-                if(visual[d]) {
-                    Object.keys(visual[d]).forEach(fid => {
-                        let nome = visual[d][fid];
-                        // Busca posto
+                if(escalaVisual[d]) {
+                    Object.values(escalaVisual[d]).forEach(nome => {
                         let militar = DB.efetivo.find(m => m.nome === nome);
                         let posto = militar ? militar.posto : "";
                         payload.push({ nome: nome, posto: posto, dia: d, codigo: "24" });
@@ -303,21 +299,12 @@
                 }
             }
             
-            if(payload.length === 0) {
-                if(!confirm("Escala vazia. Salvar mesmo assim?")) {
-                    btn.innerHTML = txt; btn.disabled = false; return;
-                }
-            }
+            if(payload.length === 0 && !confirm("Salvar vazia?")) { btn.innerHTML = txt; btn.disabled = false; return; }
 
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ pelotao: pelotaoAtual, dados: payload })
-                });
-                const msg = await res.text();
-                alert(msg); // Mostra "Salvo com sucesso! Totais calculados."
-            } catch(e) { alert("Erro: " + e); }
-
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ pelotao: pelotaoAtual, dados: payload }) });
+                alert("✅ Salvo no Drive com sucesso!");
+            } catch(e) { alert("❌ Erro: " + e); }
             btn.innerHTML = txt; btn.disabled = false;
         }
 
