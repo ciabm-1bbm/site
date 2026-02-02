@@ -3,306 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA DE ESCALAS - 1º BBM</title>
+    <title>ESCALA GERAL - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } } }
+            theme: { 
+                extend: { 
+                    colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } 
+                } 
+            }
         }
     </script>
     
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
+        /* ESTILOS DE TELA */
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* EDITOR (TELA) */
-        .glass-panel { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border-radius: 0.5rem; }
-        .calendar-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-bottom: 10px; }
-        .day-card { background: rgba(15, 23, 42, 0.95); border: 1px solid #334155; display: flex; flex-direction: column; padding-bottom: 4px; }
-        .day-header { background: #1e293b; color: #FFD700; font-weight: bold; text-align: center; font-size: 11px; padding: 2px; border-bottom: 1px solid #334155; }
-        .role-label { font-size: 9px; color: #94a3b8; font-weight: bold; text-transform: uppercase; margin-top: 4px; }
-        select { background: #0f172a; border: 1px solid #475569; color: white; width: 100%; font-size: 10px; height: 22px; border-radius: 3px; }
+        /* Tabela Editor (Estilo Excel Escuro) */
+        .editor-table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        .editor-table th, .editor-table td { 
+            border: 1px solid #334155; 
+            padding: 0; height: 32px; 
+            min-width: 90px; /* Largura da célula do dia */
+        }
         
-        /* IMPRESSÃO OFICIAL (PAPEL) */
+        /* Cabeçalhos Fixos */
+        .sticky-col { position: sticky; left: 0; background: #1e293b; z-index: 10; width: 100px; border-right: 2px solid #475569; }
+        .sticky-header { position: sticky; top: 0; background: #0f172a; z-index: 20; color: #FFD700; font-weight: bold; }
+        .z-corner { z-index: 30; background: #b71c1c; color: white; }
+
+        /* Inputs Compactos */
+        select.cell-input { 
+            width: 100%; height: 100%; background: transparent; border: none; 
+            color: #e2e8f0; font-size: 10px; padding: 0 4px; cursor: pointer; text-align: center;
+        }
+        select.cell-input:hover { background: #334155; }
+        select.cell-input:focus { background: #1e293b; outline: 2px solid #FFD700; }
+
+        /* Menu Lateral dos Pelotões */
+        .sidebar-btn { 
+            display: block; width: 100%; text-align: left; padding: 10px 15px; 
+            font-size: 11px; font-weight: bold; color: #94a3b8; border-bottom: 1px solid #334155; 
+            transition: 0.2s; 
+        }
+        .sidebar-btn:hover { background: #1e293b; color: white; }
+        .sidebar-btn.active { background: #b71c1c; color: white; border-right: 4px solid #FFD700; }
+
+        /* MODO IMPRESSÃO (GRID QUADRADO OFICIAL) */
         @media print {
             @page { size: landscape; margin: 5mm; }
-            body { background: white; color: black; font-family: 'Arial', sans-serif; }
-            .no-print, header, .editor-view, #painel-status, #controles-escala { display: none !important; }
-            #view-print { display: block !important; }
+            body { background: white; color: black; overflow: visible; font-family: 'Arial', sans-serif; }
+            .no-print, header, #sidebar { display: none !important; }
             
-            /* Tabela Oficial */
-            .tabela-oficial { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 8pt; page-break-inside: avoid; }
-            .tabela-oficial th, .tabela-oficial td { border: 1px solid black; padding: 2px; text-align: center; vertical-align: middle; }
-            .col-ref { width: 100px; text-align: left; font-weight: bold; background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
-            .header-top { text-align: center; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid black; padding-bottom: 5px; }
-            .assinaturas { margin-top: 30px; display: flex; justify-content: space-around; }
-            .assinatura-box { border-top: 1px solid black; width: 35%; text-align: center; padding-top: 5px; font-size: 9pt; }
+            #main-area { margin: 0; padding: 0; width: 100%; }
+            #view-editor { display: none; }
+            #view-print { display: block !important; }
+
+            /* Tabela de Impressão */
+            .print-table { 
+                width: 100%; border-collapse: collapse; font-size: 7pt; table-layout: fixed; 
+            }
+            .print-table th, .print-table td { 
+                border: 1px solid black; padding: 2px; text-align: center; height: 18px; 
+                overflow: hidden; white-space: nowrap;
+            }
+            /* Cabeçalho Cinza */
+            .print-header { background-color: #e5e5e5 !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+            /* Célula de Serviço (Preenchida) */
+            .cell-filled { background-color: #d1d5db !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+            
+            .header-print { text-align: center; border-bottom: 2px solid black; margin-bottom: 10px; padding-bottom: 5px; }
+            .assinaturas { display: flex; justify-content: space-between; margin-top: 30px; }
+            .assinatura-line { border-top: 1px solid black; width: 30%; text-align: center; padding-top: 2px; font-size: 8pt; }
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col h-screen">
 
-    <header class="bg-slate-900 border-b border-white/10 p-2 sticky top-0 z-50 no-print">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Brasao_do_Rio_Grande_do_Sul.svg" class="h-8">
-                <div>
-                    <h1 class="font-black text-white text-sm">ESCALA 1º BBM</h1>
-                    <h2 class="text-[9px] text-fire-yellow tracking-widest">SISTEMA INTEGRADO</h2>
-                </div>
-            </div>
-            <div class="flex gap-2 items-center bg-slate-800 p-1 rounded text-xs">
-                <select id="sel-pelotao" class="bg-slate-700 border-slate-600 text-white font-bold rounded w-32 p-1" onchange="resetarPlanner()">
-                    <option value="">PELOTÃO...</option>
+    <header class="h-12 bg-slate-900 border-b border-white/10 flex items-center justify-between px-4 no-print shrink-0">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-fire-extinguisher text-fire-yellow text-lg"></i>
+            <h1 class="font-bold text-white text-sm tracking-wide">SISTEMA C2 - 1º BBM</h1>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <div class="bg-slate-800 rounded flex items-center p-1 border border-slate-700">
+                <span class="text-[10px] text-gray-400 px-2 font-bold uppercase">Preenchimento:</span>
+                <select id="tipo-ciclo" class="bg-slate-900 text-white text-xs border border-slate-600 rounded px-1 h-6">
+                    <option value="4">24x72 (4 Dias)</option>
+                    <option value="2">24x48 (2 Dias)</option>
                 </select>
-                <button onclick="alternarVisao('editor')" class="text-blue-300 hover:text-white font-bold px-2"><i class="fas fa-edit"></i> EDITOR</button>
-                <button onclick="alternarVisao('print')" class="text-gray-400 hover:text-white font-bold px-2"><i class="fas fa-print"></i> IMPRIMIR OFICIAL</button>
-                <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-bold ml-2"><i class="fas fa-save"></i> SALVAR</button>
+                <button onclick="autoPreencher()" class="ml-2 bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-0.5 rounded text-xs font-bold" title="Replicar padrão para o mês">
+                    <i class="fas fa-bolt"></i>
+                </button>
             </div>
+
+            <div class="h-6 w-px bg-white/10 mx-1"></div>
+
+            <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs font-bold transition">
+                <i class="fas fa-print mr-1"></i> IMPRIMIR
+            </button>
+            <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs font-bold shadow-lg transition">
+                <i class="fas fa-save mr-1"></i> SALVAR
+            </button>
         </div>
     </header>
 
-    <main class="container mx-auto p-2 flex-grow w-full max-w-[98%]">
-
-        <div id="controles-escala" class="mb-2 glass-panel p-2 flex justify-between items-center hidden no-print">
-            <div class="flex items-center gap-2 text-xs">
-                <span class="text-gray-400 font-bold"><i class="fas fa-robot mr-1"></i>AUTO:</span>
-                <select id="tipo-ciclo" class="w-24 bg-slate-900 border-slate-600"><option value="4">24x72</option><option value="2">24x48</option></select>
-                <button onclick="autoPreencher()" class="bg-fire-yellow text-black px-2 py-1 rounded font-bold"><i class="fas fa-bolt"></i> REPLICAR</button>
+    <div class="flex flex-1 overflow-hidden">
+        
+        <aside id="sidebar" class="w-48 bg-slate-900 border-r border-white/10 overflow-y-auto shrink-0 no-print">
+            <div class="p-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Pelotões</div>
+            <div id="lista-pelotoes">
+                <div class="p-4 text-center text-gray-500 text-xs"><i class="fas fa-circle-notch fa-spin"></i> Carregando...</div>
             </div>
-            <div class="text-[10px] font-bold text-gray-400"><span id="stat-dias" class="text-green-400">0/31 Dias</span></div>
-        </div>
+        </aside>
 
-        <div id="view-editor" class="editor-view hidden">
-            <div id="grid-master"></div>
-            <div id="msg-inicial" class="text-center py-20 text-gray-500">Selecione o Pelotão acima.</div>
-        </div>
-
-        <div id="view-print" class="hidden bg-white text-black p-4">
+        <main id="main-area" class="flex-1 overflow-auto bg-slate-800 relative">
             
-            <div class="header-top">
-                <p>ESTADO DO RIO GRANDE DO SUL</p>
-                <p>SECRETARIA DA SEGURANÇA PÚBLICA</p>
-                <p>1º BATALHÃO DE BOMBEIROS MILITAR</p>
-                <p id="titulo-impresso" class="mt-2">ESCALA DE SERVIÇO - JANEIRO 2026</p>
+            <div id="view-editor" class="absolute inset-0">
+                <table class="editor-table">
+                    <thead class="bg-slate-900">
+                        <tr>
+                            <th class="sticky-col sticky-header z-corner text-xs text-white">FUNÇÃO</th>
+                            <script>
+                                for(let i=1; i<=31; i++) document.write(`<th class="sticky-header text-xs">${i}</th>`);
+                            </script>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-corpo">
+                        <tr><td colspan="32" class="text-center text-gray-500 py-20">Selecione um pelotão ao lado.</td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div id="area-tabelas-print"></div>
+            <div id="view-print" class="hidden">
+                <div class="header-print">
+                    <h2 style="font-size:12pt; font-weight:bold;">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h2>
+                    <h3 style="font-size:10pt;">CORPO DE BOMBEIROS MILITAR - 1º BBM</h3>
+                    <p style="font-size:9pt; margin-top:5px;" id="titulo-impresso">ESCALA DE SERVIÇO - JANEIRO 2026</p>
+                </div>
 
-            <div class="assinaturas">
-                <div class="assinatura-box">Sargenteante</div>
-                <div class="assinatura-box">Comandante de Pelotão</div>
-                <div class="assinatura-box">Comandante de Companhia</div>
+                <table class="print-table">
+                    <thead>
+                        <tr class="print-header">
+                            <th style="width:150px; text-align:left; padding-left:5px;">NOME / GRAD</th>
+                            <script>for(let i=1;i<=31;i++) document.write(`<th>${i}</th>`)</script>
+                        </tr>
+                    </thead>
+                    <tbody id="print-body">
+                        </tbody>
+                </table>
+
+                <div class="assinaturas">
+                    <div class="assinatura-line">Sargenteante</div>
+                    <div class="assinatura-line">Comandante de Pelotão</div>
+                    <div class="assinatura-line">Comandante de Companhia</div>
+                </div>
             </div>
-        </div>
 
-    </main>
+        </main>
+    </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzwCdGHXkNF5IBhbLgAw8IlnZPrRLwEQ46uHgerfdpLsZnKhw2-KB26J4X-16VrzjGR/exec"; // <--- COLE SUA URL
+        const API_URL = "SUA_URL_DO_APPS_SCRIPT_AQUI"; // <--- COLE SUA URL
 
         let efetivoGlobal = [];
         let escalaTemp = {}; 
         let contagemServicos = {};
+        let pelotaoAtual = "";
 
-        // Inicia
+        // Funções (Linhas da Tabela)
+        const FUNCOES_VISUAL = [
+            { cod: 'CG', label: 'Cmt Guarnição' },
+            { cod: 'COV', label: 'Motorista (COV)' },
+            { cod: 'CB1', label: 'Combatente 1' },
+            { cod: 'CB2', label: 'Combatente 2' }
+        ];
+
         async function init() {
             try {
                 const res = await fetch(`${API_URL}?action=getEfetivo`);
                 efetivoGlobal = await res.json();
-                
-                const pelotoes = [...new Set(efetivoGlobal.map(m => m.pelotao))].sort();
-                const sel = document.getElementById('sel-pelotao');
-                pelotoes.forEach(p => {
-                    if(p !== "GERAL") sel.add(new Option(p, p));
-                });
-            } catch (e) { console.error(e); }
+                renderizarSidebar();
+            } catch (e) { alert("Erro ao conectar base de dados."); }
         }
 
-        // --- EDITOR ---
-        function resetarPlanner() {
-            const pelotao = document.getElementById('sel-pelotao').value;
-            if(!pelotao) return;
-
-            document.getElementById('msg-inicial').classList.add('hidden');
-            document.getElementById('controles-escala').classList.remove('hidden');
-            document.getElementById('view-editor').classList.remove('hidden');
-            alternarVisao('editor');
-
-            // Zera
-            efetivoGlobal.forEach(m => contagemServicos[m.nome] = 0);
-            const master = document.getElementById('grid-master');
-            master.innerHTML = "";
-
-            // Gera 4 Linhas (Semanas)
-            const quebras = [0, 8, 16, 24, 31];
-            for(let k=0; k<4; k++) {
-                const inicio = quebras[k] + 1;
-                const fim = quebras[k+1];
-                let html = `<div class="text-[10px] font-bold text-gray-500 mb-1 mt-2">PERÍODO: DIA ${inicio} A ${fim}</div><div class="calendar-row" style="grid-template-columns: repeat(${fim-inicio+1}, 1fr)">`;
-                
-                for(let i=inicio; i<=fim; i++) {
-                    html += `
-                    <div class="day-card rounded">
-                        <div class="day-header">DIA ${i}</div>
-                        <div class="p-1 space-y-1">
-                            <div><div class="role-label text-white">CG</div><select id="d${i}-CG" onchange="atualizar(${i}, 'CG', this.value)"><option value="">-</option>${gerarOpcoes(pelotao, i, 'CB')}</select></div>
-                            <div><div class="role-label text-blue-300">COV</div><select id="d${i}-COV" onchange="atualizar(${i}, 'COV', this.value)"><option value="">-</option>${gerarOpcoes(pelotao, i, 'COV')}</select></div>
-                            <div><div class="role-label">CB 1</div><select id="d${i}-CB1" onchange="atualizar(${i}, 'CB1', this.value)"><option value="">-</option>${gerarOpcoes(pelotao, i, 'CB')}</select></div>
-                            <div><div class="role-label">CB 2</div><select id="d${i}-CB2" onchange="atualizar(${i}, 'CB2', this.value)"><option value="">-</option>${gerarOpcoes(pelotao, i, 'CB')}</select></div>
-                        </div>
-                    </div>`;
-                }
-                html += `</div>`;
-                master.innerHTML += html;
-            }
-        }
-
-        function gerarOpcoes(pelotao, dia, tipo) {
-            let lista = efetivoGlobal.filter(m => m.pelotao === pelotao);
-            if(tipo === 'COV') lista = lista.filter(m => m.funcao.includes('COV'));
+        function renderizarSidebar() {
+            const lista = document.getElementById('lista-pelotoes');
+            const pelotoes = [...new Set(efetivoGlobal.map(m => m.pelotao))].sort();
             
-            // Ordena por uso
+            lista.innerHTML = "";
+            pelotoes.forEach(p => {
+                if(p !== "GERAL" && p !== "ERRO") {
+                    const btn = document.createElement('button');
+                    btn.className = "sidebar-btn";
+                    btn.innerText = p;
+                    btn.onclick = () => carregarPelotao(p, btn);
+                    lista.appendChild(btn);
+                }
+            });
+        }
+
+        function carregarPelotao(pelotao, btnElement) {
+            pelotaoAtual = pelotao;
+            
+            // UI Sidebar Active
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            // Reset Contadores
+            efetivoGlobal.forEach(m => contagemServicos[m.nome] = 0);
+            
+            // Renderiza Tabela Editor
+            renderizarTabelaEditor();
+            
+            // Prepara Impressão
+            prepararImpressao();
+        }
+
+        function renderizarTabelaEditor() {
+            const tbody = document.getElementById('tabela-corpo');
+            tbody.innerHTML = "";
+
+            FUNCOES_VISUAL.forEach(func => {
+                let tr = document.createElement('tr');
+                
+                // Coluna Fixa (Label da Função)
+                let th = document.createElement('th');
+                th.className = "sticky-col text-xs text-blue-300 bg-slate-900";
+                th.innerText = func.label;
+                tr.appendChild(th);
+
+                // Colunas Dias 1-31
+                for(let i=1; i<=31; i++) {
+                    let td = document.createElement('td');
+                    
+                    // Select
+                    let sel = document.createElement('select');
+                    sel.id = `d${i}-${func.cod}`;
+                    sel.className = "cell-input";
+                    
+                    // Seletor vazio inicial
+                    sel.innerHTML = `<option value="">-</option>` + gerarOpcoes(pelotaoAtual, i, func.cod);
+                    
+                    // Evento
+                    sel.onchange = function() { atualizar(i, func.cod, this.value); };
+                    
+                    // Recupera valor se existir na memória
+                    if(escalaTemp[i] && escalaTemp[i][func.cod]) {
+                        sel.value = escalaTemp[i][func.cod];
+                        // Re-aplica contagem
+                        if(sel.value) {
+                            if(!contagemServicos[sel.value]) contagemServicos[sel.value]=0;
+                            contagemServicos[sel.value]++;
+                        }
+                    }
+
+                    td.appendChild(sel);
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
+        }
+
+        function gerarOpcoes(pelotao, dia, tipoFunc) {
+            let lista = efetivoGlobal.filter(m => m.pelotao === pelotao);
+            
+            // Filtro de Função
+            if(tipoFunc === 'COV') lista = lista.filter(m => m.funcao.includes('COV'));
+            
+            // Filtro de Descanso (Quem trabalhou ontem)
+            let escalaOntem = escalaTemp[dia-1] || {};
+            let nomesOntem = Object.values(escalaOntem);
+            lista = lista.filter(m => !nomesOntem.includes(m.nome));
+
+            // Ordenação (Mais folgado primeiro)
             lista.sort((a,b) => (contagemServicos[a.nome]||0) - (contagemServicos[b.nome]||0));
 
             return lista.map(m => {
                 let c = contagemServicos[m.nome] || 0;
                 let cor = c < 6 ? '🟢' : (c > 9 ? '🔴' : '🟡');
-                return `<option value="${m.nome}">${cor} ${m.nome} (${c})</option>`;
+                return `<option value="${m.nome}">${cor} ${m.nome}</option>`;
             }).join('');
         }
 
         function atualizar(dia, cargo, nome) {
             if(!escalaTemp[dia]) escalaTemp[dia] = {};
+            
+            // Gestão de contador (remove antigo, add novo)
+            if(escalaTemp[dia][cargo]) {
+                let old = escalaTemp[dia][cargo];
+                if(contagemServicos[old]>0) contagemServicos[old]--;
+            }
+            
             if(nome) {
                 escalaTemp[dia][cargo] = nome;
-                if(!contagemServicos[nome]) contagemServicos[nome] = 0;
-                contagemServicos[nome]++;
+                if(!contagemServicos[nome]) contagemServicos[nome]=0; contagemServicos[nome]++;
             } else {
                 delete escalaTemp[dia][cargo];
             }
-            document.getElementById('stat-dias').innerText = Object.keys(escalaTemp).length + "/31 Dias";
+
+            // Atualiza Impressão em tempo real
+            prepararImpressao();
         }
 
         function autoPreencher() {
+            if(!pelotaoAtual) return alert("Selecione um pelotão!");
             const ciclo = parseInt(document.getElementById('tipo-ciclo').value);
-            for(let dia=ciclo+1; dia<=31; dia++) {
-                const origem = dia - ciclo;
+            
+            for(let d=ciclo+1; d<=31; d++) {
+                let origem = d - ciclo;
                 if(escalaTemp[origem]) {
-                    ['CG','COV','CB1','CB2'].forEach(role => {
-                        const nome = escalaTemp[origem][role];
+                    FUNCOES_VISUAL.forEach(f => {
+                        let nome = escalaTemp[origem][f.cod];
                         if(nome) {
-                            if(!escalaTemp[dia]) escalaTemp[dia] = {};
-                            escalaTemp[dia][role] = nome;
-                            const el = document.getElementById(`d${dia}-${role}`);
+                            // Atualiza Memoria
+                            if(!escalaTemp[d]) escalaTemp[d] = {};
+                            escalaTemp[d][f.cod] = nome;
+                            // Atualiza DOM
+                            let el = document.getElementById(`d${d}-${f.cod}`);
                             if(el) el.value = nome;
+                            // Atualiza Contador
                             if(!contagemServicos[nome]) contagemServicos[nome]=0; contagemServicos[nome]++;
                         }
                     });
                 }
             }
+            prepararImpressao();
         }
 
-        // --- IMPRESSÃO OFICIAL (PADRÃO PLANILHA) ---
-        function gerarTabelaOficial() {
-            const container = document.getElementById('area-tabelas-print');
-            container.innerHTML = "";
-            const pelotao = document.getElementById('sel-pelotao').value;
-            document.getElementById('titulo-impresso').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotao}`;
+        // --- LÓGICA DE IMPRESSÃO (TABELA OFICIAL) ---
+        function prepararImpressao() {
+            document.getElementById('titulo-impresso').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotaoAtual}`;
+            const tbody = document.getElementById('print-body');
+            
+            // Pega lista única de nomes escalados para gerar linhas da tabela impressa
+            let nomes = new Set();
+            for(let d=1; d<=31; d++) if(escalaTemp[d]) Object.values(escalaTemp[d]).forEach(n => nomes.add(n));
+            let listaNomes = Array.from(nomes).sort();
 
-            // Gera 4 tabelas (Semanas)
-            const quebras = [0, 8, 16, 24, 31];
-            for(let k=0; k<4; k++) {
-                const inicio = quebras[k] + 1;
-                const fim = quebras[k+1];
-                
-                let html = `
-                <table class="tabela-oficial">
-                    <thead>
-                        <tr>
-                            <th class="col-ref">DIA/MÊS</th>
-                            ${gerarCabecalhoDias(inicio, fim)}
-                        </tr>
-                        <tr>
-                            <th class="col-ref">DIA SEMANA</th>
-                            ${gerarCabecalhoSemana(inicio, fim)}
-                        </tr>
-                        <tr>
-                            <th class="col-ref">TURNO</th>
-                            ${gerarCabecalhoTurno(inicio, fim)}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col-ref">Cmt. GU.</td>
-                            ${gerarLinhaFuncao(inicio, fim, 'CG')}
-                        </tr>
-                        <tr>
-                            <td class="col-ref">COV</td>
-                            ${gerarLinhaFuncao(inicio, fim, 'COV')}
-                        </tr>
-                        <tr>
-                            <td class="col-ref">Combatente</td>
-                            ${gerarLinhaFuncao(inicio, fim, 'CB1')}
-                        </tr>
-                        <tr>
-                            <td class="col-ref">Combatente</td>
-                            ${gerarLinhaFuncao(inicio, fim, 'CB2')}
-                        </tr>
-                    </tbody>
-                </table>`;
-                container.innerHTML += html;
-            }
+            let html = "";
+            listaNomes.forEach(nome => {
+                let tr = `<tr><td style="text-align:left; font-weight:bold; padding-left:5px;">${nome}</td>`;
+                for(let i=1; i<=31; i++) {
+                    let escalado = escalaTemp[i] && Object.values(escalaTemp[i]).includes(nome);
+                    tr += escalado ? `<td class="cell-filled">24</td>` : `<td></td>`;
+                }
+                tr += "</tr>";
+                html += tr;
+            });
+            tbody.innerHTML = html;
         }
 
-        // Auxiliares da Impressão
-        function gerarCabecalhoDias(i, f) {
-            let s = ""; for(; i<=f; i++) s += `<th>${i}/01</th>`; return s;
-        }
-        function gerarCabecalhoSemana(i, f) {
-            const diasSemana = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
-            let s = ""; 
-            for(; i<=f; i++) {
-                // Simulação simples de dia da semana (ajustar ano real se precisar)
-                let d = new Date(2026, 0, i).getDay(); 
-                s += `<th>${diasSemana[d]}</th>`;
-            } return s;
-        }
-        function gerarCabecalhoTurno(i, f) {
-            let s = ""; for(; i<=f; i++) s += `<th>08:00 às 08:00</th>`; return s;
-        }
-        function gerarLinhaFuncao(inicio, fim, funcao) {
-            let s = "";
-            for(let i=inicio; i<=fim; i++) {
-                let nome = (escalaTemp[i] && escalaTemp[i][funcao]) ? escalaTemp[i][funcao] : "";
-                s += `<td>${nome}</td>`;
-            }
-            return s;
-        }
-
-        function alternarVisao(modo) {
-            if(modo === 'print') {
-                gerarTabelaOficial();
-                document.getElementById('view-print').classList.remove('hidden');
-                document.getElementById('view-editor').classList.add('hidden');
-            } else {
-                document.getElementById('view-print').classList.add('hidden');
-                document.getElementById('view-editor').classList.remove('hidden');
-            }
-        }
-
-        // Salvar (Simples)
+        // Salvar
         async function salvarEscala() {
             let payload = [];
             for(let d=1; d<=31; d++) {
-                if(escalaTemp[d]) {
-                    Object.values(escalaTemp[d]).forEach(n => payload.push({ nome: n, dia: d, codigo: "24" }));
-                }
+                if(escalaTemp[d]) Object.values(escalaTemp[d]).forEach(n => payload.push({nome:n, dia:d, codigo:"24"}));
             }
             try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert("Salvo com sucesso!");
+                await fetch(API_URL, {method:'POST', body:JSON.stringify(payload)});
+                alert("Escala Salva!");
             } catch(e) { alert("Erro ao salvar."); }
         }
 
