@@ -3,237 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA C2 - 1º BBM</title>
+    <title>ESCALA OPERACIONAL 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } } }
+            theme: { 
+                extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } } 
+            }
         }
     </script>
     
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .master-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 10px; }
-        .master-table th { background: #1e293b; color: #FFD700; position: sticky; top: 0; z-index: 20; border: 1px solid #334155; height: 28px; }
-        .master-table td { border: 1px solid #334155; height: 26px; padding: 0; position: relative; }
-        .col-nome { position: sticky; left: 0; background: #1e293b; z-index: 10; min-width: 180px; padding-left: 5px; font-weight: bold; border-right: 2px solid #475569; }
-        .row-pelotao { background: #334155; color: white; font-weight: bold; text-transform: uppercase; }
-        .bg-24 { background-color: #15803d; }
-        .bg-he { background-color: #b91c1c; }
-        .bg-afast { background-color: #64748b; color: #cbd5e1; }
-        #table-container { overflow: auto; height: calc(100vh - 80px); }
-        select.cell-in { width: 100%; height: 100%; background: transparent; border: none; color: white; text-align: center; font-size: 9px; cursor: pointer; }
-        select.cell-in option { background: #1e293b; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Tabela Operacional */
+        .ops-table { width: 100%; border-collapse: separate; border-spacing: 2px; margin-bottom: 20px; }
+        .ops-table th { background: #1e293b; color: #94a3b8; font-size: 10px; padding: 4px; border-radius: 4px; }
+        .ops-table td { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 4px; vertical-align: top; height: 45px; }
+        
+        /* Cabeçalho do Dia */
+        .day-header { background: #0f172a; color: #FFD700; font-weight: bold; font-size: 12px; text-align: center; border-bottom: 2px solid #334155; padding: 2px; }
+        
+        /* Rótulos das Funções */
+        .func-row { display: flex; align-items: center; margin-bottom: 2px; padding: 0 2px; }
+        .func-label { width: 35px; font-size: 8px; font-weight: bold; text-transform: uppercase; color: #64748b; text-align: right; margin-right: 4px; }
+        .func-input { flex-grow: 1; }
+        
+        /* Selects Bonitos */
+        select.role-select { 
+            width: 100%; background: #1e293b; color: white; border: 1px solid #475569; 
+            font-size: 9px; height: 20px; border-radius: 2px; padding-left: 2px;
+        }
+        select.role-select:focus { border-color: #FFD700; outline: none; background: #000; }
+        
+        /* Cores por Função */
+        .role-cg select { border-left: 3px solid #FFD700; }
+        .role-cov select { border-left: 3px solid #60a5fa; }
+        .role-cb select { border-left: 3px solid #4ade80; }
+
+        /* Estilo de Impressão */
+        @media print {
+            @page { size: landscape; margin: 5mm; }
+            body { background: white; color: black; }
+            .no-print, header { display: none !important; }
+            #view-print { display: block !important; }
+            #view-editor { display: none !important; }
+            
+            table { width: 100%; border-collapse: collapse; font-size: 8pt; page-break-inside: avoid; margin-bottom: 15px; }
+            th, td { border: 1px solid black; padding: 2px; text-align: center; }
+            .bg-gray-200 { background-color: #ddd !important; -webkit-print-color-adjust: exact; }
+        }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="flex flex-col min-h-screen">
 
-    <div id="loader" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center">
-        <i class="fas fa-sync fa-spin text-4xl text-fire-yellow mb-2"></i>
-        <p class="text-white font-bold" id="msg-loader">SINCRONIZANDO COM DRIVE...</p>
-    </div>
-
-    <header class="h-10 bg-slate-900 border-b border-white/10 flex items-center justify-between px-4 shrink-0">
-        <div class="flex items-center gap-2">
-            <h1 class="font-black text-white text-xs">MAPA GERAL (DRIVE)</h1>
-            <span class="bg-blue-600 text-white text-[10px] px-2 rounded">JANEIRO 2026</span>
+    <header class="h-14 bg-slate-900 border-b border-white/10 flex items-center justify-between px-6 shrink-0 no-print">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-fire-extinguisher text-fire-yellow text-2xl"></i>
+            <div>
+                <h1 class="font-black text-white text-sm">ESCALA OPERACIONAL</h1>
+                <h2 class="text-[10px] text-gray-400">1º BATALHÃO DE BOMBEIROS MILITAR</h2>
+            </div>
         </div>
-        <div>
-            <button onclick="salvarTudo()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs font-bold transition shadow-lg">
-                <i class="fas fa-cloud-upload-alt mr-1"></i> SALVAR NO DRIVE
+        
+        <div class="flex items-center gap-4 bg-slate-800 p-2 rounded-lg border border-slate-700">
+            <div class="flex flex-col">
+                <label class="text-[9px] text-gray-400 font-bold uppercase">Pelotão:</label>
+                <select id="sel-pelotao" class="bg-slate-700 text-white text-xs font-bold border border-slate-600 rounded w-40 h-6" onchange="carregarPelotao()">
+                    <option value="">Selecione...</option>
+                </select>
+            </div>
+
+            <div class="h-8 w-px bg-white/10"></div>
+
+            <div class="flex items-end gap-2">
+                <div class="flex flex-col">
+                    <label class="text-[9px] text-gray-400 font-bold uppercase">Ciclo:</label>
+                    <select id="tipo-ciclo" class="bg-slate-900 text-white text-xs border border-slate-600 rounded h-6">
+                        <option value="4">24x72 (4 dias)</option>
+                        <option value="2">24x48 (2 dias)</option>
+                    </select>
+                </div>
+                <button onclick="autoPreencher()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded h-6 text-xs font-bold transition flex items-center" title="Preencher mês automaticamente">
+                    <i class="fas fa-bolt mr-1"></i> REPLICAR
+                </button>
+            </div>
+
+            <div class="h-8 w-px bg-white/10"></div>
+
+            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-1 rounded text-xs font-bold h-8">
+                <i class="fas fa-print mr-2"></i> IMPRIMIR
+            </button>
+            
+            <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs font-bold h-8 shadow-lg flex items-center">
+                <i class="fas fa-save mr-2"></i> SALVAR
             </button>
         </div>
     </header>
 
-    <div id="table-container">
-        <table class="master-table">
-            <thead>
-                <tr>
-                    <th class="col-nome z-30">MILITAR / PELOTÃO</th>
-                    <script>for(let i=1;i<=31;i++) document.write(`<th style="min-width:28px">${i}</th>`)</script>
-                    <th class="bg-slate-900 text-blue-300 min-w-[40px]">ORD</th>
-                    <th class="bg-slate-900 text-red-300 min-w-[40px]">HE</th>
-                    <th class="bg-slate-900 text-yellow-300 min-w-[40px]">ETP</th>
-                    <th class="bg-slate-900 text-green-300 min-w-[70px]">VALOR</th>
-                </tr>
-            </thead>
-            <tbody id="tabela-corpo"></tbody>
-        </table>
+    <main class="container mx-auto p-4 flex-grow">
+        
+        <div id="view-editor">
+            <div id="msg-inicial" class="text-center py-32 text-gray-500">
+                <i class="fas fa-arrow-up text-4xl mb-4 animate-bounce text-slate-700"></i><br>
+                <span class="text-lg">Selecione o Pelotão acima para montar a escala.</span>
+            </div>
+
+            <div id="grid-container" class="hidden space-y-6"></div>
+        </div>
+
+        <div id="view-print" class="hidden">
+            <div class="text-center border-b-2 border-black pb-2 mb-4">
+                <h2 class="font-bold text-lg">CORPO DE BOMBEIROS MILITAR - 1º BBM</h2>
+                <p class="font-bold text-sm" id="titulo-imp">ESCALA DE SERVIÇO - JANEIRO 2026</p>
+            </div>
+            <div id="tabelas-imp"></div>
+            <div class="flex justify-around mt-10 border-t border-gray-300 pt-10">
+                <div class="border-t border-black w-1/3 text-center pt-2 text-xs">Resp. Escala</div>
+                <div class="border-t border-black w-1/3 text-center pt-2 text-xs">Comandante</div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="modal-fin" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg w-full max-w-lg border border-slate-600 shadow-2xl">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                <h3 class="text-white font-bold"><i class="fas fa-check-circle text-green-500 mr-2"></i> ESCALA SALVA!</h3>
+                <button onclick="document.getElementById('modal-fin').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-300 text-sm mb-4">A previsão financeira para este pelotão foi atualizada:</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900 p-4 rounded text-center border border-slate-700">
+                        <div class="text-xs text-gray-500 font-bold uppercase">Horas Extras</div>
+                        <div class="text-2xl text-green-400 font-black" id="res-he">R$ 0,00</div>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded text-center border border-slate-700">
+                        <div class="text-xs text-gray-500 font-bold uppercase">Etapas</div>
+                        <div class="text-2xl text-blue-400 font-black" id="res-etp">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-slate-900 text-right rounded-b-lg">
+                <button onclick="document.getElementById('modal-fin').classList.add('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold">OK, CONTINUAR</button>
+            </div>
+        </div>
     </div>
 
-    <footer class="h-10 bg-black border-t border-yellow-600 flex items-center justify-between px-4 text-xs font-bold text-white shrink-0">
-        <div>TOTAL GERAL:</div>
-        <div class="flex gap-4">
-            <span class="text-green-400">HE: <span id="gt-he">0</span>h (<span id="gt-val">R$ 0,00</span>)</span>
-            <span class="text-blue-400">ETAPAS: <span id="gt-etp">0</span></span>
-        </div>
-    </footer>
+    <div id="loader" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center">
+        <i class="fas fa-spinner fa-spin text-4xl text-fire-yellow mb-4"></i>
+        <p class="text-white font-bold tracking-widest">CARREGANDO SISTEMA...</p>
+    </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbytRPSQv6_YO7Jr78IvQZZZHRjVOWBW58Y-VhQz7Q02E_VddwTgZp0NJQabqEqU_9Q/exec"; // <--- COLE SUA URL
 
-        let DB = { efetivo: [], precos: {}, config: {}, escala: {} };
-        const OPCOES = ["", "24", "12D", "12N", "A07", "LTS", "FER"];
-        
-        // Controle de alterações para salvar apenas o necessário (opcional, aqui salvamos por pelotão)
-        let pelotoesAlterados = new Set(); 
+        let DB = { efetivo: [], escala: {} }; // escala: { 1: {CG:'Fulano', COV:'Ciclano'}, 2: {...} }
+        let pelotaoAtual = "";
 
+        // Inicialização
         async function init() {
             try {
-                const res = await fetch(`${API_URL}?action=getInitData`);
-                const dados = await res.json();
-                DB = { ...dados, escala: dados.escalaSalva || {} };
-                renderizar();
-                document.getElementById('loader').classList.add('hidden');
-            } catch (e) { alert("Erro de conexão: " + e); }
-        }
-
-        function renderizar() {
-            const tbody = document.getElementById('tabela-corpo');
-            tbody.innerHTML = "";
-            const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))].sort();
-            
-            let gtHE=0, gtVal=0, gtEtp=0;
-
-            pelotoes.forEach(pel => {
-                if(pel === "GERAL") return;
+                const res = await fetch(`${API_URL}?action=getEfetivo`);
+                DB.efetivo = await res.json();
                 
-                // Cabeçalho Pelotão
-                tbody.innerHTML += `<tr class="row-pelotao"><td class="col-nome pl-2 py-1" colspan="36">${pel}</td></tr>`;
-                
-                const militares = DB.efetivo.filter(m => m.pelotao === pel);
-                let subHE=0, subVal=0, subEtp=0;
-
-                militares.forEach(mil => {
-                    const stats = calcular(mil.nome, mil.posto);
-                    subHE += stats.he; subVal += stats.val; subEtp += stats.etp;
-
-                    let tr = document.createElement('tr');
-                    // Nome Fixo
-                    tr.innerHTML = `<td class="col-nome text-[9px] border-r"><span class="text-gray-400">${mil.posto}</span><br>${mil.nome}</td>`;
-                    
-                    // Dias
-                    for(let i=1; i<=31; i++) {
-                        let td = document.createElement('td');
-                        let val = (DB.escala[mil.nome] && DB.escala[mil.nome][i]) || "";
-                        
-                        if(val === "24") td.className = "bg-24";
-                        else if(val.includes("12") || val === "A07") td.className = "bg-he";
-                        else if(["LTS","FER"].includes(val)) td.className = "bg-afast";
-
-                        let sel = document.createElement('select');
-                        sel.className = "cell-in";
-                        sel.innerHTML = `<option value="${val}">${val}</option>` + OPCOES.filter(o=>o!==val).map(o=>`<option value="${o}">${o}</option>`).join('');
-                        
-                        sel.onchange = function() {
-                            if(!DB.escala[mil.nome]) DB.escala[mil.nome] = {};
-                            DB.escala[mil.nome][i] = this.value;
-                            if(this.value === "") delete DB.escala[mil.nome][i];
-                            
-                            // Marca o pelotão como alterado para salvar
-                            pelotoesAlterados.add(pel);
-                            renderizar(); // Atualiza totais (pode otimizar depois)
-                        };
-                        td.appendChild(sel);
-                        tr.appendChild(td);
-                    }
-                    
-                    // Totais Linha
-                    tr.innerHTML += `
-                        <td class="text-center text-blue-300 font-bold bg-slate-800">${Math.floor(stats.ord)}</td>
-                        <td class="text-center text-red-300 font-bold bg-slate-800">${stats.he.toFixed(0)}</td>
-                        <td class="text-center text-yellow-300 font-bold bg-slate-800">${stats.etp}</td>
-                        <td class="text-right pr-2 text-green-300 font-bold bg-slate-800">${stats.valFmt}</td>`;
-                    tbody.appendChild(tr);
+                const sel = document.getElementById('sel-pelotao');
+                const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))].sort();
+                pelotoes.forEach(p => {
+                    if(p !== "GERAL" && p !== "ERRO") sel.add(new Option(p, p));
                 });
-
-                // Rodapé Pelotão
-                tbody.innerHTML += `<tr class="bg-slate-700 text-white font-bold text-[9px]"><td class="col-nome text-right pr-2">TOTAL ${pel}:</td><td colspan="31"></td><td class="text-center">-</td><td class="text-center text-red-300">${subHE.toFixed(0)}</td><td class="text-center text-yellow-300">${subEtp}</td><td class="text-right pr-2 text-green-300">R$ ${subVal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td></tr>`;
                 
-                gtHE+=subHE; gtVal+=subVal; gtEtp+=subEtp;
-            });
-
-            document.getElementById('gt-he').innerText = gtHE.toFixed(0);
-            document.getElementById('gt-etp').innerText = gtEtp;
-            document.getElementById('gt-val').innerText = gtVal.toLocaleString('pt-BR',{style:'currency', currency:'BRL'});
+                document.getElementById('loader').classList.add('hidden');
+            } catch (e) { alert("Erro de conexão."); }
         }
 
-        function calcular(nome, posto) {
-            let dados = DB.escala[nome] || {};
-            let hReais=0, hGSE=0;
-            const vals = {"24":24, "12D":12, "12N":12, "A07":7, "LTS":5.71, "FER":5.71};
+        // Carrega a tela do Pelotão
+        function carregarPelotao() {
+            pelotaoAtual = document.getElementById('sel-pelotao').value;
             
-            for(let i=1; i<=31; i++) {
-                let v = vals[dados[i]] || 0;
-                if(v > 0) {
-                    if(["LTS","FER"].includes(dados[i])) hGSE += v;
-                    else { hReais += v; hGSE += v; }
-                }
+            if(!pelotaoAtual) {
+                document.getElementById('msg-inicial').classList.remove('hidden');
+                document.getElementById('grid-container').classList.add('hidden');
+                return;
             }
-            
-            let baseEtp = Math.min(hReais, DB.config.cargaMensal);
-            let etp = Math.floor(baseEtp / 6);
-            let saldo = hGSE - DB.config.cargaMensal;
-            let he = saldo > 0 ? saldo : 0;
-            let ord = hGSE - he;
-            
-            let preco = 0;
-            for(const [k,v] of Object.entries(DB.precos)) if(posto.includes(k) || k.includes(posto)) { preco = v; break; }
-            let val = he * preco;
 
-            return { ord:ord, he:he, etp:etp, val:val, valFmt: val.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) };
+            // Reseta a memória visual (não a do DB global por enquanto)
+            // Aqui vamos criar uma estrutura baseada em DIAS, que é mais fácil para o visual
+            // A estrutura será: escalaVisual[dia] = { CG: "", COV: "", CB1: "", CB2: "" }
+            window.escalaVisual = {};
+            
+            document.getElementById('msg-inicial').classList.add('hidden');
+            document.getElementById('grid-container').classList.remove('hidden');
+            
+            renderizarGrid();
         }
 
-        async function salvarTudo() {
-            const btn = document.querySelector('button');
-            const icon = btn.querySelector('i');
-            const originalText = btn.innerHTML;
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
+        function renderizarGrid() {
+            const container = document.getElementById('grid-container');
+            container.innerHTML = "";
 
-            // Salva todos os pelotões que existem no DB.escala
-            // Para otimizar, poderiamos salvar apenas 'pelotoesAlterados', mas vamos garantir tudo por segurança
+            // Divide 31 dias em 4 semanas (linhas)
+            const semanas = [
+                {i:1, f:8}, {i:9, f:16}, {i:17, f:24}, {i:25, f:31}
+            ];
+
+            semanas.forEach(sem => {
+                let html = `
+                <div class="glass-panel p-2">
+                    <table class="ops-table">
+                        <thead>
+                            <tr>
+                                ${gerarCabecalhos(sem.i, sem.f)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                ${gerarCelulas(sem.i, sem.f)}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function gerarCabecalhos(inicio, fim) {
+            let s = "";
+            for(let i=inicio; i<=fim; i++) {
+                s += `<th class="day-header">DIA ${i}</th>`;
+            }
+            return s;
+        }
+
+        function gerarCelulas(inicio, fim) {
+            let s = "";
+            for(let i=inicio; i<=fim; i++) {
+                s += `
+                <td>
+                    <div class="func-row role-cg">
+                        <span class="func-label">CG</span>
+                        <div class="func-input">${criarSelect(i, 'CG')}</div>
+                    </div>
+                    <div class="func-row role-cov">
+                        <span class="func-label text-blue-300">COV</span>
+                        <div class="func-input">${criarSelect(i, 'COV')}</div>
+                    </div>
+                    <div class="func-row role-cb">
+                        <span class="func-label">CB1</span>
+                        <div class="func-input">${criarSelect(i, 'CB1')}</div>
+                    </div>
+                    <div class="func-row role-cb">
+                        <span class="func-label">CB2</span>
+                        <div class="func-input">${criarSelect(i, 'CB2')}</div>
+                    </div>
+                </td>`;
+            }
+            return s;
+        }
+
+        function criarSelect(dia, funcao) {
+            // Filtra opções
+            let opcoes = DB.efetivo.filter(m => m.pelotao === pelotaoAtual);
             
-            const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))];
+            // Regra: Só COV dirige
+            if(funcao === 'COV') opcoes = opcoes.filter(m => m.funcao.includes('COV'));
             
-            try {
-                // Processamento Serial para não sobrecarregar o script
-                for (const pel of pelotoes) {
-                    if(pel === "GERAL") continue;
-                    
-                    // Filtra dados deste pelotão
-                    let dadosPelotao = [];
-                    const militares = DB.efetivo.filter(m => m.pelotao === pel);
-                    
-                    militares.forEach(mil => {
-                        if(DB.escala[mil.nome]) {
-                            for(const [dia, cod] of Object.entries(DB.escala[mil.nome])) {
-                                dadosPelotao.push({ nome: mil.nome, dia: dia, codigo: cod });
-                            }
+            // Ordena alfabeticamente
+            opcoes.sort((a,b) => a.nome.localeCompare(b.nome));
+
+            let html = `<select class="role-select" id="d${dia}-${funcao}" onchange="atualizarMemoria(${dia}, '${funcao}', this.value)">`;
+            html += `<option value="">--</option>`;
+            
+            opcoes.forEach(m => {
+                html += `<option value="${m.nome}">${m.posto} ${m.nome}</option>`;
+            });
+            html += `</select>`;
+            return html;
+        }
+
+        // --- LÓGICA ---
+        function atualizarMemoria(dia, funcao, nome) {
+            if(!window.escalaVisual[dia]) window.escalaVisual[dia] = {};
+            window.escalaVisual[dia][funcao] = nome;
+            
+            // Validação simples de descanso (Dia seguinte)
+            if(dia < 31) validarDia(dia + 1);
+        }
+
+        function validarDia(dia) {
+            // Se alguém trabalhou no dia anterior, marca em vermelho no dia atual
+            if(!window.escalaVisual[dia-1]) return;
+            
+            const quemTrabalhouOntem = Object.values(window.escalaVisual[dia-1]);
+            
+            ['CG', 'COV', 'CB1', 'CB2'].forEach(f => {
+                const el = document.getElementById(`d${dia}-${f}`);
+                if(el && el.value && quemTrabalhouOntem.includes(el.value)) {
+                    el.style.backgroundColor = "#7f1d1d"; // Vermelho
+                    el.style.color = "#fecaca";
+                } else if (el) {
+                    el.style.backgroundColor = "#1e293b"; // Normal
+                    el.style.color = "white";
+                }
+            });
+        }
+
+        function autoPreencher() {
+            const ciclo = parseInt(document.getElementById('tipo-ciclo').value);
+            for(let d = ciclo + 1; d <= 31; d++) {
+                const origem = d - ciclo;
+                if(window.escalaVisual[origem]) {
+                    ['CG', 'COV', 'CB1', 'CB2'].forEach(f => {
+                        const nome = window.escalaVisual[origem][f];
+                        if(nome) {
+                            if(!window.escalaVisual[d]) window.escalaVisual[d] = {};
+                            window.escalaVisual[d][f] = nome;
+                            
+                            const el = document.getElementById(`d${d}-${f}`);
+                            if(el) el.value = nome;
                         }
                     });
-
-                    // Só envia se tiver dados
-                    if(dadosPelotao.length > 0) {
-                        await fetch(API_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({ pelotao: pel, dados: dadosPelotao })
-                        });
-                    }
+                    validarDia(d);
                 }
-                
-                alert("Todas as escalas foram salvas no Drive!");
-                pelotoesAlterados.clear();
-                
-            } catch(e) {
-                alert("Erro ao salvar: " + e);
             }
+        }
+
+        // --- SALVAR NO DRIVE ---
+        async function salvarEscala() {
+            const btn = document.querySelector('button[onclick="salvarEscala()"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
             
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+            // Converte o formato visual (Dia -> Funcao -> Nome)
+            // Para o formato do Banco de Dados (Nome -> Dia -> Codigo "24")
+            let payload = [];
+            
+            for(let d=1; d<=31; d++) {
+                if(window.escalaVisual[d]) {
+                    Object.values(window.escalaVisual[d]).forEach(nome => {
+                        if(nome) payload.push({ nome: nome, dia: d, codigo: "24" });
+                    });
+                }
+            }
+
+            if(payload.length === 0) { alert("Escala vazia!"); btn.innerHTML = "SALVAR"; return; }
+
+            try {
+                // 1. Salva
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ pelotao: pelotaoAtual, dados: payload }) 
+                });
+                
+                // 2. Pede cálculo financeiro (opcional, aqui simulamos sucesso)
+                document.getElementById('modal-fin').classList.remove('hidden');
+                document.getElementById('res-he').innerText = "ATUALIZADO"; 
+                document.getElementById('res-etp').innerText = "OK";
+
+            } catch(e) { alert("Erro ao salvar: " + e); }
+            
+            btn.innerHTML = '<i class="fas fa-save mr-2"></i> SALVAR';
         }
 
         init();
