@@ -3,370 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESCALA GERAL - 1º BBM</title>
+    <title>MAPA GERAL 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
-            theme: { 
-                extend: { 
-                    colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } 
-                } 
-            }
+            theme: { extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } } }
         }
     </script>
     
     <style>
-        /* ESTILOS DE TELA */
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* Tabela Editor (Estilo Excel Escuro) */
-        .editor-table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        .editor-table th, .editor-table td { 
-            border: 1px solid #334155; 
-            padding: 0; height: 32px; 
-            min-width: 90px; /* Largura da célula do dia */
-        }
+        /* TABELA DE DADOS */
+        .master-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 10px; }
+        .master-table th { background: #1e293b; color: #FFD700; position: sticky; top: 0; z-index: 20; border: 1px solid #334155; height: 28px; }
+        .master-table td { border: 1px solid #334155; height: 26px; padding: 0; position: relative; }
         
-        /* Cabeçalhos Fixos */
-        .sticky-col { position: sticky; left: 0; background: #1e293b; z-index: 10; width: 100px; border-right: 2px solid #475569; }
-        .sticky-header { position: sticky; top: 0; background: #0f172a; z-index: 20; color: #FFD700; font-weight: bold; }
-        .z-corner { z-index: 30; background: #b71c1c; color: white; }
+        /* COLUNAS ESPECIAIS */
+        .col-nome { position: sticky; left: 0; background: #1e293b; z-index: 10; min-width: 180px; padding-left: 5px; font-weight: bold; border-right: 2px solid #475569; }
+        .col-resumo { background: #0f172a; font-weight: bold; text-align: center; min-width: 40px; }
+        .col-dinheiro { background: #0f172a; font-weight: bold; text-align: right; padding-right: 5px; color: #4ade80; min-width: 70px; }
+        
+        /* SEPARADOR DE PELOTÃO */
+        .row-pelotao { background: #334155; color: white; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .row-total-pel { background: #475569; color: #FFD700; font-weight: bold; text-align: right; }
 
-        /* Inputs Compactos */
-        select.cell-input { 
-            width: 100%; height: 100%; background: transparent; border: none; 
-            color: #e2e8f0; font-size: 10px; padding: 0 4px; cursor: pointer; text-align: center;
-        }
-        select.cell-input:hover { background: #334155; }
-        select.cell-input:focus { background: #1e293b; outline: 2px solid #FFD700; }
+        /* INPUTS */
+        select.cell-in { width: 100%; height: 100%; background: transparent; border: none; color: white; text-align: center; -webkit-appearance: none; font-size: 9px; font-weight: bold; cursor: pointer; }
+        select.cell-in:focus { background: #b71c1c; outline: none; }
+        select.cell-in option { background: #1e293b; }
 
-        /* Menu Lateral dos Pelotões */
-        .sidebar-btn { 
-            display: block; width: 100%; text-align: left; padding: 10px 15px; 
-            font-size: 11px; font-weight: bold; color: #94a3b8; border-bottom: 1px solid #334155; 
-            transition: 0.2s; 
-        }
-        .sidebar-btn:hover { background: #1e293b; color: white; }
-        .sidebar-btn.active { background: #b71c1c; color: white; border-right: 4px solid #FFD700; }
+        /* CORES DE CÉLULA */
+        .bg-24 { background-color: #15803d; }
+        .bg-he { background-color: #b91c1c; }
+        .bg-afast { background-color: #64748b; color: #cbd5e1; }
 
-        /* MODO IMPRESSÃO (GRID QUADRADO OFICIAL) */
-        @media print {
-            @page { size: landscape; margin: 5mm; }
-            body { background: white; color: black; overflow: visible; font-family: 'Arial', sans-serif; }
-            .no-print, header, #sidebar { display: none !important; }
-            
-            #main-area { margin: 0; padding: 0; width: 100%; }
-            #view-editor { display: none; }
-            #view-print { display: block !important; }
-
-            /* Tabela de Impressão */
-            .print-table { 
-                width: 100%; border-collapse: collapse; font-size: 7pt; table-layout: fixed; 
-            }
-            .print-table th, .print-table td { 
-                border: 1px solid black; padding: 2px; text-align: center; height: 18px; 
-                overflow: hidden; white-space: nowrap;
-            }
-            /* Cabeçalho Cinza */
-            .print-header { background-color: #e5e5e5 !important; font-weight: bold; -webkit-print-color-adjust: exact; }
-            /* Célula de Serviço (Preenchida) */
-            .cell-filled { background-color: #d1d5db !important; font-weight: bold; -webkit-print-color-adjust: exact; }
-            
-            .header-print { text-align: center; border-bottom: 2px solid black; margin-bottom: 10px; padding-bottom: 5px; }
-            .assinaturas { display: flex; justify-content: space-between; margin-top: 30px; }
-            .assinatura-line { border-top: 1px solid black; width: 30%; text-align: center; padding-top: 2px; font-size: 8pt; }
-        }
+        /* SCROLL */
+        #table-container { overflow: auto; height: calc(100vh - 80px); } /* Ajuste para rodapé */
+        
+        /* RODAPÉ TOTAL */
+        footer { height: 40px; background: #000; border-top: 2px solid #FFD700; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 50; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <header class="h-12 bg-slate-900 border-b border-white/10 flex items-center justify-between px-4 no-print shrink-0">
+    <div id="loader" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center">
+        <i class="fas fa-spinner fa-spin text-4xl text-fire-yellow mb-2"></i>
+        <p class="text-white font-bold">CARREGANDO MAPA GERAL...</p>
+    </div>
+
+    <header class="h-10 bg-slate-900 border-b border-white/10 flex items-center justify-between px-4 shrink-0">
         <div class="flex items-center gap-2">
-            <i class="fas fa-fire-extinguisher text-fire-yellow text-lg"></i>
-            <h1 class="font-bold text-white text-sm tracking-wide">SISTEMA C2 - 1º BBM</h1>
+            <h1 class="font-black text-white text-xs">MAPA GERAL 1º BBM</h1>
+            <span class="bg-blue-600 text-white text-[10px] px-2 rounded">JANEIRO 2026</span>
         </div>
-        
-        <div class="flex items-center gap-2">
-            <div class="bg-slate-800 rounded flex items-center p-1 border border-slate-700">
-                <span class="text-[10px] text-gray-400 px-2 font-bold uppercase">Preenchimento:</span>
-                <select id="tipo-ciclo" class="bg-slate-900 text-white text-xs border border-slate-600 rounded px-1 h-6">
-                    <option value="4">24x72 (4 Dias)</option>
-                    <option value="2">24x48 (2 Dias)</option>
-                </select>
-                <button onclick="autoPreencher()" class="ml-2 bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-0.5 rounded text-xs font-bold" title="Replicar padrão para o mês">
-                    <i class="fas fa-bolt"></i>
-                </button>
-            </div>
-
-            <div class="h-6 w-px bg-white/10 mx-1"></div>
-
-            <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-xs font-bold transition">
-                <i class="fas fa-print mr-1"></i> IMPRIMIR
-            </button>
-            <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs font-bold shadow-lg transition">
-                <i class="fas fa-save mr-1"></i> SALVAR
+        <div>
+            <button onclick="salvarTudo()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs font-bold transition">
+                <i class="fas fa-save mr-1"></i> SALVAR ALTERAÇÕES
             </button>
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
-        
-        <aside id="sidebar" class="w-48 bg-slate-900 border-r border-white/10 overflow-y-auto shrink-0 no-print">
-            <div class="p-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Pelotões</div>
-            <div id="lista-pelotoes">
-                <div class="p-4 text-center text-gray-500 text-xs"><i class="fas fa-circle-notch fa-spin"></i> Carregando...</div>
-            </div>
-        </aside>
-
-        <main id="main-area" class="flex-1 overflow-auto bg-slate-800 relative">
-            
-            <div id="view-editor" class="absolute inset-0">
-                <table class="editor-table">
-                    <thead class="bg-slate-900">
-                        <tr>
-                            <th class="sticky-col sticky-header z-corner text-xs text-white">FUNÇÃO</th>
-                            <script>
-                                for(let i=1; i<=31; i++) document.write(`<th class="sticky-header text-xs">${i}</th>`);
-                            </script>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-corpo">
-                        <tr><td colspan="32" class="text-center text-gray-500 py-20">Selecione um pelotão ao lado.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="view-print" class="hidden">
-                <div class="header-print">
-                    <h2 style="font-size:12pt; font-weight:bold;">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h2>
-                    <h3 style="font-size:10pt;">CORPO DE BOMBEIROS MILITAR - 1º BBM</h3>
-                    <p style="font-size:9pt; margin-top:5px;" id="titulo-impresso">ESCALA DE SERVIÇO - JANEIRO 2026</p>
-                </div>
-
-                <table class="print-table">
-                    <thead>
-                        <tr class="print-header">
-                            <th style="width:150px; text-align:left; padding-left:5px;">NOME / GRAD</th>
-                            <script>for(let i=1;i<=31;i++) document.write(`<th>${i}</th>`)</script>
-                        </tr>
-                    </thead>
-                    <tbody id="print-body">
-                        </tbody>
-                </table>
-
-                <div class="assinaturas">
-                    <div class="assinatura-line">Sargenteante</div>
-                    <div class="assinatura-line">Comandante de Pelotão</div>
-                    <div class="assinatura-line">Comandante de Companhia</div>
-                </div>
-            </div>
-
-        </main>
+    <div id="table-container">
+        <table class="master-table">
+            <thead>
+                <tr>
+                    <th class="col-nome z-30">MILITAR / PELOTÃO</th>
+                    <script>for(let i=1;i<=31;i++) document.write(`<th style="min-width:25px">${i}</th>`)</script>
+                    <th class="col-resumo text-blue-300">ORD</th>
+                    <th class="col-resumo text-red-300">HE</th>
+                    <th class="col-resumo text-yellow-300">ETP</th>
+                    <th class="col-dinheiro">VALOR HE</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-corpo">
+                </tbody>
+        </table>
     </div>
 
+    <footer class="text-xs font-bold text-white">
+        <div class="flex gap-4">
+            <span>TOTAL BATALHÃO:</span>
+            <span class="text-green-400">HE: <span id="grand-total-he">0</span>h (<span id="grand-total-val">R$ 0,00</span>)</span>
+            <span class="text-blue-400">ETAPAS: <span id="grand-total-etp">0</span></span>
+        </div>
+        <div class="text-[9px] text-gray-500">SISTEMA C2 v11.0</div>
+    </footer>
+
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzwCdGHXkNF5IBhbLgAw8IlnZPrRLwEQ46uHgerfdpLsZnKhw2-KB26J4X-16VrzjGR/exec"; // <--- COLE SUA URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbxrGmzUMT2C_PWQjy-bRzv0SZmBjZ7bxjurfTfPYmmaC3O5feQhq0XdsJH5NgjE2x1D/exec"; // <--- COLE SUA URL
 
-        let efetivoGlobal = [];
-        let escalaTemp = {}; 
-        let contagemServicos = {};
-        let pelotaoAtual = "";
+        // DADOS GLOBAIS
+        let DB = {
+            efetivo: [],
+            precos: {},
+            config: {},
+            escala: {} // { "NOME": { 1: "24", 5: "12D" } }
+        };
 
-        // Funções (Linhas da Tabela)
-        const FUNCOES_VISUAL = [
-            { cod: 'CG', label: 'Cmt Guarnição' },
-            { cod: 'COV', label: 'Motorista (COV)' },
-            { cod: 'CB1', label: 'Combatente 1' },
-            { cod: 'CB2', label: 'Combatente 2' }
-        ];
+        const OPCOES_TURNO = ["", "24", "12D", "12N", "A07", "LTS", "FER", "F"];
+        const VALORES_HORA = { "24":24, "12D":12, "12N":12, "A07":7, "LTS":5.71, "FER":5.71, "F":0 };
 
         async function init() {
             try {
-                const res = await fetch(`${API_URL}?action=getEfetivo`);
-                efetivoGlobal = await res.json();
-                renderizarSidebar();
-            } catch (e) { alert("Erro ao conectar base de dados."); }
+                const res = await fetch(`${API_URL}?action=getInitData`);
+                const dados = await res.json();
+                
+                DB.efetivo = dados.efetivo;
+                DB.precos = dados.precos;
+                DB.config = dados.config;
+                DB.escala = dados.escalaSalva || {};
+
+                renderizarTabela();
+                document.getElementById('loader').classList.add('hidden');
+                
+            } catch (e) { alert("Erro ao carregar: " + e); }
         }
 
-        function renderizarSidebar() {
-            const lista = document.getElementById('lista-pelotoes');
-            const pelotoes = [...new Set(efetivoGlobal.map(m => m.pelotao))].sort();
-            
-            lista.innerHTML = "";
-            pelotoes.forEach(p => {
-                if(p !== "GERAL" && p !== "ERRO") {
-                    const btn = document.createElement('button');
-                    btn.className = "sidebar-btn";
-                    btn.innerText = p;
-                    btn.onclick = () => carregarPelotao(p, btn);
-                    lista.appendChild(btn);
-                }
-            });
-        }
-
-        function carregarPelotao(pelotao, btnElement) {
-            pelotaoAtual = pelotao;
-            
-            // UI Sidebar Active
-            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
-
-            // Reset Contadores
-            efetivoGlobal.forEach(m => contagemServicos[m.nome] = 0);
-            
-            // Renderiza Tabela Editor
-            renderizarTabelaEditor();
-            
-            // Prepara Impressão
-            prepararImpressao();
-        }
-
-        function renderizarTabelaEditor() {
+        function renderizarTabela() {
             const tbody = document.getElementById('tabela-corpo');
             tbody.innerHTML = "";
 
-            FUNCOES_VISUAL.forEach(func => {
-                let tr = document.createElement('tr');
-                
-                // Coluna Fixa (Label da Função)
-                let th = document.createElement('th');
-                th.className = "sticky-col text-xs text-blue-300 bg-slate-900";
-                th.innerText = func.label;
-                tr.appendChild(th);
+            // Agrupar por Pelotão
+            const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))].sort();
 
-                // Colunas Dias 1-31
-                for(let i=1; i<=31; i++) {
-                    let td = document.createElement('td');
+            // Totais Globais
+            let grandHE = 0, grandVal = 0, grandEtp = 0;
+
+            pelotoes.forEach(pel => {
+                if(pel === "GERAL") return;
+
+                // Cabeçalho do Pelotão
+                tbody.innerHTML += `
+                <tr class="row-pelotao">
+                    <td class="col-nome bg-slate-700 pl-2 py-1" colspan="36">${pel}</td>
+                </tr>`;
+
+                const militares = DB.efetivo.filter(m => m.pelotao === pel);
+                let subHE = 0, subVal = 0, subEtp = 0;
+
+                militares.forEach(mil => {
+                    // Calcula linha
+                    const stats = calcularMilitar(mil.nome, mil.posto);
                     
-                    // Select
-                    let sel = document.createElement('select');
-                    sel.id = `d${i}-${func.cod}`;
-                    sel.className = "cell-input";
+                    // Soma aos subtotais
+                    subHE += stats.he;
+                    subVal += stats.val;
+                    subEtp += stats.etp;
+
+                    // Renderiza Linha
+                    let tr = document.createElement('tr');
                     
-                    // Seletor vazio inicial
-                    sel.innerHTML = `<option value="">-</option>` + gerarOpcoes(pelotaoAtual, i, func.cod);
-                    
-                    // Evento
-                    sel.onchange = function() { atualizar(i, func.cod, this.value); };
-                    
-                    // Recupera valor se existir na memória
-                    if(escalaTemp[i] && escalaTemp[i][func.cod]) {
-                        sel.value = escalaTemp[i][func.cod];
-                        // Re-aplica contagem
-                        if(sel.value) {
-                            if(!contagemServicos[sel.value]) contagemServicos[sel.value]=0;
-                            contagemServicos[sel.value]++;
-                        }
+                    // Coluna Nome Fixa
+                    let tdNome = document.createElement('td');
+                    tdNome.className = "col-nome text-[9px] border-r";
+                    tdNome.innerHTML = `<span class="text-gray-400">${mil.posto}</span><br>${mil.nome}`;
+                    tr.appendChild(tdNome);
+
+                    // Dias 1-31
+                    for(let i=1; i<=31; i++) {
+                        let td = document.createElement('td');
+                        let valAtual = (DB.escala[mil.nome] && DB.escala[mil.nome][i]) ? DB.escala[mil.nome][i] : "";
+                        
+                        // Classe de cor baseada no valor
+                        if(valAtual === "24") td.className = "bg-24";
+                        else if(valAtual.includes("12") || valAtual === "A07") td.className = "bg-he";
+                        else if(["LTS","FER"].includes(valAtual)) td.className = "bg-afast";
+
+                        let sel = document.createElement('select');
+                        sel.className = "cell-in";
+                        // Popula opções (simplificado para performance)
+                        sel.innerHTML = `<option value="${valAtual}">${valAtual}</option>` + 
+                                        OPCOES_TURNO.filter(o => o !== valAtual).map(o => `<option value="${o}">${o}</option>`).join('');
+                        
+                        // Evento de Mudança
+                        sel.onchange = function() { 
+                            atualizarEscala(mil.nome, i, this.value, td); 
+                        };
+                        
+                        td.appendChild(sel);
+                        tr.appendChild(td);
                     }
 
-                    td.appendChild(sel);
-                    tr.appendChild(td);
-                }
-                tbody.appendChild(tr);
+                    // Colunas de Totais (IDs únicos para atualização via JS)
+                    const idBase = mil.nome.replace(/\s+/g, '_');
+                    tr.innerHTML += `
+                        <td class="col-resumo text-gray-400" id="ord_${idBase}">${Math.floor(stats.ord)}</td>
+                        <td class="col-resumo text-red-400" id="he_${idBase}">${stats.he.toFixed(1)}</td>
+                        <td class="col-resumo text-yellow-400" id="etp_${idBase}">${stats.etp}</td>
+                        <td class="col-dinheiro" id="val_${idBase}">${stats.valFmt}</td>
+                    `;
+                    
+                    tbody.appendChild(tr);
+                });
+
+                // Rodapé do Pelotão (Subtotal)
+                const idPel = pel.replace(/\s+/g, '_');
+                tbody.innerHTML += `
+                <tr class="row-total-pel text-[9px]">
+                    <td class="col-nome bg-slate-800 text-right pr-2">TOTAL ${pel}:</td>
+                    <td colspan="31"></td>
+                    <td class="col-resumo text-center">-</td>
+                    <td class="col-resumo text-center" id="sub_he_${idPel}">${subHE.toFixed(1)}</td>
+                    <td class="col-resumo text-center" id="sub_etp_${idPel}">${subEtp}</td>
+                    <td class="col-dinheiro" id="sub_val_${idPel}">R$ ${subVal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                </tr>`;
+
+                grandHE += subHE;
+                grandVal += subVal;
+                grandEtp += subEtp;
             });
+
+            atualizarGrandTotal(grandHE, grandEtp, grandVal);
         }
 
-        function gerarOpcoes(pelotao, dia, tipoFunc) {
-            let lista = efetivoGlobal.filter(m => m.pelotao === pelotao);
+        // --- CÁLCULOS ---
+        function calcularMilitar(nome, posto) {
+            let dadosEscala = DB.escala[nome] || {};
+            let horasReais = 0; // Para Etapa
+            let horasGSE = 0;   // Para Dinheiro
             
-            // Filtro de Função
-            if(tipoFunc === 'COV') lista = lista.filter(m => m.funcao.includes('COV'));
-            
-            // Filtro de Descanso (Quem trabalhou ontem)
-            let escalaOntem = escalaTemp[dia-1] || {};
-            let nomesOntem = Object.values(escalaOntem);
-            lista = lista.filter(m => !nomesOntem.includes(m.nome));
-
-            // Ordenação (Mais folgado primeiro)
-            lista.sort((a,b) => (contagemServicos[a.nome]||0) - (contagemServicos[b.nome]||0));
-
-            return lista.map(m => {
-                let c = contagemServicos[m.nome] || 0;
-                let cor = c < 6 ? '🟢' : (c > 9 ? '🔴' : '🟡');
-                return `<option value="${m.nome}">${cor} ${m.nome}</option>`;
-            }).join('');
-        }
-
-        function atualizar(dia, cargo, nome) {
-            if(!escalaTemp[dia]) escalaTemp[dia] = {};
-            
-            // Gestão de contador (remove antigo, add novo)
-            if(escalaTemp[dia][cargo]) {
-                let old = escalaTemp[dia][cargo];
-                if(contagemServicos[old]>0) contagemServicos[old]--;
-            }
-            
-            if(nome) {
-                escalaTemp[dia][cargo] = nome;
-                if(!contagemServicos[nome]) contagemServicos[nome]=0; contagemServicos[nome]++;
-            } else {
-                delete escalaTemp[dia][cargo];
-            }
-
-            // Atualiza Impressão em tempo real
-            prepararImpressao();
-        }
-
-        function autoPreencher() {
-            if(!pelotaoAtual) return alert("Selecione um pelotão!");
-            const ciclo = parseInt(document.getElementById('tipo-ciclo').value);
-            
-            for(let d=ciclo+1; d<=31; d++) {
-                let origem = d - ciclo;
-                if(escalaTemp[origem]) {
-                    FUNCOES_VISUAL.forEach(f => {
-                        let nome = escalaTemp[origem][f.cod];
-                        if(nome) {
-                            // Atualiza Memoria
-                            if(!escalaTemp[d]) escalaTemp[d] = {};
-                            escalaTemp[d][f.cod] = nome;
-                            // Atualiza DOM
-                            let el = document.getElementById(`d${d}-${f.cod}`);
-                            if(el) el.value = nome;
-                            // Atualiza Contador
-                            if(!contagemServicos[nome]) contagemServicos[nome]=0; contagemServicos[nome]++;
-                        }
-                    });
+            for(let i=1; i<=31; i++) {
+                let cod = dadosEscala[i];
+                let val = VALORES_HORA[cod] || 0;
+                if(val > 0) {
+                    if(["LTS","FER"].includes(cod)) {
+                        horasGSE += val;
+                    } else {
+                        horasReais += val;
+                        horasGSE += val;
+                    }
                 }
             }
-            prepararImpressao();
-        }
 
-        // --- LÓGICA DE IMPRESSÃO (TABELA OFICIAL) ---
-        function prepararImpressao() {
-            document.getElementById('titulo-impresso').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotaoAtual}`;
-            const tbody = document.getElementById('print-body');
+            // Regras
+            const carga = DB.config.cargaMensal;
             
-            // Pega lista única de nomes escalados para gerar linhas da tabela impressa
-            let nomes = new Set();
-            for(let d=1; d<=31; d++) if(escalaTemp[d]) Object.values(escalaTemp[d]).forEach(n => nomes.add(n));
-            let listaNomes = Array.from(nomes).sort();
+            // Etapas (Teto 177h)
+            let baseEtapa = Math.min(horasReais, carga);
+            let etapas = Math.floor(baseEtapa / 6);
 
-            let html = "";
-            listaNomes.forEach(nome => {
-                let tr = `<tr><td style="text-align:left; font-weight:bold; padding-left:5px;">${nome}</td>`;
-                for(let i=1; i<=31; i++) {
-                    let escalado = escalaTemp[i] && Object.values(escalaTemp[i]).includes(nome);
-                    tr += escalado ? `<td class="cell-filled">24</td>` : `<td></td>`;
-                }
-                tr += "</tr>";
-                html += tr;
-            });
-            tbody.innerHTML = html;
+            // GSE
+            let saldo = horasGSE - carga;
+            let he = saldo > 0 ? saldo : 0;
+            let ord = horasGSE - he;
+
+            // Valor
+            // Tenta casar o posto com a tabela de preços (busca aproximada)
+            let preco = 0;
+            for (const [key, value] of Object.entries(DB.precos)) {
+                if(posto.includes(key) || key.includes(posto)) { preco = value; break; }
+            }
+            let totalVal = he * preco;
+
+            return {
+                ord: ord,
+                he: he,
+                etp: etapas,
+                val: totalVal,
+                valFmt: totalVal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+            };
         }
 
-        // Salvar
-        async function salvarEscala() {
+        function atualizarEscala(nome, dia, valor, tdElement) {
+            // Atualiza Memória
+            if(!DB.escala[nome]) DB.escala[nome] = {};
+            
+            if(valor === "") delete DB.escala[nome][dia];
+            else DB.escala[nome][dia] = valor;
+
+            // Atualiza Cor da Célula
+            tdElement.className = "";
+            if(valor === "24") tdElement.className = "bg-24";
+            else if(valor.includes("12") || valor === "A07") tdElement.className = "bg-he";
+            else if(["LTS","FER"].includes(valor)) tdElement.className = "bg-afast";
+
+            // Recalcula Totais da Linha e Globais (Sem recarregar tudo)
+            // Para simplificar neste exemplo, vamos recarregar a tabela toda
+            // (Em produção, faríamos update pontual dos IDs)
+            renderizarTabela(); 
+        }
+
+        function atualizarGrandTotal(he, etp, val) {
+            document.getElementById('grand-total-he').innerText = he.toFixed(1);
+            document.getElementById('grand-total-etp').innerText = etp;
+            document.getElementById('grand-total-val').innerText = val.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        }
+
+        async function salvarTudo() {
+            const btn = document.querySelector('button[onclick="salvarTudo()"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
+            
+            // Transforma objeto escala em lista para o backend
             let payload = [];
-            for(let d=1; d<=31; d++) {
-                if(escalaTemp[d]) Object.values(escalaTemp[d]).forEach(n => payload.push({nome:n, dia:d, codigo:"24"}));
+            for (const [nome, dias] of Object.entries(DB.escala)) {
+                for (const [dia, codigo] of Object.entries(dias)) {
+                    payload.push({ nome: nome, dia: dia, codigo: codigo });
+                }
             }
+
             try {
-                await fetch(API_URL, {method:'POST', body:JSON.stringify(payload)});
-                alert("Escala Salva!");
-            } catch(e) { alert("Erro ao salvar."); }
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert("Dados salvos e sincronizados com a planilha!");
+            } catch(e) { alert("Erro ao salvar: " + e); }
+            
+            btn.innerHTML = '<i class="fas fa-save mr-1"></i> SALVAR ALTERAÇÕES';
         }
 
         init();
