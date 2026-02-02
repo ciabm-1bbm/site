@@ -3,209 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESCALA OPERACIONAL 1º BBM</title>
+    <title>ESCALA OFICIAL - 1º BBM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
-            theme: { 
-                extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } } 
-            }
+            theme: { extend: { colors: { 'fire-red': '#b71c1c', 'fire-yellow': '#FFD700', 'dark-bg': '#0f172a' } } }
         }
     </script>
     
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
         
-        /* Tabela Operacional */
-        .ops-table { width: 100%; border-collapse: separate; border-spacing: 2px; margin-bottom: 20px; }
-        .ops-table th { background: #1e293b; color: #94a3b8; font-size: 10px; padding: 4px; border-radius: 4px; }
-        .ops-table td { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 4px; vertical-align: top; height: 45px; }
+        /* ESTILO DO EDITOR (TELA) */
+        .glass-panel { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; margin-bottom: 20px; }
         
-        /* Cabeçalho do Dia */
-        .day-header { background: #0f172a; color: #FFD700; font-weight: bold; font-size: 12px; text-align: center; border-bottom: 2px solid #334155; padding: 2px; }
+        .tabela-editor { width: 100%; border-collapse: separate; border-spacing: 2px; }
+        .tabela-editor th { background: #1e293b; color: #94a3b8; font-size: 10px; padding: 4px; text-align: center; }
+        .tabela-editor td { background: #334155; padding: 0; height: 35px; border: 1px solid #475569; position: relative; }
         
-        /* Rótulos das Funções */
-        .func-row { display: flex; align-items: center; margin-bottom: 2px; padding: 0 2px; }
-        .func-label { width: 35px; font-size: 8px; font-weight: bold; text-transform: uppercase; color: #64748b; text-align: right; margin-right: 4px; }
-        .func-input { flex-grow: 1; }
-        
-        /* Selects Bonitos */
-        select.role-select { 
-            width: 100%; background: #1e293b; color: white; border: 1px solid #475569; 
-            font-size: 9px; height: 20px; border-radius: 2px; padding-left: 2px;
+        /* Select dentro da célula */
+        select.cell-selector { 
+            width: 100%; height: 100%; background: transparent; border: none; color: white; 
+            font-size: 10px; padding-left: 4px; cursor: pointer; appearance: none;
         }
-        select.role-select:focus { border-color: #FFD700; outline: none; background: #000; }
-        
-        /* Cores por Função */
-        .role-cg select { border-left: 3px solid #FFD700; }
-        .role-cov select { border-left: 3px solid #60a5fa; }
-        .role-cb select { border-left: 3px solid #4ade80; }
+        select.cell-selector:focus { background: #000; outline: 2px solid #FFD700; }
+        select.cell-selector option { background: #1e293b; }
 
-        /* Estilo de Impressão */
+        /* Coluna de Títulos (Lateral) */
+        .row-header { width: 100px; background: #0f172a !important; color: #FFD700; font-weight: bold; font-size: 10px; text-align: right; padding-right: 8px; border: none !important; }
+
+        /* ESTILO DE IMPRESSÃO (PDF OFICIAL) */
         @media print {
             @page { size: landscape; margin: 5mm; }
-            body { background: white; color: black; }
-            .no-print, header { display: none !important; }
-            #view-print { display: block !important; }
-            #view-editor { display: none !important; }
+            body { background: white; color: black; font-family: 'Arial', sans-serif; }
             
-            table { width: 100%; border-collapse: collapse; font-size: 8pt; page-break-inside: avoid; margin-bottom: 15px; }
-            th, td { border: 1px solid black; padding: 2px; text-align: center; }
-            .bg-gray-200 { background-color: #ddd !important; -webkit-print-color-adjust: exact; }
+            /* Esconde tudo que não é papel */
+            .no-print, header, #editor-area, #msg-inicial, #loader { display: none !important; }
+            #print-area { display: block !important; }
+
+            /* Tabela Oficial */
+            .print-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 8pt; page-break-inside: avoid; }
+            .print-table th, .print-table td { border: 1px solid black; padding: 3px; text-align: center; height: 20px; }
+            .print-header { background-color: #f3f4f6 !important; font-weight: bold; -webkit-print-color-adjust: exact; }
+            
+            .header-doc { text-align: center; border-bottom: 2px solid black; margin-bottom: 10px; padding-bottom: 5px; }
+            .assinaturas { display: flex; justify-content: space-around; margin-top: 30px; page-break-inside: avoid; }
+            .assinatura-box { border-top: 1px solid black; width: 30%; text-align: center; padding-top: 5px; font-size: 8pt; }
+            
+            /* Destaque para células preenchidas */
+            .cell-filled { background-color: #e5e7eb !important; font-weight: bold; -webkit-print-color-adjust: exact; }
         }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <header class="h-14 bg-slate-900 border-b border-white/10 flex items-center justify-between px-6 shrink-0 no-print">
+    <header class="h-16 bg-slate-900 border-b border-white/10 flex items-center justify-between px-6 sticky top-0 z-50 shadow-lg no-print">
         <div class="flex items-center gap-3">
-            <i class="fas fa-fire-extinguisher text-fire-yellow text-2xl"></i>
+            <i class="fas fa-fire-extinguisher text-fire-yellow text-3xl"></i>
             <div>
-                <h1 class="font-black text-white text-sm">ESCALA OPERACIONAL</h1>
-                <h2 class="text-[10px] text-gray-400">1º BATALHÃO DE BOMBEIROS MILITAR</h2>
+                <h1 class="font-black text-white text-lg leading-none">ESCALA 1º BBM</h1>
+                <h2 class="text-xs text-gray-400 font-bold tracking-widest">SISTEMA OFICIAL</h2>
             </div>
         </div>
         
         <div class="flex items-center gap-4 bg-slate-800 p-2 rounded-lg border border-slate-700">
             <div class="flex flex-col">
-                <label class="text-[9px] text-gray-400 font-bold uppercase">Pelotão:</label>
-                <select id="sel-pelotao" class="bg-slate-700 text-white text-xs font-bold border border-slate-600 rounded w-40 h-6" onchange="carregarPelotao()">
-                    <option value="">Selecione...</option>
+                <label class="text-[9px] text-gray-400 font-bold uppercase">SELECIONE O PELOTÃO:</label>
+                <select id="sel-pelotao" class="bg-slate-700 text-white text-sm font-bold border border-slate-600 rounded w-48 h-8 px-2" onchange="carregarPelotao()">
+                    <option value="">Carregando...</option>
                 </select>
             </div>
 
-            <div class="h-8 w-px bg-white/10"></div>
+            <div class="h-10 w-px bg-white/10 mx-2"></div>
 
-            <div class="flex items-end gap-2">
-                <div class="flex flex-col">
-                    <label class="text-[9px] text-gray-400 font-bold uppercase">Ciclo:</label>
-                    <select id="tipo-ciclo" class="bg-slate-900 text-white text-xs border border-slate-600 rounded h-6">
-                        <option value="4">24x72 (4 dias)</option>
-                        <option value="2">24x48 (2 dias)</option>
-                    </select>
-                </div>
-                <button onclick="autoPreencher()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded h-6 text-xs font-bold transition flex items-center" title="Preencher mês automaticamente">
-                    <i class="fas fa-bolt mr-1"></i> REPLICAR
-                </button>
-            </div>
-
-            <div class="h-8 w-px bg-white/10"></div>
-
-            <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-1 rounded text-xs font-bold h-8">
-                <i class="fas fa-print mr-2"></i> IMPRIMIR
+            <button onclick="imprimirEscala()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded font-bold shadow-md flex items-center gap-2 transition transform hover:scale-105">
+                <i class="fas fa-print fa-lg"></i> IMPRIMIR ESCALA
             </button>
             
-            <button onclick="salvarEscala()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-xs font-bold h-8 shadow-lg flex items-center">
-                <i class="fas fa-save mr-2"></i> SALVAR
+            <button onclick="salvarNoDrive()" class="bg-green-600 hover:bg-green-500 text-white px-5 py-2 rounded font-bold shadow-md flex items-center gap-2 transition transform hover:scale-105">
+                <i class="fas fa-cloud-upload-alt fa-lg"></i> SALVAR NO DRIVE
             </button>
         </div>
     </header>
 
-    <main class="container mx-auto p-4 flex-grow">
-        
-        <div id="view-editor">
-            <div id="msg-inicial" class="text-center py-32 text-gray-500">
-                <i class="fas fa-arrow-up text-4xl mb-4 animate-bounce text-slate-700"></i><br>
-                <span class="text-lg">Selecione o Pelotão acima para montar a escala.</span>
-            </div>
+    <main class="container mx-auto p-4 flex-grow max-w-[98%]">
 
-            <div id="grid-container" class="hidden space-y-6"></div>
+        <div id="msg-inicial" class="text-center py-32 text-gray-500 no-print">
+            <i class="fas fa-arrow-up text-5xl mb-4 animate-bounce text-slate-700"></i><br>
+            <span class="text-xl font-bold">Selecione o Pelotão acima para começar.</span>
         </div>
 
-        <div id="view-print" class="hidden">
-            <div class="text-center border-b-2 border-black pb-2 mb-4">
-                <h2 class="font-bold text-lg">CORPO DE BOMBEIROS MILITAR - 1º BBM</h2>
-                <p class="font-bold text-sm" id="titulo-imp">ESCALA DE SERVIÇO - JANEIRO 2026</p>
+        <div id="editor-area" class="hidden no-print">
             </div>
-            <div id="tabelas-imp"></div>
-            <div class="flex justify-around mt-10 border-t border-gray-300 pt-10">
-                <div class="border-t border-black w-1/3 text-center pt-2 text-xs">Resp. Escala</div>
-                <div class="border-t border-black w-1/3 text-center pt-2 text-xs">Comandante</div>
+
+        <div id="print-area" class="hidden">
+            <div class="header-doc">
+                <h3 style="font-size:12pt; font-weight:bold;">ESTADO DO RIO GRANDE DO SUL - SECRETARIA DA SEGURANÇA PÚBLICA</h3>
+                <h4 style="font-size:10pt;">CORPO DE BOMBEIROS MILITAR - 1º BBM</h4>
+                <p style="font-size:9pt; margin-top:5px; font-weight:bold;" id="titulo-doc">ESCALA DE SERVIÇO</p>
+            </div>
+            
+            <div id="tabelas-print"></div>
+
+            <div class="assinaturas">
+                <div class="assinatura-box">Sargenteante</div>
+                <div class="assinatura-box">Comandante de Pelotão</div>
+                <div class="assinatura-box">Comandante de Companhia</div>
             </div>
         </div>
 
     </main>
 
-    <div id="modal-fin" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 rounded-lg w-full max-w-lg border border-slate-600 shadow-2xl">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center">
-                <h3 class="text-white font-bold"><i class="fas fa-check-circle text-green-500 mr-2"></i> ESCALA SALVA!</h3>
-                <button onclick="document.getElementById('modal-fin').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6">
-                <p class="text-gray-300 text-sm mb-4">A previsão financeira para este pelotão foi atualizada:</p>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-900 p-4 rounded text-center border border-slate-700">
-                        <div class="text-xs text-gray-500 font-bold uppercase">Horas Extras</div>
-                        <div class="text-2xl text-green-400 font-black" id="res-he">R$ 0,00</div>
-                    </div>
-                    <div class="bg-slate-900 p-4 rounded text-center border border-slate-700">
-                        <div class="text-xs text-gray-500 font-bold uppercase">Etapas</div>
-                        <div class="text-2xl text-blue-400 font-black" id="res-etp">0</div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-4 bg-slate-900 text-right rounded-b-lg">
-                <button onclick="document.getElementById('modal-fin').classList.add('hidden')" class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold">OK, CONTINUAR</button>
-            </div>
-        </div>
-    </div>
-
     <div id="loader" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center">
-        <i class="fas fa-spinner fa-spin text-4xl text-fire-yellow mb-4"></i>
-        <p class="text-white font-bold tracking-widest">CARREGANDO SISTEMA...</p>
+        <i class="fas fa-spinner fa-spin text-5xl text-fire-yellow mb-4"></i>
+        <p class="text-white font-bold tracking-widest text-lg" id="loader-txt">CARREGANDO SISTEMA...</p>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbytRPSQv6_YO7Jr78IvQZZZHRjVOWBW58Y-VhQz7Q02E_VddwTgZp0NJQabqEqU_9Q/exec"; // <--- COLE SUA URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbyz2s9bdk5wIi_eoKHh7fb9e_J3bpXpf1zsjIwvgTgVqhaye86jgUtt2mRtakKbt5Ll/exec"; // <--- COLE SUA URL AQUI
 
-        let DB = { efetivo: [], escala: {} }; // escala: { 1: {CG:'Fulano', COV:'Ciclano'}, 2: {...} }
+        let DB = { efetivo: [], escala: {} };
+        let escalaVisual = {}; // { 1: {CG:"Fulano", COV:"Ciclano"}, 2: ... }
         let pelotaoAtual = "";
 
-        // Inicialização
+        // Estrutura das Funções (Linhas da Tabela)
+        const FUNCOES = [
+            { id: 'CG', label: 'Cmt Guarnição' },
+            { id: 'COV', label: 'Motorista (COV)' },
+            { id: 'CB1', label: 'Combatente 1' },
+            { id: 'CB2', label: 'Combatente 2' }
+        ];
+
         async function init() {
             try {
-                const res = await fetch(`${API_URL}?action=getEfetivo`);
-                DB.efetivo = await res.json();
+                const res = await fetch(`${API_URL}?action=getInitData`);
+                const dados = await res.json();
+                DB.efetivo = dados.efetivo;
+                // Converte escala salva do formato {Nome: {Dia: Codigo}} para {Dia: {Funcao: Nome}}
+                // Isso é complexo pois não salvamos a função, apenas o código '24'.
+                // Para simplificar, vamos iniciar vazio ou implementar lógica de recuperação futura.
+                // Por enquanto, inicia limpo para montagem.
                 
-                const sel = document.getElementById('sel-pelotao');
-                const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))].sort();
-                pelotoes.forEach(p => {
-                    if(p !== "GERAL" && p !== "ERRO") sel.add(new Option(p, p));
-                });
-                
+                popularSelectPelotoes();
                 document.getElementById('loader').classList.add('hidden');
-            } catch (e) { alert("Erro de conexão."); }
+            } catch (e) { alert("Erro de conexão: " + e); }
         }
 
-        // Carrega a tela do Pelotão
+        function popularSelectPelotoes() {
+            const pelotoes = [...new Set(DB.efetivo.map(m => m.pelotao))].sort();
+            const sel = document.getElementById('sel-pelotao');
+            sel.innerHTML = '<option value="">SELECIONE...</option>';
+            pelotoes.forEach(p => {
+                if(p !== "GERAL" && p !== "ERRO") sel.add(new Option(p, p));
+            });
+        }
+
         function carregarPelotao() {
             pelotaoAtual = document.getElementById('sel-pelotao').value;
-            
             if(!pelotaoAtual) {
                 document.getElementById('msg-inicial').classList.remove('hidden');
-                document.getElementById('grid-container').classList.add('hidden');
+                document.getElementById('editor-area').classList.add('hidden');
                 return;
             }
 
-            // Reseta a memória visual (não a do DB global por enquanto)
-            // Aqui vamos criar uma estrutura baseada em DIAS, que é mais fácil para o visual
-            // A estrutura será: escalaVisual[dia] = { CG: "", COV: "", CB1: "", CB2: "" }
-            window.escalaVisual = {};
-            
             document.getElementById('msg-inicial').classList.add('hidden');
-            document.getElementById('grid-container').classList.remove('hidden');
+            document.getElementById('editor-area').classList.remove('hidden');
             
-            renderizarGrid();
+            escalaVisual = {}; // Reseta visual
+            renderizarEditor();
         }
 
-        function renderizarGrid() {
-            const container = document.getElementById('grid-container');
+        function renderizarEditor() {
+            const container = document.getElementById('editor-area');
             container.innerHTML = "";
 
-            // Divide 31 dias em 4 semanas (linhas)
+            // Cria 4 semanas (blocos de datas)
             const semanas = [
                 {i:1, f:8}, {i:9, f:16}, {i:17, f:24}, {i:25, f:31}
             ];
@@ -213,70 +187,52 @@
             semanas.forEach(sem => {
                 let html = `
                 <div class="glass-panel p-2">
-                    <table class="ops-table">
+                    <table class="tabela-editor">
                         <thead>
                             <tr>
-                                ${gerarCabecalhos(sem.i, sem.f)}
+                                <th style="width:100px; background:transparent;"></th> ${gerarCabecalhoDias(sem.i, sem.f)}
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                ${gerarCelulas(sem.i, sem.f)}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>`;
+                        <tbody>`;
+                
+                FUNCOES.forEach(func => {
+                    html += `
+                    <tr>
+                        <td class="row-header">${func.label}</td>
+                        ${gerarCelulasSelect(sem.i, sem.f, func.id)}
+                    </tr>`;
+                });
+
+                html += `</tbody></table></div>`;
                 container.innerHTML += html;
             });
         }
 
-        function gerarCabecalhos(inicio, fim) {
+        function gerarCabecalhoDias(inicio, fim) {
+            let s = "";
+            for(let i=inicio; i<=fim; i++) s += `<th>DIA ${i}</th>`;
+            return s;
+        }
+
+        function gerarCelulasSelect(inicio, fim, funcao) {
             let s = "";
             for(let i=inicio; i<=fim; i++) {
-                s += `<th class="day-header">DIA ${i}</th>`;
+                s += `<td>${criarSelectHTML(i, funcao)}</td>`;
             }
             return s;
         }
 
-        function gerarCelulas(inicio, fim) {
-            let s = "";
-            for(let i=inicio; i<=fim; i++) {
-                s += `
-                <td>
-                    <div class="func-row role-cg">
-                        <span class="func-label">CG</span>
-                        <div class="func-input">${criarSelect(i, 'CG')}</div>
-                    </div>
-                    <div class="func-row role-cov">
-                        <span class="func-label text-blue-300">COV</span>
-                        <div class="func-input">${criarSelect(i, 'COV')}</div>
-                    </div>
-                    <div class="func-row role-cb">
-                        <span class="func-label">CB1</span>
-                        <div class="func-input">${criarSelect(i, 'CB1')}</div>
-                    </div>
-                    <div class="func-row role-cb">
-                        <span class="func-label">CB2</span>
-                        <div class="func-input">${criarSelect(i, 'CB2')}</div>
-                    </div>
-                </td>`;
-            }
-            return s;
-        }
-
-        function criarSelect(dia, funcao) {
-            // Filtra opções
+        function criarSelectHTML(dia, funcao) {
             let opcoes = DB.efetivo.filter(m => m.pelotao === pelotaoAtual);
             
-            // Regra: Só COV dirige
+            // Filtro Básico de Função
             if(funcao === 'COV') opcoes = opcoes.filter(m => m.funcao.includes('COV'));
             
-            // Ordena alfabeticamente
+            // Ordena
             opcoes.sort((a,b) => a.nome.localeCompare(b.nome));
 
-            let html = `<select class="role-select" id="d${dia}-${funcao}" onchange="atualizarMemoria(${dia}, '${funcao}', this.value)">`;
-            html += `<option value="">--</option>`;
-            
+            let html = `<select class="cell-selector" onchange="atualizarMemoria(${dia}, '${funcao}', this.value)">`;
+            html += `<option value="">-</option>`;
             opcoes.forEach(m => {
                 html += `<option value="${m.nome}">${m.posto} ${m.nome}</option>`;
             });
@@ -284,87 +240,109 @@
             return html;
         }
 
-        // --- LÓGICA ---
         function atualizarMemoria(dia, funcao, nome) {
-            if(!window.escalaVisual[dia]) window.escalaVisual[dia] = {};
-            window.escalaVisual[dia][funcao] = nome;
-            
-            // Validação simples de descanso (Dia seguinte)
-            if(dia < 31) validarDia(dia + 1);
+            if(!escalaVisual[dia]) escalaVisual[dia] = {};
+            if(nome) escalaVisual[dia][funcao] = nome;
+            else delete escalaVisual[dia][funcao];
         }
 
-        function validarDia(dia) {
-            // Se alguém trabalhou no dia anterior, marca em vermelho no dia atual
-            if(!window.escalaVisual[dia-1]) return;
+        // --- BOTÃO 1: IMPRIMIR ---
+        function imprimirEscala() {
+            if(!pelotaoAtual) return alert("Selecione um pelotão primeiro.");
             
-            const quemTrabalhouOntem = Object.values(window.escalaVisual[dia-1]);
-            
-            ['CG', 'COV', 'CB1', 'CB2'].forEach(f => {
-                const el = document.getElementById(`d${dia}-${f}`);
-                if(el && el.value && quemTrabalhouOntem.includes(el.value)) {
-                    el.style.backgroundColor = "#7f1d1d"; // Vermelho
-                    el.style.color = "#fecaca";
-                } else if (el) {
-                    el.style.backgroundColor = "#1e293b"; // Normal
-                    el.style.color = "white";
-                }
+            // 1. Gera o HTML de Impressão (Estático)
+            const container = document.getElementById('tabelas-print');
+            document.getElementById('titulo-doc').innerText = `ESCALA DE SERVIÇO - JANEIRO 2026 - ${pelotaoAtual}`;
+            container.innerHTML = "";
+
+            const semanas = [{i:1, f:8}, {i:9, f:16}, {i:17, f:24}, {i:25, f:31}];
+
+            semanas.forEach(sem => {
+                let html = `
+                <table class="print-table">
+                    <thead>
+                        <tr class="print-header">
+                            <th style="width:100px;">DATA</th>
+                            ${gerarCabecalhoDiasPrint(sem.i, sem.f)}
+                        </tr>
+                        <tr>
+                            <th class="print-header">DIA SEMANA</th>
+                            ${gerarCabecalhoSemanaPrint(sem.i, sem.f)}
+                        </tr>
+                        <tr>
+                            <th class="print-header">TURNO</th>
+                            ${gerarCabecalhoTurnoPrint(sem.i, sem.f)}
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                FUNCOES.forEach(func => {
+                    html += `<tr><td class="print-header">${func.label}</td>`;
+                    for(let d=sem.i; d<=sem.f; d++) {
+                        let nome = (escalaVisual[d] && escalaVisual[d][func.id]) ? escalaVisual[d][func.id] : "";
+                        // Limpa o posto para caber melhor na impressão (opcional)
+                        html += `<td class="${nome ? 'cell-filled' : ''}">${nome}</td>`;
+                    }
+                    html += `</tr>`;
+                });
+
+                html += `</tbody></table>`;
+                container.innerHTML += html;
             });
+
+            // 2. Chama a caixa de diálogo do navegador
+            window.print();
         }
 
-        function autoPreencher() {
-            const ciclo = parseInt(document.getElementById('tipo-ciclo').value);
-            for(let d = ciclo + 1; d <= 31; d++) {
-                const origem = d - ciclo;
-                if(window.escalaVisual[origem]) {
-                    ['CG', 'COV', 'CB1', 'CB2'].forEach(f => {
-                        const nome = window.escalaVisual[origem][f];
-                        if(nome) {
-                            if(!window.escalaVisual[d]) window.escalaVisual[d] = {};
-                            window.escalaVisual[d][f] = nome;
-                            
-                            const el = document.getElementById(`d${d}-${f}`);
-                            if(el) el.value = nome;
-                        }
-                    });
-                    validarDia(d);
-                }
-            }
+        function gerarCabecalhoDiasPrint(i, f) {
+            let s=""; for(;i<=f;i++) s+=`<th>${i}/01</th>`; return s;
+        }
+        function gerarCabecalhoSemanaPrint(i, f) {
+            const dias = ["dom","seg","ter","qua","qui","sex","sáb"];
+            let s=""; for(;i<=f;i++) { let d = new Date(2026,0,i).getDay(); s+=`<th>${dias[d]}</th>`; } return s;
+        }
+        function gerarCabecalhoTurnoPrint(i, f) {
+            let s=""; for(;i<=f;i++) s+=`<th>08h-08h</th>`; return s;
         }
 
-        // --- SALVAR NO DRIVE ---
-        async function salvarEscala() {
-            const btn = document.querySelector('button[onclick="salvarEscala()"]');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
+
+        // --- BOTÃO 2: SALVAR NO DRIVE ---
+        async function salvarNoDrive() {
+            if(!pelotaoAtual) return alert("Selecione um pelotão.");
             
-            // Converte o formato visual (Dia -> Funcao -> Nome)
-            // Para o formato do Banco de Dados (Nome -> Dia -> Codigo "24")
+            const btn = document.querySelector('button[onclick="salvarNoDrive()"]');
+            const txtOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SALVANDO...';
+            btn.disabled = true;
+
+            // Transforma escala visual em dados para o banco (Nome, Dia, Codigo "24")
             let payload = [];
-            
             for(let d=1; d<=31; d++) {
-                if(window.escalaVisual[d]) {
-                    Object.values(window.escalaVisual[d]).forEach(nome => {
-                        if(nome) payload.push({ nome: nome, dia: d, codigo: "24" });
+                if(escalaVisual[d]) {
+                    Object.values(escalaVisual[d]).forEach(nome => {
+                        payload.push({ nome: nome, dia: d, codigo: "24" });
                     });
                 }
             }
 
-            if(payload.length === 0) { alert("Escala vazia!"); btn.innerHTML = "SALVAR"; return; }
+            if(payload.length === 0) {
+                if(!confirm("A escala parece estar vazia. Salvar mesmo assim?")) {
+                    btn.innerHTML = txtOriginal; btn.disabled = false; return;
+                }
+            }
 
             try {
-                // 1. Salva
-                await fetch(API_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ pelotao: pelotaoAtual, dados: payload }) 
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ pelotao: pelotaoAtual, dados: payload })
                 });
-                
-                // 2. Pede cálculo financeiro (opcional, aqui simulamos sucesso)
-                document.getElementById('modal-fin').classList.remove('hidden');
-                document.getElementById('res-he').innerText = "ATUALIZADO"; 
-                document.getElementById('res-etp').innerText = "OK";
+                alert("✅ Escala salva no Drive com sucesso!");
+            } catch(e) {
+                alert("❌ Erro ao salvar: " + e);
+            }
 
-            } catch(e) { alert("Erro ao salvar: " + e); }
-            
-            btn.innerHTML = '<i class="fas fa-save mr-2"></i> SALVAR';
+            btn.innerHTML = txtOriginal;
+            btn.disabled = false;
         }
 
         init();
