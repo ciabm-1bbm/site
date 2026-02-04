@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoramento 1º BBM - Porto Alegre</title>
+    <title>Painel Operacional 1º BBM</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,6 +14,7 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
+                        'moss-green': '#9BE36D',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -21,314 +23,357 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
     <style>
-        body { background-color: #0f172a; color: white; overflow-x: hidden; }
+        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
         
-        /* --- CONFIGURAÇÃO DO BACKGROUND MARCA D'ÁGUA --- */
-        .hero-background { 
-            background-color: #0f172a; 
-            position: relative;
-        }
-
+        /* --- VISUAL DO MONITOR (MARCA D'ÁGUA) --- */
+        .hero-background { position: relative; min-height: 100vh; }
         .hero-background::before { 
-            content: '';
-            position: fixed;
-            left: 5%;
-            right: 5%;
-            bottom: 20px;
-            top: 320px; 
+            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center top; 
-            background-repeat: no-repeat;
-            background-size: contain; 
-            z-index: 0;
-            opacity: 0.15; 
-            filter: grayscale(100%); 
-            pointer-events: none; 
+            background-position: center; background-repeat: no-repeat; background-size: 500px;
+            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
         }
-
-        @media (max-width: 768px) {
-            .hero-background::before {
-                top: 550px; 
-                opacity: 0.1; 
-            }
-        }
-
         .hero-background::after {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
-            z-index: 1; 
-            pointer-events: none;
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+            z-index: 1; pointer-events: none;
         }
-
         .content-wrapper { position: relative; z-index: 10; }
 
-        .card-oc { 
-            background: rgba(30, 41, 59, 0.85);
+        /* CARD ESTILO MONITOR (GLASSMORPHISM) */
+        .card-monitor {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.75rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
         }
-        .card-oc:hover { 
-            transform: scale(1.02) translateY(-5px);
+        .card-monitor:hover {
+            transform: translateY(-5px) scale(1.02);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            background: rgba(30, 41, 59, 0.98);
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(255, 140, 0, 0.5);
             z-index: 50;
-            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Cores */
-        .color-incendio { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); } 
-        .border-incendio { border-left: 6px solid #FFD700; }
-        .color-resgate { color: #F97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); } 
-        .border-resgate { border-left: 6px solid #F97316; }
-        .color-aph { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.4); } 
-        .border-aph { border-left: 6px solid #DC2626; }
-        .color-arvore { color: #84cc16; } 
-        .border-arvore { border-left: 6px solid #84cc16; }
-        .color-insetos { color: #fde68a; } 
-        .border-insetos { border-left: 6px solid #fde68a; }
-        .color-prev { color: #d1d5db; } 
-        .border-prev { border-left: 6px solid #d1d5db; }
-        .color-hazmat { color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } 
-        .border-hazmat { border-left: 6px solid #ffffff; }
-        .color-vistoria { color: #38bdf8; } 
-        .border-vistoria { border-left: 6px solid #38bdf8; }
-        
-        /* Botão Pulsante */
-        .btn-estado {
-            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-            transition: transform 0.2s;
-        }
-        .btn-estado:hover { transform: scale(1.05); }
+        /* BORDAS LATERAIS COLORIDAS (Identidade Visual) */
+        .border-l-fire { border-left: 4px solid #DC2626; }
+        .border-l-support { border-left: 4px solid #FFD700; }
+        .border-l-rescue { border-left: 4px solid #FFFFFF; }
 
+        /* STATS PANEL (Adaptado para o visual do Monitor) */
+        .stats-container {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* TOOLTIP */
+        .tooltip-box {
+            visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
+            width: max-content; min-width: 150px; z-index: 100; transition: 0.2s; pointer-events: none;
+            box-shadow: 0 10px 40px black; margin-top: 10px;
+        }
+        .group:hover .tooltip-box { visibility: visible; opacity: 1; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
+
+        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
-<body class="hero-background min-h-screen font-sans">
-    
-    <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
+<body class="hero-background">
+
+    <div id="loading">
+        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Sincronizando Escala</h2>
+        <p class="text-sm text-gray-500 mt-2 font-mono">Buscando dados do turno atual...</p>
+    </div>
+
+    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
         
-        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6 relative z-20">
-            
+        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
             <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
             </div>
 
-            <div class="text-center px-4 flex-grow">
-                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
-                    Ocorrências em Andamento
+            <div class="text-center flex-grow">
+                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                    Guarnições em Serviço
                 </h1>
-                
-                <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-2 uppercase tracking-widest">
-                    PORTO ALEGRE
+                <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
+                    PORTO ALEGRE - 1º BBM
                 </h2>
                 
-                <div class="flex flex-col items-center justify-center gap-2 mt-4">
-                    <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
-                        Iniciando sistema...
-                    </div>
-                    </div>
+                <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
+                    <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
+                    <span>|</span>
+                    <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
+                </div>
             </div>
 
             <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
             </div>
         </header>
 
-        <div id="loading" class="text-center py-20">
-            <i class="fas fa-circle-notch fa-spin text-5xl text-bombeiros-orange mb-4"></i>
-            <p class="animate-pulse text-gray-300 font-bold uppercase tracking-widest">Carregando Dados...</p>
-        </div>
+        <main class="w-full max-w-7xl mx-auto flex-grow">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                
+                <div class="stats-container border-l-4 border-bombeiros-orange">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (TURNO ATUAL)
+                    </h3>
+                    <div class="flex justify-around items-center">
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                            <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                            <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                            <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                            <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                            <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                    </div>
+                </div>
 
-        <div id="vazio" class="hidden text-center py-20 bg-slate-800/50 rounded-xl border border-white/5 w-full max-w-2xl backdrop-blur-sm">
-            <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
-            <h3 class="text-2xl font-bold text-white">QAP TOTAL</h3>
-            <p class="text-gray-400 mt-2">Nenhuma ocorrência em andamento no momento.</p>
-        </div>
+                <div class="stats-container border-l-4 border-fire-red">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                        <i class="fas fa-truck text-fire-red"></i> VIATURAS PRONTAS
+                    </h3>
+                    <div class="flex justify-around items-center">
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-abt">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
+                            <div class="tooltip-box"><ul id="list-abt" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR)</span>
+                            <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-4 relative z-10"></div>
+            <div id="grid-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start pb-10">
+                </div>
 
-        <footer class="mt-auto py-6 w-full text-center relative z-20">
-            <p style="font-family: Arial, sans-serif; font-size: 12px; color: white; opacity: 0.8;">
-                © 2026 Companhia de Bombeiro Militar - 1º BBM. Site Desenvolvido por Gustavo Medeiros.
+        </main>
+
+        <footer class="mt-auto py-6 text-center border-t border-white/5">
+            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                Sistema de Controle Operacional - 1º BBM - 2026
             </p>
+            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
         </footer>
-
     </div>
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO: COLE SEU LINK DO GOOGLE SCRIPT AQUI
+        // CONFIGURAÇÃO: COLE SEU LINK DO GOOGLE AQUI
         // ============================================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
-        
-        const frotaMap = {
-            "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
-            "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
-            "AT-1590": "PELOTÃO AÇORIANOS", "ATP-0543": "PELOTÃO AÇORIANOS", "ATP-0639": "PELOTÃO AÇORIANOS", 
-            "ATP-0640": "PELOTÃO AÇORIANOS", "ATP-0964": "PELOTÃO AÇORIANOS", "ATP-10666": "PELOTÃO AÇORIANOS", 
-            "ATP-1506": "PELOTÃO AÇORIANOS", "ATP-201": "PELOTÃO AÇORIANOS", "EIN-204": "PELOTÃO AÇORIANOS", 
-            "RRC-99": "PELOTÃO AÇORIANOS",
-            "ABT-0594": "PELOTÃO TERESÓPOLIS", "ATP-10654": "PELOTÃO TERESÓPOLIS", "ATP-1505": "PELOTÃO TERESÓPOLIS",
-            "AR-0766": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)", "AR-0455": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)",
-            "ABT-0596": "PELOTÃO ASSUNÇÃO", "ATP-10650": "PELOTÃO ASSUNÇÃO", "ATP-10667": "PELOTÃO ASSUNÇÃO",
-            "ABT-0598": "PELOTÃO RESTINGA", "ATP-1233": "PELOTÃO RESTINGA", "ATP-9836": "PELOTÃO RESTINGA",
-            "ABT-0599": "PELOTÃO BELÉM NOVO", "ATP-10653": "PELOTÃO BELÉM NOVO", "ATP-1451": "PELOTÃO BELÉM NOVO", 
-            "ATP-3759": "PELOTÃO BELÉM NOVO", "EIN-704": "PELOTÃO BELÉM NOVO",
-            "ABT-0597": "PELOTÃO FLORESTA", "ATP-1235": "PELOTÃO FLORESTA", "ATP-292": "PELOTÃO FLORESTA", 
-            "EIN-701": "PELOTÃO FLORESTA", "ATP-1243": "PELOTÃO FLORESTA",
-            "ABT-0600": "PELOTÃO PASSO D'AREIA",
-            "ABT-1363": "PELOTÃO PARTENON", "ABT-1365": "PELOTÃO PARTENON", "ATP-1452": "PELOTÃO PARTENON"
-        };
 
-        function analisarTipo(tipoRaw) {
-            const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
-            if(tipo.includes("INCÊNDIO")) return { p: 1, cor: 'color-incendio', border: 'border-incendio', icon: 'fa-fire' };
-            if(tipo.includes("SALVAMENTO") || tipo.includes("BUSCA") || tipo.includes("RESGATE")) return { p: 2, cor: 'color-resgate', border: 'border-resgate', icon: 'fa-life-ring' };
-            if(tipo.includes("HOSPITALAR") || tipo.includes("APH")) return { p: 3, cor: 'color-aph', border: 'border-aph', icon: 'fa-ambulance' };
-            if(tipo.includes("ÁRVORE")) return { p: 4, cor: 'color-arvore', border: 'border-arvore', icon: 'fa-tree' };
-            if(tipo.includes("INSETOS")) return { p: 5, cor: 'color-insetos', border: 'border-insetos', icon: 'fa-bug' };
-            if(tipo.includes("PREVENTIVA")) return { p: 6, cor: 'color-prev', border: 'border-prev', icon: 'fa-shield-alt' };
-            if(tipo.includes("PERIGOSOS") || tipo.includes("HAZMAT")) return { p: 7, cor: 'color-hazmat', border: 'border-hazmat', icon: 'fa-skull-crossbones' };
-            if(tipo.includes("VISTORIA")) return { p: 8, cor: 'color-vistoria', border: 'border-vistoria', icon: 'fa-clipboard-check' };
-            return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
+        const ORDEM_QUARTEIS = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON"];
+
+        function atualizarRelogio() {
+            const agora = new Date();
+            document.getElementById('data-topo').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
 
-        function descobrirPelotao(viaturasArray) {
-            if (!viaturasArray || viaturasArray.length === 0) return "AGUARDANDO EMPENHO";
-            for (let v of viaturasArray) {
-                let prefixo = v.prefixo.trim().toUpperCase();
-                if (frotaMap[prefixo]) {
-                    return frotaMap[prefixo];
-                }
-            }
-            return "PELOTÃO NÃO IDENTIFICADO";
-        }
-
-        async function carregar() {
+        async function iniciarSistema() {
             try {
-                const req = await fetch(API_URL);
-                const dadosRaw = await req.json();
-                renderizar(dadosRaw);
-            } catch(e) {
-                console.error(e);
-                document.getElementById('status').innerHTML = "<span class='text-red-500'>Erro na Conexão</span>";
-            }
+                const req = await fetch(URL_DADOS);
+                const dados = await req.json();
+
+                if(dados.erro) {
+                    setTimeout(iniciarSistema, 5000); return;
+                }
+
+                // Lógica de Filtro e Processamento
+                const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
+                // Se filtro zerou tudo (erro de fuso ou troca de turno), mostra tudo por segurança
+                const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
+
+                processarDados(dadosFinais);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').classList.remove('hidden');
+
+            } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        function renderizar(lista) {
-            const grid = document.getElementById('grid');
-            const vazio = document.getElementById('vazio');
-            const statusDiv = document.getElementById('status');
-            const loading = document.getElementById('loading');
-
-            loading.classList.add('hidden');
-            grid.innerHTML = '';
-
-            if(!lista || lista.length === 0) {
-                vazio.classList.remove('hidden');
-                grid.classList.add('hidden');
-            } else {
-                vazio.classList.add('hidden');
-                grid.classList.remove('hidden');
+        function filtrarTurnoAtual(dados) {
+            const agora = new Date();
+            const minAtual = agora.getHours() * 60 + agora.getMinutes();
+            return dados.filter(d => {
+                if(!d.horario || d.horario.includes("24h") || d.horario.includes("08:00 às 08:00")) return true;
+                const limpo = d.horario.replace(/[^\d:]/g, ''); 
+                if(limpo.length < 8) return true; 
                 
-                lista.sort((a, b) => {
-                    let styleA = analisarTipo(a.tipo);
-                    let styleB = analisarTipo(b.tipo);
-                    return styleA.p - styleB.p;
-                });
+                // Formato esperado HH:MMHH:MM (ex: 08:0020:00) após limpeza
+                const h1 = parseInt(limpo.substr(0,2))*60 + parseInt(limpo.substr(3,2));
+                const h2 = parseInt(limpo.substr(5,2))*60 + parseInt(limpo.substr(8,2));
+                
+                if(isNaN(h1) || isNaN(h2)) return true;
+                return (h1 < h2) ? (minAtual >= h1 && minAtual < h2) : (minAtual >= h1 || minAtual < h2);
+            });
+        }
 
-                lista.forEach(oc => {
-                    const style = analisarTipo(oc.tipo);
-                    const pelotaoNome = descobrirPelotao(oc.viaturas);
+        function processarDados(dados) {
+            const estrutura = {};
+            const stats = { cap: [], sgt: [], sd: [], abt: [], ar: [] };
 
-                    let vtrsHtml = 'Aguardando';
-                    if(oc.viaturas && oc.viaturas.length > 0) {
-                        vtrsHtml = oc.viaturas.map(v => 
-                            `<span class="bg-black/40 border border-white/10 px-2 py-1 rounded text-sm text-white font-mono font-bold mr-1 mb-1 inline-block">
-                                ${v.prefixo}
-                            </span>`
-                        ).join('');
-                    }
+            dados.forEach(d => {
+                let obmRaw = (d.obm || "").toUpperCase();
+                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
+                let nome = (d.nome || "").trim();
+                let func = (d.func || "").trim();
+                let hora = (d.horario || "24h").replace(" - ", " às ").replace("24h", "08:00 às 08:00");
 
-                    // --- TRATAMENTO DO TIPO ---
-                    let tipoPrincipal = oc.tipo;
-                    let tipoSecundario = "";
-                    
-                    if(oc.tipo.includes('/')) {
-                        const parts = oc.tipo.split('/');
-                        tipoPrincipal = parts[0].trim();
-                        tipoSecundario = parts.slice(1).join('/').trim();
-                    }
+                let obmKey = "OUTROS";
+                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
+                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
+                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
 
-                    // LINK GOOGLE MAPS
-                    const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
-                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+                if(!estrutura[obmKey]) estrutura[obmKey] = [];
+                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
+                if(!viaturaObj) {
+                    viaturaObj = { nome: vtr, guarnicao: [] };
+                    estrutura[obmKey].push(viaturaObj);
+                }
+                
+                if(nome !== "ND" && nome !== "A CONFIRMAR") {
+                    viaturaObj.guarnicao.push({ f: func, n: nome, h: hora });
+                    if(nome.match(/(CAP|TEN|MAJ|CEL|ASP)/)) stats.cap.push(nome);
+                    else if(nome.includes("SGT")) stats.sgt.push(nome);
+                    else stats.sd.push(nome);
+                }
 
-                    grid.innerHTML += `
-                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para ver no Google Maps">
-                            
-                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                                
-                                <div class="w-full md:flex-1">
-                                    <div class="flex items-center mb-1">
-                                        <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-gray-500 font-mono border border-white/5 mr-2">#${oc.id}</span>
-                                        <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
-                                    </div>
-                                    
-                                    <h2 class="text-3xl font-black uppercase leading-none mb-1 ${style.cor}">
-                                        <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${tipoPrincipal}
-                                    </h2>
-                                    
-                                    ${tipoSecundario ? `<h2 class="text-lg font-bold uppercase leading-none mb-2 text-gray-400">${tipoSecundario}</h2>` : ''}
-                                    
-                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors mt-2">
-                                        <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
-                                    </p>
-                                    <p class="text-sm text-gray-400 font-bold uppercase mt-2 ml-5 border-l-2 border-gray-600 pl-2">${oc.cidade}</p>
-                                </div>
+                if(vtr.includes("ABT") && !stats.abt.includes(vtr)) stats.abt.push(vtr);
+                if((vtr.includes("AR") || vtr.includes("AEM")) && !stats.ar.includes(vtr)) stats.ar.push(vtr);
+            });
 
-                                <div class="w-full md:w-auto md:min-w-[35%] flex flex-col md:items-end md:text-right">
-                                    
-                                    <div class="mb-2">
-                                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
-                                        <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded md:float-right">
-                                            <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
-                                        </div>
-                                    </div>
+            atualizarStats(stats);
+            renderizarCards(estrutura);
+        }
 
-                                    <div class="clear-both"></div> 
+        function atualizarStats(stats) {
+            const fill = (idC, idL, arr) => {
+                document.getElementById(idC).innerText = arr.length;
+                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
+            };
+            fill('count-cap', 'list-cap', stats.cap);
+            fill('count-sgt', 'list-sgt', stats.sgt);
+            fill('count-sd', 'list-sd', stats.sd);
+            document.getElementById('count-abt').innerText = stats.abt.length;
+            document.getElementById('count-ar').innerText = stats.ar.length;
+            document.getElementById('list-abt').innerHTML = stats.abt.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-ar').innerHTML = stats.ar.map(x => `<li>• ${x}</li>`).join('');
+        }
 
-                                    <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 mt-2">Viaturas</div>
-                                    <div class="flex flex-wrap md:justify-end gap-1">
-                                        ${vtrsHtml}
-                                    </div>
-                                </div>
+        function renderizarCards(estrutura) {
+            const grid = document.getElementById('grid-cards');
+            grid.innerHTML = "";
 
+            const keysOrdenadas = [
+                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
+                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
+            ];
+
+            keysOrdenadas.forEach(obmName => {
+                const viaturas = estrutura[obmName];
+                
+                const card = document.createElement('div');
+                // Lógica de borda colorida baseada no tipo de OBM
+                let borderClass = "border-l-fire"; // Padrão (Incêndio)
+                if(obmName.includes("CANIL") || obmName.includes("MERGULHO")) borderClass = "border-l-support";
+                if(obmName.includes("OFICIAL") || obmName.includes("COBOM")) borderClass = "border-l-rescue";
+
+                card.className = `card-monitor ${borderClass} flex flex-col`;
+
+                let htmlContent = `
+                    <div class="bg-black/30 px-4 py-3 border-b border-white/5 flex justify-between items-center">
+                        <h2 class="text-sm font-black text-white tracking-tight uppercase">${obmName}</h2>
+                        <i class="fas fa-shield-alt text-gray-600 text-xs"></i>
+                    </div>
+                    <div class="p-4 flex flex-col gap-6">
+                `;
+
+                viaturas.forEach(v => {
+                    v.guarnicao.sort((a,b) => {
+                        const getScore = (role) => {
+                            let r = role.toUpperCase();
+                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
+                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
+                            return 3;
+                        }
+                        return getScore(a.f) - getScore(b.f);
+                    });
+
+                    htmlContent += `
+                        <div class="flex flex-col items-center w-full">
+                            <div class="w-full text-center border-b border-bombeiros-yellow/30 mb-3 pb-1">
+                                <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase">${v.nome}</span>
                             </div>
                             
-                            <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
-                                <i class="fas fa-map-marked-alt text-white text-xs"></i>
+                            <div class="w-full flex flex-col gap-3">
+                                ${v.guarnicao.map(m => `
+                                    <div class="text-center group">
+                                        <div class="text-moss-green font-bold text-lg leading-none mb-0.5 drop-shadow-md">
+                                            ${m.n}
+                                        </div>
+                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">
+                                            ${m.f} <span class="text-gray-600 font-normal ml-1">${m.h}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
                     `;
                 });
-            }
-            
-            const agora = new Date();
-            const horaString = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            statusDiv.innerHTML = `<i class="fas fa-satellite-dish mr-1 animate-pulse text-green-500"></i> Atualizado às ${horaString}`;
+
+                htmlContent += `</div>`;
+                card.innerHTML = htmlContent;
+                grid.appendChild(card);
+            });
         }
 
-        carregar();
-        setInterval(carregar, 60000); 
+        iniciarSistema();
+        setInterval(iniciarSistema, 60000); 
     </script>
 </body>
 </html>
