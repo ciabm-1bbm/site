@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - Favorito</title>
+    <title>Painel Operacional 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -143,19 +143,16 @@
                             <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
                             <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
-                        
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
                             <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
-                        
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
                             <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
-                        
                         <div class="w-px h-10 bg-white/10 mx-2"></div>
                         <div class="group relative text-center">
                             <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
@@ -204,9 +201,24 @@
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
-        const ORDEM_QUARTEIS = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON"];
+        // --- ORDEM PERSONALIZADA SOLICITADA ---
+        const ORDEM_QUARTEIS = [
+            "OFICIAL DE DIA",
+            "AÇORIANOS",
+            "ASSUNÇÃO",
+            "TERESÓPOLIS",
+            "RESTINGA",
+            "BELÉM NOVO",
+            "FLORESTA",
+            "PASSO D'AREIA",
+            "PARTENON",
+            "COBOM",
+            "AQUÁTICA",
+            "MERGULHO",
+            "CANIL"
+        ];
 
-        // 1. DATA OPERACIONAL (O dia só vira às 08h)
+        // 1. DATA OPERACIONAL
         function getDataOperacional() {
             const agora = new Date();
             if (agora.getHours() < 8) {
@@ -305,7 +317,7 @@
                 let func = (d.func || "").trim();
                 let hora = formatarTurno(d.horario);
 
-                // Mapeamento OBM
+                // Mapeamento OBM REVISADO
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
                 else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
@@ -332,17 +344,13 @@
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
 
-                    // === CONTABILIZAÇÃO CORRETA E RESTRITIVA ===
-                    
-                    // 1. SARGENTOS (Prioridade)
+                    // Stats
                     if(nomeCompleto.includes("SGT")) {
                         stats.sgt.add(idMilitar + "|" + nomeExibicao);
                     }
-                    // 2. OFICIAIS (Apenas patentes de oficial)
                     else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
                         stats.cap.add(idMilitar + "|" + nomeExibicao);
                     }
-                    // 3. PRAÇAS (SD/CB e outros)
                     else {
                         stats.sd.add(idMilitar + "|" + nomeExibicao);
                     }
@@ -357,7 +365,6 @@
         }
 
         function atualizarStats(stats) {
-            // Converte Set para Array
             const capArr = Array.from(stats.cap).map(s => s.split('|')[1]);
             const sgtArr = Array.from(stats.sgt).map(s => s.split('|')[1]);
             const sdArr = Array.from(stats.sd).map(s => s.split('|')[1]);
@@ -444,7 +451,7 @@
                                             ${m.n}
                                         </div>
                                         <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-600 font-normal normal-case ml-1">(${m.h})</span>
+                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">(${m.h})</span>
                                         </div>
                                     </div>
                                 `).join('')}
