@@ -3,44 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Tático - CBMRS</title>
+    <title>Painel Tático CBMRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background-color: #121212;
-        }
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        /* Mensagem de carregamento caso a net esteja lenta */
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #b71c1c;
-            font-family: sans-serif;
-            text-align: center;
-            z-index: -1;
-        }
+        body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .header { text-align: center; border-bottom: 3px solid #b71c1c; padding-bottom: 15px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .card { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; overflow: hidden; }
+        .card-head { background: linear-gradient(90deg, #2c2c2c, #222); padding: 10px; border-left: 4px solid #b71c1c; display: flex; justify-content: space-between; }
+        .vtr { font-weight: bold; font-size: 1.2rem; color: white; }
+        .obm { font-size: 0.7rem; color: #aaa; }
+        .item { padding: 8px 10px; border-bottom: 1px solid #333; display: flex; align-items: center; font-size: 0.9rem; }
+        .func { width: 80px; font-size: 0.7rem; font-weight: bold; color: #b71c1c; }
+        .nome { flex-grow: 1; color: #ddd; }
+        .hora { font-size: 0.7rem; background: #333; padding: 2px 5px; border-radius: 3px; }
+        #loading { text-align: center; margin-top: 50px; }
     </style>
 </head>
 <body>
 
-    <div class="loading">
-        <h2>Carregando Painel Operacional...</h2>
-        <p>Conectando ao Motor Seguro...</p>
+    <div class="header">
+        <h2 style="margin:0"><i class="fas fa-fire-extinguisher"></i> EFETIVO OPERACIONAL</h2>
+        <small id="last-up">Sincronizando...</small>
     </div>
 
-    <iframe src="https://script.google.com/macros/s/AKfycby1aM6Oe4LCbZIkIpyUY_Or7awGAxGk2cC5-cPC42HAsEzwUr7KWs-8swH5FwxjP2IS/exec" allow="fullscreen"></iframe>
+    <div id="loading"><i class="fas fa-spinner fa-spin fa-3x" style="color:#b71c1c"></i></div>
+    <div class="grid" id="container"></div>
 
+    <script>
+        // --- COLE SEU LINK AQUI ---
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
+
+        async function carregar() {
+            try {
+                const req = await fetch(URL_DADOS);
+                const dados = await req.json();
+
+                if(dados.erro) {
+                    document.getElementById('loading').innerHTML = "<h3>Aguardando dados do PC...</h3><p>Deixe a aba do E193 aberta no computador para sincronizar.</p>";
+                    return;
+                }
+
+                renderizar(dados);
+            } catch(e) {
+                console.log(e);
+            }
+        }
+
+        function renderizar(dados) {
+            const container = document.getElementById('container');
+            container.innerHTML = "";
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('last-up').innerText = "Atualizado: " + new Date().toLocaleTimeString();
+
+            // Agrupa viaturas
+            const frota = {};
+            dados.forEach(d => {
+                const id = d.vtr + d.obm;
+                if(!frota[id]) frota[id] = {vtr: d.vtr, obm: d.obm, equipe: []};
+                frota[id].equipe.push(d);
+            });
+
+            Object.values(frota).forEach(v => {
+                // Ordena Comandante
+                v.equipe.sort((a,b) => a.func.includes('CMT') ? -1 : 1);
+
+                let linhas = "";
+                v.equipe.forEach(m => {
+                    linhas += `
+                        <div class="item">
+                            <span class="func">${m.func}</span>
+                            <span class="nome">${m.nome}</span>
+                            <span class="hora">${m.hora}</span>
+                        </div>`;
+                });
+
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="card-head">
+                            <div><div class="vtr">${v.vtr}</div><div class="obm">${v.obm}</div></div>
+                            <i class="fas fa-truck-medical" style="color:#444"></i>
+                        </div>
+                        <div>${linhas}</div>
+                    </div>`;
+            });
+        }
+
+        carregar();
+        setInterval(carregar, 60000); // Atualiza a cada 1 min
+    </script>
 </body>
 </html>
