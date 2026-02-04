@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Tático 1º BBM</title>
+    <title>Painel Operacional 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -14,11 +14,14 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'dark-bg': '#0f172a',
-                        'card-bg': '#1e293b'
+                        'moss-green': '#9BE36D', /* Verde Musgo Claro para ler no fundo escuro */
                     },
                     fontFamily: {
                         sans: ['Roboto', 'sans-serif'],
+                    },
+                    fontSize: {
+                        'xxs': '0.60rem', 
+                        'tiny': '0.50rem',
                     }
                 }
             }
@@ -31,11 +34,10 @@
     <style>
         body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
         
-        /* PLANO DE FUNDO COM LOGO DO BBM */
+        /* BACKGROUND */
         .hero-background { 
-            /* Substitua pela URL da sua logo se preferir */
             background-image: url('https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png');
-            background-size: 400px; 
+            background-size: 350px; 
             background-position: center; 
             background-repeat: no-repeat; 
             background-attachment: fixed; 
@@ -43,37 +45,38 @@
         }
         .hero-background::before { 
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-            /* Camada escura para dar leitura no texto */
-            background: rgba(15, 23, 42, 0.92); 
+            background: rgba(15, 23, 42, 0.94); /* Fundo bem escuro para contraste */
             z-index: 0; 
         }
         .content-wrapper { position: relative; z-index: 10; }
         
-        /* CARD ESTILIZADO */
+        /* CARD COM ZOOM FORTE */
         .guarnicao-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            background: rgba(30, 41, 59, 0.85); /* Mais opaco */
+            backdrop-filter: blur(5px);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito elástico */
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
         .guarnicao-card:hover {
-            transform: translateY(-5px);
-            border-color: #FFD700;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: scale(1.08) translateY(-5px); /* Zoom Maior */
+            z-index: 50;
+            border-color: #FF8C00;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            background: rgba(30, 41, 59, 1);
         }
 
-        /* BARRA DE STATUS DO CARD */
+        /* BARRA TOPO CARD */
         .card-top-bar {
-            height: 4px;
+            height: 3px;
             background: linear-gradient(90deg, #DC2626 0%, #FF8C00 100%);
             width: 100%;
         }
 
-        /* TOOLTIP PERSONALIZADO (STAT BOX) */
+        /* TOOLTIP */
         .stat-tooltip {
             visibility: hidden;
             opacity: 0;
@@ -81,17 +84,17 @@
             top: 100%;
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.95);
+            background-color: #000;
             border: 1px solid #FF8C00;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 8px;
+            border-radius: 4px;
             width: max-content;
-            min-width: 200px;
-            max-width: 300px;
-            z-index: 50;
-            transition: opacity 0.2s;
+            min-width: 180px;
+            max-width: 280px;
+            z-index: 100;
+            transition: opacity 0.1s;
             margin-top: 5px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 20px rgba(0,0,0,1);
             text-align: left;
         }
         .group:hover .stat-tooltip {
@@ -99,10 +102,8 @@
             opacity: 1;
         }
 
-        /* SCROLLBAR FINA */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
 
         #loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -114,97 +115,92 @@
 <body class="hero-background min-h-screen flex flex-col">
 
     <div id="loading-overlay">
-        <i class="fas fa-shield-alt fa-beat text-fire-red text-6xl mb-4"></i>
-        <h2 class="text-2xl font-bold tracking-widest uppercase">Carregando Painel</h2>
-        <p class="text-sm text-gray-400 mt-2 animate-pulse">Sincronizando com a Base de Dados...</p>
+        <i class="fas fa-shield-alt fa-flip text-bombeiros-orange text-5xl mb-4" style="--fa-animation-duration: 3s;"></i>
+        <h2 class="text-xl font-bold tracking-widest uppercase">Carregando Sistema</h2>
+        <p class="text-xs text-gray-500 mt-2">Sincronizando...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen w-full hidden" id="main-content">
         
-        <header class="bg-black/50 border-b border-white/10 py-4 shadow-lg">
-            <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
-                <div class="flex items-center gap-4">
-                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 drop-shadow-lg">
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
-                            GUARNIÇÕES EM SERVIÇO <span class="text-bombeiros-yellow">- PORTO ALEGRE/RS</span>
-                        </h1>
-                        <p class="text-sm text-gray-300 font-bold uppercase tracking-widest mt-1" id="data-topo">--/--/----</p>
-                    </div>
-                </div>
-                <div class="bg-slate-800/80 px-4 py-2 rounded border border-white/10">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold">ATUALIZADO EM:</p>
-                    <p class="text-xl font-mono text-green-400 font-bold leading-none" id="hora-topo">--:--</p>
+        <header class="bg-black/60 border-b border-white/10 py-3 shadow-lg backdrop-blur-sm">
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1">
+                    GUARNIÇÕES EM SERVIÇO <span class="text-bombeiros-orange">- PORTO ALEGRE - 1º BBM</span>
+                </h1>
+                <div class="flex justify-center items-center gap-4 text-gray-400">
+                    <p class="text-xs font-bold uppercase tracking-widest" id="data-topo">--/--/----</p>
+                    <span class="text-[8px]">•</span>
+                    <p class="text-[10px] uppercase font-bold">ATUALIZADO EM: <span class="text-green-400 font-mono text-xs" id="hora-topo">--:--</span></p>
                 </div>
             </div>
         </header>
 
-        <main class="container mx-auto px-4 py-6 flex-grow">
+        <main class="container mx-auto px-2 py-4 flex-grow">
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="group relative bg-slate-800/80 p-3 rounded-lg border border-white/10 hover:border-bombeiros-orange transition cursor-help text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">OFICIAIS (CAP)</p>
-                    <p class="text-2xl font-black text-bombeiros-orange" id="count-cap">0</p>
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <div class="group relative bg-slate-900/90 px-3 py-1 rounded border border-white/10 hover:border-bombeiros-orange transition cursor-help text-center min-w-[80px]">
+                    <p class="text-[9px] text-gray-500 font-bold uppercase">CAP</p>
+                    <p class="text-lg font-black text-bombeiros-orange leading-none" id="count-cap">0</p>
                     <div class="stat-tooltip">
-                        <p class="text-xs font-bold text-bombeiros-orange border-b border-gray-600 mb-1 pb-1">NOMINATA</p>
-                        <ul class="text-[10px] text-gray-300" id="list-cap"></ul>
+                        <p class="text-[10px] font-bold text-bombeiros-orange border-b border-gray-800 mb-1 pb-1">MILITARES:</p>
+                        <ul class="text-[9px] text-gray-300" id="list-cap"></ul>
                     </div>
                 </div>
 
-                <div class="group relative bg-slate-800/80 p-3 rounded-lg border border-white/10 hover:border-bombeiros-yellow transition cursor-help text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">SARGENTOS (SGT)</p>
-                    <p class="text-2xl font-black text-bombeiros-yellow" id="count-sgt">0</p>
+                <div class="group relative bg-slate-900/90 px-3 py-1 rounded border border-white/10 hover:border-bombeiros-yellow transition cursor-help text-center min-w-[80px]">
+                    <p class="text-[9px] text-gray-500 font-bold uppercase">SGT</p>
+                    <p class="text-lg font-black text-bombeiros-yellow leading-none" id="count-sgt">0</p>
                     <div class="stat-tooltip">
-                        <p class="text-xs font-bold text-bombeiros-yellow border-b border-gray-600 mb-1 pb-1">NOMINATA</p>
-                        <ul class="text-[10px] text-gray-300" id="list-sgt"></ul>
+                        <p class="text-[10px] font-bold text-bombeiros-yellow border-b border-gray-800 mb-1 pb-1">MILITARES:</p>
+                        <ul class="text-[9px] text-gray-300" id="list-sgt"></ul>
                     </div>
                 </div>
 
-                <div class="group relative bg-slate-800/80 p-3 rounded-lg border border-white/10 hover:border-blue-400 transition cursor-help text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">SOLDADOS (SD)</p>
-                    <p class="text-2xl font-black text-blue-400" id="count-sd">0</p>
+                <div class="group relative bg-slate-900/90 px-3 py-1 rounded border border-white/10 hover:border-blue-400 transition cursor-help text-center min-w-[80px]">
+                    <p class="text-[9px] text-gray-500 font-bold uppercase">SD</p>
+                    <p class="text-lg font-black text-blue-400 leading-none" id="count-sd">0</p>
                     <div class="stat-tooltip">
-                        <p class="text-xs font-bold text-blue-400 border-b border-gray-600 mb-1 pb-1">NOMINATA</p>
-                        <ul class="text-[10px] text-gray-300" id="list-sd"></ul>
+                        <p class="text-[10px] font-bold text-blue-400 border-b border-gray-800 mb-1 pb-1">MILITARES:</p>
+                        <ul class="text-[9px] text-gray-300" id="list-sd"></ul>
                     </div>
                 </div>
 
-                <div class="group relative bg-slate-800/80 p-3 rounded-lg border border-white/10 hover:border-fire-red transition cursor-help text-center flex justify-around items-center">
+                <div class="group relative bg-slate-900/90 px-3 py-1 rounded border border-white/10 hover:border-fire-red transition cursor-help text-center flex gap-3">
                     <div class="text-center">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase">ABT</p>
-                        <p class="text-xl font-black text-fire-red" id="count-abt">0</p>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase">ABT</p>
+                        <p class="text-lg font-black text-fire-red leading-none" id="count-abt">0</p>
                     </div>
-                    <div class="w-px h-8 bg-gray-600"></div>
+                    <div class="w-px bg-gray-700"></div>
                     <div class="text-center">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase">AR (RESGATE)</p>
-                        <p class="text-xl font-black text-white" id="count-ar">0</p>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase">AR</p>
+                        <p class="text-lg font-black text-white leading-none" id="count-ar">0</p>
                     </div>
-                    
-                    <div class="stat-tooltip !w-48">
-                        <p class="text-xs font-bold text-fire-red border-b border-gray-600 mb-1 pb-1">VIATURAS ATIVAS</p>
-                        <ul class="text-[10px] text-gray-300" id="list-vtr"></ul>
+                    <div class="stat-tooltip">
+                        <p class="text-[10px] font-bold text-fire-red border-b border-gray-800 mb-1 pb-1">VIATURAS:</p>
+                        <ul class="text-[9px] text-gray-300" id="list-vtr"></ul>
                     </div>
                 </div>
             </div>
 
-            <div id="grid-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div id="grid-cards" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 justify-items-stretch">
                 </div>
 
         </main>
 
-        <footer class="bg-black/80 py-2 text-center border-t border-white/10">
-            <p class="text-[10px] text-gray-500 uppercase font-bold">Sistema de Gestão Operacional - 1º BBM</p>
+        <footer class="bg-black/90 py-3 text-center border-t border-white/5">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Sistema de Controle Operacional - 1º BBM - 2026</p>
+            <p class="text-[9px] text-gray-600 mt-0.5">Desenvolvido por Gustavo Medeiros</p>
         </footer>
     </div>
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO: COLE SEU LINK AQUI
+        // CONFIGURAÇÃO: COLE SEU LINK DO GOOGLE AQUI
         // ============================================================
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
-        // ORDEM FIXA DOS QUARTÉIS
+        // ORDEM FIXA
         const ORDEM_QUARTEIS = [
             "AÇORIANOS",
             "ASSUNÇÃO",
@@ -216,40 +212,36 @@
             "PARTENON"
         ];
 
-        // Atualiza Data e Hora
+        // RELÓGIO
         function atualizarRelogio() {
             const agora = new Date();
-            document.getElementById('data-topo').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const dataStr = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('data-topo').innerText = dataStr;
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
-        // MOTOR PRINCIPAL
+        // SISTEMA
         async function iniciarSistema() {
             try {
                 const req = await fetch(URL_DADOS);
                 const dados = await req.json();
 
                 if(dados.erro) {
-                    console.log("Aguardando dados...");
+                    console.log("Aguardando PC...");
                     setTimeout(iniciarSistema, 5000);
                     return;
                 }
 
                 processarDados(dados);
-                
-                // Libera a tela
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('main-content').classList.remove('hidden');
 
-            } catch(e) {
-                console.error("Erro:", e);
-            }
+            } catch(e) { console.error(e); }
         }
 
         function processarDados(dadosBrutos) {
-            // 1. LIMPEZA E MAPEAMENTO
             const estrutura = {};
             const stats = { cap: [], sgt: [], sd: [], abt: [], ar: [] };
 
@@ -260,7 +252,14 @@
                 let func = d.func.trim();
                 let hora = d.hora || "24h";
 
-                // Mapeia OBM Bruto para Nome Curto
+                // Formatação de Hora (XX:XX às XX:XX)
+                if (hora.includes("-")) {
+                    hora = hora.replace(" - ", " às ");
+                } else if (hora === "24h") {
+                    hora = "08:00 às 08:00";
+                }
+
+                // Agrupamento
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
                 else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
@@ -268,7 +267,7 @@
                 else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
                 else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
                 else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
-                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA"; // Pega variações de aspas
+                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
                 else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
                 else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
                 else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
@@ -276,33 +275,25 @@
                 else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
                 else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
 
-                // Adiciona na estrutura
                 if(!estrutura[obmKey]) estrutura[obmKey] = [];
                 
-                // Agrupa por viatura
                 let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
                 if(!viaturaObj) {
                     viaturaObj = { nome: vtr, guarnicao: [] };
                     estrutura[obmKey].push(viaturaObj);
                 }
                 
-                // Adiciona Militar
                 if(nome !== "ND" && nome !== "A CONFIRMAR") {
                     viaturaObj.guarnicao.push({ f: func, n: nome, h: hora });
 
-                    // Coleta Estatísticas
+                    // Stats
                     if(nome.includes("CAP") || nome.includes("TEN") || nome.includes("MAJ") || nome.includes("CEL")) stats.cap.push(nome);
                     else if(nome.includes("SGT")) stats.sgt.push(nome);
                     else stats.sd.push(nome);
                 }
 
-                // Coleta Viatura
-                if(vtr.includes("ABT")) {
-                    if(!stats.abt.includes(vtr)) stats.abt.push(vtr);
-                }
-                else if(vtr.includes("AR") || vtr.includes("AEM")) {
-                    if(!stats.ar.includes(vtr)) stats.ar.push(vtr);
-                }
+                if(vtr.includes("ABT") && !stats.abt.includes(vtr)) stats.abt.push(vtr);
+                if((vtr.includes("AR") || vtr.includes("AEM")) && !stats.ar.includes(vtr)) stats.ar.push(vtr);
             });
 
             atualizarStats(stats);
@@ -310,12 +301,10 @@
         }
 
         function atualizarStats(stats) {
-            // Função auxiliar para preencher
-            const fill = (idCount, idList, arr) => {
-                document.getElementById(idCount).innerText = arr.length;
-                document.getElementById(idList).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
+            const fill = (idC, idL, arr) => {
+                document.getElementById(idC).innerText = arr.length;
+                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
             };
-
             fill('count-cap', 'list-cap', stats.cap);
             fill('count-sgt', 'list-sgt', stats.sgt);
             fill('count-sd', 'list-sd', stats.sd);
@@ -324,63 +313,61 @@
             document.getElementById('count-ar').innerText = stats.ar.length;
             document.getElementById('list-vtr').innerHTML = 
                 stats.abt.map(x => `<li class="text-fire-red">• ${x}</li>`).join('') +
-                stats.ar.map(x => `<li class="text-white">• ${x}</li>`).join('');
+                stats.ar.map(x => `<li class="text-white">• ${x} (AR)</li>`).join('');
         }
 
         function renderizarCards(estrutura) {
             const grid = document.getElementById('grid-cards');
             grid.innerHTML = "";
 
-            // Cria lista final ordenada: Primeiro os da lista fixa, depois o resto
             const keysOrdenadas = [
-                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), // Só os que existem hoje
-                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k)) // Resto (Cobom, etc)
+                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
+                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
             ];
 
             keysOrdenadas.forEach(obmName => {
                 const viaturas = estrutura[obmName];
                 
-                // CARD DO PELOTÃO
                 const card = document.createElement('div');
                 card.className = "guarnicao-card";
 
-                // Conteúdo do Card
                 let htmlContent = `
                     <div class="card-top-bar"></div>
-                    <div class="bg-black/40 p-3 text-center border-b border-white/5">
-                        <h2 class="text-xl font-black text-white tracking-tighter uppercase">${obmName}</h2>
+                    <div class="bg-black/30 py-1.5 text-center border-b border-white/5">
+                        <h2 class="text-sm font-black text-bombeiros-orange tracking-tight uppercase">${obmName}</h2>
                     </div>
-                    <div class="p-4 flex-grow flex flex-col gap-6">
+                    <div class="p-2 flex-grow flex flex-col gap-4">
                 `;
 
-                // Loop nas Viaturas dentro do Quartel
                 viaturas.forEach(v => {
-                    // Ordena Militares: CMT -> MOT -> Resto
                     v.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
-                            if(r.includes("CMT") || r.includes("COMANDANTE") || r.includes("CHEFE")) return 1;
-                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA") || r.includes("COV")) return 2;
+                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
+                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
                             return 3;
                         }
                         return getScore(a.f) - getScore(b.f);
                     });
 
-                    // VIATURA AMARELA CENTRALIZADA
+                    // VIATURA METADE DO TAMANHO, AMARELA
                     htmlContent += `
                         <div class="flex flex-col items-center">
-                            <div class="bg-bombeiros-yellow/10 px-4 py-1 rounded border border-bombeiros-yellow/30 mb-3">
-                                <span class="text-bombeiros-yellow font-black text-lg tracking-widest">${v.nome}</span>
+                            <div class="bg-bombeiros-yellow/10 px-2 py-0.5 rounded border border-bombeiros-yellow/30 mb-2">
+                                <span class="text-bombeiros-yellow font-black text-[10px] tracking-widest">${v.nome}</span>
                             </div>
                             
-                            <div class="w-full flex flex-col gap-4">
+                            <div class="w-full flex flex-col gap-3">
                                 ${v.guarnicao.map(m => `
                                     <div class="text-center">
-                                        <div class="text-white font-bold text-lg leading-none mb-1 shadow-black drop-shadow-md">
+                                        <div class="text-moss-green font-bold text-sm leading-none mb-0.5 shadow-black drop-shadow-md">
                                             ${m.n}
                                         </div>
-                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-600">(${m.h})</span>
+                                        <div class="text-[9px] text-gray-500 font-bold uppercase tracking-wide">
+                                            ${m.f}
+                                        </div>
+                                        <div class="text-[8px] text-gray-600 font-mono">
+                                            ${m.h}
                                         </div>
                                     </div>
                                 `).join('')}
@@ -389,15 +376,14 @@
                     `;
                 });
 
-                htmlContent += `</div>`; // Fecha corpo
+                htmlContent += `</div>`;
                 card.innerHTML = htmlContent;
                 grid.appendChild(card);
             });
         }
 
-        // Inicia
         iniciarSistema();
-        setInterval(iniciarSistema, 60000); // Atualiza a cada 1 min
+        setInterval(iniciarSistema, 60000);
 
     </script>
 </body>
