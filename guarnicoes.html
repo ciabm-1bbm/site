@@ -14,7 +14,8 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'moss-green': '#9BE36D', /* Verde para os Nomes */
+                        'moss-green': '#9BE36D',
+                        'total-green': '#4ade80' /* Verde vibrante para o total */
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -30,7 +31,7 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
         
-        /* --- VISUAL DO MONITOR (MARCA D'ÁGUA) --- */
+        /* BACKGROUND MARCA D'ÁGUA */
         .hero-background { position: relative; min-height: 100vh; }
         .hero-background::before { 
             content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
@@ -45,31 +46,34 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* CARD ESTILO MONITOR (GLASSMORPHISM) */
+        /* CARD NOVO (Barra Lateral Vermelha) */
         .card-monitor {
-            background: rgba(30, 41, 59, 0.75);
+            background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
+            border-radius: 0.5rem;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* Importante para a barra lateral */
         }
         .card-monitor:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            background: rgba(30, 41, 59, 0.95);
+            background: rgba(30, 41, 59, 0.98);
             border-color: rgba(255, 140, 0, 0.5);
             z-index: 50;
         }
 
-        /* BORDAS LATERAIS COLORIDAS (Identidade Visual) */
-        .border-l-fire { border-left: 4px solid #DC2626; }
-        .border-l-support { border-left: 4px solid #FFD700; }
-        .border-l-rescue { border-left: 4px solid #FFFFFF; }
+        /* TEXTO VERTICAL */
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            white-space: nowrap;
+        }
 
-        /* STATS PANEL (Adaptado para o visual do Monitor) */
+        /* STATS PANEL */
         .stats-container {
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -87,7 +91,6 @@
         }
         .group:hover .tooltip-box { visibility: visible; opacity: 1; }
 
-        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
 
@@ -99,7 +102,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Sincronizando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono">Buscando dados do turno atual...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Buscando dados do turno atual...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -135,30 +138,35 @@
                 
                 <div class="stats-container border-l-4 border-bombeiros-orange">
                     <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (TURNO ATUAL)
+                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO ESCALADO
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
                             <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
                             <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
                             <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10 mx-2"></div>
+                        <div class="group relative text-center">
+                            <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-container border-l-4 border-fire-red">
                     <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-truck text-fire-red"></i> VIATURAS PRONTAS
+                        <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
@@ -169,14 +177,14 @@
                         <div class="w-px h-10 bg-white/10"></div>
                         <div class="group relative text-center cursor-help">
                             <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR)</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR / AEM)</span>
                             <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="grid-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start pb-10">
+            <div id="grid-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-start pb-10">
                 </div>
 
         </main>
@@ -191,7 +199,7 @@
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO: SEU LINK JÁ CONFIGURADO
+        // CONFIGURAÇÃO: SEU LINK GOOGLE SCRIPT
         // ============================================================
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
@@ -212,12 +220,14 @@
                 const dados = await req.json();
 
                 if(dados.erro) {
-                    setTimeout(iniciarSistema, 5000); return;
+                    document.getElementById('msg-loading').innerText = "Aguardando envio do PC...";
+                    setTimeout(iniciarSistema, 5000); 
+                    return;
                 }
 
                 // Lógica de Filtro e Processamento
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
-                // Se filtro zerou tudo (erro de fuso ou troca de turno), mostra tudo por segurança
+                // Se filtro zerou (ex: erro de hora), usa os dados brutos
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
                 processarDados(dadosFinais);
@@ -236,7 +246,6 @@
                 const limpo = d.horario.replace(/[^\d:]/g, ''); 
                 if(limpo.length < 8) return true; 
                 
-                // Formato esperado HH:MMHH:MM (ex: 08:0020:00) após limpeza
                 const h1 = parseInt(limpo.substr(0,2))*60 + parseInt(limpo.substr(3,2));
                 const h2 = parseInt(limpo.substr(5,2))*60 + parseInt(limpo.substr(8,2));
                 
@@ -301,6 +310,11 @@
             fill('count-cap', 'list-cap', stats.cap);
             fill('count-sgt', 'list-sgt', stats.sgt);
             fill('count-sd', 'list-sd', stats.sd);
+            
+            // TOTAL
+            const total = stats.cap.length + stats.sgt.length + stats.sd.length;
+            document.getElementById('count-total').innerText = total;
+
             document.getElementById('count-abt').innerText = stats.abt.length;
             document.getElementById('count-ar').innerText = stats.ar.length;
             document.getElementById('list-abt').innerHTML = stats.abt.map(x => `<li>• ${x}</li>`).join('');
@@ -319,23 +333,27 @@
             keysOrdenadas.forEach(obmName => {
                 const viaturas = estrutura[obmName];
                 
+                // CARD COM LAYOUT FLEX ROW
                 const card = document.createElement('div');
-                // Lógica de borda colorida baseada no tipo de OBM
-                let borderClass = "border-l-fire"; // Padrão (Incêndio)
-                if(obmName.includes("CANIL") || obmName.includes("MERGULHO")) borderClass = "border-l-support";
-                if(obmName.includes("OFICIAL") || obmName.includes("COBOM")) borderClass = "border-l-rescue";
+                card.className = "card-monitor"; // Flex-row aplicado via CSS se precisar, aqui controlamos no innerHTML
 
-                card.className = `card-monitor ${borderClass} flex flex-col`;
-
-                let htmlContent = `
-                    <div class="bg-black/30 px-4 py-3 border-b border-white/5 flex justify-between items-center">
-                        <h2 class="text-sm font-black text-white tracking-tight uppercase">${obmName}</h2>
-                        <i class="fas fa-shield-alt text-gray-600 text-xs"></i>
+                // Lógica de conteúdo
+                let content = '';
+                
+                // Barra Lateral Vermelha (Nome Vertical)
+                content += `
+                    <div class="bg-fire-red w-10 flex items-center justify-center py-4 flex-shrink-0">
+                        <h2 class="vertical-text text-white font-black text-[10px] tracking-widest uppercase">
+                            ${obmName}
+                        </h2>
                     </div>
-                    <div class="p-4 flex flex-col gap-6">
                 `;
 
+                // Área de Conteúdo
+                content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
+
                 viaturas.forEach(v => {
+                    // Ordenação
                     v.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
@@ -346,20 +364,20 @@
                         return getScore(a.f) - getScore(b.f);
                     });
 
-                    htmlContent += `
-                        <div class="flex flex-col items-center w-full">
-                            <div class="w-full text-center border-b border-bombeiros-yellow/30 mb-3 pb-1">
-                                <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase">${v.nome}</span>
-                            </div>
+                    content += `
+                        <div class="w-full flex flex-col items-center">
+                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
+                                ${v.nome}
+                            </span>
                             
-                            <div class="w-full flex flex-col gap-3">
+                            <div class="w-full flex flex-col gap-2">
                                 ${v.guarnicao.map(m => `
                                     <div class="text-center group">
-                                        <div class="text-moss-green font-bold text-lg leading-none mb-0.5 drop-shadow-md">
+                                        <div class="text-moss-green font-bold text-sm leading-tight drop-shadow-md">
                                             ${m.n}
                                         </div>
-                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-600 font-normal ml-1">${m.h}</span>
+                                        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
+                                            ${m.f} <span class="text-gray-600 font-normal normal-case ml-1">(${m.h})</span>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -368,8 +386,8 @@
                     `;
                 });
 
-                htmlContent += `</div>`;
-                card.innerHTML = htmlContent;
+                content += `</div>`; // Fecha content area
+                card.innerHTML = content;
                 grid.appendChild(card);
             });
         }
