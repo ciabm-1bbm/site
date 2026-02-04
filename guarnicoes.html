@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM</title>
+    <title>Painel Operacional 1º BBM - V14</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -196,12 +196,11 @@
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO: COLE SEU LINK DO GOOGLE AQUI
+        // CONFIGURAÇÃO: LINK FIXO
         // ============================================================
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
-        // --- ORDEM PERSONALIZADA SOLICITADA ---
         const ORDEM_QUARTEIS = [
             "OFICIAL DE DIA",
             "AÇORIANOS",
@@ -248,6 +247,7 @@
                     return;
                 }
 
+                // Filtro + Processamento
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
@@ -258,17 +258,19 @@
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // Lógica de Turno
+        // --- LÓGICA DE TURNO E HORÁRIOS CORRIGIDA ---
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
             
             return dados.filter(d => {
                 let txt = d.horario || "";
-                if(!txt || txt.includes("24h") || txt.includes("08:00 às 08:00")) return true;
                 
-                const nums = txt.match(/(\d{2}):(\d{2})/g);
-                if(!nums || nums.length < 2) return true;
+                // Extrai todos os pares HH:MM encontrados na string suja
+                const nums = txt.match(/(\d{2}:\d{2})/g);
+                
+                // Se não achar horário, assume 24h ou horário padrão e exibe
+                if(!nums || nums.length < 2) return true; 
 
                 const [h1, m1] = nums[0].split(':').map(Number);
                 const [h2, m2] = nums[1].split(':').map(Number);
@@ -276,9 +278,12 @@
                 const inicio = h1 * 60 + m1;
                 const fim = h2 * 60 + m2;
 
+                // Lógica de virada de dia
                 if (inicio < fim) { 
+                    // Turno no mesmo dia (ex: 08:00 - 20:00)
                     return minAtual >= inicio && minAtual < fim;
                 } else { 
+                    // Turno vira a noite (ex: 20:00 - 08:00)
                     return minAtual >= inicio || minAtual < fim;
                 }
             });
@@ -286,11 +291,20 @@
 
         function formatarTurno(raw) {
             if(!raw) return "24h";
+            // Extrai as horas limpas da string suja (ex: "1204/02... 08:00... 20:00")
             const nums = raw.match(/(\d{2}:\d{2})/g);
+            
             if(nums && nums.length >= 2) {
-                if(nums[0] === "08:00" && nums[1] === "08:00") return "08:00 às 08:00 (24h)";
-                return `${nums[0]} às ${nums[1]}`;
+                // Pega a primeira e a segunda ocorrência de hora (Início e Fim)
+                const inicio = nums[0];
+                const fim = nums[1];
+
+                // Se forem iguais, é 24h
+                if(inicio === "08:00" && fim === "08:00") return "08:00 às 08:00 (24h)";
+                
+                return `${inicio} às ${fim}`;
             }
+            // Fallback
             if(raw.includes("24")) return "08:00 às 08:00 (24h)";
             return raw;
         }
@@ -306,6 +320,7 @@
 
         function processarDados(dados) {
             const estrutura = {};
+            // Sets para unicidade por ID
             const stats = { cap: new Set(), sgt: new Set(), sd: new Set(), abt: new Set(), ar: new Set() };
 
             dados.forEach(d => {
@@ -315,9 +330,11 @@
                 let idMilitar = extrairID(nomeCompleto);
                 let nomeExibicao = limparNome(nomeCompleto);
                 let func = (d.func || "").trim();
-                let hora = formatarTurno(d.horario);
+                
+                // Formatação Limpa do Horário
+                let hora = formatarTurno(d.horario || "");
 
-                // Mapeamento OBM REVISADO
+                // Mapeamento OBM
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
                 else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
@@ -344,7 +361,7 @@
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
 
-                    // Stats
+                    // Stats RIGOROSOS
                     if(nomeCompleto.includes("SGT")) {
                         stats.sgt.add(idMilitar + "|" + nomeExibicao);
                     }
@@ -451,7 +468,7 @@
                                             ${m.n}
                                         </div>
                                         <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">(${m.h})</span>
+                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
                                         </div>
                                     </div>
                                 `).join('')}
