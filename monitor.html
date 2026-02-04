@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - V16 Final</title>
+    <title>Painel Operacional 1º BBM - Turnos Reais</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,7 +31,6 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
         
-        /* BACKGROUND */
         .hero-background { position: relative; min-height: 100vh; }
         .hero-background::before { 
             content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
@@ -46,7 +45,6 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* CARD */
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
@@ -98,8 +96,8 @@
 
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Conectando ao sistema...</p>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Sincronizando Escala</h2>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Calculando turnos de 12h e 24h...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -219,7 +217,7 @@
 
         function getDataOperacional() {
             const agora = new Date();
-            if (agora.getHours() < 8) {
+            if (agora.getHours() < 7) { // Tolerância até 7 da manhã
                 agora.setDate(agora.getDate() - 1);
             }
             return agora;
@@ -245,9 +243,8 @@
                     return;
                 }
 
-                // Filtra dados do turno atual
+                // AQUI ESTÁ A MÁGICA: FILTRO PRECISO
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
-                // Se der problema no filtro, usa tudo por segurança
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
                 processarDados(dadosFinais);
@@ -257,7 +254,7 @@
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // Lógica de Turno e Horários (AGORA LÊ DIRETAMENTE DO SCRIPT)
+        // --- LÓGICA DE TURNO E HORÁRIOS CORRIGIDA ---
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
@@ -265,10 +262,10 @@
             return dados.filter(d => {
                 let txt = d.horario || "";
                 
-                // Se o script mandou 24h ou não tem hora, mostra sempre
-                if(!txt || txt.includes("24h") || txt.includes("08:00 às 08:00")) return true;
+                // Se não tem hora, assume 24h e mostra
+                if(!txt || txt.includes("24h")) return true;
                 
-                // Se vier "08:00 - 20:00", extrai
+                // Procura HH:MM
                 const nums = txt.match(/(\d{2}:\d{2})/g);
                 if(!nums || nums.length < 2) return true;
 
@@ -278,18 +275,36 @@
                 const inicio = h1 * 60 + m1;
                 const fim = h2 * 60 + m2;
 
-                if (inicio < fim) { // Dia (08h as 20h)
+                // Lógica de Virada de Dia
+                if (inicio < fim) { 
+                    // Ex: 08:00 - 20:00 (Mesmo dia)
                     return minAtual >= inicio && minAtual < fim;
-                } else { // Noite (20h as 08h)
+                } else { 
+                    // Ex: 20:00 - 08:00 (Vira a noite)
+                    // Ex: 19:00 - 07:00 (Vira a noite)
                     return minAtual >= inicio || minAtual < fim;
                 }
             });
         }
 
-        // Formatação Simples: Apenas mostra o que veio do Tampermonkey (que já está formatado)
+        // Formatação Visual Bonita com Cálculo de Turno
         function formatarTurno(raw) {
-            if(!raw) return "24h";
-            return raw.replace("-", "às"); // Garante estética
+            const nums = raw.match(/(\d{2}:\d{2})/g);
+            if(!nums || nums.length < 2) return "08:00 às 08:00 (24h)";
+
+            const h1 = nums[0];
+            const h2 = nums[1];
+
+            const [hh1] = h1.split(':').map(Number);
+            const [hh2] = h2.split(':').map(Number);
+            
+            let diff = hh2 - hh1;
+            if(diff < 0) diff += 24;
+
+            if(diff >= 23 || diff === 0) return `${h1} às ${h2} (24h)`;
+            if(diff >= 11 && diff <= 13) return `${h1} às ${h2} (12h)`; // Exibe 12h para turnos de 12
+            
+            return `${h1} às ${h2}`;
         }
 
         function extrairID(nomeCompleto) {
@@ -312,8 +327,11 @@
                 let idMilitar = extrairID(nomeCompleto);
                 let nomeExibicao = limparNome(nomeCompleto);
                 let func = (d.func || "").trim();
-                let hora = formatarTurno(d.horario); // Usa o horário que veio do Coletor
+                
+                // Formatação Limpa
+                let hora = formatarTurno(d.horario || "");
 
+                // Mapeamento OBM
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
                 else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
@@ -340,10 +358,16 @@
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
 
-                    // Stats
-                    if(nomeCompleto.includes("SGT")) stats.sgt.add(idMilitar + "|" + nomeExibicao);
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) stats.cap.add(idMilitar + "|" + nomeExibicao);
-                    else stats.sd.add(idMilitar + "|" + nomeExibicao);
+                    // Stats RIGOROSOS
+                    if(nomeCompleto.includes("SGT")) {
+                        stats.sgt.add(idMilitar + "|" + nomeExibicao);
+                    }
+                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
+                        stats.cap.add(idMilitar + "|" + nomeExibicao);
+                    }
+                    else {
+                        stats.sd.add(idMilitar + "|" + nomeExibicao);
+                    }
                 }
 
                 if(vtr.includes("ABT")) stats.abt.add(vtr);
@@ -406,7 +430,6 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor"; 
 
-                // Barra Lateral Aumentada
                 let content = `
                     <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
@@ -442,7 +465,7 @@
                                             ${m.n}
                                         </div>
                                         <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">(${m.h})</span>
+                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
                                         </div>
                                     </div>
                                 `).join('')}
