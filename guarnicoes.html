@@ -196,16 +196,17 @@
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO
+        // CONFIGURAÇÃO: COLE SEU LINK DO GOOGLE AQUI
         // ============================================================
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
         const ORDEM_QUARTEIS = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON"];
 
-        // 1. DATA OPERACIONAL (Se for antes das 08h, mostra dia anterior)
+        // 1. DATA OPERACIONAL (O dia só vira às 08h)
         function getDataOperacional() {
             const agora = new Date();
+            // Se for antes das 08:00, ainda é a escala de ontem
             if (agora.getHours() < 8) {
                 agora.setDate(agora.getDate() - 1);
             }
@@ -234,9 +235,8 @@
                     return;
                 }
 
-                // Filtrar turno atual com base na hora
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
-                // Se der erro no filtro, usa tudo
+                // Se o filtro zerar tudo (ex: problema de fuso), usa os dados brutos como segurança
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
                 processarDados(dadosFinais);
@@ -247,15 +247,18 @@
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
+        // Lógica de Turno Refinada
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
             
             return dados.filter(d => {
                 let txt = d.horario || "";
-                if(!txt || txt.includes("24h")) return true;
                 
-                // Tenta extrair HH:MM
+                // Se for 24h ou indefinido, mostra sempre
+                if(!txt || txt.includes("24h") || txt.includes("08:00 às 08:00")) return true;
+                
+                // Busca horários (ex: 08:0020:00 ou 08:00 - 20:00)
                 const nums = txt.match(/(\d{2}):(\d{2})/g);
                 if(!nums || nums.length < 2) return true;
 
@@ -265,10 +268,9 @@
                 const inicio = h1 * 60 + m1;
                 const fim = h2 * 60 + m2;
 
-                // Logica de turno
-                if (inicio < fim) { // Ex: 08:00 - 20:00
+                if (inicio < fim) { // Turno Diurno (ex: 08:00 - 20:00)
                     return minAtual >= inicio && minAtual < fim;
-                } else { // Ex: 20:00 - 08:00 (vira dia)
+                } else { // Turno Noturno (ex: 20:00 - 08:00)
                     return minAtual >= inicio || minAtual < fim;
                 }
             });
@@ -276,24 +278,48 @@
 
         function formatarTurno(raw) {
             if(!raw) return "24h";
-            // Procura padrões como "08:00 - 20:00" ou "08:0008:00"
+            // Extrai as horas limpas
             const nums = raw.match(/(\d{2}:\d{2})/g);
             if(nums && nums.length >= 2) {
+                // Se for igual, é 24h
+                if(nums[0] === "08:00" && nums[1] === "08:00") return "08:00 às 08:00 (24h)";
                 return `${nums[0]} às ${nums[1]}`;
             }
-            if(raw.includes("24")) return "08:00 às 08:00";
+            if(raw.includes("24")) return "08:00 às 08:00 (24h)";
             return raw;
         }
 
+        // Extrai ID (Matrícula) do nome
+        function extrairID(nomeCompleto) {
+            const match = nomeCompleto.match(/^(\d{7})/);
+            return match ? match[1] : nomeCompleto; // Retorna o ID ou o nome todo se não achar
+        }
+
+        // Limpa o nome para exibição (remove o ID)
+        function limparNome(nomeCompleto) {
+            return nomeCompleto.replace(/^\d{7}\s+/, '').trim();
+        }
+
         function processarDados(dados) {
-            // Estrutura para agrupar
-            const estrutura = {}; 
-            const stats = { cap: [], sgt: [], sd: [], abt: [], ar: [] };
+            const estrutura = {};
+            // Sets para contar IDs únicos (Evita contar o mesmo militar 2x)
+            const stats = { 
+                cap: new Set(), 
+                sgt: new Set(), 
+                sd: new Set(), 
+                abt: new Set(), 
+                ar: new Set() 
+            };
 
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                let nome = (d.nome || "").trim();
+                
+                // Trata o nome e ID
+                let nomeCompleto = (d.nome || "").trim();
+                let idMilitar = extrairID(nomeCompleto);
+                let nomeExibicao = limparNome(nomeCompleto);
+                
                 let func = (d.func || "").trim();
                 let hora = formatarTurno(d.horario);
 
@@ -315,26 +341,28 @@
 
                 if(!estrutura[obmKey]) estrutura[obmKey] = [];
                 
-                // --- LÓGICA DE VIATURA ---
                 let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
                 if(!viaturaObj) {
                     viaturaObj = { nome: vtr, guarnicao: [] };
                     estrutura[obmKey].push(viaturaObj);
                 }
                 
-                // Adiciona Militar
-                if(nome !== "ND" && nome !== "A CONFIRMAR") {
-                    viaturaObj.guarnicao.push({ f: func, n: nome, h: hora });
+                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
+                    viaturaObj.guarnicao.push({ 
+                        f: func, 
+                        n: nomeExibicao, 
+                        id: idMilitar, 
+                        h: hora 
+                    });
 
-                    // Stats
-                    if(nome.match(/(CAP|TEN|MAJ|CEL|ASP)/)) stats.cap.push(nome);
-                    else if(nome.includes("SGT")) stats.sgt.push(nome);
-                    else stats.sd.push(nome);
+                    // Stats usando ID único
+                    if(nomeCompleto.match(/(CAP|TEN|MAJ|CEL|ASP)/)) stats.cap.add(idMilitar + "|" + nomeExibicao);
+                    else if(nomeCompleto.includes("SGT")) stats.sgt.add(idMilitar + "|" + nomeExibicao);
+                    else stats.sd.add(idMilitar + "|" + nomeExibicao);
                 }
 
-                // Stats Viaturas
-                if(vtr.includes("ABT") && !stats.abt.includes(vtr)) stats.abt.push(vtr);
-                if((vtr.includes("AR") || vtr.includes("AEM")) && !stats.ar.includes(vtr)) stats.ar.push(vtr);
+                if(vtr.includes("ABT")) stats.abt.add(vtr);
+                if(vtr.includes("AR") || vtr.includes("AEM")) stats.ar.add(vtr);
             });
 
             atualizarStats(stats);
@@ -342,21 +370,30 @@
         }
 
         function atualizarStats(stats) {
+            // Converte Sets para Arrays para exibição
+            const capArr = Array.from(stats.cap).map(s => s.split('|')[1]);
+            const sgtArr = Array.from(stats.sgt).map(s => s.split('|')[1]);
+            const sdArr = Array.from(stats.sd).map(s => s.split('|')[1]);
+            const abtArr = Array.from(stats.abt);
+            const arArr = Array.from(stats.ar);
+
             const fill = (idC, idL, arr) => {
                 document.getElementById(idC).innerText = arr.length;
                 document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
             };
-            fill('count-cap', 'list-cap', stats.cap);
-            fill('count-sgt', 'list-sgt', stats.sgt);
-            fill('count-sd', 'list-sd', stats.sd);
+
+            fill('count-cap', 'list-cap', capArr);
+            fill('count-sgt', 'list-sgt', sgtArr);
+            fill('count-sd', 'list-sd', sdArr);
             
-            const total = stats.cap.length + stats.sgt.length + stats.sd.length;
+            const total = capArr.length + sgtArr.length + sdArr.length;
             document.getElementById('count-total').innerText = total;
 
-            document.getElementById('count-abt').innerText = stats.abt.length;
-            document.getElementById('count-ar').innerText = stats.ar.length;
-            document.getElementById('list-abt').innerHTML = stats.abt.map(x => `<li>• ${x}</li>`).join('');
-            document.getElementById('list-ar').innerHTML = stats.ar.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('count-abt').innerText = abtArr.length;
+            document.getElementById('count-ar').innerText = arArr.length;
+            
+            document.getElementById('list-abt').innerHTML = abtArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-ar').innerHTML = arArr.map(x => `<li>• ${x}</li>`).join('');
         }
 
         function renderizarCards(estrutura) {
@@ -371,17 +408,17 @@
             keysOrdenadas.forEach(obmName => {
                 const viaturasRaw = estrutura[obmName];
                 
-                // --- AGRUPAMENTO INTELIGENTE (DUPLICADOS) ---
-                // Se a equipe é IDÊNTICA, junta as viaturas
+                // --- AGRUPAMENTO INTELIGENTE ---
+                // Se a equipe (baseada nos IDs) for igual, junta as viaturas
                 const gruposUnicos = [];
                 
                 viaturasRaw.forEach(vtr => {
-                    // Cria uma "assinatura" da equipe (nomes ordenados)
-                    const assinatura = vtr.guarnicao.map(m => m.n).sort().join('|');
+                    // Cria assinatura baseada nos IDs ordenados
+                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
                     
                     const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
                     
-                    if(grupoExistente) {
+                    if(grupoExistente && assinatura.length > 0) { // Só agrupa se tiver gente
                         grupoExistente.nomesVtrs.push(vtr.nome);
                     } else {
                         gruposUnicos.push({
@@ -392,7 +429,7 @@
                     }
                 });
 
-                // CARD PRINCIPAL
+                // CARD
                 const card = document.createElement('div');
                 card.className = "card-monitor"; 
 
@@ -408,7 +445,7 @@
                 content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
                 gruposUnicos.forEach(grupo => {
-                    // Ordena Militares
+                    // Ordena: CMT > MOT > RESTO
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
@@ -419,7 +456,6 @@
                         return getScore(a.f) - getScore(b.f);
                     });
 
-                    // Lista de Viaturas (Juntadas)
                     const listaVtrs = grupo.nomesVtrs.join(' / ');
 
                     content += `
@@ -454,4 +490,4 @@
         setInterval(iniciarSistema, 60000); 
     </script>
 </body>
-</html>
+</html>      
