@@ -255,7 +255,8 @@
                 Core.setLoading(true, "Conectando...", 10);
 
                 try {
-                    const url = `${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv`;
+                    // Cache Buster para evitar dados antigos
+                    const url = `${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`;
                     const res = await fetch(url);
                     if(!res.ok) throw new Error("Mês não disponível");
                     const text = await res.text();
@@ -274,10 +275,11 @@
 
                 let buffer = [];
                 let done = 0;
+                
                 // Fetch Paralelo de todos os meses
                 const promises = CONFIG.months.map(async m => {
                     try {
-                        const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv`);
+                        const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
                         if(res.ok) return await res.text();
                     } catch(e) {}
                     done++;
@@ -310,7 +312,6 @@
                 Core.db = [];
                 if(!raw || !raw[0]) { Core.setLoading(false); return; }
 
-                // Detecção de Colunas Inteligente
                 const keys = Object.keys(raw[0]);
                 const find = k => keys.find(x => x.toLowerCase().includes(k));
                 const cNat = find('natureza')||find('emerg');
@@ -327,12 +328,11 @@
                     const v = (cVtr ? row[cVtr] || "" : "").toUpperCase();
                     const nRaw = (row[cNat] || "N/A").toUpperCase();
 
-                    // Regras de Pelotão
                     let pel = "OUTROS";
                     if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                     else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
                     else if(s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
-                    else if(s.includes("TERRESTRE")) pel = "BBS (POA) - TERRESTRE";
+                    else if(s.includes("TERRESTRE") || s.includes("BBS")) pel = "BBS (POA) - TERRESTRE";
                     else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
                     else if(s.includes("FLORESTA")) pel = "FLORESTA";
                     else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
@@ -347,7 +347,6 @@
                         if(clean.length > 2) pel = clean;
                     }
 
-                    // Natureza
                     let nat = nRaw.trim();
                     if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                     else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
@@ -361,13 +360,12 @@
                     let sub = row[cSub] ? row[cSub].trim() : "";
                     if(sub === "N/A" || sub === "0") sub = "";
 
-                    // Mapa Link Corrigido
                     let map = null;
                     if(row['Latitude'] && row['Longitude']) {
                         const la = String(row['Latitude']).replace(',','.').trim();
                         const lo = String(row['Longitude']).replace(',','.').trim();
-                        // Link Universal
-                        map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
+                        // Google Maps Pin Link Universal
+                        map = `https://www.google.com/maps?q=${la},${lo}`;
                     }
 
                     Core.db.push({
@@ -424,11 +422,13 @@
                     "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025" : 
                     `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Core.ctxLabel}`;
                 document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
-                document.getElementById('statusBadge').innerText = "Dados Visualizados";
-                document.getElementById('statusBadge').classList = "mt-2 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-[10px] text-emerald-400 font-mono uppercase";
+                
+                const badge = document.getElementById('statusBadge');
+                badge.innerText = "Dados Visualizados";
+                badge.className = "mt-2 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-[10px] text-emerald-400 font-mono uppercase";
 
                 const tbody = document.getElementById('tblBody');
-                // Renderização em Batch (String gigante) é 50x mais rápido que criar elementos
+                // Tabela em batch (rápida)
                 const html = data.slice(0, 800).map((d, i) => {
                     const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
                     const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
@@ -551,6 +551,31 @@
                 });
             }
         };
+
+        // Fábrica de Opções Seguras
+        function createCommonOptions() {
+            return {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                resizeDelay: 0,
+                animation: { duration: 0 },
+                layout: { padding: { right: 40 } },
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: (v) => v.toLocaleString('pt-BR')
+                    },
+                    tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)' }
+                },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
+                    y: { ticks: { autoSkip: false } }
+                }
+            };
+        }
 
         document.addEventListener('DOMContentLoaded', Core.init);
     </script>
