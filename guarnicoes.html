@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM</title>
+    <title>Painel Operacional 1º BBM - Favorito</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -143,16 +143,19 @@
                             <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
                             <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
+                        
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
                             <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
+                        
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
                             <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
+                        
                         <div class="w-px h-10 bg-white/10 mx-2"></div>
                         <div class="group relative text-center">
                             <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
@@ -201,12 +204,11 @@
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
-        const ORDEM_QUARTEIS = ["OFICIAL DE DIA", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "COBOM-DCCI", , "CANIL", , "AQUÁTICA", , "MERGULHO"];
+        const ORDEM_QUARTEIS = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON"];
 
         // 1. DATA OPERACIONAL (O dia só vira às 08h)
         function getDataOperacional() {
             const agora = new Date();
-            // Se for antes das 08:00, ainda é a escala de ontem
             if (agora.getHours() < 8) {
                 agora.setDate(agora.getDate() - 1);
             }
@@ -216,7 +218,6 @@
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
-            
             document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
@@ -236,29 +237,24 @@
                 }
 
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
-                // Se o filtro zerar tudo (ex: problema de fuso), usa os dados brutos como segurança
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
                 processarDados(dadosFinais);
-                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('app').classList.remove('hidden');
 
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // Lógica de Turno Refinada
+        // Lógica de Turno
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
             
             return dados.filter(d => {
                 let txt = d.horario || "";
-                
-                // Se for 24h ou indefinido, mostra sempre
                 if(!txt || txt.includes("24h") || txt.includes("08:00 às 08:00")) return true;
                 
-                // Busca horários (ex: 08:0020:00 ou 08:00 - 20:00)
                 const nums = txt.match(/(\d{2}):(\d{2})/g);
                 if(!nums || nums.length < 2) return true;
 
@@ -268,9 +264,9 @@
                 const inicio = h1 * 60 + m1;
                 const fim = h2 * 60 + m2;
 
-                if (inicio < fim) { // Turno Diurno (ex: 08:00 - 20:00)
+                if (inicio < fim) { 
                     return minAtual >= inicio && minAtual < fim;
-                } else { // Turno Noturno (ex: 20:00 - 08:00)
+                } else { 
                     return minAtual >= inicio || minAtual < fim;
                 }
             });
@@ -278,10 +274,8 @@
 
         function formatarTurno(raw) {
             if(!raw) return "24h";
-            // Extrai as horas limpas
             const nums = raw.match(/(\d{2}:\d{2})/g);
             if(nums && nums.length >= 2) {
-                // Se for igual, é 24h
                 if(nums[0] === "08:00" && nums[1] === "08:00") return "08:00 às 08:00 (24h)";
                 return `${nums[0]} às ${nums[1]}`;
             }
@@ -289,37 +283,25 @@
             return raw;
         }
 
-        // Extrai ID (Matrícula) do nome
         function extrairID(nomeCompleto) {
             const match = nomeCompleto.match(/^(\d{7})/);
-            return match ? match[1] : nomeCompleto; // Retorna o ID ou o nome todo se não achar
+            return match ? match[1] : nomeCompleto; 
         }
 
-        // Limpa o nome para exibição (remove o ID)
         function limparNome(nomeCompleto) {
             return nomeCompleto.replace(/^\d{7}\s+/, '').trim();
         }
 
         function processarDados(dados) {
             const estrutura = {};
-            // Sets para contar IDs únicos (Evita contar o mesmo militar 2x)
-            const stats = { 
-                cap: new Set(), 
-                sgt: new Set(), 
-                sd: new Set(), 
-                abt: new Set(), 
-                ar: new Set() 
-            };
+            const stats = { cap: new Set(), sgt: new Set(), sd: new Set(), abt: new Set(), ar: new Set() };
 
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                
-                // Trata o nome e ID
                 let nomeCompleto = (d.nome || "").trim();
                 let idMilitar = extrairID(nomeCompleto);
                 let nomeExibicao = limparNome(nomeCompleto);
-                
                 let func = (d.func || "").trim();
                 let hora = formatarTurno(d.horario);
 
@@ -348,17 +330,22 @@
                 }
                 
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ 
-                        f: func, 
-                        n: nomeExibicao, 
-                        id: idMilitar, 
-                        h: hora 
-                    });
+                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
 
-                    // Stats usando ID único
-                    if(nomeCompleto.match(/(CAP|TEN|MAJ|CEL|ASP)/)) stats.cap.add(idMilitar + "|" + nomeExibicao);
-                    else if(nomeCompleto.includes("SGT")) stats.sgt.add(idMilitar + "|" + nomeExibicao);
-                    else stats.sd.add(idMilitar + "|" + nomeExibicao);
+                    // === CONTABILIZAÇÃO CORRETA E RESTRITIVA ===
+                    
+                    // 1. SARGENTOS (Prioridade)
+                    if(nomeCompleto.includes("SGT")) {
+                        stats.sgt.add(idMilitar + "|" + nomeExibicao);
+                    }
+                    // 2. OFICIAIS (Apenas patentes de oficial)
+                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
+                        stats.cap.add(idMilitar + "|" + nomeExibicao);
+                    }
+                    // 3. PRAÇAS (SD/CB e outros)
+                    else {
+                        stats.sd.add(idMilitar + "|" + nomeExibicao);
+                    }
                 }
 
                 if(vtr.includes("ABT")) stats.abt.add(vtr);
@@ -370,7 +357,7 @@
         }
 
         function atualizarStats(stats) {
-            // Converte Sets para Arrays para exibição
+            // Converte Set para Array
             const capArr = Array.from(stats.cap).map(s => s.split('|')[1]);
             const sgtArr = Array.from(stats.sgt).map(s => s.split('|')[1]);
             const sdArr = Array.from(stats.sd).map(s => s.split('|')[1]);
@@ -407,33 +394,21 @@
 
             keysOrdenadas.forEach(obmName => {
                 const viaturasRaw = estrutura[obmName];
-                
-                // --- AGRUPAMENTO INTELIGENTE ---
-                // Se a equipe (baseada nos IDs) for igual, junta as viaturas
                 const gruposUnicos = [];
                 
                 viaturasRaw.forEach(vtr => {
-                    // Cria assinatura baseada nos IDs ordenados
                     const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
-                    
                     const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
-                    
-                    if(grupoExistente && assinatura.length > 0) { // Só agrupa se tiver gente
+                    if(grupoExistente && assinatura.length > 0) {
                         grupoExistente.nomesVtrs.push(vtr.nome);
                     } else {
-                        gruposUnicos.push({
-                            assinatura: assinatura,
-                            nomesVtrs: [vtr.nome],
-                            guarnicao: vtr.guarnicao
-                        });
+                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
                     }
                 });
 
-                // CARD
                 const card = document.createElement('div');
                 card.className = "card-monitor"; 
 
-                // Barra Lateral
                 let content = `
                     <div class="bg-fire-red w-14 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-sm tracking-widest uppercase shadow-black drop-shadow-md">
@@ -445,7 +420,6 @@
                 content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
                 gruposUnicos.forEach(grupo => {
-                    // Ordena: CMT > MOT > RESTO
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
@@ -463,7 +437,6 @@
                             <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
                                 ${listaVtrs}
                             </span>
-                            
                             <div class="w-full flex flex-col gap-2">
                                 ${grupo.guarnicao.map(m => `
                                     <div class="text-center group">
@@ -490,5 +463,4 @@
         setInterval(iniciarSistema, 60000); 
     </script>
 </body>
-</html>      
-
+</html>
