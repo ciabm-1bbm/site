@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - Versão Favorita</title>
+    <title>Painel Operacional 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,7 +31,7 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
         
-        /* BACKGROUND MARCA D'ÁGUA */
+        /* BACKGROUND */
         .hero-background { position: relative; min-height: 100vh; }
         .hero-background::before { 
             content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
@@ -46,26 +46,25 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* CARD (Barra Lateral Vermelha) */
+        /* CARD */
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.5rem;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
             overflow: hidden;
             display: flex;
             flex-direction: row; 
         }
         .card-monitor:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
             background: rgba(30, 41, 59, 0.98);
             border-color: rgba(255, 140, 0, 0.5);
             z-index: 50;
         }
 
-        /* TEXTO VERTICAL (PELOTÃO) */
         .vertical-text {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
@@ -73,7 +72,6 @@
             white-space: nowrap;
         }
 
-        /* STATS PANEL */
         .stats-container {
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -82,7 +80,6 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        /* TOOLTIP */
         .tooltip-box {
             visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
             background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
@@ -101,8 +98,8 @@
 
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Sincronizando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Buscando dados do turno atual...</p>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Conectando ao sistema...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -199,21 +196,33 @@
 
     <script>
         // ============================================================
-        // CONFIGURAÇÃO: COLE SEU LINK DO GOOGLE AQUI
+        // CONFIGURAÇÃO
         // ============================================================
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
         const ORDEM_QUARTEIS = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON"];
 
-        function atualizarRelogio() {
+        // 1. DATA OPERACIONAL (Se for antes das 08h, mostra dia anterior)
+        function getDataOperacional() {
             const agora = new Date();
-            document.getElementById('data-topo').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            if (agora.getHours() < 8) {
+                agora.setDate(agora.getDate() - 1);
+            }
+            return agora;
+        }
+
+        function atualizarRelogio() {
+            const dataOp = getDataOperacional();
+            const agora = new Date();
+            
+            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
+        // 2. SISTEMA PRINCIPAL
         async function iniciarSistema() {
             try {
                 const req = await fetch(URL_DADOS);
@@ -225,7 +234,9 @@
                     return;
                 }
 
+                // Filtrar turno atual com base na hora
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
+                // Se der erro no filtro, usa tudo
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
                 processarDados(dadosFinais);
@@ -239,21 +250,44 @@
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
+            
             return dados.filter(d => {
-                if(!d.horario || d.horario.includes("24h") || d.horario.includes("08:00 às 08:00")) return true;
-                const limpo = d.horario.replace(/[^\d:]/g, ''); 
-                if(limpo.length < 8) return true; 
+                let txt = d.horario || "";
+                if(!txt || txt.includes("24h")) return true;
                 
-                const h1 = parseInt(limpo.substr(0,2))*60 + parseInt(limpo.substr(3,2));
-                const h2 = parseInt(limpo.substr(5,2))*60 + parseInt(limpo.substr(8,2));
+                // Tenta extrair HH:MM
+                const nums = txt.match(/(\d{2}):(\d{2})/g);
+                if(!nums || nums.length < 2) return true;
+
+                const [h1, m1] = nums[0].split(':').map(Number);
+                const [h2, m2] = nums[1].split(':').map(Number);
                 
-                if(isNaN(h1) || isNaN(h2)) return true;
-                return (h1 < h2) ? (minAtual >= h1 && minAtual < h2) : (minAtual >= h1 || minAtual < h2);
+                const inicio = h1 * 60 + m1;
+                const fim = h2 * 60 + m2;
+
+                // Logica de turno
+                if (inicio < fim) { // Ex: 08:00 - 20:00
+                    return minAtual >= inicio && minAtual < fim;
+                } else { // Ex: 20:00 - 08:00 (vira dia)
+                    return minAtual >= inicio || minAtual < fim;
+                }
             });
         }
 
+        function formatarTurno(raw) {
+            if(!raw) return "24h";
+            // Procura padrões como "08:00 - 20:00" ou "08:0008:00"
+            const nums = raw.match(/(\d{2}:\d{2})/g);
+            if(nums && nums.length >= 2) {
+                return `${nums[0]} às ${nums[1]}`;
+            }
+            if(raw.includes("24")) return "08:00 às 08:00";
+            return raw;
+        }
+
         function processarDados(dados) {
-            const estrutura = {};
+            // Estrutura para agrupar
+            const estrutura = {}; 
             const stats = { cap: [], sgt: [], sd: [], abt: [], ar: [] };
 
             dados.forEach(d => {
@@ -261,8 +295,9 @@
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
                 let nome = (d.nome || "").trim();
                 let func = (d.func || "").trim();
-                let hora = (d.horario || "24h").replace(" - ", " às ").replace("24h", "08:00 às 08:00");
+                let hora = formatarTurno(d.horario);
 
+                // Mapeamento OBM
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
                 else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
@@ -279,19 +314,25 @@
                 else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
 
                 if(!estrutura[obmKey]) estrutura[obmKey] = [];
+                
+                // --- LÓGICA DE VIATURA ---
                 let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
                 if(!viaturaObj) {
                     viaturaObj = { nome: vtr, guarnicao: [] };
                     estrutura[obmKey].push(viaturaObj);
                 }
                 
+                // Adiciona Militar
                 if(nome !== "ND" && nome !== "A CONFIRMAR") {
                     viaturaObj.guarnicao.push({ f: func, n: nome, h: hora });
+
+                    // Stats
                     if(nome.match(/(CAP|TEN|MAJ|CEL|ASP)/)) stats.cap.push(nome);
                     else if(nome.includes("SGT")) stats.sgt.push(nome);
                     else stats.sd.push(nome);
                 }
 
+                // Stats Viaturas
                 if(vtr.includes("ABT") && !stats.abt.includes(vtr)) stats.abt.push(vtr);
                 if((vtr.includes("AR") || vtr.includes("AEM")) && !stats.ar.includes(vtr)) stats.ar.push(vtr);
             });
@@ -328,11 +369,34 @@
             ];
 
             keysOrdenadas.forEach(obmName => {
-                const viaturas = estrutura[obmName];
-                const card = document.createElement('div');
-                card.className = "card-monitor"; // Flex-row habilitado no CSS
+                const viaturasRaw = estrutura[obmName];
+                
+                // --- AGRUPAMENTO INTELIGENTE (DUPLICADOS) ---
+                // Se a equipe é IDÊNTICA, junta as viaturas
+                const gruposUnicos = [];
+                
+                viaturasRaw.forEach(vtr => {
+                    // Cria uma "assinatura" da equipe (nomes ordenados)
+                    const assinatura = vtr.guarnicao.map(m => m.n).sort().join('|');
+                    
+                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
+                    
+                    if(grupoExistente) {
+                        grupoExistente.nomesVtrs.push(vtr.nome);
+                    } else {
+                        gruposUnicos.push({
+                            assinatura: assinatura,
+                            nomesVtrs: [vtr.nome],
+                            guarnicao: vtr.guarnicao
+                        });
+                    }
+                });
 
-                // --- AQUI ESTÁ A ALTERAÇÃO: BARRA LATERAL VERMELHA COM NOME GRANDE ---
+                // CARD PRINCIPAL
+                const card = document.createElement('div');
+                card.className = "card-monitor"; 
+
+                // Barra Lateral
                 let content = `
                     <div class="bg-fire-red w-14 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-sm tracking-widest uppercase shadow-black drop-shadow-md">
@@ -343,8 +407,9 @@
 
                 content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
-                viaturas.forEach(v => {
-                    v.guarnicao.sort((a,b) => {
+                gruposUnicos.forEach(grupo => {
+                    // Ordena Militares
+                    grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
                             if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
@@ -354,14 +419,17 @@
                         return getScore(a.f) - getScore(b.f);
                     });
 
+                    // Lista de Viaturas (Juntadas)
+                    const listaVtrs = grupo.nomesVtrs.join(' / ');
+
                     content += `
                         <div class="w-full flex flex-col items-center">
                             <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
-                                ${v.nome}
+                                ${listaVtrs}
                             </span>
                             
                             <div class="w-full flex flex-col gap-2">
-                                ${v.guarnicao.map(m => `
+                                ${grupo.guarnicao.map(m => `
                                     <div class="text-center group">
                                         <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
                                             ${m.n}
