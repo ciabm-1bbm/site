@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - V14</title>
+    <title>Painel Operacional 1º BBM - V15</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -217,7 +217,6 @@
             "CANIL"
         ];
 
-        // 1. DATA OPERACIONAL
         function getDataOperacional() {
             const agora = new Date();
             if (agora.getHours() < 8) {
@@ -235,7 +234,6 @@
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
-        // 2. SISTEMA PRINCIPAL
         async function iniciarSistema() {
             try {
                 const req = await fetch(URL_DADOS);
@@ -247,7 +245,6 @@
                     return;
                 }
 
-                // Filtro + Processamento
                 const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
                 const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
 
@@ -258,7 +255,7 @@
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // --- LÓGICA DE TURNO E HORÁRIOS CORRIGIDA ---
+        // Lógica de Turno
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
@@ -266,11 +263,9 @@
             return dados.filter(d => {
                 let txt = d.horario || "";
                 
-                // Extrai todos os pares HH:MM encontrados na string suja
+                // Extrai as horas exatas da string "suja"
                 const nums = txt.match(/(\d{2}:\d{2})/g);
-                
-                // Se não achar horário, assume 24h ou horário padrão e exibe
-                if(!nums || nums.length < 2) return true; 
+                if(!nums || nums.length < 2) return true; // Se não tem hora, mostra por segurança
 
                 const [h1, m1] = nums[0].split(':').map(Number);
                 const [h2, m2] = nums[1].split(':').map(Number);
@@ -278,35 +273,28 @@
                 const inicio = h1 * 60 + m1;
                 const fim = h2 * 60 + m2;
 
-                // Lógica de virada de dia
-                if (inicio < fim) { 
-                    // Turno no mesmo dia (ex: 08:00 - 20:00)
+                if (inicio < fim) { // Dia (08:00 - 20:00)
                     return minAtual >= inicio && minAtual < fim;
-                } else { 
-                    // Turno vira a noite (ex: 20:00 - 08:00)
+                } else { // Noite (20:00 - 08:00)
                     return minAtual >= inicio || minAtual < fim;
                 }
             });
         }
 
+        // --- CORREÇÃO DE HORÁRIOS ---
         function formatarTurno(raw) {
-            if(!raw) return "24h";
-            // Extrai as horas limpas da string suja (ex: "1204/02... 08:00... 20:00")
+            if(!raw) return "08:00 às 08:00"; // Padrão se vazio
+            
+            // Busca apenas os padrões de hora HH:MM na string bagunçada
             const nums = raw.match(/(\d{2}:\d{2})/g);
             
             if(nums && nums.length >= 2) {
-                // Pega a primeira e a segunda ocorrência de hora (Início e Fim)
-                const inicio = nums[0];
-                const fim = nums[1];
-
-                // Se forem iguais, é 24h
-                if(inicio === "08:00" && fim === "08:00") return "08:00 às 08:00 (24h)";
-                
-                return `${inicio} às ${fim}`;
+                // Pega a primeira (início) e a segunda (fim)
+                return `${nums[0]} às ${nums[1]}`;
             }
-            // Fallback
-            if(raw.includes("24")) return "08:00 às 08:00 (24h)";
-            return raw;
+            
+            // Fallback se não achar formato
+            return "08:00 às 08:00"; 
         }
 
         function extrairID(nomeCompleto) {
@@ -320,7 +308,6 @@
 
         function processarDados(dados) {
             const estrutura = {};
-            // Sets para unicidade por ID
             const stats = { cap: new Set(), sgt: new Set(), sd: new Set(), abt: new Set(), ar: new Set() };
 
             dados.forEach(d => {
@@ -331,7 +318,7 @@
                 let nomeExibicao = limparNome(nomeCompleto);
                 let func = (d.func || "").trim();
                 
-                // Formatação Limpa do Horário
+                // Formatação Limpa
                 let hora = formatarTurno(d.horario || "");
 
                 // Mapeamento OBM
@@ -361,16 +348,10 @@
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
 
-                    // Stats RIGOROSOS
-                    if(nomeCompleto.includes("SGT")) {
-                        stats.sgt.add(idMilitar + "|" + nomeExibicao);
-                    }
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
-                        stats.cap.add(idMilitar + "|" + nomeExibicao);
-                    }
-                    else {
-                        stats.sd.add(idMilitar + "|" + nomeExibicao);
-                    }
+                    // Stats
+                    if(nomeCompleto.includes("SGT")) stats.sgt.add(idMilitar + "|" + nomeExibicao);
+                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) stats.cap.add(idMilitar + "|" + nomeExibicao);
+                    else stats.sd.add(idMilitar + "|" + nomeExibicao);
                 }
 
                 if(vtr.includes("ABT")) stats.abt.add(vtr);
@@ -433,9 +414,10 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor"; 
 
+                // --- AQUI: AUMENTO DE FONTE E LARGURA DA BARRA ---
                 let content = `
-                    <div class="bg-fire-red w-14 flex items-center justify-center py-4 flex-shrink-0">
-                        <h2 class="vertical-text text-white font-black text-sm tracking-widest uppercase shadow-black drop-shadow-md">
+                    <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
+                        <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
                             ${obmName}
                         </h2>
                     </div>
@@ -468,7 +450,7 @@
                                             ${m.n}
                                         </div>
                                         <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
+                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">(${m.h})</span>
                                         </div>
                                     </div>
                                 `).join('')}
