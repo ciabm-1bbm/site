@@ -3,94 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Tático CBMRS</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Painel Tático - CBMRS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .header { text-align: center; border-bottom: 3px solid #b71c1c; padding-bottom: 15px; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-        .card { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; overflow: hidden; }
-        .card-head { background: linear-gradient(90deg, #2c2c2c, #222); padding: 10px; border-left: 4px solid #b71c1c; display: flex; justify-content: space-between; }
-        .vtr { font-weight: bold; font-size: 1.2rem; color: white; }
-        .obm { font-size: 0.7rem; color: #aaa; }
-        .item { padding: 8px 10px; border-bottom: 1px solid #333; display: flex; align-items: center; font-size: 0.9rem; }
-        .func { width: 80px; font-size: 0.7rem; font-weight: bold; color: #b71c1c; }
-        .nome { flex-grow: 1; color: #ddd; }
-        .hora { font-size: 0.7rem; background: #333; padding: 2px 5px; border-radius: 3px; }
-        #loading { text-align: center; margin-top: 50px; }
+        :root {
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --fire-red: #d32f2f; /* Vermelho Bombeiro */
+            --fire-gradient: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* CABEÇALHO */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--fire-red);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            background: rgba(30, 30, 30, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .header i { color: var(--fire-red); margin-right: 10px; }
+        
+        .status-badge {
+            background-color: #333;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            border: 1px solid #555;
+        }
+
+        /* GRID DE VIATURAS */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Responsivo */
+            gap: 20px;
+        }
+
+        /* CARD DA VIATURA */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(183, 28, 28, 0.2);
+            border-color: var(--fire-red);
+        }
+
+        .card-header {
+            background: var(--fire-gradient);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vtr-info h2 { margin: 0; font-size: 1.4rem; color: white; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .vtr-info p { margin: 0; font-size: 0.7rem; color: rgba(255,255,255,0.8); font-weight: 500; text-transform: uppercase; margin-top: 2px;}
+
+        .card-icon { font-size: 1.5rem; color: rgba(255,255,255,0.3); }
+
+        /* LISTA DA GUARNIÇÃO */
+        .crew-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .crew-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #2a2a2a;
+            transition: background 0.2s;
+        }
+
+        .crew-item:last-child { border-bottom: none; }
+        .crew-item:hover { background-color: #252525; }
+
+        /* ÍCONES E FUNÇÕES */
+        .role-icon {
+            width: 30px;
+            text-align: center;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .role-icon.cmd { color: #ffd700; /* Dourado para Cmt */ }
+        .role-icon.motor { color: #00bcd4; /* Azul para Motorista */ }
+        .role-icon.user { color: #757575; /* Cinza para os demais */ }
+
+        .info-col { flex-grow: 1; }
+
+        .role-name {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--fire-red);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .crew-name {
+            display: block;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .time-badge {
+            background-color: #2c2c2c;
+            color: #bbb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            border: 1px solid #444;
+        }
+
+        /* LOADING */
+        #loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 999;
+        }
+        .spinner { font-size: 3rem; color: var(--fire-red); animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 style="margin:0"><i class="fas fa-fire-extinguisher"></i> EFETIVO OPERACIONAL</h2>
-        <small id="last-up">Sincronizando...</small>
+    <div id="loading">
+        <i class="fas fa-circle-notch spinner"></i>
+        <h3 style="margin-top: 20px; font-weight: 300;">Sincronizando Sistema Tático...</h3>
     </div>
 
-    <div id="loading"><i class="fas fa-spinner fa-spin fa-3x" style="color:#b71c1c"></i></div>
-    <div class="grid" id="container"></div>
+    <div class="header">
+        <div style="display:flex; align-items:center;">
+            <i class="fas fa-shield-alt fa-2x"></i>
+            <div>
+                <h1>Painel Operacional</h1>
+                <span style="font-size: 0.8rem; color: #888;">CORPO DE BOMBEIROS MILITAR - POA</span>
+            </div>
+        </div>
+        <div class="status-badge">
+            <span id="ponto-status" style="color: #00ff00; margin-right: 5px;">●</span>
+            <span id="last-update">Atualizando...</span>
+        </div>
+    </div>
+
+    <div class="grid-container" id="container"></div>
 
     <script>
-        // --- COLE SEU LINK AQUI ---
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
+        // ============================================================
+        // CONFIGURAÇÃO - COLE SEU LINK AQUI EMBAIXO
+        // ============================================================
+        const URL_DADOS = "COLE_AQUI_SEU_LINK_DO_GOOGLE"; 
+        // ============================================================
 
-        async function carregar() {
+        async function carregarDados() {
             try {
+                // Efeito visual de "carregando" no badge
+                document.getElementById('ponto-status').style.color = 'yellow';
+                document.getElementById('last-update').innerText = "Buscando...";
+
                 const req = await fetch(URL_DADOS);
                 const dados = await req.json();
 
                 if(dados.erro) {
-                    document.getElementById('loading').innerHTML = "<h3>Aguardando dados do PC...</h3><p>Deixe a aba do E193 aberta no computador para sincronizar.</p>";
+                    mostrarTelaEspera();
                     return;
                 }
 
-                renderizar(dados);
+                renderizarPainel(dados);
+                
+                // Sucesso
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('ponto-status').style.color = '#00ff00';
+                document.getElementById('last-update').innerText = new Date().toLocaleTimeString();
+
             } catch(e) {
-                console.log(e);
+                console.error("Erro:", e);
+                document.getElementById('ponto-status').style.color = 'red';
+                document.getElementById('last-update').innerText = "Erro Conexão";
             }
         }
 
-        function renderizar(dados) {
+        function mostrarTelaEspera() {
+            document.getElementById('container').innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #666;">
+                    <i class="fas fa-wifi fa-3x" style="margin-bottom:20px;"></i>
+                    <h2>Aguardando conexão com a Base...</h2>
+                    <p>Mantenha o computador do quartel ligado na página do E193.</p>
+                </div>
+            `;
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function renderizarPainel(dados) {
             const container = document.getElementById('container');
             container.innerHTML = "";
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('last-up').innerText = "Atualizado: " + new Date().toLocaleTimeString();
 
-            // Agrupa viaturas
+            // 1. Agrupar por Viatura + OBM
             const frota = {};
             dados.forEach(d => {
-                const id = d.vtr + d.obm;
-                if(!frota[id]) frota[id] = {vtr: d.vtr, obm: d.obm, equipe: []};
+                // Limpeza de dados crus
+                const vtrClean = d.vtr.replace(/\(.*\)/, '').trim();
+                const obmClean = d.obm.replace('PORTO ALEGRE', '').trim();
+                const id = vtrClean + "_" + obmClean;
+
+                if(!frota[id]) {
+                    frota[id] = {
+                        vtr: vtrClean,
+                        obm: obmClean,
+                        equipe: []
+                    };
+                }
                 frota[id].equipe.push(d);
             });
 
-            Object.values(frota).forEach(v => {
-                // Ordena Comandante
-                v.equipe.sort((a,b) => a.func.includes('CMT') ? -1 : 1);
-
-                let linhas = "";
-                v.equipe.forEach(m => {
-                    linhas += `
-                        <div class="item">
-                            <span class="func">${m.func}</span>
-                            <span class="nome">${m.nome}</span>
-                            <span class="hora">${m.hora}</span>
-                        </div>`;
+            // 2. Ordenar e Criar Cards
+            // Convertemos o objeto em array para ordenar as viaturas se quiser (opcional)
+            // Aqui vamos apenas iterar
+            Object.values(frota).forEach(viatura => {
+                
+                // === AQUI ESTÁ A "LEI" DO LAYOUT ANTERIOR ===
+                // Ordenação da Equipe: 
+                // 1. Comandante (CMT, SGT, TEN no comando)
+                // 2. Condutor (Motorista)
+                // 3. Demais
+                viatura.equipe.sort((a, b) => {
+                    const getPeso = (f) => {
+                        const funcao = f.toUpperCase();
+                        if (funcao.includes("CMT") || funcao.includes("COMANDANTE") || funcao.includes("CHEFE")) return 1;
+                        if (funcao.includes("CONDUTOR") || funcao.includes("COV") || funcao.includes("MOTORISTA")) return 2;
+                        return 3;
+                    };
+                    return getPeso(a.func) - getPeso(b.func);
                 });
 
-                container.innerHTML += `
+                // HTML da Lista de Militares
+                let htmlEquipe = "";
+                viatura.equipe.forEach(militar => {
+                    // Ícones Dinâmicos
+                    let iconClass = "fas fa-user role-icon user"; // Padrão
+                    const f = militar.func.toUpperCase();
+                    
+                    if (f.includes("CMT") || f.includes("COMANDANTE")) {
+                        iconClass = "fas fa-star role-icon cmd"; // Estrela Dourada
+                    } else if (f.includes("CONDUTOR") || f.includes("COV") || f.includes("MOTORISTA")) {
+                        iconClass = "fas fa-dharmachakra role-icon motor"; // Volante Azul
+                    }
+
+                    // Limpeza do Nome (Tira espaços extras)
+                    const nomeFormatado = militar.nome.trim();
+
+                    htmlEquipe += `
+                        <li class="crew-item">
+                            <i class="${iconClass}"></i>
+                            <div class="info-col">
+                                <span class="role-name">${militar.func}</span>
+                                <span class="crew-name">${nomeFormatado}</span>
+                            </div>
+                            <span class="time-badge">${militar.hora || '24h'}</span>
+                        </li>
+                    `;
+                });
+
+                // HTML do Card Completo
+                const cardHTML = `
                     <div class="card">
-                        <div class="card-head">
-                            <div><div class="vtr">${v.vtr}</div><div class="obm">${v.obm}</div></div>
-                            <i class="fas fa-truck-medical" style="color:#444"></i>
+                        <div class="card-header">
+                            <div class="vtr-info">
+                                <h2>${viatura.vtr}</h2>
+                                <p>${viatura.obm}</p>
+                            </div>
+                            <i class="fas fa-truck-medical card-icon"></i>
                         </div>
-                        <div>${linhas}</div>
-                    </div>`;
+                        <ul class="crew-list">
+                            ${htmlEquipe}
+                        </ul>
+                    </div>
+                `;
+
+                container.innerHTML += cardHTML;
             });
         }
 
-        carregar();
-        setInterval(carregar, 60000); // Atualiza a cada 1 min
+        // Inicia
+        carregarDados();
+        
+        // Atualização automática a cada 30 segundos
+        setInterval(carregarDados, 30000);
+
     </script>
 </body>
 </html>
