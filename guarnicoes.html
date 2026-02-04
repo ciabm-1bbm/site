@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - V15</title>
+    <title>Painel Operacional 1º BBM - V16 (Contagem por ID)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -255,7 +255,7 @@
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // Lógica de Turno
+        // Lógica de Turno e Horários (AGORA LÊ DIRETAMENTE DO SCRIPT)
         function filtrarTurnoAtual(dados) {
             const agora = new Date();
             const minAtual = agora.getHours() * 60 + agora.getMinutes();
@@ -263,9 +263,10 @@
             return dados.filter(d => {
                 let txt = d.horario || "";
                 
-                // Extrai as horas exatas da string "suja"
+                if(!txt || txt.includes("24h") || txt.includes("08:00 às 08:00")) return true;
+                
                 const nums = txt.match(/(\d{2}:\d{2})/g);
-                if(!nums || nums.length < 2) return true; // Se não tem hora, mostra por segurança
+                if(!nums || nums.length < 2) return true;
 
                 const [h1, m1] = nums[0].split(':').map(Number);
                 const [h2, m2] = nums[1].split(':').map(Number);
@@ -273,52 +274,72 @@
                 const inicio = h1 * 60 + m1;
                 const fim = h2 * 60 + m2;
 
-                if (inicio < fim) { // Dia (08:00 - 20:00)
+                if (inicio < fim) { // Dia
                     return minAtual >= inicio && minAtual < fim;
-                } else { // Noite (20:00 - 08:00)
+                } else { // Noite
                     return minAtual >= inicio || minAtual < fim;
                 }
             });
         }
 
-        // --- CORREÇÃO DE HORÁRIOS ---
         function formatarTurno(raw) {
-            if(!raw) return "08:00 às 08:00"; // Padrão se vazio
+            if(!raw) return "24h";
             
-            // Busca apenas os padrões de hora HH:MM na string bagunçada
+            // Tenta pegar o horário vindo do script (ex: 08:00 - 20:00)
+            // Se vier bagunçado, limpa
             const nums = raw.match(/(\d{2}:\d{2})/g);
-            
             if(nums && nums.length >= 2) {
-                // Pega a primeira (início) e a segunda (fim)
-                return `${nums[0]} às ${nums[1]}`;
+                const h1 = nums[0];
+                const h2 = nums[1];
+                
+                // Calculo de Carga Horária para exibição
+                const [hh1] = h1.split(':').map(Number);
+                const [hh2] = h2.split(':').map(Number);
+                let diff = hh2 - hh1;
+                if(diff < 0) diff += 24;
+
+                let carga = "";
+                if(diff >= 23 || diff === 0) carga = "(24h)";
+                else if(diff >= 11 && diff <= 13) carga = "(12h)";
+
+                return `${h1} às ${h2} ${carga}`;
             }
             
-            // Fallback se não achar formato
-            return "08:00 às 08:00"; 
+            return raw; // Retorna bruto se não conseguir formatar
         }
 
+        // === EXTRAÇÃO ROBUSTA DE ID ===
         function extrairID(nomeCompleto) {
-            const match = nomeCompleto.match(/^(\d{7})/);
-            return match ? match[1] : nomeCompleto; 
+            const match = nomeCompleto.match(/(\d{7})/);
+            return match ? match[1] : null; 
         }
 
         function limparNome(nomeCompleto) {
-            return nomeCompleto.replace(/^\d{7}\s+/, '').trim();
+            return nomeCompleto.replace(/\d{7}\s+/, '').trim();
         }
 
         function processarDados(dados) {
             const estrutura = {};
-            const stats = { cap: new Set(), sgt: new Set(), sd: new Set(), abt: new Set(), ar: new Set() };
+            
+            // === USO DE MAP PARA EVITAR DUPLICIDADE DE ID ===
+            // Chave = ID, Valor = Nome Completo
+            const mapOficiais = new Map();
+            const mapSargentos = new Map();
+            const mapPracas = new Map();
+            
+            const statsViaturas = { abt: new Set(), ar: new Set() };
 
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                let nomeCompleto = (d.nome || "").trim();
+                let nomeCompleto = (d.nome || "").trim().toUpperCase();
                 let idMilitar = extrairID(nomeCompleto);
-                let nomeExibicao = limparNome(nomeCompleto);
-                let func = (d.func || "").trim();
                 
-                // Formatação Limpa
+                // Se não achou ID, usa o nome como ID (fallback)
+                let idUnico = idMilitar ? idMilitar : nomeCompleto;
+                let nomeExibicao = limparNome(nomeCompleto);
+                
+                let func = (d.func || "").trim();
                 let hora = formatarTurno(d.horario || "");
 
                 // Mapeamento OBM
@@ -346,28 +367,38 @@
                 }
                 
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
+                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: hora });
 
-                    // Stats
-                    if(nomeCompleto.includes("SGT")) stats.sgt.add(idMilitar + "|" + nomeExibicao);
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) stats.cap.add(idMilitar + "|" + nomeExibicao);
-                    else stats.sd.add(idMilitar + "|" + nomeExibicao);
+                    // === LÓGICA DE CONTAGEM POR ID ÚNICO ===
+                    // Se o ID já estiver no mapa, ele sobrescreve (não duplica)
+                    
+                    if(nomeCompleto.includes("SGT")) {
+                        mapSargentos.set(idUnico, nomeExibicao);
+                    }
+                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
+                        mapOficiais.set(idUnico, nomeExibicao);
+                    }
+                    else {
+                        mapPracas.set(idUnico, nomeExibicao);
+                    }
                 }
 
-                if(vtr.includes("ABT")) stats.abt.add(vtr);
-                if(vtr.includes("AR") || vtr.includes("AEM")) stats.ar.add(vtr);
+                if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
+                if(vtr.includes("AR") || vtr.includes("AEM")) statsViaturas.ar.add(vtr);
             });
 
-            atualizarStats(stats);
+            atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
             renderizarCards(estrutura);
         }
 
-        function atualizarStats(stats) {
-            const capArr = Array.from(stats.cap).map(s => s.split('|')[1]);
-            const sgtArr = Array.from(stats.sgt).map(s => s.split('|')[1]);
-            const sdArr = Array.from(stats.sd).map(s => s.split('|')[1]);
-            const abtArr = Array.from(stats.abt);
-            const arArr = Array.from(stats.ar);
+        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
+            // Converte os valores do Map para Array para exibir na lista
+            const capArr = Array.from(mapOficiais.values());
+            const sgtArr = Array.from(mapSargentos.values());
+            const sdArr = Array.from(mapPracas.values());
+            
+            const abtArr = Array.from(statsViaturas.abt);
+            const arArr = Array.from(statsViaturas.ar);
 
             const fill = (idC, idL, arr) => {
                 document.getElementById(idC).innerText = arr.length;
@@ -402,8 +433,10 @@
                 const gruposUnicos = [];
                 
                 viaturasRaw.forEach(vtr => {
+                    // Agrupa por assinatura de equipe (IDs ordenados)
                     const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
                     const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
+                    
                     if(grupoExistente && assinatura.length > 0) {
                         grupoExistente.nomesVtrs.push(vtr.nome);
                     } else {
@@ -414,7 +447,7 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor"; 
 
-                // --- AQUI: AUMENTO DE FONTE E LARGURA DA BARRA ---
+                // Barra Lateral Maior
                 let content = `
                     <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
@@ -426,6 +459,7 @@
                 content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
                 gruposUnicos.forEach(grupo => {
+                    // Ordena Militares
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
@@ -450,7 +484,7 @@
                                             ${m.n}
                                         </div>
                                         <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">(${m.h})</span>
+                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
                                         </div>
                                     </div>
                                 `).join('')}
