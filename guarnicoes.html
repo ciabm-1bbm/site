@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - V16 (Contagem por ID)</title>
+    <title>Guarnição Operacional em Porto Alegre</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,7 +31,6 @@
     <style>
         body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
         
-        /* BACKGROUND */
         .hero-background { position: relative; min-height: 100vh; }
         .hero-background::before { 
             content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
@@ -46,7 +45,6 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* CARD */
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
@@ -99,7 +97,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Conectando ao sistema...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Buscando efetivo total do dia...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -135,7 +133,7 @@
                 
                 <div class="stats-container border-l-4 border-bombeiros-orange">
                     <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO ESCALADO
+                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA 24H)
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
@@ -217,8 +215,10 @@
             "CANIL"
         ];
 
+        // 1. DATA OPERACIONAL (Dia vira às 08h)
         function getDataOperacional() {
             const agora = new Date();
+            // Se for antes das 08h, ainda mostra a escala que começou ontem
             if (agora.getHours() < 8) {
                 agora.setDate(agora.getDate() - 1);
             }
@@ -245,70 +245,42 @@
                     return;
                 }
 
-                const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
-                const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
-
-                processarDados(dadosFinais);
+                // === AQUI A MUDANÇA: NÃO FILTRAMOS MAIS POR HORA ===
+                // Se o dado veio do JSON, ele faz parte do dia operacional e deve ser exibido.
+                // O filtro de data já é feito na coleta ou assume-se a coleta atual.
+                processarDados(dados);
+                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('app').classList.remove('hidden');
 
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // Lógica de Turno e Horários (AGORA LÊ DIRETAMENTE DO SCRIPT)
-        function filtrarTurnoAtual(dados) {
-            const agora = new Date();
-            const minAtual = agora.getHours() * 60 + agora.getMinutes();
-            
-            return dados.filter(d => {
-                let txt = d.horario || "";
-                
-                if(!txt || txt.includes("24h") || txt.includes("08:00 às 08:00")) return true;
-                
-                const nums = txt.match(/(\d{2}:\d{2})/g);
-                if(!nums || nums.length < 2) return true;
-
-                const [h1, m1] = nums[0].split(':').map(Number);
-                const [h2, m2] = nums[1].split(':').map(Number);
-                
-                const inicio = h1 * 60 + m1;
-                const fim = h2 * 60 + m2;
-
-                if (inicio < fim) { // Dia
-                    return minAtual >= inicio && minAtual < fim;
-                } else { // Noite
-                    return minAtual >= inicio || minAtual < fim;
-                }
-            });
-        }
-
         function formatarTurno(raw) {
             if(!raw) return "24h";
             
-            // Tenta pegar o horário vindo do script (ex: 08:00 - 20:00)
-            // Se vier bagunçado, limpa
             const nums = raw.match(/(\d{2}:\d{2})/g);
             if(nums && nums.length >= 2) {
                 const h1 = nums[0];
                 const h2 = nums[1];
                 
-                // Calculo de Carga Horária para exibição
                 const [hh1] = h1.split(':').map(Number);
                 const [hh2] = h2.split(':').map(Number);
+                
                 let diff = hh2 - hh1;
                 if(diff < 0) diff += 24;
 
+                // Etiquetas de Turno para clareza
                 let carga = "";
                 if(diff >= 23 || diff === 0) carga = "(24h)";
                 else if(diff >= 11 && diff <= 13) carga = "(12h)";
+                else carga = ""; // Outros turnos
 
                 return `${h1} às ${h2} ${carga}`;
             }
-            
-            return raw; // Retorna bruto se não conseguir formatar
+            return raw;
         }
 
-        // === EXTRAÇÃO ROBUSTA DE ID ===
         function extrairID(nomeCompleto) {
             const match = nomeCompleto.match(/(\d{7})/);
             return match ? match[1] : null; 
@@ -320,22 +292,18 @@
 
         function processarDados(dados) {
             const estrutura = {};
-            
-            // === USO DE MAP PARA EVITAR DUPLICIDADE DE ID ===
-            // Chave = ID, Valor = Nome Completo
             const mapOficiais = new Map();
             const mapSargentos = new Map();
             const mapPracas = new Map();
-            
             const statsViaturas = { abt: new Set(), ar: new Set() };
 
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
                 let nomeCompleto = (d.nome || "").trim().toUpperCase();
-                let idMilitar = extrairID(nomeCompleto);
                 
-                // Se não achou ID, usa o nome como ID (fallback)
+                let idMilitar = extrairID(nomeCompleto);
+                // Fallback para nome se não tiver ID (evita crash)
                 let idUnico = idMilitar ? idMilitar : nomeCompleto;
                 let nomeExibicao = limparNome(nomeCompleto);
                 
@@ -369,18 +337,10 @@
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: hora });
 
-                    // === LÓGICA DE CONTAGEM POR ID ÚNICO ===
-                    // Se o ID já estiver no mapa, ele sobrescreve (não duplica)
-                    
-                    if(nomeCompleto.includes("SGT")) {
-                        mapSargentos.set(idUnico, nomeExibicao);
-                    }
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
-                        mapOficiais.set(idUnico, nomeExibicao);
-                    }
-                    else {
-                        mapPracas.set(idUnico, nomeExibicao);
-                    }
+                    // Stats Únicos
+                    if(nomeCompleto.includes("SGT")) mapSargentos.set(idUnico, nomeExibicao);
+                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) mapOficiais.set(idUnico, nomeExibicao);
+                    else mapPracas.set(idUnico, nomeExibicao);
                 }
 
                 if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
@@ -392,11 +352,9 @@
         }
 
         function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
-            // Converte os valores do Map para Array para exibir na lista
             const capArr = Array.from(mapOficiais.values());
             const sgtArr = Array.from(mapSargentos.values());
             const sdArr = Array.from(mapPracas.values());
-            
             const abtArr = Array.from(statsViaturas.abt);
             const arArr = Array.from(statsViaturas.ar);
 
@@ -433,7 +391,6 @@
                 const gruposUnicos = [];
                 
                 viaturasRaw.forEach(vtr => {
-                    // Agrupa por assinatura de equipe (IDs ordenados)
                     const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
                     const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
                     
@@ -447,7 +404,6 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor"; 
 
-                // Barra Lateral Maior
                 let content = `
                     <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
@@ -459,7 +415,7 @@
                 content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
                 gruposUnicos.forEach(grupo => {
-                    // Ordena Militares
+                    // Ordena
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
@@ -467,7 +423,11 @@
                             if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
                             return 3;
                         }
-                        return getScore(a.f) - getScore(b.f);
+                        // Se função igual, ordena por horário (Quem chega antes aparece antes)
+                        let scoreA = getScore(a.f);
+                        let scoreB = getScore(b.f);
+                        if(scoreA !== scoreB) return scoreA - scoreB;
+                        return a.h.localeCompare(b.h); 
                     });
 
                     const listaVtrs = grupo.nomesVtrs.join(' / ');
