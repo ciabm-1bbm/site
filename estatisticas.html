@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESTATÍSTICAS - 1º BBM (2025)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,9 +19,9 @@
                     colors: {
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
+                        'dark-bg': '#0f172a',
                         'cb-green': '#10B981',
-                        'insect-brown': '#8B4513',
-                        'dark-base': '#0f172a'
+                        'insect-brown': '#8B4513'
                     },
                     fontFamily: { mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] }
                 }
@@ -30,178 +30,189 @@
     </script>
 
     <style>
-        /* Otimizações de Performance e GPU */
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
-        .layer-bg::before {
+        /* Background */
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .hero-bg::before {
             content: ''; position: absolute; top: 380px; left: 10%; right: 10%; bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
             background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
         }
-        .layer-bg::after {
+        .hero-bg::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.98) 100%);
             pointer-events: none;
         }
 
-        .glass-panel {
+        .glass-card {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            contain: content;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
         /* Botões */
-        .btn-core { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
-        .btn-core:active { transform: scale(0.95); }
-        
+        .btn-mes { transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); }
         .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
         .btn-mes.active { 
-            background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #10B981, #059669); color: white; 
+            border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); transform: scale(1.05);
         }
 
-        .btn-anual { border-color: rgba(234, 179, 8, 0.3); color: #FEF08A; }
+        .btn-anual { transition: all 0.2s; border: 1px solid rgba(253, 224, 71, 0.3); color: #fef08a; }
+        .btn-anual:hover { background: rgba(253, 224, 71, 0.1); border-color: #FACC15; }
         .btn-anual.active {
             background: linear-gradient(135deg, #CA8A04, #EAB308); color: white;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); border-color: #FEF08A;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); border-color: #FEF08A; transform: scale(1.05);
         }
 
-        /* Tabela Rápida */
-        .table-wrap { max-height: 500px; overflow-y: auto; will-change: scroll-position; }
-        .table-wrap::-webkit-scrollbar { width: 6px; }
-        .table-wrap::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
-        thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
-
-        /* Correção de Gráficos Mobile */
-        .chart-container { position: relative; width: 100%; height: 350px; }
-        @media (min-width: 1024px) { .chart-container { height: 500px; } }
-
         /* Loader */
-        .loader-bar { width: 0%; transition: width 0.3s ease-out; }
+        #progressContainer { transition: opacity 0.3s; }
+        .progress-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem; animation: p-stripes 1s linear infinite;
+        }
+        @keyframes p-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
+
+        /* Tabela */
+        .table-scroll { max-height: 600px; overflow-y: auto; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        thead th { position: sticky; top: 0; z-index: 10; background-color: #0f172a; }
+
+        .filter-select {
+            background-color: #1e293b; color: #e2e8f0; border: 1px solid #475569;
+            padding: 0.5rem; border-radius: 0.5rem; width: 100%; outline: none;
+        }
+
+        /* Gráfico Container */
+        .chart-wrapper { position: relative; width: 100%; height: 350px; }
+        @media (min-width: 768px) { .chart-wrapper { height: 500px; } }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-    <div class="layer-bg"></div>
+    <div class="hero-bg"></div>
 
-    <main class="container mx-auto px-4 py-6 flex-grow z-10 space-y-6">
+    <div class="container mx-auto px-4 py-6 flex-grow z-10">
         
-        <header class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
-            <div class="text-center">
-                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none mb-1">ESTATÍSTICAS - 1º BBM</h1>
-                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em]">PORTO ALEGRE (2025)</h2>
-                <div id="statusBadge" class="mt-2 inline-block text-xs text-gray-400 font-mono">Aguardando Seleção</div>
+        <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6 glass-card p-6">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 opacity-90">
+            <div class="text-center flex-1">
+                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter mb-1">ESTATÍSTICAS - 1º BBM</h1>
+                <h2 class="text-lg md:text-xl font-bold text-fire-yellow tracking-widest uppercase">PORTO ALEGRE (2025)</h2>
+                <div class="mt-2 text-xs text-gray-400 font-mono" id="statusMsg">Sistema Online. Selecione um período.</div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90">
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 opacity-90">
         </header>
 
-        <div id="loadingState" class="hidden glass-panel p-6 text-center">
-            <div class="flex justify-between text-xs font-mono text-blue-400 mb-1">
-                <span id="loadMsg">Iniciando...</span>
-                <span id="loadPct">0%</span>
+        <div id="progressContainer" class="hidden mb-6 glass-card p-4">
+            <div class="flex justify-between mb-1 text-sm font-bold font-mono">
+                <span class="text-blue-400" id="progressText">Carregando...</span>
+                <span class="text-white" id="progressPercent">0%</span>
             </div>
-            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                <div id="loadBar" class="bg-blue-500 h-full loader-bar"></div>
+            <div class="w-full bg-gray-700 rounded-full h-3">
+                <div id="progressBar" class="bg-blue-500 h-3 rounded-full progress-striped transition-all duration-300" style="width: 0%"></div>
             </div>
         </div>
 
-        <div class="glass-panel p-4">
-            <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthGrid"></div>
-            <div class="flex justify-center pt-4 border-t border-white/5">
-                <button id="btnAnual" class="btn-core btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10">
+        <div class="glass-card p-4 mb-6">
+            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2" id="mesesContainer"></div>
+            <div class="flex justify-center border-t border-white/10 pt-4 mt-4">
+                <button id="btnAnual" class="btn-anual bg-yellow-900/20 text-yellow-100 py-3 px-8 rounded-lg text-sm font-bold uppercase tracking-wider border border-yellow-600/30 w-full md:w-auto">
                     ANUAL 2025
                 </button>
             </div>
         </div>
 
-        <div id="appContent" class="hidden opacity-0 transition-opacity duration-500 space-y-6">
+        <div id="dashboardArea" class="hidden opacity-0 transition-opacity duration-700">
             
-            <div class="flex justify-center">
-                <div class="glass-panel px-10 py-6 text-center border-t-4 border-emerald-500 bg-slate-900/80">
-                    <p class="text-xs font-bold tracking-[0.2em] text-emerald-400 mb-2" id="kpiTitle">OCORRÊNCIAS TOTAIS</p>
-                    <p class="text-5xl font-black text-white drop-shadow-xl" id="kpiValue">0</p>
+            <div class="flex justify-center mb-8">
+                <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-8 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md w-full md:w-auto">
+                    <p class="text-xs font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS</p>
+                    <p class="text-4xl md:text-5xl font-black text-white" id="totalDisplay">0</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass-panel p-4 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
-                    <div class="chart-container flex-grow">
-                        <canvas id="cvsPelotoes"></canvas>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="glass-card p-4">
+                    <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartPelotoes"></canvas>
                     </div>
                 </div>
-                <div class="glass-panel p-4 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
-                    <div class="chart-container flex-grow">
-                        <canvas id="cvsNatureza"></canvas>
+                <div class="glass-card p-4">
+                    <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartNatureza"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-4">
-                <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
-                <div id="wrapSubgrupos" class="chart-container" style="min-height: 500px;">
-                    <canvas id="cvsSubgrupos"></canvas>
+            <div class="glass-card p-4 mb-6">
+                <h3 class="text-sm md:text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
+                <div id="subgrupoContainer" class="chart-wrapper" style="height: 500px; min-height: 500px;">
+                    <canvas id="chartSubgrupos"></canvas>
                 </div>
             </div>
 
-            <div class="glass-panel overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-white/5 bg-slate-900/50 flex flex-col lg:flex-row justify-between items-center gap-4">
-                    <h3 class="text-sm font-bold text-white uppercase">Registro de Dados</h3>
-                    <div class="flex gap-2 w-full lg:w-auto text-xs overflow-x-auto pb-2 lg:pb-0">
-                        <select id="fNat" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Natureza</option></select>
-                        <select id="fSub" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Subgrupo</option></select>
-                        <select id="fBai" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Bairro</option></select>
-                        <select id="fPel" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Pelotão</option></select>
-                        <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
+            <div class="glass-card p-1 overflow-hidden">
+                <div class="p-4 bg-black/30 border-b border-white/10">
+                    <h3 class="text-sm md:text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
+                        <select id="filterNatureza" class="filter-select"><option value="">Todas as Naturezas</option></select>
+                        <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
+                        <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
+                        <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
+                        <button onclick="resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm flex justify-center items-center">
+                            <i class="fas fa-undo mr-2"></i> Limpar
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-xs text-gray-400 font-mono">Linhas: <span id="totalLista" class="text-white font-bold">0</span></span>
                     </div>
                 </div>
-                <div class="p-2 bg-slate-900/80 text-right text-[10px] font-mono text-gray-400">
-                    Mostrando: <span id="lblRows" class="text-white font-bold">0</span> registros
-                </div>
-                <div class="table-wrap">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="text-gray-400 uppercase font-bold text-[10px] tracking-wider bg-slate-900">
+
+                <div class="table-scroll">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="text-xs text-gray-400 uppercase font-bold bg-slate-900">
                             <tr>
-                                <th class="p-3 text-center w-10">#</th>
-                                <th class="p-3 w-24">Data</th>
-                                <th class="p-3">Natureza</th>
-                                <th class="p-3">Subgrupo</th>
-                                <th class="p-3">Bairro</th>
-                                <th class="p-3">Pelotão</th>
-                                <th class="p-3 text-center">Map</th>
-                                <th class="p-3 text-right">ID</th>
+                                <th class="p-3 text-center w-12 border-b border-gray-700">#</th>
+                                <th class="p-3 border-b border-gray-700">Data</th>
+                                <th class="p-3 border-b border-gray-700">Natureza</th>
+                                <th class="p-3 border-b border-gray-700">Subgrupo</th>
+                                <th class="p-3 border-b border-gray-700">Bairro</th>
+                                <th class="p-3 border-b border-gray-700">Pelotão</th>
+                                <th class="p-3 text-center border-b border-gray-700">Map</th>
+                                <th class="p-3 text-right border-b border-gray-700">ID</th>
                             </tr>
                         </thead>
-                        <tbody id="tblBody" class="text-gray-300 font-mono divide-y divide-white/5"></tbody>
+                        <tbody id="tabelaBody" class="text-sm text-gray-300 font-mono"></tbody>
                     </table>
                 </div>
             </div>
-
         </div>
-        <div class="h-8"></div>
-    </main>
 
-    <footer class="text-center py-6 text-gray-500 text-[10px] uppercase tracking-widest border-t border-white/5 bg-slate-900">
-        © Companhia de Bombeiro Militar do 1º BBM. Desenvolvido por Gustavo Medeiros.
+        <div class="h-10"></div>
+    </div>
+
+    <footer class="w-full text-center py-6 text-gray-500 text-xs border-t border-white/5 mt-auto bg-black/20 backdrop-blur-sm">
+        <p>© Companhia de Bombeiro Militar do 1º BBM. Desenvolvido por Gustavo Medeiros.</p>
     </footer>
 
     <script>
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2025,
+            year: 2025, // ANO PADRÃO
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
         };
 
         const THEME = {
             "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" },
+            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" }, 
             "BUSCA E RESGATE": { c: "#F97316", i: "🛟", cl: "text-orange-500" },
             "CORTE DE ÁRVORE": { c: "#4ADE80", i: "🌳", cl: "text-green-400" },
             "AÇÕES PREVENTIVAS": { c: "#9CA3AF", i: "🛡️", cl: "text-gray-400" },
@@ -211,373 +222,336 @@
             "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
         };
 
-        const Core = {
-            db: [],
-            charts: {},
-            ctxLabel: '',
+        let chartP = null, chartN = null, chartS = null;
+        let mesSelecionado = "";
+        let dadosGlobais = [];
 
-            init: () => {
-                Chart.register(ChartDataLabels);
-                const grid = document.getElementById('monthGrid');
-                CONFIG.months.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-core btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold tracking-wider';
-                    btn.innerText = m;
-                    btn.onclick = () => Core.fetchMonth(m, btn);
-                    grid.appendChild(btn);
-                });
-                document.getElementById('btnAnual').addEventListener('click', Core.fetchAnnual);
-                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
-            },
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            Chart.register(ChartDataLabels);
+            const container = document.getElementById('mesesContainer');
+            CONFIG.months.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
+                btn.innerText = m;
+                btn.onclick = () => loadMonth(m, btn);
+                container.appendChild(btn);
+            });
+            document.getElementById('btnAnual').onclick = () => loadAnual(document.getElementById('btnAnual'));
+            ['filterNatureza','filterSubgrupo','filterBairro','filterPelotao'].forEach(id => {
+                document.getElementById(id).addEventListener('change', applyFilters);
+            });
+        });
 
-            setLoading: (active, msg="", pct=0) => {
-                const load = document.getElementById('loadingState');
-                const content = document.getElementById('appContent');
-                if(active) {
-                    content.classList.add('hidden');
-                    load.classList.remove('hidden');
-                    document.getElementById('loadMsg').innerText = msg;
-                    document.getElementById('loadPct').innerText = pct + '%';
-                    document.getElementById('loadBar').style.width = pct + '%';
-                } else {
-                    load.classList.add('hidden');
-                    content.classList.remove('hidden');
-                    setTimeout(() => content.classList.remove('opacity-0'), 100);
-                }
-            },
+        // LOADING
+        function setLoad(active, msg="", pct=0) {
+            const p = document.getElementById('progressContainer');
+            const d = document.getElementById('dashboardArea');
+            if(active) {
+                p.classList.remove('hidden');
+                d.classList.add('hidden');
+                d.classList.remove('opacity-100');
+                document.getElementById('progressText').innerText = msg;
+                document.getElementById('progressPercent').innerText = pct + '%';
+                document.getElementById('progressBar').style.width = pct + '%';
+            } else {
+                setTimeout(() => {
+                    p.classList.add('hidden');
+                    d.classList.remove('hidden');
+                    requestAnimationFrame(() => d.classList.add('opacity-100'));
+                }, 300);
+            }
+        }
 
-            resetButtons: () => document.querySelectorAll('button').forEach(b => b.classList.remove('active')),
+        function resetBtn() {
+            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        }
 
-            fetchMonth: async (month, btn) => {
-                Core.resetButtons();
-                btn.classList.add('active');
-                Core.ctxLabel = `EM ${month} ${CONFIG.year}`;
-                Core.setLoading(true, "Conectando...", 10);
+        // FETCHING
+        async function loadMonth(m, btn) {
+            mesSelecionado = `EM ${m} ${CONFIG.year}`;
+            resetBtn();
+            btn.classList.add('active');
+            setLoad(true, "Baixando...", 20);
 
+            try {
+                // Cache Busting simples
+                const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?v=${Date.now()}`);
+                if(!res.ok) throw new Error("Mês não disponível.");
+                const txt = await res.text();
+                processCSV(txt);
+            } catch(e) {
+                setLoad(false);
+                alert(e.message);
+            }
+        }
+
+        async function loadAnual(btn) {
+            mesSelecionado = `NO ANO DE ${CONFIG.year}`;
+            resetBtn();
+            btn.classList.add('active');
+            setLoad(true, "Iniciando...", 10);
+
+            let combined = [];
+            let done = 0;
+            const promises = CONFIG.months.map(async m => {
                 try {
-                    // Cache Buster para evitar dados antigos
-                    const url = `${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`;
-                    const res = await fetch(url);
-                    if(!res.ok) throw new Error("Mês não disponível");
-                    const text = await res.text();
-                    Core.processData(text);
-                } catch(e) {
-                    Core.setLoading(false);
-                    alert("Dados não encontrados para este período.");
-                }
-            },
-
-            fetchAnnual: async () => {
-                Core.resetButtons();
-                document.getElementById('btnAnual').classList.add('active');
-                Core.ctxLabel = `NO ANO DE ${CONFIG.year}`;
-                Core.setLoading(true, "Iniciando compilação anual...", 5);
-
-                let buffer = [];
-                let done = 0;
-                
-                // Fetch Paralelo de todos os meses
-                const promises = CONFIG.months.map(async m => {
-                    try {
-                        const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
-                        if(res.ok) return await res.text();
-                    } catch(e) {}
-                    done++;
-                    Core.setLoading(true, `Baixando meses (${done}/12)...`, Math.round((done/12)*80));
-                    return null;
-                });
-
-                const results = await Promise.all(promises);
-                results.forEach(txt => {
-                    if(txt) {
-                        const p = Papa.parse(txt, {header:true, skipEmptyLines:true});
-                        if(p.data) buffer = buffer.concat(p.data);
+                    const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?v=${Date.now()}`);
+                    if(res.ok) {
+                        const txt = await res.text();
+                        return new Promise(r => Papa.parse(txt, {header:true, skipEmptyLines:true, complete: res => r(res.data)}));
                     }
-                });
+                } catch(e){}
+                done++;
+                setLoad(true, "Compilando...", Math.round((done/12)*80));
+                return [];
+            });
 
-                if(buffer.length) Core.normalize(buffer);
-                else { Core.setLoading(false); alert("Nenhum dado anual encontrado."); }
-            },
+            const results = await Promise.all(promises);
+            results.forEach(d => combined = combined.concat(d));
+            
+            if(combined.length) processData(combined);
+            else { setLoad(false); alert("Nenhum dado encontrado."); }
+        }
 
-            processData: (csv) => {
-                Core.setLoading(true, "Processando...", 60);
-                Papa.parse(csv, {
-                    header: true, skipEmptyLines: true, encoding: "UTF-8",
-                    complete: (res) => Core.normalize(res.data)
-                });
-            },
+        function processCSV(txt) {
+            setLoad(true, "Lendo...", 70);
+            Papa.parse(txt, {
+                header: true, skipEmptyLines: true, encoding: "UTF-8",
+                complete: (res) => processData(res.data)
+            });
+        }
 
-            normalize: (raw) => {
-                Core.setLoading(true, "Organizando...", 90);
-                Core.db = [];
-                if(!raw || !raw[0]) { Core.setLoading(false); return; }
+        // DATA PROCESSING
+        function processData(data) {
+            setLoad(true, "Organizando...", 90);
+            dadosGlobais = [];
+            if(!data || !data[0]) { setLoad(false); return; }
 
-                const keys = Object.keys(raw[0]);
-                const find = k => keys.find(x => x.toLowerCase().includes(k));
-                const cNat = find('natureza')||find('emerg');
-                const cObm = find('obm')||find('guarni');
-                const cSub = find('subgrupo')||find('detalhe');
-                const cVtr = find('viatura')||find('prefixo');
+            const keys = Object.keys(data[0]);
+            const find = k => keys.find(x => x.toLowerCase().includes(k));
+            const cNat = find('natureza')||find('emerg');
+            const cObm = find('obm')||find('guarni');
+            const cSub = find('subgrupo')||find('detalhe');
+            const cVtr = find('viatura')||find('prefixo');
 
-                if(!cNat || !cObm) { Core.setLoading(false); return alert("Estrutura CSV inválida."); }
+            if(!cNat || !cObm) { setLoad(false); return alert("Erro no formato do arquivo."); }
 
-                let id = 1;
-                raw.forEach(row => {
-                    if(!row[cNat]) return;
-                    const s = (row[cObm] || "").toUpperCase();
-                    const v = (cVtr ? row[cVtr] || "" : "").toUpperCase();
-                    const nRaw = (row[cNat] || "N/A").toUpperCase();
+            let id=1;
+            data.forEach(row => {
+                if(!row[cNat]) return;
+                const s = String(row[cObm]||"").toUpperCase();
+                const v = String(cVtr ? row[cVtr]||"" : "").toUpperCase();
+                const nRaw = String(row[cNat]||"N/A").toUpperCase();
 
-                    let pel = "OUTROS";
-                    if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
-                    else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
-                    else if(s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
-                    else if(s.includes("TERRESTRE") || s.includes("BBS")) pel = "BBS (POA) - TERRESTRE";
-                    else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
-                    else if(s.includes("FLORESTA")) pel = "FLORESTA";
-                    else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
-                    else if(s.includes("RESTINGA")) pel = "RESTINGA";
-                    else if(s.includes("PARTENON")) pel = "PARTENON";
-                    else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
-                    else if(s.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
-                    else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) pel = (v.includes("AR") || s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
-                    else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
-                    else {
-                        const clean = s.replace("1º BBM / ","").replace("CIA / ","").replace("PEL / ","").trim();
-                        if(clean.length > 2) pel = clean;
-                    }
-
-                    let nat = nRaw.trim();
-                    if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
-                    else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
-                    else if(nRaw.includes("SALVAMENTO") || nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
-                    else if(nRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
-                    else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
-                    else if(nRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
-                    else if(nRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
-                    else if(nRaw.includes("VISTORIA") && nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-
-                    let sub = row[cSub] ? row[cSub].trim() : "";
-                    if(sub === "N/A" || sub === "0") sub = "";
-
-                    let map = null;
-                    if(row['Latitude'] && row['Longitude']) {
-                        const la = String(row['Latitude']).replace(',','.').trim();
-                        const lo = String(row['Longitude']).replace(',','.').trim();
-                        // Google Maps Pin Link Universal
-                        map = `https://www.google.com/maps?q=${la},${lo}`;
-                    }
-
-                    Core.db.push({
-                        id: row['Nº Oc.'] || id++,
-                        date: row['Data'] || '--',
-                        nat, sub, pel, map,
-                        bairro: (row['Bairro'] || '--').toUpperCase()
-                    });
-                });
-
-                Core.initFilters();
-                Core.renderView(Core.db);
-                Core.setLoading(false);
-            },
-
-            initFilters: () => {
-                const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                Core.db.forEach(d => {
-                    s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
-                    if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
-                });
-                const fill = (id, set) => {
-                    const el = document.getElementById(id);
-                    const lbl = el.options[0].text;
-                    el.innerHTML = `<option value="">${lbl}</option>`;
-                    Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
-                };
-                fill('fNat', s.n); fill('fSub', s.s); fill('fBai', s.b); fill('fPel', s.p);
-            },
-
-            applyFilters: () => {
-                const v = {
-                    n: document.getElementById('fNat').value,
-                    s: document.getElementById('fSub').value,
-                    b: document.getElementById('fBai').value,
-                    p: document.getElementById('fPel').value
-                };
-                const res = Core.db.filter(d => 
-                    (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
-                    (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
-                );
-                Core.renderView(res, true);
-            },
-
-            resetFilters: () => {
-                document.querySelectorAll('select').forEach(s => s.value = "");
-                Core.renderView(Core.db);
-            },
-
-            renderView: (data, isFiltered=false) => {
-                const tot = data.length;
-                document.getElementById('kpiValue').innerText = tot.toLocaleString('pt-BR');
-                document.getElementById('kpiTitle').innerText = Core.ctxLabel.includes("ANO") ? 
-                    "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025" : 
-                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Core.ctxLabel}`;
-                document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
-                
-                const badge = document.getElementById('statusBadge');
-                badge.innerText = "Dados Visualizados";
-                badge.className = "mt-2 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-[10px] text-emerald-400 font-mono uppercase";
-
-                const tbody = document.getElementById('tblBody');
-                // Tabela em batch (rápida)
-                const html = data.slice(0, 800).map((d, i) => {
-                    const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
-                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
-                    return `
-                    <tr class="hover:bg-white/5 odd:bg-white/5 transition-colors border-b border-white/5">
-                        <td class="p-3 text-center text-slate-500">${i+1}</td>
-                        <td class="p-3 whitespace-nowrap">${d.date}</td>
-                        <td class="p-3 font-bold ${st.cl} whitespace-nowrap"><span class="mr-2">${st.i}</span>${d.nat}</td>
-                        <td class="p-3 text-blue-200/70 text-[11px]">${d.sub}</td>
-                        <td class="p-3">${d.bairro}</td>
-                        <td class="p-3"><span class="text-fire-yellow font-bold">${d.pel}</span></td>
-                        <td class="p-3 text-center">${mapBtn}</td>
-                        <td class="p-3 text-right text-slate-600">#${d.id}</td>
-                    </tr>`;
-                }).join('');
-                
-                tbody.innerHTML = html;
-
-                if(tot > 0) setTimeout(() => Core.buildCharts(data), 50);
-            },
-
-            buildCharts: (data) => {
-                const agg = { p:{}, n:{}, s:{} };
-                data.forEach(d => {
-                    agg.p[d.pel] = (agg.p[d.pel] || 0) + 1;
-                    agg.n[d.nat] = (agg.n[d.nat] || 0) + 1;
-                    if(d.sub) agg.s[`${d.nat}___${d.sub}`] = (agg.s[`${d.nat}___${d.sub}`] || 0) + 1;
-                });
-
-                const sort = o => Object.entries(o).sort((a,b) => b[1] - a[1]);
-                Core.draw('cvsPelotoes', 'p', sort(agg.p));
-                Core.draw('cvsNatureza', 'n', sort(agg.n));
-                Core.draw('cvsSubgrupos', 's', sort(agg.s).filter(x => x[1] >= 1));
-            },
-
-            draw: (id, type, dataset) => {
-                if(Core.charts[id]) Core.charts[id].destroy();
-
-                const ctx = document.getElementById(id).getContext('2d');
-                
-                const labels = dataset.map(x => {
-                    if(type === 'n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
-                    if(type === 's') {
-                        const [n,s] = x[0].split('___');
-                        const icon = (THEME[n] || {i:"📄"}).i;
-                        return `${icon} ${n} [${s}]`;
-                    }
-                    if(type === 'n') {
-                        const icon = (THEME[x[0]] || {i:"📄"}).i;
-                        return `${icon} ${x[0]}`;
-                    }
-                    return x[0];
-                });
-
-                const values = dataset.map(x => x[1]);
-
-                if(type === 's') {
-                    const h = Math.max(500, values.length * 28);
-                    document.getElementById('wrapSubgrupos').style.height = h + 'px';
+                let pel = "OUTROS";
+                if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
+                else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
+                else if(s.includes("AQUATICA")||s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
+                else if(s.includes("TERRESTRE")||(s.includes("BBS")&&!s.includes("1º"))) pel = "BBS (POA) - TERRESTRE";
+                else if(s.includes("AÇORIANOS")||s.includes("ACORIANOS")) pel = "AÇORIANOS";
+                else if(s.includes("FLORESTA")) pel = "FLORESTA";
+                else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
+                else if(s.includes("RESTINGA")) pel = "RESTINGA";
+                else if(s.includes("PARTENON")) pel = "PARTENON";
+                else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
+                else if(s.includes("ASSUNÇÃO")||s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
+                else if(s.includes("TERESÓPOLIS")||s.includes("TERESOPOLIS")) pel = (v.includes("AR")||s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
+                else if(s.includes("RESGATE")||s.includes("GBS")) pel = "AUTO RESGATE";
+                else {
+                    const clean = s.replace("1º BBM / ","").replace("CIA / ","").replace("PEL / ","").trim();
+                    if(clean.length > 2) pel = clean;
                 }
 
-                Core.charts[id] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            borderRadius: 4,
-                            barPercentage: 0.7,
-                            backgroundColor: (c) => {
-                                const i = c.dataIndex;
-                                if(type === 'p') return CONFIG.poa.includes(dataset[i][0]) ? '#10B981' : '#64748B';
-                                const key = type === 's' ? dataset[i][0].split('___')[0] : dataset[i][0];
-                                return (THEME[key] || {c:"#64748B"}).c;
-                            },
-                            hoverBorderWidth: 2, hoverBorderColor: '#fff'
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: false,
-                        layout: { padding: { right: 50 } },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.95)' },
-                            datalabels: {
-                                color: (ctx) => ctx.active ? '#fff' : '#94a3b8',
-                                anchor: 'end', align: 'end', offset: 4,
-                                font: (ctx) => ({ weight: 'bold', size: ctx.active ? 14 : 11 }),
-                                formatter: v => v.toLocaleString('pt-BR')
-                            }
+                let nat = nRaw.trim();
+                if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
+                else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
+                else if(nRaw.includes("SALVAMENTO")||nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                else if(nRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
+                else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
+                else if(nRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
+                else if(nRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
+                else if(nRaw.includes("VISTORIA")&&nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
+
+                let sub = row[cSub] ? row[cSub].trim() : "";
+                if(sub === "N/A" || sub === "0") sub = "";
+
+                let map = null;
+                if(row['Latitude'] && row['Longitude']) {
+                    const la = String(row['Latitude']).replace(',','.').trim();
+                    const lo = String(row['Longitude']).replace(',','.').trim();
+                    map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
+                }
+
+                dadosGlobais.push({
+                    id: row['Nº Oc.'] || id++,
+                    date: row['Data'] || '--',
+                    nat, sub, pel, map,
+                    bairro: (row['Bairro'] || '--').toUpperCase()
+                });
+            });
+
+            popFilters();
+            render(dadosGlobais);
+            setLoad(false);
+        }
+
+        // RENDER & CHARTS
+        function popFilters() {
+            const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
+            dadosGlobais.forEach(d => {
+                s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
+                if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
+            });
+            const fill = (id, set) => {
+                const el = document.getElementById(id);
+                el.innerHTML = `<option value="">${el.options[0].text}</option>`;
+                Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
+            };
+            fill('filterNatureza', s.n); fill('filterSubgrupo', s.s); 
+            fill('filterBairro', s.b); fill('filterPelotao', s.p);
+        }
+
+        function applyFilters() {
+            const v = {
+                n: document.getElementById('filterNatureza').value,
+                s: document.getElementById('filterSubgrupo').value,
+                b: document.getElementById('filterBairro').value,
+                p: document.getElementById('filterPelotao').value
+            };
+            const res = dadosGlobais.filter(d => 
+                (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
+                (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
+            );
+            render(res, true);
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('select').forEach(s => s.value = "");
+            render(dadosGlobais);
+        }
+
+        function render(data, isFil=false) {
+            const tot = data.length;
+            document.getElementById('totalDisplay').innerText = tot.toLocaleString('pt-BR');
+            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${mesSelecionado}`;
+            document.getElementById('totalLista').innerText = isFil ? `${tot} (Filtrado)` : tot;
+
+            const tbody = document.getElementById('tabelaBody');
+            const view = data.slice(0, 800);
+            let html = "";
+            
+            view.forEach((d, i) => {
+                const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
+                const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white"><i class="fas fa-map-marker-alt"></i></a>` : '';
+                html += `<tr class="hover:bg-white/5 border-b border-gray-800/50 odd:bg-white/5">
+                    <td class="p-3 text-center text-slate-500">${i+1}</td>
+                    <td class="p-3 whitespace-nowrap">${d.date}</td>
+                    <td class="p-3 font-bold ${st.cl} whitespace-nowrap"><span class="mr-2">${st.i}</span>${d.nat}</td>
+                    <td class="p-3 text-blue-200/70 text-[11px]">${d.sub}</td>
+                    <td class="p-3">${d.bairro}</td>
+                    <td class="p-3"><span class="text-fire-yellow font-bold">${d.pel}</span></td>
+                    <td class="p-3 text-center">${mapBtn}</td>
+                    <td class="p-3 text-right text-slate-600">#${d.id}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+
+            if(tot > 0) setTimeout(() => buildCharts(data), 50);
+        }
+
+        function buildCharts(data) {
+            const c = { p:{}, n:{}, s:{} };
+            data.forEach(d => {
+                c.p[d.pel] = (c.p[d.pel]||0)+1;
+                c.n[d.nat] = (c.n[d.nat]||0)+1;
+                if(d.sub) c.s[`${d.nat}___${d.sub}`] = (c.s[`${d.nat}___${d.sub}`]||0)+1;
+            });
+
+            const sort = o => Object.entries(o).sort((a,b)=>b[1]-a[1]);
+            draw('chartPelotoes', 'p', sort(c.p));
+            draw('chartNatureza', 'n', sort(c.n));
+            draw('chartSubgrupos', 's', sort(c.s).filter(x=>x[1]>=1));
+        }
+
+        function draw(id, type, ds) {
+            if(id==='chartPelotoes' && chartP) chartP.destroy();
+            if(id==='chartNatureza' && chartN) chartN.destroy();
+            if(id==='chartSubgrupos' && chartS) chartS.destroy();
+
+            const ctx = document.getElementById(id).getContext('2d');
+            const labels = ds.map(x => {
+                if(type==='n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
+                if(type==='s') {
+                    const [n,s] = x[0].split('___');
+                    const i = (THEME[n]||{i:"📄"}).i;
+                    return `${i} ${n} [${s}]`;
+                }
+                if(type==='n') return `${(THEME[x[0]]||{i:"📄"}).i} ${x[0]}`;
+                return x[0];
+            });
+            const data = ds.map(x => x[1]);
+
+            if(type==='s') document.getElementById('subgrupoContainer').style.height = Math.max(500, data.length*28) + 'px';
+
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        borderRadius: 4,
+                        barPercentage: 0.7,
+                        backgroundColor: (ctx) => {
+                            const i = ctx.dataIndex;
+                            if(type==='p') return CONFIG.poa.includes(ds[i][0]) ? '#10B981' : '#64748B';
+                            const k = type==='s' ? ds[i][0].split('___')[0] : ds[i][0];
+                            return (THEME[k]||{c:"#64748B"}).c;
                         },
-                        scales: {
-                            x: { display: false },
-                            y: {
-                                grid: { color: 'rgba(255,255,255,0.02)' },
-                                ticks: {
-                                    autoSkip: false,
-                                    color: (c) => {
-                                        if(type === 'p') {
-                                            const l = Core.charts[id].data.labels[c.index];
-                                            return CONFIG.poa.includes(l) ? '#10B981' : '#64748B';
-                                        }
-                                        return '#94a3b8';
-                                    },
-                                    font: (c) => {
-                                        let size = 10;
-                                        if(type === 'p') {
-                                            const l = Core.charts[id].data.labels[c.index];
-                                            if(CONFIG.poa.includes(l)) size = 13;
-                                        }
-                                        return { size: size, family: 'monospace' };
-                                    }
+                        hoverBorderWidth: 2, hoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    layout: { padding: { right: 50 } },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: ctx => ctx.active ? '#fff' : '#e2e8f0',
+                            anchor: 'end', align: 'end', offset: 4,
+                            font: ctx => ({ weight: 'bold', size: ctx.active ? 14 : 11 }),
+                            formatter: v => v.toLocaleString('pt-BR')
+                        },
+                        tooltip: { enabled: true, backgroundColor: 'rgba(15,23,42,0.95)' }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.02)' },
+                            ticks: {
+                                autoSkip: false,
+                                color: (ctx) => {
+                                    if(type==='p') return CONFIG.poa.includes(chart.data.labels[ctx.index]) ? '#10B981' : '#64748B';
+                                    return '#94a3b8';
+                                },
+                                font: (ctx) => {
+                                    let s = 10;
+                                    if(type==='p' && CONFIG.poa.includes(chart.data.labels[ctx.index])) s = 13;
+                                    return { size: s, family: 'monospace' };
                                 }
                             }
                         }
                     }
-                });
-            }
-        };
-
-        // Fábrica de Opções Seguras
-        function createCommonOptions() {
-            return {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                resizeDelay: 0,
-                animation: { duration: 0 },
-                layout: { padding: { right: 40 } },
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
-                        font: { weight: 'bold', size: 11 },
-                        formatter: (v) => v.toLocaleString('pt-BR')
-                    },
-                    tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)' }
-                },
-                scales: {
-                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
-                    y: { ticks: { autoSkip: false } }
                 }
-            };
-        }
+            });
 
-        document.addEventListener('DOMContentLoaded', Core.init);
+            if(id==='chartPelotoes') chartP = chart;
+            if(id==='chartNatureza') chartN = chart;
+            if(id==='chartSubgrupos') chartS = chart;
+        }
     </script>
 </body>
 </html>
