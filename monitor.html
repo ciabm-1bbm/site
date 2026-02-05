@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional 1º BBM - Turnos Reais</title>
-    
+    <title>Monitoramento 1º BBM - Porto Alegre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,8 +13,6 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'moss-green': '#9BE36D',
-                        'total-green': '#4ade80'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -24,464 +21,321 @@
             }
         }
     </script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        body { background-color: #0f172a; color: white; overflow-x: hidden; }
         
-        .hero-background { position: relative; min-height: 100vh; }
+        /* --- CONFIGURAÇÃO DO BACKGROUND MARCA D'ÁGUA --- */
+        .hero-background { 
+            background-color: #0f172a; 
+            position: relative;
+        }
+
         .hero-background::before { 
-            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+            content: '';
+            position: fixed;
+            left: 5%;
+            right: 5%;
+            bottom: 20px;
+            top: 320px; 
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center; background-repeat: no-repeat; background-size: 500px;
-            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+            background-position: center top; 
+            background-repeat: no-repeat;
+            background-size: contain; 
+            z-index: 0;
+            opacity: 0.15; 
+            filter: grayscale(100%); 
+            pointer-events: none; 
         }
+
+        @media (max-width: 768px) {
+            .hero-background::before {
+                top: 550px; 
+                opacity: 0.1; 
+            }
+        }
+
         .hero-background::after {
-            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
-            z-index: 1; pointer-events: none;
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%);
+            z-index: 1; 
+            pointer-events: none;
         }
+
         .content-wrapper { position: relative; z-index: 10; }
 
-        .card-monitor {
+        .card-oc { 
             background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: row; 
+            border-radius: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
         }
-        .card-monitor:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        .card-oc:hover { 
+            transform: scale(1.02) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             background: rgba(30, 41, 59, 0.98);
-            border-color: rgba(255, 140, 0, 0.5);
             z-index: 50;
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .vertical-text {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            text-align: center;
-            white-space: nowrap;
+        /* Cores */
+        .color-incendio { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); } 
+        .border-incendio { border-left: 6px solid #FFD700; }
+        .color-resgate { color: #F97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.4); } 
+        .border-resgate { border-left: 6px solid #F97316; }
+        .color-aph { color: #DC2626; text-shadow: 0 0 10px rgba(220, 38, 38, 0.4); } 
+        .border-aph { border-left: 6px solid #DC2626; }
+        .color-arvore { color: #84cc16; } 
+        .border-arvore { border-left: 6px solid #84cc16; }
+        .color-insetos { color: #fde68a; } 
+        .border-insetos { border-left: 6px solid #fde68a; }
+        .color-prev { color: #d1d5db; } 
+        .border-prev { border-left: 6px solid #d1d5db; }
+        .color-hazmat { color: #ffffff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } 
+        .border-hazmat { border-left: 6px solid #ffffff; }
+        .color-vistoria { color: #38bdf8; } 
+        .border-vistoria { border-left: 6px solid #38bdf8; }
+        
+        /* Botão Pulsante */
+        .btn-estado {
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            transition: transform 0.2s;
         }
+        .btn-estado:hover { transform: scale(1.05); }
 
-        .stats-container {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            padding: 1rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .tooltip-box {
-            visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
-            width: max-content; min-width: 150px; z-index: 100; transition: 0.2s; pointer-events: none;
-            box-shadow: 0 10px 40px black; margin-top: 10px;
-        }
-        .group:hover .tooltip-box { visibility: visible; opacity: 1; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
-
-        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
-<body class="hero-background">
-
-    <div id="loading">
-        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Sincronizando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Calculando turnos de 12h e 24h...</p>
-    </div>
-
-    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
+<body class="hero-background min-h-screen font-sans">
+    
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxAgOHre5RZuHE1REAW3wkBRGybgQi9X9Ha8qBiFJCuF9Si2VQZbT8d2cF_cF8n-vvr6w/exec"; 
         
-        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
+        const frotaMap = {
+            "ABT-1364": "PELOTÃO AÇORIANOS", "AT-270": "PELOTÃO AÇORIANOS", "ABT-0595": "PELOTÃO AÇORIANOS", 
+            "AEM-0482": "PELOTÃO AÇORIANOS", "AT-0671": "PELOTÃO AÇORIANOS", "AT-0672": "PELOTÃO AÇORIANOS", 
+            "AT-1590": "PELOTÃO AÇORIANOS", "ATP-0543": "PELOTÃO AÇORIANOS", "ATP-0639": "PELOTÃO AÇORIANOS", 
+            "ATP-0640": "PELOTÃO AÇORIANOS", "ATP-0964": "PELOTÃO AÇORIANOS", "ATP-10666": "PELOTÃO AÇORIANOS", 
+            "ATP-1506": "PELOTÃO AÇORIANOS", "ATP-201": "PELOTÃO AÇORIANOS", "EIN-204": "PELOTÃO AÇORIANOS", 
+            "RRC-99": "PELOTÃO AÇORIANOS",
+            "ABT-0594": "PELOTÃO TERESÓPOLIS", "ATP-10654": "PELOTÃO TERESÓPOLIS", "ATP-1505": "PELOTÃO TERESÓPOLIS",
+            "AR-0766": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)", "AR-0455": "PELOTÃO TERESÓPOLIS (AUTO RESGATE)",
+            
+            // --- NOVA VIATURA ADICIONADA AQUI ---
+            "AR-1628": "PELOTÃO AUTO RESGATE",
+            
+            "ABT-0596": "PELOTÃO ASSUNÇÃO", "ATP-10650": "PELOTÃO ASSUNÇÃO", "ATP-10667": "PELOTÃO ASSUNÇÃO",
+            "ABT-0598": "PELOTÃO RESTINGA", "ATP-1233": "PELOTÃO RESTINGA", "ATP-9836": "PELOTÃO RESTINGA",
+            "ABT-0599": "PELOTÃO BELÉM NOVO", "ATP-10653": "PELOTÃO BELÉM NOVO", "ATP-1451": "PELOTÃO BELÉM NOVO", 
+            "ATP-3759": "PELOTÃO BELÉM NOVO", "EIN-704": "PELOTÃO BELÉM NOVO",
+            "ABT-0597": "PELOTÃO FLORESTA", "ATP-1235": "PELOTÃO FLORESTA", "ATP-292": "PELOTÃO FLORESTA", 
+            "EIN-701": "PELOTÃO FLORESTA", "ATP-1243": "PELOTÃO FLORESTA",
+            "ABT-0600": "PELOTÃO PASSO D'AREIA",
+            "ABT-1363": "PELOTÃO PARTENON", "ABT-1365": "PELOTÃO PARTENON", "ATP-1452": "PELOTÃO PARTENON"
+        };
+    </script>
+
+    <div class="content-wrapper flex flex-col items-center min-h-screen p-4">
+        
+        <header class="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center py-6 mb-4 border-b border-white/10 gap-6 relative z-20">
+            
             <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-24 md:h-28 drop-shadow-lg">
             </div>
 
-            <div class="text-center flex-grow">
-                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
-                    Guarnições em Serviço
+            <div class="text-center px-4 flex-grow">
+                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tight drop-shadow-md">
+                    Ocorrências em Andamento
                 </h1>
-                <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
-                    PORTO ALEGRE - 1º BBM
+                
+                <h2 class="text-xl md:text-2xl font-bold text-bombeiros-orange mt-2 uppercase tracking-widest">
+                    PORTO ALEGRE
                 </h2>
                 
-                <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
-                    <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
-                    <span>|</span>
-                    <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
+                <div class="flex flex-col items-center justify-center gap-2 mt-4">
+                    <div id="status" class="text-xs font-mono text-gray-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                        Iniciando sistema...
+                    </div>
+                    
+                    <a href="monitor.cbmrs.html" class="btn-estado px-6 py-2 rounded-full text-xs font-bold uppercase text-white border border-blue-400 flex items-center mt-2 shadow-lg hover:shadow-blue-500/50">
+                        <i class="fas fa-map-marked-alt mr-2"></i> VER OCORRÊNCIAS NO RS
+                    </a>
                 </div>
             </div>
 
             <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão 1º BBM" class="h-24 md:h-28 drop-shadow-lg">
             </div>
         </header>
 
-        <main class="w-full max-w-7xl mx-auto flex-grow">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-                
-                <div class="stats-container border-l-4 border-bombeiros-orange">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO ESCALADO
-                    </h3>
-                    <div class="flex justify-around items-center">
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
-                            <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
-                            <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
-                            <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
-                            <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
-                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
-                            <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="w-px h-10 bg-white/10 mx-2"></div>
-                        <div class="group relative text-center">
-                            <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
-                        </div>
-                    </div>
-                </div>
+        <div id="loading" class="text-center py-20">
+            <i class="fas fa-circle-notch fa-spin text-5xl text-bombeiros-orange mb-4"></i>
+            <p class="animate-pulse text-gray-300 font-bold uppercase tracking-widest">Carregando Dados...</p>
+        </div>
 
-                <div class="stats-container border-l-4 border-fire-red">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
-                    </h3>
-                    <div class="flex justify-around items-center">
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-abt">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box"><ul id="list-abt" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="w-px h-10 bg-white/10"></div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR / AEM)</span>
-                            <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="vazio" class="hidden text-center py-20 bg-slate-800/50 rounded-xl border border-white/5 w-full max-w-2xl backdrop-blur-sm">
+            <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+            <h3 class="text-2xl font-bold text-white">QAP TOTAL</h3>
+            <p class="text-gray-400 mt-2">Nenhuma ocorrência em andamento no momento.</p>
+        </div>
 
-            <div id="grid-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-start pb-10">
-                </div>
+        <div id="grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl hidden pb-4 relative z-10"></div>
 
-        </main>
-
-        <footer class="mt-auto py-6 text-center border-t border-white/5">
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
-                Sistema de Controle Operacional - 1º BBM - 2026
+        <footer class="mt-auto py-6 w-full text-center relative z-20">
+            <p style="font-family: Arial, sans-serif; font-size: 12px; color: white; opacity: 0.8;">
+                © 2026 Companhia de Bombeiro Militar - 1º BBM. Site Desenvolvido por Gustavo Medeiros.
             </p>
-            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
         </footer>
+
     </div>
 
     <script>
-        // ============================================================
-        // CONFIGURAÇÃO: LINK FIXO
-        // ============================================================
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
-        // ============================================================
+        function analisarTipo(tipoRaw) {
+            const tipo = tipoRaw ? tipoRaw.toUpperCase() : "";
+            if(tipo.includes("INCÊNDIO")) return { p: 1, cor: 'color-incendio', border: 'border-incendio', icon: 'fa-fire' };
+            if(tipo.includes("SALVAMENTO") || tipo.includes("BUSCA") || tipo.includes("RESGATE")) return { p: 2, cor: 'color-resgate', border: 'border-resgate', icon: 'fa-life-ring' };
+            if(tipo.includes("HOSPITALAR") || tipo.includes("APH")) return { p: 3, cor: 'color-aph', border: 'border-aph', icon: 'fa-ambulance' };
+            if(tipo.includes("ÁRVORE")) return { p: 4, cor: 'color-arvore', border: 'border-arvore', icon: 'fa-tree' };
+            if(tipo.includes("INSETOS")) return { p: 5, cor: 'color-insetos', border: 'border-insetos', icon: 'fa-bug' };
+            if(tipo.includes("PREVENTIVA")) return { p: 6, cor: 'color-prev', border: 'border-prev', icon: 'fa-shield-alt' };
+            if(tipo.includes("PERIGOSOS") || tipo.includes("HAZMAT")) return { p: 7, cor: 'color-hazmat', border: 'border-hazmat', icon: 'fa-skull-crossbones' };
+            if(tipo.includes("VISTORIA")) return { p: 8, cor: 'color-vistoria', border: 'border-vistoria', icon: 'fa-clipboard-check' };
+            return { p: 99, cor: 'text-gray-400', border: 'border-gray-600', icon: 'fa-bell' };
+        }
 
-        const ORDEM_QUARTEIS = [
-            "OFICIAL DE DIA",
-            "AÇORIANOS",
-            "ASSUNÇÃO",
-            "TERESÓPOLIS",
-            "RESTINGA",
-            "BELÉM NOVO",
-            "FLORESTA",
-            "PASSO D'AREIA",
-            "PARTENON",
-            "COBOM",
-            "AQUÁTICA",
-            "MERGULHO",
-            "CANIL"
-        ];
-
-        function getDataOperacional() {
-            const agora = new Date();
-            if (agora.getHours() < 7) { // Tolerância até 7 da manhã
-                agora.setDate(agora.getDate() - 1);
+        function descobrirPelotao(viaturasArray) {
+            if (!viaturasArray || viaturasArray.length === 0) return "AGUARDANDO EMPENHO";
+            for (let v of viaturasArray) {
+                let prefixo = v.prefixo.trim().toUpperCase();
+                if (frotaMap[prefixo]) {
+                    return frotaMap[prefixo];
+                }
             }
-            return agora;
+            return "PELOTÃO NÃO IDENTIFICADO";
         }
 
-        function atualizarRelogio() {
-            const dataOp = getDataOperacional();
-            const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
-            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
-        }
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
-
-        async function iniciarSistema() {
+        async function carregar() {
             try {
-                const req = await fetch(URL_DADOS);
-                const dados = await req.json();
-
-                if(dados.erro) {
-                    document.getElementById('msg-loading').innerText = "Aguardando envio do PC...";
-                    setTimeout(iniciarSistema, 5000); 
-                    return;
-                }
-
-                // AQUI ESTÁ A MÁGICA: FILTRO PRECISO
-                const dadosFiltrados = filtrarTurnoAtual(dados.length > 0 ? dados : []);
-                const dadosFinais = (dadosFiltrados.length === 0 && dados.length > 0) ? dados : dadosFiltrados;
-
-                processarDados(dadosFinais);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-
-            } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
+                const req = await fetch(API_URL);
+                const dadosRaw = await req.json();
+                renderizar(dadosRaw);
+            } catch(e) {
+                console.error(e);
+                document.getElementById('status').innerHTML = "<span class='text-red-500'>Erro na Conexão</span>";
+            }
         }
 
-        // --- LÓGICA DE TURNO E HORÁRIOS CORRIGIDA ---
-        function filtrarTurnoAtual(dados) {
-            const agora = new Date();
-            const minAtual = agora.getHours() * 60 + agora.getMinutes();
-            
-            return dados.filter(d => {
-                let txt = d.horario || "";
+        function renderizar(lista) {
+            const grid = document.getElementById('grid');
+            const vazio = document.getElementById('vazio');
+            const statusDiv = document.getElementById('status');
+            const loading = document.getElementById('loading');
+
+            loading.classList.add('hidden');
+            grid.innerHTML = '';
+
+            if(!lista || lista.length === 0) {
+                vazio.classList.remove('hidden');
+                grid.classList.add('hidden');
+            } else {
+                vazio.classList.add('hidden');
+                grid.classList.remove('hidden');
                 
-                // Se não tem hora, assume 24h e mostra
-                if(!txt || txt.includes("24h")) return true;
-                
-                // Procura HH:MM
-                const nums = txt.match(/(\d{2}:\d{2})/g);
-                if(!nums || nums.length < 2) return true;
-
-                const [h1, m1] = nums[0].split(':').map(Number);
-                const [h2, m2] = nums[1].split(':').map(Number);
-                
-                const inicio = h1 * 60 + m1;
-                const fim = h2 * 60 + m2;
-
-                // Lógica de Virada de Dia
-                if (inicio < fim) { 
-                    // Ex: 08:00 - 20:00 (Mesmo dia)
-                    return minAtual >= inicio && minAtual < fim;
-                } else { 
-                    // Ex: 20:00 - 08:00 (Vira a noite)
-                    // Ex: 19:00 - 07:00 (Vira a noite)
-                    return minAtual >= inicio || minAtual < fim;
-                }
-            });
-        }
-
-        // Formatação Visual Bonita com Cálculo de Turno
-        function formatarTurno(raw) {
-            const nums = raw.match(/(\d{2}:\d{2})/g);
-            if(!nums || nums.length < 2) return "08:00 às 08:00 (24h)";
-
-            const h1 = nums[0];
-            const h2 = nums[1];
-
-            const [hh1] = h1.split(':').map(Number);
-            const [hh2] = h2.split(':').map(Number);
-            
-            let diff = hh2 - hh1;
-            if(diff < 0) diff += 24;
-
-            if(diff >= 23 || diff === 0) return `${h1} às ${h2} (24h)`;
-            if(diff >= 11 && diff <= 13) return `${h1} às ${h2} (12h)`; // Exibe 12h para turnos de 12
-            
-            return `${h1} às ${h2}`;
-        }
-
-        function extrairID(nomeCompleto) {
-            const match = nomeCompleto.match(/^(\d{7})/);
-            return match ? match[1] : nomeCompleto; 
-        }
-
-        function limparNome(nomeCompleto) {
-            return nomeCompleto.replace(/^\d{7}\s+/, '').trim();
-        }
-
-        function processarDados(dados) {
-            const estrutura = {};
-            const stats = { cap: new Set(), sgt: new Set(), sd: new Set(), abt: new Set(), ar: new Set() };
-
-            dados.forEach(d => {
-                let obmRaw = (d.obm || "").toUpperCase();
-                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                let nomeCompleto = (d.nome || "").trim();
-                let idMilitar = extrairID(nomeCompleto);
-                let nomeExibicao = limparNome(nomeCompleto);
-                let func = (d.func || "").trim();
-                
-                // Formatação Limpa
-                let hora = formatarTurno(d.horario || "");
-
-                // Mapeamento OBM
-                let obmKey = "OUTROS";
-                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
-                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
-                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
-                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
-                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
-                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
-                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
-                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
-                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
-                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
-                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
-                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
-                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
-
-                if(!estrutura[obmKey]) estrutura[obmKey] = [];
-                
-                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
-                if(!viaturaObj) {
-                    viaturaObj = { nome: vtr, guarnicao: [] };
-                    estrutura[obmKey].push(viaturaObj);
-                }
-                
-                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idMilitar, h: hora });
-
-                    // Stats RIGOROSOS
-                    if(nomeCompleto.includes("SGT")) {
-                        stats.sgt.add(idMilitar + "|" + nomeExibicao);
-                    }
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) {
-                        stats.cap.add(idMilitar + "|" + nomeExibicao);
-                    }
-                    else {
-                        stats.sd.add(idMilitar + "|" + nomeExibicao);
-                    }
-                }
-
-                if(vtr.includes("ABT")) stats.abt.add(vtr);
-                if(vtr.includes("AR") || vtr.includes("AEM")) stats.ar.add(vtr);
-            });
-
-            atualizarStats(stats);
-            renderizarCards(estrutura);
-        }
-
-        function atualizarStats(stats) {
-            const capArr = Array.from(stats.cap).map(s => s.split('|')[1]);
-            const sgtArr = Array.from(stats.sgt).map(s => s.split('|')[1]);
-            const sdArr = Array.from(stats.sd).map(s => s.split('|')[1]);
-            const abtArr = Array.from(stats.abt);
-            const arArr = Array.from(stats.ar);
-
-            const fill = (idC, idL, arr) => {
-                document.getElementById(idC).innerText = arr.length;
-                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
-            };
-
-            fill('count-cap', 'list-cap', capArr);
-            fill('count-sgt', 'list-sgt', sgtArr);
-            fill('count-sd', 'list-sd', sdArr);
-            
-            const total = capArr.length + sgtArr.length + sdArr.length;
-            document.getElementById('count-total').innerText = total;
-
-            document.getElementById('count-abt').innerText = abtArr.length;
-            document.getElementById('count-ar').innerText = arArr.length;
-            
-            document.getElementById('list-abt').innerHTML = abtArr.map(x => `<li>• ${x}</li>`).join('');
-            document.getElementById('list-ar').innerHTML = arArr.map(x => `<li>• ${x}</li>`).join('');
-        }
-
-        function renderizarCards(estrutura) {
-            const grid = document.getElementById('grid-cards');
-            grid.innerHTML = "";
-
-            const keysOrdenadas = [
-                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
-                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
-            ];
-
-            keysOrdenadas.forEach(obmName => {
-                const viaturasRaw = estrutura[obmName];
-                const gruposUnicos = [];
-                
-                viaturasRaw.forEach(vtr => {
-                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
-                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
-                    if(grupoExistente && assinatura.length > 0) {
-                        grupoExistente.nomesVtrs.push(vtr.nome);
-                    } else {
-                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
-                    }
+                lista.sort((a, b) => {
+                    let styleA = analisarTipo(a.tipo);
+                    let styleB = analisarTipo(b.tipo);
+                    return styleA.p - styleB.p;
                 });
 
-                const card = document.createElement('div');
-                card.className = "card-monitor"; 
+                lista.forEach(oc => {
+                    const style = analisarTipo(oc.tipo);
+                    const pelotaoNome = descobrirPelotao(oc.viaturas);
 
-                let content = `
-                    <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
-                        <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
-                            ${obmName}
-                        </h2>
-                    </div>
-                `;
+                    let vtrsHtml = 'Aguardando';
+                    if(oc.viaturas && oc.viaturas.length > 0) {
+                        vtrsHtml = oc.viaturas.map(v => 
+                            `<span class="bg-black/40 border border-white/10 px-2 py-1 rounded text-sm text-white font-mono font-bold mr-1 mb-1 inline-block">
+                                ${v.prefixo}
+                            </span>`
+                        ).join('');
+                    }
 
-                content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
+                    // --- TRATAMENTO DO TIPO ---
+                    let tipoPrincipal = oc.tipo;
+                    let tipoSecundario = "";
+                    
+                    if(oc.tipo.includes('/')) {
+                        const parts = oc.tipo.split('/');
+                        tipoPrincipal = parts[0].trim();
+                        // Junta o resto (se houver mais barras) como subtitulo
+                        tipoSecundario = parts.slice(1).join('/').trim();
+                    }
 
-                gruposUnicos.forEach(grupo => {
-                    grupo.guarnicao.sort((a,b) => {
-                        const getScore = (role) => {
-                            let r = role.toUpperCase();
-                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
-                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
-                            return 3;
-                        }
-                        return getScore(a.f) - getScore(b.f);
-                    });
+                    // LINK GOOGLE MAPS
+                    const mapsQuery = encodeURIComponent(`${oc.endereco}, ${oc.cidade}, RS`);
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
-                    const listaVtrs = grupo.nomesVtrs.join(' / ');
+                    grid.innerHTML += `
+                        <div onclick="window.open('${mapsUrl}', '_blank')" class="card-oc ${style.border} p-6 relative w-full cursor-pointer" title="Clique para ver no Google Maps">
+                            
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                                
+                                <div class="w-full md:flex-1">
+                                    <div class="flex items-center mb-1">
+                                        <span class="bg-black/30 px-2 py-0.5 rounded text-[10px] text-gray-500 font-mono border border-white/5 mr-2">#${oc.id}</span>
+                                        <span class="text-xs font-bold text-gray-400"><i class="far fa-clock"></i> ${oc.dataHora.split(' ')[1] || oc.dataHora}</span>
+                                    </div>
+                                    
+                                    <h2 class="text-3xl font-black uppercase leading-none mb-1 ${style.cor}">
+                                        <i class="fas ${style.icon} mr-2 text-2xl opacity-80"></i> ${tipoPrincipal}
+                                    </h2>
+                                    
+                                    ${tipoSecundario ? `<h2 class="text-3xl font-black uppercase leading-none mb-2 ${style.cor}">${tipoSecundario}</h2>` : ''}
+                                    
+                                    <p class="text-lg text-white font-medium leading-tight opacity-90 group-hover:text-blue-300 transition-colors mt-2">
+                                        <i class="fas fa-map-marker-alt text-red-500 mr-1"></i> ${oc.endereco}
+                                    </p>
+                                    <p class="text-sm text-gray-400 font-bold uppercase mt-2 ml-5 border-l-2 border-gray-600 pl-2">${oc.cidade}</p>
+                                </div>
 
-                    content += `
-                        <div class="w-full flex flex-col items-center">
-                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
-                                ${listaVtrs}
-                            </span>
-                            <div class="w-full flex flex-col gap-2">
-                                ${grupo.guarnicao.map(m => `
-                                    <div class="text-center group">
-                                        <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
-                                            ${m.n}
-                                        </div>
-                                        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
+                                <div class="w-full md:w-auto md:min-w-[35%] flex flex-col md:items-end md:text-right">
+                                    
+                                    <div class="mb-2">
+                                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Guarnição</div>
+                                        <div class="inline-block bg-bombeiros-orange/10 border border-bombeiros-orange/30 px-3 py-1 rounded md:float-right">
+                                            <div class="text-sm text-bombeiros-orange font-bold uppercase glow">${pelotaoNome}</div>
                                         </div>
                                     </div>
-                                `).join('')}
+
+                                    <div class="clear-both"></div> 
+
+                                    <div class="text-[10px] text-gray-500 uppercase font-bold mb-1 mt-2">Viaturas</div>
+                                    <div class="flex flex-wrap md:justify-end gap-1">
+                                        ${vtrsHtml}
+                                    </div>
+                                </div>
+
+                            </div>
+                            
+                            <div class="absolute bottom-2 right-2 opacity-10 hover:opacity-50 transition-opacity">
+                                <i class="fas fa-map-marked-alt text-white text-xs"></i>
                             </div>
                         </div>
                     `;
                 });
-
-                content += `</div>`;
-                card.innerHTML = content;
-                grid.appendChild(card);
-            });
+            }
+            
+            const agora = new Date();
+            const horaString = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            statusDiv.innerHTML = `<i class="fas fa-satellite-dish mr-1 animate-pulse text-green-500"></i> Atualizado às ${horaString}`;
         }
 
-        iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
+        carregar();
+        setInterval(carregar, 60000); 
     </script>
 </body>
 </html>
