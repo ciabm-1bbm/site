@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESTATÍSTICAS 1º BBM</title>
+    <title>ESTATÍSTICAS - 1º BBM (2025)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,7 +30,7 @@
     </script>
 
     <style>
-        /* Otimizações v4.0 */
+        /* Otimizações de Performance e GPU */
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
         .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
@@ -70,26 +70,13 @@
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); border-color: #FEF08A;
         }
 
-        /* Botões de Ano (Novo) */
-        .btn-year {
-            background: rgba(30, 41, 59, 0.5);
-            color: #94a3b8;
-            border: 1px solid #334155;
-            transition: all 0.2s;
-        }
-        .btn-year:hover { border-color: #60A5FA; color: white; }
-        .btn-year.active {
-            background: #2563EB; color: white; border-color: #60A5FA;
-            box-shadow: 0 0 15px rgba(37, 99, 235, 0.5); transform: scale(1.05); font-weight: bold;
-        }
-
         /* Tabela Rápida */
         .table-wrap { max-height: 500px; overflow-y: auto; will-change: scroll-position; }
         .table-wrap::-webkit-scrollbar { width: 6px; }
         .table-wrap::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
 
-        /* Chart Mobile Fix (v4.0) */
+        /* Correção de Gráficos Mobile */
         .chart-container { position: relative; width: 100%; height: 350px; }
         @media (min-width: 1024px) { .chart-container { height: 500px; } }
 
@@ -105,16 +92,12 @@
         
         <header class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6">
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
-            <div class="text-center w-full md:w-auto">
+            <div class="text-center">
                 <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none mb-1">ESTATÍSTICAS - 1º BBM</h1>
-                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em]">PORTO ALEGRE (<span id="lblYearDisplay">2026</span>)</h2>
-                
-                <div class="mt-4 flex flex-wrap justify-center gap-2 bg-slate-900/50 p-2 rounded-lg" id="yearContainer">
-                    </div>
-
+                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em]">PORTO ALEGRE (2025)</h2>
                 <div id="statusBadge" class="mt-2 inline-block text-xs text-gray-400 font-mono">Aguardando Seleção</div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90 hidden md:block">
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90">
         </header>
 
         <div id="loadingState" class="hidden glass-panel p-6 text-center">
@@ -130,8 +113,8 @@
         <div class="glass-panel p-4">
             <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthGrid"></div>
             <div class="flex justify-center pt-4 border-t border-white/5">
-                <button id="btnAnual" class="btn-core btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10 w-full md:w-auto">
-                    ANUAL <span id="lblAnualYear">2026</span>
+                <button id="btnAnual" class="btn-core btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10">
+                    ANUAL 2025
                 </button>
             </div>
         </div>
@@ -211,8 +194,7 @@
     <script>
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2026, // Ano Padrão
-            yearsList: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+            year: 2025,
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
         };
@@ -236,47 +218,16 @@
 
             init: () => {
                 Chart.register(ChartDataLabels);
-                
-                // 1. Renderiza Botões de Ano
-                const yearContainer = document.getElementById('yearContainer');
-                CONFIG.yearsList.forEach(y => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-year px-3 py-1 rounded text-xs font-mono cursor-pointer';
-                    btn.innerText = y;
-                    btn.id = 'y'+y;
-                    btn.onclick = () => Core.setYear(y);
-                    yearContainer.appendChild(btn);
-                });
-
-                // 2. Renderiza Botões de Mês
                 const grid = document.getElementById('monthGrid');
                 CONFIG.months.forEach(m => {
                     const btn = document.createElement('button');
-                    btn.className = 'btn-core btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold uppercase tracking-wider';
+                    btn.className = 'btn-core btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold tracking-wider';
                     btn.innerText = m;
                     btn.onclick = () => Core.fetchMonth(m, btn);
                     grid.appendChild(btn);
                 });
-
                 document.getElementById('btnAnual').addEventListener('click', Core.fetchAnnual);
                 ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
-                
-                // Inicia com 2026
-                Core.setYear(2026);
-            },
-
-            setYear: (y) => {
-                CONFIG.year = y;
-                // UI updates
-                document.getElementById('displayYear').innerText = y;
-                document.getElementById('lblAnualYear').innerText = y;
-                document.querySelectorAll('.btn-year').forEach(b => b.classList.remove('active'));
-                document.getElementById('y'+y).classList.add('active');
-                
-                // Reseta estado
-                Core.resetButtons();
-                document.getElementById('appContent').classList.add('hidden');
-                document.getElementById('statusBadge').innerText = `Ano ${y} Selecionado`;
             },
 
             setLoading: (active, msg="", pct=0) => {
@@ -295,7 +246,7 @@
                 }
             },
 
-            resetButtons: () => document.querySelectorAll('.btn-mes, .btn-anual').forEach(b => b.classList.remove('active')),
+            resetButtons: () => document.querySelectorAll('button').forEach(b => b.classList.remove('active')),
 
             fetchMonth: async (month, btn) => {
                 Core.resetButtons();
@@ -304,7 +255,7 @@
                 Core.setLoading(true, "Conectando...", 10);
 
                 try {
-                    // Busca arquivo do ano selecionado
+                    // Cache Buster para evitar dados antigos
                     const url = `${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`;
                     const res = await fetch(url);
                     if(!res.ok) throw new Error("Mês não disponível");
@@ -312,7 +263,7 @@
                     Core.processData(text);
                 } catch(e) {
                     Core.setLoading(false);
-                    alert(`Dados de ${month}/${CONFIG.year} não encontrados.`);
+                    alert("Dados não encontrados para este período.");
                 }
             },
 
@@ -320,18 +271,19 @@
                 Core.resetButtons();
                 document.getElementById('btnAnual').classList.add('active');
                 Core.ctxLabel = `NO ANO DE ${CONFIG.year}`;
-                Core.setLoading(true, "Iniciando...", 5);
+                Core.setLoading(true, "Iniciando compilação anual...", 5);
 
                 let buffer = [];
                 let done = 0;
                 
+                // Fetch Paralelo de todos os meses
                 const promises = CONFIG.months.map(async m => {
                     try {
                         const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
                         if(res.ok) return await res.text();
                     } catch(e) {}
                     done++;
-                    Core.setLoading(true, `Baixando...`, Math.round((done/12)*80));
+                    Core.setLoading(true, `Baixando meses (${done}/12)...`, Math.round((done/12)*80));
                     return null;
                 });
 
@@ -344,7 +296,7 @@
                 });
 
                 if(buffer.length) Core.normalize(buffer);
-                else { Core.setLoading(false); alert(`Nenhum dado encontrado para ${CONFIG.year}.`); }
+                else { Core.setLoading(false); alert("Nenhum dado anual encontrado."); }
             },
 
             processData: (csv) => {
@@ -360,7 +312,6 @@
                 Core.db = [];
                 if(!raw || !raw[0]) { Core.setLoading(false); return; }
 
-                // Detecção de Colunas (Otimizada e Segura - Código v4.0)
                 const keys = Object.keys(raw[0]);
                 const find = k => keys.find(x => x.toLowerCase().includes(k));
                 const cNat = find('natureza')||find('emerg');
@@ -368,20 +319,20 @@
                 const cSub = find('subgrupo')||find('detalhe');
                 const cVtr = find('viatura')||find('prefixo');
 
-                if(!cNat || !cObm) { Core.setLoading(false); return alert("Erro no formato do arquivo."); }
+                if(!cNat || !cObm) { Core.setLoading(false); return alert("Estrutura CSV inválida."); }
 
                 let id = 1;
                 raw.forEach(row => {
                     if(!row[cNat]) return;
-                    const s = (row[cObm]||"").toUpperCase();
-                    const v = (cVtr ? row[cVtr]||"" : "").toUpperCase();
-                    const nRaw = (row[cNat]||"N/A").toUpperCase();
+                    const s = (row[cObm] || "").toUpperCase();
+                    const v = (cVtr ? row[cVtr] || "" : "").toUpperCase();
+                    const nRaw = (row[cNat] || "N/A").toUpperCase();
 
                     let pel = "OUTROS";
                     if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                     else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
-                    else if(s.includes("AQUATICA")||s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
-                    else if(s.includes("TERRESTRE")||(s.includes("BBS")&&!s.includes("1º"))) pel = "BBS (POA) - TERRESTRE";
+                    else if(s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
+                    else if(s.includes("TERRESTRE") || s.includes("BBS")) pel = "BBS (POA) - TERRESTRE";
                     else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
                     else if(s.includes("FLORESTA")) pel = "FLORESTA";
                     else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
@@ -389,8 +340,8 @@
                     else if(s.includes("PARTENON")) pel = "PARTENON";
                     else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
                     else if(s.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
-                    else if(s.includes("TERESÓPOLIS")||s.includes("TERESOPOLIS")) pel = (v.includes("AR")||s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
-                    else if(s.includes("RESGATE")||s.includes("GBS")) pel = "AUTO RESGATE";
+                    else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) pel = (v.includes("AR") || s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
+                    else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
                     else {
                         const clean = s.replace("1º BBM / ","").replace("CIA / ","").replace("PEL / ","").trim();
                         if(clean.length > 2) pel = clean;
@@ -399,12 +350,12 @@
                     let nat = nRaw.trim();
                     if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                     else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
-                    else if(nRaw.includes("SALVAMENTO")||nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                    else if(nRaw.includes("SALVAMENTO") || nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
                     else if(nRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
                     else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
                     else if(nRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
                     else if(nRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
-                    else if(nRaw.includes("VISTORIA")&&nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
+                    else if(nRaw.includes("VISTORIA") && nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
 
                     let sub = row[cSub] ? row[cSub].trim() : "";
                     if(sub === "N/A" || sub === "0") sub = "";
@@ -413,6 +364,7 @@
                     if(row['Latitude'] && row['Longitude']) {
                         const la = String(row['Latitude']).replace(',','.').trim();
                         const lo = String(row['Longitude']).replace(',','.').trim();
+                        // Google Maps Pin Link Universal
                         map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
                     }
 
@@ -437,7 +389,8 @@
                 });
                 const fill = (id, set) => {
                     const el = document.getElementById(id);
-                    el.innerHTML = `<option value="">${el.options[0].text}</option>`;
+                    const lbl = el.options[0].text;
+                    el.innerHTML = `<option value="">${lbl}</option>`;
                     Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
                 };
                 fill('fNat', s.n); fill('fSub', s.s); fill('fBai', s.b); fill('fPel', s.p);
@@ -466,15 +419,15 @@
                 const tot = data.length;
                 document.getElementById('kpiValue').innerText = tot.toLocaleString('pt-BR');
                 document.getElementById('kpiTitle').innerText = Core.ctxLabel.includes("ANO") ? 
-                    `TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE ${CONFIG.year}` : 
+                    "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025" : 
                     `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Core.ctxLabel}`;
                 document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
                 
-                document.getElementById('statusBadge').innerText = "Dados Carregados";
-                document.getElementById('statusBadge').className = "mt-3 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-emerald-400 text-xs font-bold";
+                document.getElementById('statusBadge').innerText = "Dados Visualizados";
+                document.getElementById('statusBadge').classList = "mt-2 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-[10px] text-emerald-400 font-mono uppercase";
 
                 const tbody = document.getElementById('tblBody');
-                // Tabela em batch (super rápida)
+                // Tabela em batch (rápida)
                 const html = data.slice(0, 800).map((d, i) => {
                     const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
                     const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
