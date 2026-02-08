@@ -20,7 +20,7 @@
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
                         'cb-green': '#10B981',
-                        'insect-brown': '#8B4513',
+                        'insect-brown': '#8B4513', // Cor correta
                         'dark-base': '#0f172a'
                     },
                     fontFamily: { mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] }
@@ -30,72 +30,63 @@
     </script>
 
     <style>
-        /* Otimizações de GPU para Mobile */
-        body { 
-            background-color: #0f172a; 
-            color: #e2e8f0; 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent;
-        }
+        /* OTIMIZAÇÃO DE GPU E RENDERIZAÇÃO */
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         
-        /* Background Estático */
-        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
-        .hero-bg::before {
+        /* Fundo Fixo (Não consome memória ao rolar) */
+        .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
+        .layer-bg::before {
             content: ''; position: absolute; top: 380px; left: 10%; right: 10%; bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
             background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
         }
-        .hero-bg::after {
+        .layer-bg::after {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.98) 100%);
             pointer-events: none;
         }
 
         .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
+            background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            content-visibility: auto; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            contain: content;
         }
 
-        /* Botões Meses */
-        .btn-mes { transition: background 0.2s; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-mes:active, .btn-mes.active { 
+        /* Botões de Mês */
+        .btn-mes { transition: background 0.1s; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-mes.active { 
             background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
 
-        /* Botão Anual */
+        /* Botão Anual Dourado */
         .btn-anual { border-color: rgba(234, 179, 8, 0.3); color: #FEF08A; }
         .btn-anual.active {
-            background: linear-gradient(135deg, #CA8A04, #EAB308); color: white; border-color: #FEF08A;
+            background: linear-gradient(135deg, #CA8A04, #EAB308); color: white;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); border-color: #FEF08A;
         }
 
-        /* Botões de Ano (Novo) */
+        /* Botões de Ano (Timeline) */
         .btn-year {
-            background: rgba(30, 41, 59, 0.6);
-            color: #94a3b8;
-            border: 1px solid #334155;
-            transition: all 0.2s;
+            background: rgba(30, 41, 59, 0.6); color: #94a3b8; border: 1px solid #334155; transition: all 0.2s;
         }
-        .btn-year:active, .btn-year.active {
-            background: #2563EB; color: white; border-color: #60A5FA;
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); font-weight: bold; transform: scale(1.05);
+        .btn-year.active {
+            background: #2563EB; color: white; border-color: #60A5FA; font-weight: bold; transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
         }
 
-        /* Tabela Otimizada */
-        .table-wrap { max-height: 500px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        /* Tabela Rápida */
+        .table-wrap { max-height: 500px; overflow-y: auto; will-change: scroll-position; }
+        .table-wrap::-webkit-scrollbar { width: 6px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
 
-        /* Container de Gráfico */
-        .chart-box { 
-            position: relative; 
-            width: 100%; 
-            height: 300px; 
-            min-height: 300px;
-        }
-        @media (min-width: 1024px) { .chart-box { height: 500px; min-height: 500px; } }
+        /* Container Gráfico Seguro */
+        .chart-container { position: relative; width: 100%; height: 320px; }
+        @media (min-width: 1024px) { .chart-container { height: 500px; } }
 
         /* Loader */
         .loader-bar { width: 0%; transition: width 0.2s linear; }
@@ -103,7 +94,7 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <div class="hero-bg"></div>
+    <div class="layer-bg"></div>
 
     <main class="container mx-auto px-4 py-6 flex-grow z-10 space-y-6">
         
@@ -111,12 +102,14 @@
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
             <div class="text-center w-full md:w-auto">
                 <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none mb-1">ESTATÍSTICAS - 1º BBM</h1>
-                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em]">PORTO ALEGRE (<span id="lblYearDisplay">2025</span>)</h2>
+                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em] uppercase">PORTO ALEGRE</h2>
                 
-                <div class="mt-4 flex flex-wrap justify-center gap-2 bg-slate-900/50 p-2 rounded-lg" id="yearContainer">
+                <div class="mt-3 flex flex-wrap justify-center gap-2 bg-slate-900/50 p-2 rounded-lg border border-white/5" id="yearSelector">
                     </div>
-
-                <div id="statusBadge" class="mt-2 inline-block text-xs text-gray-400 font-mono">Aguardando Seleção</div>
+                
+                <div id="statusBadge" class="mt-2 inline-block text-[10px] text-gray-400 font-mono border border-white/10 px-2 py-1 rounded bg-black/20">
+                    Aguardando Seleção
+                </div>
             </div>
             <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90 hidden md:block">
         </header>
@@ -134,8 +127,8 @@
         <div class="glass-panel p-4">
             <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthGrid"></div>
             <div class="flex justify-center pt-4 border-t border-white/5">
-                <button id="btnAnual" class="btn-mes btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10 w-full md:w-auto">
-                    ANUAL <span id="lblAnualYear">2025</span>
+                <button id="btnAnual" class="btn-mes btn-anual py-3 px-12 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10 w-full md:w-auto hover:bg-yellow-900/30">
+                    RELATÓRIO ANUAL <span id="lblAnualYear">...</span>
                 </button>
             </div>
         </div>
@@ -152,13 +145,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="glass-panel p-4 flex flex-col">
                     <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
-                    <div class="chart-box">
+                    <div class="chart-container flex-grow">
                         <canvas id="cvsPelotoes"></canvas>
                     </div>
                 </div>
                 <div class="glass-panel p-4 flex flex-col">
                     <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
-                    <div class="chart-box">
+                    <div class="chart-container flex-grow">
                         <canvas id="cvsNatureza"></canvas>
                     </div>
                 </div>
@@ -166,24 +159,26 @@
 
             <div class="glass-panel p-4">
                 <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
-                <div id="wrapSubgrupos" class="chart-box" style="height: auto; min-height: 500px;">
+                <div id="wrapSubgrupos" class="chart-container" style="height: auto; min-height: 500px;">
                     <canvas id="cvsSubgrupos"></canvas>
                 </div>
             </div>
 
             <div class="glass-panel overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-white/5 bg-slate-900/50 flex flex-col lg:flex-row justify-between items-center gap-4">
-                    <h3 class="text-sm font-bold text-white uppercase">Registro de Dados</h3>
+                    <h3 class="text-sm font-bold text-white uppercase flex items-center gap-2">
+                        <i class="fas fa-list"></i> Registro de Dados
+                    </h3>
                     <div class="flex gap-2 w-full lg:w-auto text-xs overflow-x-auto pb-2 lg:pb-0">
                         <select id="fNat" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Natureza</option></select>
                         <select id="fSub" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Subgrupo</option></select>
                         <select id="fBai" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Bairro</option></select>
                         <select id="fPel" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Pelotão</option></select>
-                        <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
+                        <button onclick="Engine.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
                     </div>
                 </div>
                 <div class="p-2 bg-slate-900/80 text-right text-[10px] font-mono text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>Exibindo últimas 200 ocorrências para otimizar performance.
+                    <span id="lblRows" class="text-white font-bold">0</span> registros carregados.
                 </div>
                 <div class="table-wrap">
                     <table class="w-full text-left border-collapse text-xs">
@@ -213,14 +208,16 @@
     </footer>
 
     <script>
+        // CONFIGURAÇÕES GLOBAIS
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2025, // Ano padrão inicial
+            year: 2026, // Ano inicial padrão
             yearsList: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
         };
 
+        // ESTILOS (Sua paleta favorita v4.0)
         const THEME = {
             "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-fire-yellow" },
             "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" },
@@ -233,7 +230,7 @@
             "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
         };
 
-        const Core = {
+        const Engine = {
             db: [],
             charts: {},
             ctxLabel: '',
@@ -241,55 +238,56 @@
             init: () => {
                 Chart.register(ChartDataLabels);
                 
-                // 1. Renderiza Botões de Ano
-                const yearContainer = document.getElementById('yearContainer');
+                // 1. Renderiza Anos
+                const yContainer = document.getElementById('yearSelector');
                 CONFIG.yearsList.forEach(y => {
                     const btn = document.createElement('button');
                     btn.className = 'btn-year px-3 py-1 rounded text-xs font-mono cursor-pointer';
                     btn.innerText = y;
                     btn.id = 'y'+y;
-                    btn.onclick = () => Core.setYear(y);
-                    yearContainer.appendChild(btn);
+                    btn.onclick = () => Engine.selectYear(y);
+                    yContainer.appendChild(btn);
                 });
 
-                // 2. Renderiza Botões de Mês
-                const grid = document.getElementById('monthGrid');
+                // 2. Renderiza Meses
+                const mContainer = document.getElementById('monthGrid');
                 CONFIG.months.forEach(m => {
                     const btn = document.createElement('button');
                     btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold uppercase tracking-wider w-full';
                     btn.innerText = m;
-                    btn.onclick = () => Core.fetchMonth(m, btn);
-                    grid.appendChild(btn);
+                    btn.onclick = () => Engine.fetchMonth(m, btn);
+                    mContainer.appendChild(btn);
                 });
-                
-                document.getElementById('btnAnual').onclick = Core.fetchAnnual;
+
+                document.getElementById('btnAnual').onclick = Engine.fetchAnnual;
                 
                 // Filtros
-                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
+                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Engine.applyFilters));
 
-                // Inicia no ano de 2025 para garantir dados
-                Core.setYear(2025);
+                // Iniciar com o ano mais recente
+                Engine.selectYear(2026); 
             },
 
-            // --- LÓGICA DE ANO ---
-            setYear: (y) => {
+            // --- LÓGICA DE SELEÇÃO DE ANO ---
+            selectYear: (y) => {
                 CONFIG.year = y;
-                // Atualiza Texto
-                document.getElementById('lblYearDisplay').innerText = y;
-                document.getElementById('lblAnualYear').innerText = y;
-                // Atualiza Botões
+                
+                // Atualiza UI
                 document.querySelectorAll('.btn-year').forEach(b => b.classList.remove('active'));
                 document.getElementById('y'+y).classList.add('active');
+                document.getElementById('lblAnualYear').innerText = y;
                 
-                // Reseta View
-                Core.resetButtons();
+                // Limpa a tela e avisa o usuário
+                Engine.resetButtons();
                 document.getElementById('appContent').classList.add('hidden');
-                document.getElementById('statusBadge').innerText = `Ano ${y} Selecionado`;
+                document.getElementById('statusBadge').innerText = `Ano ${y} Selecionado - Aguardando Mês`;
+                document.getElementById('statusBadge').className = "mt-2 inline-block text-xs text-blue-400 font-bold border border-blue-500/30 px-2 py-1 rounded bg-blue-900/20";
             },
 
             setLoading: (active, msg="", pct=0) => {
                 const load = document.getElementById('loadingState');
                 const content = document.getElementById('appContent');
+                
                 if(active) {
                     content.classList.add('hidden');
                     load.classList.remove('hidden');
@@ -305,44 +303,50 @@
 
             resetButtons: () => document.querySelectorAll('.btn-mes, .btn-anual').forEach(b => b.classList.remove('active')),
 
-            // --- FETCH DATA ---
+            // --- BUSCA DE DADOS (SEARCH ENGINE) ---
             fetchMonth: async (month, btn) => {
-                Core.resetButtons();
+                Engine.resetButtons();
                 btn.classList.add('active');
-                Core.ctxLabel = `EM ${month} ${CONFIG.year}`;
-                Core.setLoading(true, "Baixando...", 20);
+                Engine.ctxLabel = `EM ${month} ${CONFIG.year}`;
+                Engine.setLoading(true, "Buscando dados...", 20);
 
                 try {
-                    const res = await fetch(`${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`);
+                    // Cache Buster para garantir arquivo novo
+                    const url = `${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`;
+                    const res = await fetch(url);
                     if(!res.ok) throw new Error("404");
                     const txt = await res.text();
-                    Core.processData(txt);
+                    Engine.parseData(txt);
                 } catch(e) {
-                    Core.setLoading(false);
-                    alert(`Não foi possível localizar os dados de ${month}/${CONFIG.year}. Verifique se o arquivo existe no repositório.`);
+                    Engine.setLoading(false);
+                    // Reset botão se falhar
+                    btn.classList.remove('active');
+                    alert(`Não foram encontrados dados para ${month}/${CONFIG.year}.`);
                 }
             },
 
             fetchAnnual: async () => {
-                Core.resetButtons();
+                Engine.resetButtons();
                 document.getElementById('btnAnual').classList.add('active');
-                Core.ctxLabel = `NO ANO DE ${CONFIG.year}`;
-                Core.setLoading(true, "Iniciando...", 10);
+                Engine.ctxLabel = `NO ANO DE ${CONFIG.year}`;
+                Engine.setLoading(true, "Compilando ano...", 5);
 
                 let buffer = [];
-                let done = 0;
+                let completed = 0;
                 
+                // Dispara 12 requisições simultâneas (Performance máxima)
                 const promises = CONFIG.months.map(async m => {
                     try {
                         const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
                         if(res.ok) return await res.text();
                     } catch(e) {}
-                    done++;
-                    Core.setLoading(true, `Baixando meses...`, Math.round((done/12)*80));
+                    completed++;
+                    Engine.setLoading(true, `Baixando...`, Math.round((completed/12)*80));
                     return null;
                 });
 
                 const results = await Promise.all(promises);
+                
                 results.forEach(txt => {
                     if(txt) {
                         const p = Papa.parse(txt, {header:true, skipEmptyLines:true});
@@ -350,26 +354,30 @@
                     }
                 });
 
-                if(buffer.length) Core.processBuffer(buffer);
-                else { 
-                    Core.setLoading(false); 
-                    alert(`Nenhum dado encontrado para o ano de ${CONFIG.year}.`); 
+                if(buffer.length > 0) Engine.processBuffer(buffer);
+                else {
+                    Engine.setLoading(false);
+                    document.getElementById('btnAnual').classList.remove('active');
+                    alert(`Nenhum dado encontrado no ano de ${CONFIG.year}.`);
                 }
             },
 
             processData: (csv) => {
+                Engine.setLoading(true, "Lendo...", 60);
                 Papa.parse(csv, {
                     header: true, skipEmptyLines: true, encoding: "UTF-8",
-                    complete: (res) => Core.processBuffer(res.data)
+                    complete: (res) => Engine.processBuffer(res.data)
                 });
             },
 
+            // --- PROCESSAMENTO E NORMALIZAÇÃO ---
             processBuffer: (raw) => {
-                Core.setLoading(true, "Organizando...", 90);
-                Core.db = [];
+                Engine.setLoading(true, "Organizando...", 90);
+                Engine.db = [];
 
-                if(!raw || !raw[0]) { Core.setLoading(false); return; }
+                if(!raw || !raw[0]) { Engine.setLoading(false); return; }
 
+                // Detecção de Colunas (Inteligente)
                 const keys = Object.keys(raw[0]);
                 const find = k => keys.find(x => x.toLowerCase().includes(k));
                 const cNat = find('natureza')||find('emerg');
@@ -377,7 +385,7 @@
                 const cSub = find('subgrupo')||find('detalhe');
                 const cVtr = find('viatura')||find('prefixo');
 
-                if(!cNat || !cObm) { Core.setLoading(false); return alert("Erro no CSV."); }
+                if(!cNat || !cObm) { Engine.setLoading(false); return alert("Erro: Estrutura do CSV inválida."); }
 
                 let id=1;
                 raw.forEach(row => {
@@ -386,7 +394,7 @@
                     const v = (cVtr ? row[cVtr]||"" : "").toUpperCase();
                     const nRaw = (row[cNat]||"N/A").toUpperCase();
 
-                    // Pelotão
+                    // 1. Pelotão
                     let pel = "OUTROS";
                     if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                     else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
@@ -406,7 +414,7 @@
                         if(clean.length > 2) pel = clean;
                     }
 
-                    // Natureza
+                    // 2. Natureza
                     let nat = nRaw.trim();
                     if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                     else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
@@ -420,14 +428,15 @@
                     let sub = row[cSub] ? row[cSub].trim() : "";
                     if(sub === "N/A" || sub === "0") sub = "";
 
+                    // 3. Mapa
                     let map = null;
                     if(row['Latitude'] && row['Longitude']) {
                         const la = String(row['Latitude']).replace(',','.').trim();
                         const lo = String(row['Longitude']).replace(',','.').trim();
-                        map = `https://www.google.com/maps?q=${la},${lo}`;
+                        map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
                     }
 
-                    Core.db.push({
+                    Engine.db.push({
                         id: row['Nº Oc.'] || id++,
                         date: row['Data'] || '--',
                         nat, sub, pel, map,
@@ -435,14 +444,15 @@
                     });
                 });
 
-                Core.initFilters();
-                Core.renderView(Core.db);
-                Core.setLoading(false);
+                Engine.initFilters();
+                Engine.renderView(Engine.db);
+                Engine.setLoading(false);
             },
 
+            // --- RENDERIZAÇÃO (Motor Gráfico v4.0) ---
             initFilters: () => {
                 const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                Core.db.forEach(d => {
+                Engine.db.forEach(d => {
                     s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
                     if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
                 });
@@ -461,32 +471,34 @@
                     b: document.getElementById('fBai').value,
                     p: document.getElementById('fPel').value
                 };
-                const res = Core.db.filter(d => 
+                const res = Engine.db.filter(d => 
                     (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
                     (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
                 );
-                Core.renderView(res, true);
+                Engine.renderView(res, true);
             },
 
             resetFilters: () => {
                 document.querySelectorAll('select').forEach(s => s.value = "");
-                Core.renderView(Core.db);
+                Engine.renderView(Engine.db);
             },
 
             renderView: (data, isFiltered=false) => {
                 const tot = data.length;
                 document.getElementById('kpiValue').innerText = tot.toLocaleString('pt-BR');
-                document.getElementById('kpiTitle').innerText = Core.ctxLabel.includes("ANO") ? 
-                    "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE " + CONFIG.year : 
-                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Core.ctxLabel}`;
+                document.getElementById('kpiTitle').innerText = Engine.ctxLabel.includes("ANO") ? 
+                    `TOTAL DE OCORRÊNCIAS NO ANO DE ${CONFIG.year}` : 
+                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Engine.ctxLabel}`;
                 document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
                 
                 document.getElementById('statusBadge').innerText = "Dados Carregados";
+                document.getElementById('statusBadge').className = "mt-2 inline-block text-xs text-emerald-400 font-bold border border-emerald-500/30 px-2 py-1 rounded bg-emerald-900/20";
 
                 const tbody = document.getElementById('tblBody');
-                const html = data.slice(0, 200).map((d, i) => {
+                // Batch Rendering (Rápido)
+                const html = data.slice(0, 500).map((d, i) => {
                     const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
-                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
+                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
                     return `
                     <tr class="hover:bg-white/5 odd:bg-white/5 transition-colors border-b border-white/5">
                         <td class="p-3 text-center text-slate-500">${i+1}</td>
@@ -501,7 +513,7 @@
                 }).join('');
                 tbody.innerHTML = html;
 
-                if(tot > 0) setTimeout(() => Core.buildCharts(data), 50);
+                if(tot > 0) setTimeout(() => Engine.buildCharts(data), 50);
             },
 
             buildCharts: (data) => {
@@ -513,13 +525,13 @@
                 });
 
                 const sort = o => Object.entries(o).sort((a,b)=>b[1]-a[1]);
-                Core.draw('cvsPelotoes', 'p', sort(agg.p));
-                Core.draw('cvsNatureza', 'n', sort(agg.n));
-                Core.draw('cvsSubgrupos', 's', sort(agg.s).filter(x=>x[1]>=1));
+                Engine.draw('cvsPelotoes', 'p', sort(agg.p));
+                Engine.draw('cvsNatureza', 'n', sort(agg.n));
+                Engine.draw('cvsSubgrupos', 's', sort(agg.s).filter(x=>x[1]>=1));
             },
 
             draw: (id, type, dataset) => {
-                if(Core.charts[id]) Core.charts[id].destroy();
+                if(Engine.charts[id]) Engine.charts[id].destroy();
 
                 const ctx = document.getElementById(id).getContext('2d');
                 
@@ -541,7 +553,7 @@
                     document.getElementById('wrapSubgrupos').style.height = h + 'px';
                 }
 
-                Core.charts[id] = new Chart(ctx, {
+                Engine.charts[id] = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -582,7 +594,7 @@
                                     autoSkip: false,
                                     color: (c) => {
                                         if(type==='p') {
-                                            const l = Core.charts[id].data.labels[c.index];
+                                            const l = Engine.charts[id].data.labels[c.index];
                                             return CONFIG.poa.includes(l) ? '#10B981' : '#94a3b8';
                                         }
                                         return '#94a3b8';
@@ -590,7 +602,7 @@
                                     font: (c) => {
                                         let size = 10;
                                         if(type==='p') {
-                                            const l = Core.charts[id].data.labels[c.index];
+                                            const l = Engine.charts[id].data.labels[c.index];
                                             if(CONFIG.poa.includes(l)) size = 13;
                                         }
                                         return { size: size, family: 'monospace' };
@@ -603,7 +615,7 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', Core.init);
+        document.addEventListener('DOMContentLoaded', Engine.init);
     </script>
 </body>
 </html>
