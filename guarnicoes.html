@@ -1,582 +1,208 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESTATÍSTICAS 1º BBM (2025)</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+// ==UserScript==
+// @name         Coletor E193 - V33 (Injeção Direta)
+// @namespace    http://tampermonkey.net/
+// @version      33.0
+// @description  Usa o motor do site (jQuery) para forçar o login e o filtro.
+// @author       Expert
+// @match        *://e193.cbm.rs.gov.br/*
+// @match        *://www.e193.cbm.rs.gov.br/*
+// @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// @run-at       document-end
+// ==/UserScript==
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'fire-yellow': '#FFD700',
-                        'bombeiros-orange': '#F97316',
-                        'cb-green': '#10B981',
-                        'insect-brown': '#8B4513',
-                        'dark-base': '#0f172a'
-                    },
-                    fontFamily: { mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] }
-                }
+(function() {
+    'use strict';
+
+    // DADOS
+    const URL_PONTE = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec";
+    const USER = "2822130";
+    const PASS = "E193@Gus";
+
+    // STATUS
+    const statusBox = document.createElement('div');
+    statusBox.style = "position:fixed; bottom:15px; right:15px; background:red; color:#fff; padding:15px; z-index:9999999; font-weight:bold; font-family:sans-serif; border:2px solid #fff; text-align:center;";
+    statusBox.id = "robo_status";
+    statusBox.innerText = "🤖 V33: INICIANDO";
+    document.body.appendChild(statusBox);
+
+    function log(txt) {
+        const el = document.getElementById("robo_status");
+        if(el) {
+            el.innerText = "🤖 " + txt;
+            el.style.background = txt.includes("SUCESSO") ? "green" : "blue";
+        }
+    }
+
+    // =================================================================
+    // LOOP PRINCIPAL (1s)
+    // =================================================================
+    setInterval(() => {
+        const url = window.location.href;
+        
+        // ELEMENTOS
+        const senhaEl = document.querySelector('input[name="senha"]'); // Só existe no login
+        const tabela = document.getElementById('lista_escala');        // Só existe na escala
+        const menu = document.getElementById('main_navbar');           // Só existe logado
+
+        // 1. TELA DE LOGIN (PRIORIDADE TOTAL)
+        if (senhaEl) {
+            rotinaLogin();
+        }
+        // 2. NA ESCALA
+        else if (tabela) {
+            rotinaEscala(tabela);
+        }
+        // 3. LOGADO (HOME) -> IR PRA ESCALA
+        else if (menu && !url.includes('cons_guarnicao.php')) {
+            log("INDO PARA O MÓDULO...");
+            if(typeof unsafeWindow.loadModulo === 'function') {
+                unsafeWindow.loadModulo('gua', '23', 'cons_guarnicao.php');
+            } else {
+                const link = document.querySelector('a[href*="cons_guarnicao.php"]');
+                if(link) link.click();
             }
         }
-    </script>
 
-    <style>
-        /* Otimizações de GPU para Mobile */
-        body { 
-            background-color: #0f172a; 
-            color: #e2e8f0; 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent;
-        }
+    }, 1000);
+
+    // Recarrega a cada 5 min
+    setTimeout(() => location.reload(), 300000);
+
+
+    // =================================================================
+    // 1. LOGIN (FORÇA BRUTA VIA JQUERY)
+    // =================================================================
+    let tentouLogin = false;
+
+    function rotinaLogin() {
+        if(tentouLogin) return;
         
-        /* Background Estático (Menos processamento) */
-        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
-        .hero-bg::before {
-            content: ''; position: absolute; top: 380px; left: 10%; right: 10%; bottom: 0;
-            background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
-            background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
-        }
-        .hero-bg::after {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.98) 100%);
-            pointer-events: none;
-        }
-
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.75); /* Menos transparência = Mais performance */
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            /* Importante: diz ao navegador para não renderizar se não estiver visível */
-            content-visibility: auto; 
-        }
-
-        /* Botões Otimizados */
-        .btn-mes { transition: background 0.2s; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-mes:active, .btn-mes.active { 
-            background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
-        }
-
-        .btn-anual { border-color: rgba(234, 179, 8, 0.3); color: #FEF08A; }
-        .btn-anual.active {
-            background: linear-gradient(135deg, #CA8A04, #EAB308); color: white; border-color: #FEF08A;
-        }
-
-        /* Tabela Otimizada */
-        .table-wrap { max-height: 500px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
-
-        /* Container de Gráfico com Tamanho Fixo para não colapsar */
-        .chart-box { 
-            position: relative; 
-            width: 100%; 
-            height: 300px; /* Altura fixa mobile */
-            min-height: 300px;
-        }
-        @media (min-width: 1024px) { .chart-box { height: 500px; min-height: 500px; } }
-
-        /* Loader Simples */
-        .loader-bar { width: 0%; transition: width 0.2s linear; }
-    </style>
-</head>
-<body class="flex flex-col min-h-screen">
-
-    <div class="hero-bg"></div>
-
-    <main class="container mx-auto px-4 py-6 flex-grow z-10 space-y-6">
+        log("PREENCHENDO LOGIN...");
         
-        <header class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
-            <div class="text-center">
-                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none mb-1">ESTATÍSTICAS - 1º BBM</h1>
-                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em]">PORTO ALEGRE (2025)</h2>
-                <div id="statusBadge" class="mt-2 inline-block text-xs text-gray-400 font-mono">Aguardando Seleção</div>
-            </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90">
-        </header>
-
-        <div id="loadingState" class="hidden glass-panel p-6 text-center">
-            <div class="flex justify-between text-xs font-mono text-blue-400 mb-1">
-                <span id="loadMsg">Processando...</span>
-                <span id="loadPct">0%</span>
-            </div>
-            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                <div id="loadBar" class="bg-blue-500 h-full loader-bar"></div>
-            </div>
-        </div>
-
-        <div class="glass-panel p-4">
-            <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthGrid"></div>
-            <div class="flex justify-center pt-4 border-t border-white/5">
-                <button id="btnAnual" class="btn-mes btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10">
-                    ANUAL 2025
-                </button>
-            </div>
-        </div>
-
-        <div id="appContent" class="hidden opacity-0 transition-opacity duration-500 space-y-6">
+        // Tenta usar o jQuery do site ($) para preencher
+        // Isso é infalível em sites Semantic UI
+        if (typeof unsafeWindow.jQuery !== 'undefined') {
+            const $ = unsafeWindow.jQuery;
             
-            <div class="flex justify-center">
-                <div class="glass-panel px-10 py-6 text-center border-t-4 border-emerald-500 bg-slate-900/80">
-                    <p class="text-xs font-bold tracking-[0.2em] text-emerald-400 mb-2" id="kpiTitle">OCORRÊNCIAS TOTAIS</p>
-                    <p class="text-5xl font-black text-white drop-shadow-xl" id="kpiValue">0</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass-panel p-4 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
-                    <div class="chart-box">
-                        <canvas id="cvsPelotoes"></canvas>
-                    </div>
-                </div>
-                <div class="glass-panel p-4 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
-                    <div class="chart-box">
-                        <canvas id="cvsNatureza"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-panel p-4">
-                <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
-                <div id="wrapSubgrupos" class="chart-box" style="height: auto; min-height: 500px;">
-                    <canvas id="cvsSubgrupos"></canvas>
-                </div>
-            </div>
-
-            <div class="glass-panel overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-white/5 bg-slate-900/50 flex flex-col lg:flex-row justify-between items-center gap-4">
-                    <h3 class="text-sm font-bold text-white uppercase">Registro de Dados</h3>
-                    <div class="flex gap-2 w-full lg:w-auto text-xs overflow-x-auto pb-2 lg:pb-0">
-                        <select id="fNat" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Natureza</option></select>
-                        <select id="fSub" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Subgrupo</option></select>
-                        <select id="fBai" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Bairro</option></select>
-                        <select id="fPel" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Pelotão</option></select>
-                        <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
-                    </div>
-                </div>
-                <div class="p-2 bg-slate-900/80 text-right text-[10px] font-mono text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>Exibindo últimas 200 ocorrências para otimizar performance.
-                </div>
-                <div class="table-wrap">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="text-gray-400 uppercase font-bold text-[10px] tracking-wider bg-slate-900">
-                            <tr>
-                                <th class="p-3 text-center w-10">#</th>
-                                <th class="p-3 w-24">Data</th>
-                                <th class="p-3">Natureza</th>
-                                <th class="p-3">Subgrupo</th>
-                                <th class="p-3">Bairro</th>
-                                <th class="p-3">Pelotão</th>
-                                <th class="p-3 text-center">Map</th>
-                                <th class="p-3 text-right">ID</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tblBody" class="text-gray-300 font-mono divide-y divide-white/5"></tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-        <div class="h-8"></div>
-    </main>
-
-    <footer class="text-center py-6 text-gray-500 text-[10px] uppercase tracking-widest border-t border-white/5 bg-slate-900">
-        © Companhia de Bombeiro Militar do 1º BBM. Desenvolvido por Gustavo Medeiros.
-    </footer>
-
-    <script>
-        const CONFIG = {
-            repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2025,
-            months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
-            poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
-        };
-
-        const THEME = {
-            "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" },
-            "BUSCA E RESGATE": { c: "#F97316", i: "🛟", cl: "text-orange-500" },
-            "CORTE DE ÁRVORE": { c: "#4ADE80", i: "🌳", cl: "text-green-400" },
-            "AÇÕES PREVENTIVAS": { c: "#9CA3AF", i: "🛡️", cl: "text-gray-400" },
-            "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO": { c: "#60A5FA", i: "📋", cl: "text-blue-400" },
-            "PRÉ-HOSPITALAR": { c: "#EF4444", i: "🚑", cl: "text-red-500" },
-            "PRODUTOS PERIGOSOS": { c: "#FFFFFF", i: "☢️", cl: "text-white" },
-            "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
-        };
-
-        const Core = {
-            db: [],
-            charts: {},
-            ctxLabel: '',
-
-            init: () => {
-                // Configuração Global do Chart.js para performance
-                Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, monospace';
-                Chart.defaults.color = '#94a3b8';
+            // 1. Define valor e dispara gatilho
+            $('input[name="usuario"]').val(USER).trigger('change');
+            $('input[name="senha"]').val(PASS).trigger('change');
+            
+            // 2. Clica no botão
+            setTimeout(() => {
+                log("CLICANDO ENTRAR...");
+                const btn = $('button[type="submit"]');
+                if(btn.length > 0) btn.click();
+                else document.querySelector('form').submit(); // Fallback
                 
-                // Cria botões
-                const grid = document.getElementById('monthGrid');
-                CONFIG.months.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold uppercase tracking-wider w-full';
-                    btn.innerText = m;
-                    btn.onclick = () => Core.fetchMonth(m, btn);
-                    grid.appendChild(btn);
-                });
+                tentouLogin = true;
+                // Destrava depois de 5s caso falhe
+                setTimeout(() => { tentouLogin = false; }, 5000);
+            }, 500);
+
+        } else {
+            // Se o jQuery falhar, usa Javascript Puro
+            const u = document.querySelector('input[name="usuario"]');
+            const p = document.querySelector('input[name="senha"]');
+            if(u && p) {
+                u.value = USER;
+                p.value = PASS;
+                // Dispara eventos manuais
+                u.dispatchEvent(new Event('input', {bubbles:true}));
+                p.dispatchEvent(new Event('change', {bubbles:true}));
                 
-                document.getElementById('btnAnual').onclick = Core.fetchAnnual;
-                
-                // Filtros
-                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
-            },
-
-            // Sistema de Loading (Esconde o app enquanto carrega para não travar a UI)
-            setLoading: (active, msg="", pct=0) => {
-                const load = document.getElementById('loadingState');
-                const content = document.getElementById('appContent');
-                if(active) {
-                    content.classList.add('hidden');
-                    load.classList.remove('hidden');
-                    document.getElementById('loadMsg').innerText = msg;
-                    document.getElementById('loadPct').innerText = pct + '%';
-                    document.getElementById('loadBar').style.width = pct + '%';
-                } else {
-                    load.classList.add('hidden');
-                    content.classList.remove('hidden');
-                    // Pequeno delay para a UI "respirar"
-                    setTimeout(() => content.classList.remove('opacity-0'), 100);
-                }
-            },
-
-            resetButtons: () => document.querySelectorAll('button').forEach(b => b.classList.remove('active')),
-
-            // --- FETCH DATA ---
-            fetchMonth: async (month, btn) => {
-                Core.resetButtons();
-                btn.classList.add('active');
-                Core.ctxLabel = `EM ${month} ${CONFIG.year}`;
-                Core.setLoading(true, "Baixando...", 20);
-
-                try {
-                    // ?t=Date impede cache
-                    const res = await fetch(`${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`);
-                    if(!res.ok) throw new Error("Mês não disponível");
-                    const txt = await res.text();
-                    Core.processData(txt);
-                } catch(e) {
-                    Core.setLoading(false);
-                    alert("Dados indisponíveis.");
-                }
-            },
-
-            fetchAnnual: async () => {
-                Core.resetButtons();
-                document.getElementById('btnAnual').classList.add('active');
-                Core.ctxLabel = `NO ANO DE ${CONFIG.year}`;
-                Core.setLoading(true, "Iniciando...", 10);
-
-                let buffer = [];
-                let done = 0;
-                // Baixa os 12 meses em paralelo
-                const promises = CONFIG.months.map(async m => {
-                    try {
-                        const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
-                        if(res.ok) return await res.text();
-                    } catch(e){}
-                    done++;
-                    // Atualiza a barra de progresso visualmente
-                    Core.setLoading(true, `Baixando meses...`, Math.round((done/12)*80));
-                    return null;
-                });
-
-                const results = await Promise.all(promises);
-                results.forEach(txt => {
-                    if(txt) {
-                        const p = Papa.parse(txt, {header:true, skipEmptyLines:true});
-                        if(p.data) buffer = buffer.concat(p.data);
-                    }
-                });
-
-                if(buffer.length) Core.processBuffer(buffer);
-                else { Core.setLoading(false); alert("Nenhum dado encontrado."); }
-            },
-
-            processData: (csv) => {
-                Papa.parse(csv, {
-                    header: true, skipEmptyLines: true, encoding: "UTF-8",
-                    complete: (res) => Core.processBuffer(res.data)
-                });
-            },
-
-            // --- PROCESSAMENTO (Engine Única) ---
-            processBuffer: (raw) => {
-                Core.setLoading(true, "Organizando...", 90);
-                Core.db = []; // Limpa memória
-
-                if(!raw || !raw[0]) { Core.setLoading(false); return; }
-
-                // Detecção de colunas (Case Insensitive)
-                const keys = Object.keys(raw[0]);
-                const find = k => keys.find(x => x.toLowerCase().includes(k));
-                const cNat = find('natureza')||find('emerg');
-                const cObm = find('obm')||find('guarni');
-                const cSub = find('subgrupo')||find('detalhe');
-                const cVtr = find('viatura')||find('prefixo');
-
-                if(!cNat || !cObm) { Core.setLoading(false); return alert("Erro no CSV."); }
-
-                let id=1;
-                raw.forEach(row => {
-                    if(!row[cNat]) return;
-                    const s = (row[cObm]||"").toUpperCase();
-                    const v = (cVtr ? row[cVtr]||"" : "").toUpperCase();
-                    const nRaw = (row[cNat]||"N/A").toUpperCase();
-
-                    // 1. Pelotão Logic
-                    let pel = "OUTROS";
-                    if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
-                    else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
-                    else if(s.includes("AQUATICA")||s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
-                    else if(s.includes("TERRESTRE")||(s.includes("BBS")&&!s.includes("1º"))) pel = "BBS (POA) - TERRESTRE";
-                    else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
-                    else if(s.includes("FLORESTA")) pel = "FLORESTA";
-                    else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
-                    else if(s.includes("RESTINGA")) pel = "RESTINGA";
-                    else if(s.includes("PARTENON")) pel = "PARTENON";
-                    else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
-                    else if(s.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
-                    else if(s.includes("TERESÓPOLIS")||s.includes("TERESOPOLIS")) pel = (v.includes("AR")||s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
-                    else if(s.includes("RESGATE")||s.includes("GBS")) pel = "AUTO RESGATE";
-                    else {
-                        const clean = s.replace("1º BBM / ","").replace("CIA / ","").replace("PEL / ","").trim();
-                        if(clean.length > 2) pel = clean;
-                    }
-
-                    // 2. Natureza Logic
-                    let nat = nRaw.trim();
-                    if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
-                    else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
-                    else if(nRaw.includes("SALVAMENTO")||nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
-                    else if(nRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
-                    else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
-                    else if(nRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
-                    else if(nRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
-                    else if(nRaw.includes("VISTORIA")&&nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-
-                    let sub = row[cSub] ? row[cSub].trim() : "";
-                    if(sub === "N/A" || sub === "0") sub = "";
-
-                    // 3. Map Link
-                    let map = null;
-                    if(row['Latitude'] && row['Longitude']) {
-                        const la = String(row['Latitude']).replace(',','.').trim();
-                        const lo = String(row['Longitude']).replace(',','.').trim();
-                        map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
-                    }
-
-                    Core.db.push({
-                        id: row['Nº Oc.'] || id++,
-                        date: row['Data'] || '--',
-                        nat, sub, pel, map,
-                        bairro: (row['Bairro'] || '--').toUpperCase()
-                    });
-                });
-
-                Core.initFilters();
-                Core.renderView(Core.db);
-                Core.setLoading(false);
-            },
-
-            // --- UI RENDER ---
-            initFilters: () => {
-                const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                Core.db.forEach(d => {
-                    s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
-                    if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
-                });
-                const fill = (id, set) => {
-                    const el = document.getElementById(id);
-                    el.innerHTML = `<option value="">${el.options[0].text}</option>`;
-                    Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
-                };
-                fill('fNat', s.n); fill('fSub', s.s); fill('fBai', s.b); fill('fPel', s.p);
-            },
-
-            applyFilters: () => {
-                const v = {
-                    n: document.getElementById('fNat').value,
-                    s: document.getElementById('fSub').value,
-                    b: document.getElementById('fBai').value,
-                    p: document.getElementById('fPel').value
-                };
-                const res = Core.db.filter(d => 
-                    (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
-                    (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
-                );
-                Core.renderView(res, true);
-            },
-
-            resetFilters: () => {
-                document.querySelectorAll('select').forEach(s => s.value = "");
-                Core.renderView(Core.db);
-            },
-
-            renderView: (data, isFiltered=false) => {
-                const tot = data.length;
-                document.getElementById('kpiValue').innerText = tot.toLocaleString('pt-BR');
-                document.getElementById('kpiTitle').innerText = Core.ctxLabel.includes("ANO") ? 
-                    "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025" : 
-                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Core.ctxLabel}`;
-                document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
-                
-                document.getElementById('statusBadge').innerText = "Dados Carregados";
-                document.getElementById('statusBadge').classList = "mt-2 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-emerald-400 text-xs";
-
-                // Tabela em Batch HTML (Performance extrema)
-                const tbody = document.getElementById('tblBody');
-                // IMPORTANTE: Limita a tabela a 200 linhas para não travar o scroll no celular
-                const view = data.slice(0, 200); 
-                
-                const html = view.map((d, i) => {
-                    const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
-                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white"><i class="fas fa-map-marker-alt"></i></a>` : '';
-                    return `
-                    <tr class="hover:bg-white/5 odd:bg-white/5 transition-colors border-b border-white/5">
-                        <td class="p-3 text-center text-slate-500">${i+1}</td>
-                        <td class="p-3 whitespace-nowrap">${d.date}</td>
-                        <td class="p-3 font-bold ${st.cl} whitespace-nowrap"><span class="mr-2">${st.i}</span>${d.nat}</td>
-                        <td class="p-3 text-blue-200/70 text-[11px]">${d.sub}</td>
-                        <td class="p-3">${d.bairro}</td>
-                        <td class="p-3"><span class="text-fire-yellow font-bold">${d.pel}</span></td>
-                        <td class="p-3 text-center">${mapBtn}</td>
-                        <td class="p-3 text-right text-slate-600">#${d.id}</td>
-                    </tr>`;
-                }).join('');
-                tbody.innerHTML = html;
-
-                // Renderiza gráficos com pequeno delay para liberar a thread
-                if(tot > 0) setTimeout(() => Core.buildCharts(data), 50);
-            },
-
-            // --- GRÁFICOS ---
-            buildCharts: (data) => {
-                const agg = { p:{}, n:{}, s:{} };
-                data.forEach(d => {
-                    agg.p[d.pel] = (agg.p[d.pel]||0)+1;
-                    agg.n[d.nat] = (agg.n[d.nat]||0)+1;
-                    if(d.sub) agg.s[`${d.nat}___${d.sub}`] = (agg.s[`${d.nat}___${d.sub}`]||0)+1;
-                });
-
-                const sort = o => Object.entries(o).sort((a,b)=>b[1]-a[1]);
-                Core.draw('cvsPelotoes', 'p', sort(agg.p));
-                Core.draw('cvsNatureza', 'n', sort(agg.n));
-                Core.draw('cvsSubgrupos', 's', sort(agg.s).filter(x=>x[1]>=1));
-            },
-
-            draw: (id, type, dataset) => {
-                // Destrói gráfico anterior se existir (Limpa memória)
-                if(Core.charts[id]) Core.charts[id].destroy();
-
-                const ctx = document.getElementById(id).getContext('2d');
-                
-                const labels = dataset.map(x => {
-                    if(type==='n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
-                    if(type==='s') {
-                        const [n,s] = x[0].split('___');
-                        const i = (THEME[n]||{i:"📄"}).i;
-                        return `${i} ${n} [${s}]`;
-                    }
-                    if(type==='n') return `${(THEME[x[0]]||{i:"📄"}).i} ${x[0]}`;
-                    return x[0];
-                });
-
-                const values = dataset.map(x => x[1]);
-
-                if(type==='s') {
-                    const h = Math.max(500, values.length * 28);
-                    document.getElementById('wrapSubgrupos').style.height = h + 'px';
-                }
-
-                // Configuração OTIMIZADA do Chart.js
-                Core.charts[id] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            borderRadius: 4,
-                            barPercentage: 0.7,
-                            backgroundColor: (c) => {
-                                const i = c.dataIndex;
-                                if(type==='p') return CONFIG.poa.includes(dataset[i][0]) ? '#10B981' : '#64748B';
-                                const key = type==='s' ? dataset[i][0].split('___')[0] : dataset[i][0];
-                                return (THEME[key]||{c:"#64748B"}).c;
-                            },
-                            // Borda Branca Leve
-                            hoverBorderWidth: 2, 
-                            hoverBorderColor: '#fff'
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        // Animação desligada para não travar celular
-                        animation: false, 
-                        layout: { padding: { right: 50 } },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.95)' },
-                            datalabels: {
-                                color: '#e2e8f0',
-                                anchor: 'end', align: 'end', offset: 4,
-                                font: { weight: 'bold', size: 11 },
-                                formatter: v => v.toLocaleString('pt-BR')
-                            }
-                        },
-                        scales: {
-                            x: { display: false }, // Remove grid X para limpar visual
-                            y: {
-                                grid: { color: 'rgba(255,255,255,0.03)' },
-                                ticks: {
-                                    autoSkip: false,
-                                    color: (c) => {
-                                        if(type==='p') {
-                                            const l = Core.charts[id].data.labels[c.index];
-                                            return CONFIG.poa.includes(l) ? '#10B981' : '#94a3b8';
-                                        }
-                                        return '#94a3b8';
-                                    },
-                                    font: (c) => {
-                                        let size = 10;
-                                        if(type==='p') {
-                                            const l = Core.charts[id].data.labels[c.index];
-                                            if(CONFIG.poa.includes(l)) size = 13;
-                                        }
-                                        return { size: size, family: 'monospace' };
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                document.querySelector('button[type="submit"]').click();
             }
-        };
+        }
+    }
 
-        // Inicia
-        document.addEventListener('DOMContentLoaded', Core.init);
-    </script>
-</body>
-</html>
+    // =================================================================
+    // 2. ESCALA (FILTRAR E LER)
+    // =================================================================
+    let travado = false;
+    let ultimoEnvio = 0;
+
+    function rotinaEscala(tabela) {
+        const linhas = tabela.querySelectorAll('tr').length;
+        const visivel = !tabela.classList.contains('d-none');
+
+        // SE VAZIO -> FILTRA
+        if ((linhas < 5 || !visivel) && !travado) {
+            log("FILTRANDO...");
+            travado = true;
+
+            // Define Cidade POA via jQuery
+            if (typeof unsafeWindow.jQuery !== 'undefined') {
+                unsafeWindow.jQuery('#id_cidade').val("325").trigger('change');
+            } else {
+                const c = document.getElementById('id_cidade');
+                if(c) c.value = "325";
+            }
+
+            // Clica Filtrar
+            const btn = document.querySelector('input[value="Filtrar"]');
+            if(btn) btn.click();
+            else if(typeof unsafeWindow.loadEscalas === 'function') unsafeWindow.loadEscalas();
+
+            setTimeout(() => { travado = false; }, 10000);
+        }
+        
+        // SE CHEIO -> ENVIA
+        else if (linhas > 5 && visivel) {
+            lerDados(tabela);
+        }
+    }
+
+    function lerDados(tabela) {
+        const agora = new Date().getTime();
+        if (agora - ultimoEnvio < 20000) return;
+
+        log("ENVIANDO DADOS...");
+
+        const linhas = tabela.querySelectorAll('tr');
+        const dados = [];
+        let obm = "GERAL", vtr = "IND";
+
+        linhas.forEach(tr => {
+            if(tr.className.includes('dtrg-level-1')) obm = tr.innerText.trim();
+            else if(tr.className.includes('dtrg-level-2')) vtr = tr.innerText.split('(')[0].trim();
+            else if(tr.className.includes('odd') || tr.className.includes('even')) {
+                const tds = tr.querySelectorAll('td');
+                let nome="ND", func="ND", horarios=[];
+
+                tds.forEach(td => {
+                    let txt = td.innerText.trim();
+                    if(txt.match(/^\d{2}:\d{2}$/)) horarios.push(txt);
+                    else if(txt.match(/^(\d+\s*)?([123]º\s*)?(SD|CB|SGT|TEN|CAP|MAJ|TC|CEL|ASP|SUB)/)) nome = txt;
+                    else if(txt.length > 3 && !txt.match(/^\d+$/)) func = txt;
+                });
+
+                if(nome === "ND") {
+                    const noVis = tr.querySelector('.noVis');
+                    if(noVis) nome = noVis.innerText.trim();
+                }
+
+                let turno = "08:00 - 08:00";
+                if(horarios.length >= 2) turno = `${horarios[0]} - ${horarios[horarios.length-1]}`;
+                else if(horarios.length === 1) turno = `${horarios[0]} - 08:00`;
+
+                if(nome !== "ND") dados.push({ obm, vtr, nome, func, horario: turno });
+            }
+        });
+
+        if(dados.length > 0) {
+            GM_xmlhttpRequest({
+                method: "POST",
+                url: URL_PONTE,
+                data: JSON.stringify(dados),
+                headers: { "Content-Type": "application/json" },
+                onload: function(r) {
+                    if(r.status === 200) { log("SUCESSO! DADOS NO PAINEL."); ultimoEnvio = agora; }
+                    else log("ERRO: " + r.status);
+                }
+            });
+        }
+    }
+
+})();
