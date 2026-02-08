@@ -1,208 +1,460 @@
-// ==UserScript==
-// @name         Coletor E193 - V33 (Injeção Direta)
-// @namespace    http://tampermonkey.net/
-// @version      33.0
-// @description  Usa o motor do site (jQuery) para forçar o login e o filtro.
-// @author       Expert
-// @match        *://e193.cbm.rs.gov.br/*
-// @match        *://www.e193.cbm.rs.gov.br/*
-// @grant        GM_xmlhttpRequest
-// @grant        unsafeWindow
-// @run-at       document-end
-// ==/UserScript==
-
-(function() {
-    'use strict';
-
-    // DADOS
-    const URL_PONTE = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec";
-    const USER = "2822130";
-    const PASS = "E193@Gus";
-
-    // STATUS
-    const statusBox = document.createElement('div');
-    statusBox.style = "position:fixed; bottom:15px; right:15px; background:red; color:#fff; padding:15px; z-index:9999999; font-weight:bold; font-family:sans-serif; border:2px solid #fff; text-align:center;";
-    statusBox.id = "robo_status";
-    statusBox.innerText = "🤖 V33: INICIANDO";
-    document.body.appendChild(statusBox);
-
-    function log(txt) {
-        const el = document.getElementById("robo_status");
-        if(el) {
-            el.innerText = "🤖 " + txt;
-            el.style.background = txt.includes("SUCESSO") ? "green" : "blue";
-        }
-    }
-
-    // =================================================================
-    // LOOP PRINCIPAL (1s)
-    // =================================================================
-    setInterval(() => {
-        const url = window.location.href;
-        
-        // ELEMENTOS
-        const senhaEl = document.querySelector('input[name="senha"]'); // Só existe no login
-        const tabela = document.getElementById('lista_escala');        // Só existe na escala
-        const menu = document.getElementById('main_navbar');           // Só existe logado
-
-        // 1. TELA DE LOGIN (PRIORIDADE TOTAL)
-        if (senhaEl) {
-            rotinaLogin();
-        }
-        // 2. NA ESCALA
-        else if (tabela) {
-            rotinaEscala(tabela);
-        }
-        // 3. LOGADO (HOME) -> IR PRA ESCALA
-        else if (menu && !url.includes('cons_guarnicao.php')) {
-            log("INDO PARA O MÓDULO...");
-            if(typeof unsafeWindow.loadModulo === 'function') {
-                unsafeWindow.loadModulo('gua', '23', 'cons_guarnicao.php');
-            } else {
-                const link = document.querySelector('a[href*="cons_guarnicao.php"]');
-                if(link) link.click();
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guarnição Operacional em Porto Alegre</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                        'moss-green': '#9BE36D',
+                        'total-green': '#4ade80'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
             }
         }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
 
-    }, 1000);
-
-    // Recarrega a cada 5 min
-    setTimeout(() => location.reload(), 300000);
-
-
-    // =================================================================
-    // 1. LOGIN (FORÇA BRUTA VIA JQUERY)
-    // =================================================================
-    let tentouLogin = false;
-
-    function rotinaLogin() {
-        if(tentouLogin) return;
+    <style>
+        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
         
-        log("PREENCHENDO LOGIN...");
+        .hero-background { position: relative; min-height: 100vh; }
+        .hero-background::before { 
+            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
+            background-position: center; background-repeat: no-repeat; background-size: 500px;
+            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+        }
+        .hero-background::after {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+            z-index: 1; pointer-events: none;
+        }
+        .content-wrapper { position: relative; z-index: 10; }
+
+        .card-monitor {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row; 
+            /* Importante para o layout Masonry não quebrar o card no meio */
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        .card-monitor:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.98);
+            border-color: rgba(255, 140, 0, 0.5);
+            z-index: 50;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .stats-container {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .tooltip-box {
+            visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
+            width: max-content; min-width: 150px; z-index: 100; transition: 0.2s; pointer-events: none;
+            box-shadow: 0 10px 40px black; margin-top: 10px;
+        }
+        .group:hover .tooltip-box { visibility: visible; opacity: 1; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
+
+        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+    </style>
+</head>
+<body class="hero-background">
+
+    <div id="loading">
+        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando guarnições...</p>
+    </div>
+
+    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
         
-        // Tenta usar o jQuery do site ($) para preencher
-        // Isso é infalível em sites Semantic UI
-        if (typeof unsafeWindow.jQuery !== 'undefined') {
-            const $ = unsafeWindow.jQuery;
-            
-            // 1. Define valor e dispara gatilho
-            $('input[name="usuario"]').val(USER).trigger('change');
-            $('input[name="senha"]').val(PASS).trigger('change');
-            
-            // 2. Clica no botão
-            setTimeout(() => {
-                log("CLICANDO ENTRAR...");
-                const btn = $('button[type="submit"]');
-                if(btn.length > 0) btn.click();
-                else document.querySelector('form').submit(); // Fallback
+        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
+            </div>
+
+            <div class="text-center flex-grow">
+                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                    Guarnição Operacional
+                </h1>
+                <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
+                    EM PORTO ALEGRE
+                </h2>
                 
-                tentouLogin = true;
-                // Destrava depois de 5s caso falhe
-                setTimeout(() => { tentouLogin = false; }, 5000);
-            }, 500);
+                <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
+                    <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
+                    <span>|</span>
+                    <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
+                </div>
+            </div>
 
-        } else {
-            // Se o jQuery falhar, usa Javascript Puro
-            const u = document.querySelector('input[name="usuario"]');
-            const p = document.querySelector('input[name="senha"]');
-            if(u && p) {
-                u.value = USER;
-                p.value = PASS;
-                // Dispara eventos manuais
-                u.dispatchEvent(new Event('input', {bubbles:true}));
-                p.dispatchEvent(new Event('change', {bubbles:true}));
+            <div class="flex-shrink-0">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
+            </div>
+        </header>
+
+        <main class="w-full max-w-7xl mx-auto flex-grow">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
                 
-                document.querySelector('button[type="submit"]').click();
+                <div class="stats-container border-l-4 border-bombeiros-orange">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA 24H)
+                    </h3>
+                    <div class="flex justify-around items-center">
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                            <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                            <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                            <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                            <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                            <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10 mx-2"></div>
+                        <div class="group relative text-center">
+                            <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-container border-l-4 border-fire-red">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                        <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
+                    </h3>
+                    <div class="flex justify-around items-center">
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-abt">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
+                            <div class="tooltip-box"><ul id="list-abt" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR / AEM)</span>
+                            <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10">
+                </div>
+
+        </main>
+
+        <footer class="mt-auto py-6 text-center border-t border-white/5">
+            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                Sistema de Controle Operacional - 1º BBM - 2026
+            </p>
+            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURAÇÃO
+        // ============================================================
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
+        // ============================================================
+
+        // --- ORDEM OTIMIZADA PARA PAREAMENTO ---
+        const ORDEM_QUARTEIS = [
+            "OFICIAL DE DIA", 
+            "COBOM", 
+            "AÇORIANOS", 
+            "ASSUNÇÃO", 
+            "TERESÓPOLIS", 
+            "RESTINGA", 
+            "BELÉM NOVO", 
+            "FLORESTA", 
+            "PASSO D'AREIA", 
+            "PARTENON", 
+            "CANIL", 
+            "AQUÁTICA", 
+            "MERGULHO"
+        ];
+
+        function getDataOperacional() {
+            const agora = new Date();
+            if (agora.getHours() < 8) {
+                agora.setDate(agora.getDate() - 1);
             }
+            return agora;
         }
-    }
 
-    // =================================================================
-    // 2. ESCALA (FILTRAR E LER)
-    // =================================================================
-    let travado = false;
-    let ultimoEnvio = 0;
+        function atualizarRelogio() {
+            const dataOp = getDataOperacional();
+            const agora = new Date();
+            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
+        }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
 
-    function rotinaEscala(tabela) {
-        const linhas = tabela.querySelectorAll('tr').length;
-        const visivel = !tabela.classList.contains('d-none');
+        async function iniciarSistema() {
+            try {
+                const req = await fetch(URL_DADOS);
+                const dados = await req.json();
 
-        // SE VAZIO -> FILTRA
-        if ((linhas < 5 || !visivel) && !travado) {
-            log("FILTRANDO...");
-            travado = true;
+                if(dados.erro) {
+                    document.getElementById('msg-loading').innerText = "Aguardando envio do PC...";
+                    setTimeout(iniciarSistema, 5000); 
+                    return;
+                }
 
-            // Define Cidade POA via jQuery
-            if (typeof unsafeWindow.jQuery !== 'undefined') {
-                unsafeWindow.jQuery('#id_cidade').val("325").trigger('change');
-            } else {
-                const c = document.getElementById('id_cidade');
-                if(c) c.value = "325";
+                // V18: Sem filtro de hora, mostra escala completa
+                processarDados(dados);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').classList.remove('hidden');
+
+            } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
+        }
+
+        function formatarTurno(raw) {
+            if(!raw) return "24h";
+            
+            const nums = raw.match(/(\d{2}:\d{2})/g);
+            if(nums && nums.length >= 2) {
+                const h1 = nums[0];
+                const h2 = nums[1];
+                
+                const [hh1] = h1.split(':').map(Number);
+                const [hh2] = h2.split(':').map(Number);
+                let diff = hh2 - hh1;
+                if(diff < 0) diff += 24;
+
+                let carga = "";
+                if(diff >= 23 || diff === 0) carga = "(24h)";
+                else if(diff >= 11 && diff <= 13) carga = "(12h)";
+
+                return `${h1} às ${h2} ${carga}`;
             }
-
-            // Clica Filtrar
-            const btn = document.querySelector('input[value="Filtrar"]');
-            if(btn) btn.click();
-            else if(typeof unsafeWindow.loadEscalas === 'function') unsafeWindow.loadEscalas();
-
-            setTimeout(() => { travado = false; }, 10000);
+            return raw;
         }
-        
-        // SE CHEIO -> ENVIA
-        else if (linhas > 5 && visivel) {
-            lerDados(tabela);
+
+        function extrairID(nomeCompleto) {
+            const match = nomeCompleto.match(/(\d{7})/);
+            return match ? match[1] : null; 
         }
-    }
 
-    function lerDados(tabela) {
-        const agora = new Date().getTime();
-        if (agora - ultimoEnvio < 20000) return;
+        function limparNome(nomeCompleto) {
+            return nomeCompleto.replace(/\d{7}\s+/, '').trim();
+        }
 
-        log("ENVIANDO DADOS...");
+        function processarDados(dados) {
+            const estrutura = {};
+            const mapOficiais = new Map();
+            const mapSargentos = new Map();
+            const mapPracas = new Map();
+            const statsViaturas = { abt: new Set(), ar: new Set() };
 
-        const linhas = tabela.querySelectorAll('tr');
-        const dados = [];
-        let obm = "GERAL", vtr = "IND";
+            dados.forEach(d => {
+                let obmRaw = (d.obm || "").toUpperCase();
+                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
+                let nomeCompleto = (d.nome || "").trim().toUpperCase();
+                
+                let idMilitar = extrairID(nomeCompleto);
+                let idUnico = idMilitar ? idMilitar : nomeCompleto;
+                let nomeExibicao = limparNome(nomeCompleto);
+                
+                let func = (d.func || "").trim();
+                let hora = formatarTurno(d.horario || "");
 
-        linhas.forEach(tr => {
-            if(tr.className.includes('dtrg-level-1')) obm = tr.innerText.trim();
-            else if(tr.className.includes('dtrg-level-2')) vtr = tr.innerText.split('(')[0].trim();
-            else if(tr.className.includes('odd') || tr.className.includes('even')) {
-                const tds = tr.querySelectorAll('td');
-                let nome="ND", func="ND", horarios=[];
+                let obmKey = "OUTROS";
+                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
+                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
+                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
 
-                tds.forEach(td => {
-                    let txt = td.innerText.trim();
-                    if(txt.match(/^\d{2}:\d{2}$/)) horarios.push(txt);
-                    else if(txt.match(/^(\d+\s*)?([123]º\s*)?(SD|CB|SGT|TEN|CAP|MAJ|TC|CEL|ASP|SUB)/)) nome = txt;
-                    else if(txt.length > 3 && !txt.match(/^\d+$/)) func = txt;
+                if(!estrutura[obmKey]) estrutura[obmKey] = [];
+                
+                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
+                if(!viaturaObj) {
+                    viaturaObj = { nome: vtr, guarnicao: [] };
+                    estrutura[obmKey].push(viaturaObj);
+                }
+                
+                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
+                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: hora });
+
+                    if(nomeCompleto.includes("SGT")) mapSargentos.set(idUnico, nomeExibicao);
+                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) mapOficiais.set(idUnico, nomeExibicao);
+                    else mapPracas.set(idUnico, nomeExibicao);
+                }
+
+                if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
+                if(vtr.includes("AR") || vtr.includes("AEM")) statsViaturas.ar.add(vtr);
+            });
+
+            atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
+            renderizarCards(estrutura);
+        }
+
+        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
+            const capArr = Array.from(mapOficiais.values());
+            const sgtArr = Array.from(mapSargentos.values());
+            const sdArr = Array.from(mapPracas.values());
+            const abtArr = Array.from(statsViaturas.abt);
+            const arArr = Array.from(statsViaturas.ar);
+
+            const fill = (idC, idL, arr) => {
+                document.getElementById(idC).innerText = arr.length;
+                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
+            };
+
+            fill('count-cap', 'list-cap', capArr);
+            fill('count-sgt', 'list-sgt', sgtArr);
+            fill('count-sd', 'list-sd', sdArr);
+            
+            const total = capArr.length + sgtArr.length + sdArr.length;
+            document.getElementById('count-total').innerText = total;
+
+            document.getElementById('count-abt').innerText = abtArr.length;
+            document.getElementById('count-ar').innerText = arArr.length;
+            
+            document.getElementById('list-abt').innerHTML = abtArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-ar').innerHTML = arArr.map(x => `<li>• ${x}</li>`).join('');
+        }
+
+        function renderizarCards(estrutura) {
+            const grid = document.getElementById('grid-cards');
+            grid.innerHTML = "";
+
+            const keysOrdenadas = [
+                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
+                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
+            ];
+
+            keysOrdenadas.forEach(obmName => {
+                const viaturasRaw = estrutura[obmName];
+                const gruposUnicos = [];
+                
+                viaturasRaw.forEach(vtr => {
+                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
+                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
+                    
+                    if(grupoExistente && assinatura.length > 0) {
+                        grupoExistente.nomesVtrs.push(vtr.nome);
+                    } else {
+                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+                    }
                 });
 
-                if(nome === "ND") {
-                    const noVis = tr.querySelector('.noVis');
-                    if(noVis) nome = noVis.innerText.trim();
-                }
+                const card = document.createElement('div');
+                // IMPORTANTE: Adicionado mb-5 para espaçamento vertical no Masonry
+                card.className = "card-monitor break-inside-avoid mb-5"; 
 
-                let turno = "08:00 - 08:00";
-                if(horarios.length >= 2) turno = `${horarios[0]} - ${horarios[horarios.length-1]}`;
-                else if(horarios.length === 1) turno = `${horarios[0]} - 08:00`;
+                let content = `
+                    <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
+                        <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
+                            ${obmName}
+                        </h2>
+                    </div>
+                `;
 
-                if(nome !== "ND") dados.push({ obm, vtr, nome, func, horario: turno });
-            }
-        });
+                content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
-        if(dados.length > 0) {
-            GM_xmlhttpRequest({
-                method: "POST",
-                url: URL_PONTE,
-                data: JSON.stringify(dados),
-                headers: { "Content-Type": "application/json" },
-                onload: function(r) {
-                    if(r.status === 200) { log("SUCESSO! DADOS NO PAINEL."); ultimoEnvio = agora; }
-                    else log("ERRO: " + r.status);
-                }
+                gruposUnicos.forEach(grupo => {
+                    grupo.guarnicao.sort((a,b) => {
+                        const getScore = (role) => {
+                            let r = role.toUpperCase();
+                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
+                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
+                            return 3;
+                        }
+                        // Ordena por patente/função E depois por horário
+                        let scoreA = getScore(a.f);
+                        let scoreB = getScore(b.f);
+                        if(scoreA !== scoreB) return scoreA - scoreB;
+                        return a.h.localeCompare(b.h); 
+                    });
+
+                    const listaVtrs = grupo.nomesVtrs.join(' / ');
+
+                    content += `
+                        <div class="w-full flex flex-col items-center">
+                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
+                                ${listaVtrs}
+                            </span>
+                            <div class="w-full flex flex-col gap-2">
+                                ${grupo.guarnicao.map(m => `
+                                    <div class="text-center group">
+                                        <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
+                                            ${m.n}
+                                        </div>
+                                        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
+                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                content += `</div>`;
+                card.innerHTML = content;
+                grid.appendChild(card);
             });
         }
-    }
 
-})();
+        iniciarSistema();
+        setInterval(iniciarSistema, 60000); 
+    </script>
+</body>
+</html>
