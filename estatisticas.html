@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESTATÍSTICAS 1º BBM</title>
+    <title>ESTATÍSTICAS - 1º BBM (2025)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,7 +20,7 @@
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
                         'cb-green': '#10B981',
-                        'insect-brown': '#8B4513', // Cor correta
+                        'insect-brown': '#8B4513',
                         'dark-base': '#0f172a'
                     },
                     fontFamily: { mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] }
@@ -30,10 +30,9 @@
     </script>
 
     <style>
-        /* OTIMIZAÇÃO DE GPU E RENDERIZAÇÃO */
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        /* Otimizações de Performance e GPU */
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* Fundo Fixo (Não consome memória ao rolar) */
         .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
         .layer-bg::before {
             content: ''; position: absolute; top: 380px; left: 10%; right: 10%; bottom: 0;
@@ -55,27 +54,20 @@
             contain: content;
         }
 
-        /* Botões de Mês */
-        .btn-mes { transition: background 0.1s; border: 1px solid rgba(255,255,255,0.1); }
+        /* Botões */
+        .btn-core { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .btn-core:active { transform: scale(0.95); }
+        
+        .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
         .btn-mes.active { 
             background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
 
-        /* Botão Anual Dourado */
         .btn-anual { border-color: rgba(234, 179, 8, 0.3); color: #FEF08A; }
         .btn-anual.active {
             background: linear-gradient(135deg, #CA8A04, #EAB308); color: white;
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); border-color: #FEF08A;
-        }
-
-        /* Botões de Ano (Timeline) */
-        .btn-year {
-            background: rgba(30, 41, 59, 0.6); color: #94a3b8; border: 1px solid #334155; transition: all 0.2s;
-        }
-        .btn-year.active {
-            background: #2563EB; color: white; border-color: #60A5FA; font-weight: bold; transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
         }
 
         /* Tabela Rápida */
@@ -84,12 +76,12 @@
         .table-wrap::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
 
-        /* Container Gráfico Seguro */
-        .chart-container { position: relative; width: 100%; height: 320px; }
+        /* Correção de Gráficos Mobile */
+        .chart-container { position: relative; width: 100%; height: 350px; }
         @media (min-width: 1024px) { .chart-container { height: 500px; } }
 
         /* Loader */
-        .loader-bar { width: 0%; transition: width 0.2s linear; }
+        .loader-bar { width: 0%; transition: width 0.3s ease-out; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -100,23 +92,17 @@
         
         <header class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-6">
             <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
-            <div class="text-center w-full md:w-auto">
+            <div class="text-center">
                 <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none mb-1">ESTATÍSTICAS - 1º BBM</h1>
-                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em] uppercase">PORTO ALEGRE</h2>
-                
-                <div class="mt-3 flex flex-wrap justify-center gap-2 bg-slate-900/50 p-2 rounded-lg border border-white/5" id="yearSelector">
-                    </div>
-                
-                <div id="statusBadge" class="mt-2 inline-block text-[10px] text-gray-400 font-mono border border-white/10 px-2 py-1 rounded bg-black/20">
-                    Aguardando Seleção
-                </div>
+                <h2 class="text-lg font-bold text-fire-yellow tracking-[0.2em]">PORTO ALEGRE (2025)</h2>
+                <div id="statusBadge" class="mt-2 inline-block text-xs text-gray-400 font-mono">Aguardando Seleção</div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90 hidden md:block">
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90">
         </header>
 
         <div id="loadingState" class="hidden glass-panel p-6 text-center">
             <div class="flex justify-between text-xs font-mono text-blue-400 mb-1">
-                <span id="loadMsg">Processando...</span>
+                <span id="loadMsg">Iniciando...</span>
                 <span id="loadPct">0%</span>
             </div>
             <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -127,8 +113,8 @@
         <div class="glass-panel p-4">
             <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthGrid"></div>
             <div class="flex justify-center pt-4 border-t border-white/5">
-                <button id="btnAnual" class="btn-mes btn-anual py-3 px-12 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10 w-full md:w-auto hover:bg-yellow-900/30">
-                    RELATÓRIO ANUAL <span id="lblAnualYear">...</span>
+                <button id="btnAnual" class="btn-core btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10">
+                    ANUAL 2025
                 </button>
             </div>
         </div>
@@ -159,26 +145,24 @@
 
             <div class="glass-panel p-4">
                 <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
-                <div id="wrapSubgrupos" class="chart-container" style="height: auto; min-height: 500px;">
+                <div id="wrapSubgrupos" class="chart-container" style="min-height: 500px;">
                     <canvas id="cvsSubgrupos"></canvas>
                 </div>
             </div>
 
             <div class="glass-panel overflow-hidden flex flex-col">
                 <div class="p-4 border-b border-white/5 bg-slate-900/50 flex flex-col lg:flex-row justify-between items-center gap-4">
-                    <h3 class="text-sm font-bold text-white uppercase flex items-center gap-2">
-                        <i class="fas fa-list"></i> Registro de Dados
-                    </h3>
+                    <h3 class="text-sm font-bold text-white uppercase">Registro de Dados</h3>
                     <div class="flex gap-2 w-full lg:w-auto text-xs overflow-x-auto pb-2 lg:pb-0">
                         <select id="fNat" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Natureza</option></select>
                         <select id="fSub" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Subgrupo</option></select>
                         <select id="fBai" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Bairro</option></select>
                         <select id="fPel" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Pelotão</option></select>
-                        <button onclick="Engine.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
+                        <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
                     </div>
                 </div>
                 <div class="p-2 bg-slate-900/80 text-right text-[10px] font-mono text-gray-400">
-                    <span id="lblRows" class="text-white font-bold">0</span> registros carregados.
+                    Mostrando: <span id="lblRows" class="text-white font-bold">0</span> registros
                 </div>
                 <div class="table-wrap">
                     <table class="w-full text-left border-collapse text-xs">
@@ -208,16 +192,13 @@
     </footer>
 
     <script>
-        // CONFIGURAÇÕES GLOBAIS
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2026, // Ano inicial padrão
-            yearsList: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+            year: 2025,
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
         };
 
-        // ESTILOS (Sua paleta favorita v4.0)
         const THEME = {
             "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-fire-yellow" },
             "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" },
@@ -230,64 +211,28 @@
             "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
         };
 
-        const Engine = {
+        const Core = {
             db: [],
             charts: {},
             ctxLabel: '',
 
             init: () => {
                 Chart.register(ChartDataLabels);
-                
-                // 1. Renderiza Anos
-                const yContainer = document.getElementById('yearSelector');
-                CONFIG.yearsList.forEach(y => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-year px-3 py-1 rounded text-xs font-mono cursor-pointer';
-                    btn.innerText = y;
-                    btn.id = 'y'+y;
-                    btn.onclick = () => Engine.selectYear(y);
-                    yContainer.appendChild(btn);
-                });
-
-                // 2. Renderiza Meses
-                const mContainer = document.getElementById('monthGrid');
+                const grid = document.getElementById('monthGrid');
                 CONFIG.months.forEach(m => {
                     const btn = document.createElement('button');
-                    btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold uppercase tracking-wider w-full';
+                    btn.className = 'btn-core btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold tracking-wider';
                     btn.innerText = m;
-                    btn.onclick = () => Engine.fetchMonth(m, btn);
-                    mContainer.appendChild(btn);
+                    btn.onclick = () => Core.fetchMonth(m, btn);
+                    grid.appendChild(btn);
                 });
-
-                document.getElementById('btnAnual').onclick = Engine.fetchAnnual;
-                
-                // Filtros
-                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Engine.applyFilters));
-
-                // Iniciar com o ano mais recente
-                Engine.selectYear(2026); 
-            },
-
-            // --- LÓGICA DE SELEÇÃO DE ANO ---
-            selectYear: (y) => {
-                CONFIG.year = y;
-                
-                // Atualiza UI
-                document.querySelectorAll('.btn-year').forEach(b => b.classList.remove('active'));
-                document.getElementById('y'+y).classList.add('active');
-                document.getElementById('lblAnualYear').innerText = y;
-                
-                // Limpa a tela e avisa o usuário
-                Engine.resetButtons();
-                document.getElementById('appContent').classList.add('hidden');
-                document.getElementById('statusBadge').innerText = `Ano ${y} Selecionado - Aguardando Mês`;
-                document.getElementById('statusBadge').className = "mt-2 inline-block text-xs text-blue-400 font-bold border border-blue-500/30 px-2 py-1 rounded bg-blue-900/20";
+                document.getElementById('btnAnual').addEventListener('click', Core.fetchAnnual);
+                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
             },
 
             setLoading: (active, msg="", pct=0) => {
                 const load = document.getElementById('loadingState');
                 const content = document.getElementById('appContent');
-                
                 if(active) {
                     content.classList.add('hidden');
                     load.classList.remove('hidden');
@@ -301,52 +246,48 @@
                 }
             },
 
-            resetButtons: () => document.querySelectorAll('.btn-mes, .btn-anual').forEach(b => b.classList.remove('active')),
+            resetButtons: () => document.querySelectorAll('button').forEach(b => b.classList.remove('active')),
 
-            // --- BUSCA DE DADOS (SEARCH ENGINE) ---
             fetchMonth: async (month, btn) => {
-                Engine.resetButtons();
+                Core.resetButtons();
                 btn.classList.add('active');
-                Engine.ctxLabel = `EM ${month} ${CONFIG.year}`;
-                Engine.setLoading(true, "Buscando dados...", 20);
+                Core.ctxLabel = `EM ${month} ${CONFIG.year}`;
+                Core.setLoading(true, "Conectando...", 10);
 
                 try {
-                    // Cache Buster para garantir arquivo novo
+                    // Cache Buster para evitar dados antigos
                     const url = `${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`;
                     const res = await fetch(url);
-                    if(!res.ok) throw new Error("404");
-                    const txt = await res.text();
-                    Engine.parseData(txt);
+                    if(!res.ok) throw new Error("Mês não disponível");
+                    const text = await res.text();
+                    Core.processData(text);
                 } catch(e) {
-                    Engine.setLoading(false);
-                    // Reset botão se falhar
-                    btn.classList.remove('active');
-                    alert(`Não foram encontrados dados para ${month}/${CONFIG.year}.`);
+                    Core.setLoading(false);
+                    alert("Dados não encontrados para este período.");
                 }
             },
 
             fetchAnnual: async () => {
-                Engine.resetButtons();
+                Core.resetButtons();
                 document.getElementById('btnAnual').classList.add('active');
-                Engine.ctxLabel = `NO ANO DE ${CONFIG.year}`;
-                Engine.setLoading(true, "Compilando ano...", 5);
+                Core.ctxLabel = `NO ANO DE ${CONFIG.year}`;
+                Core.setLoading(true, "Iniciando compilação anual...", 5);
 
                 let buffer = [];
-                let completed = 0;
+                let done = 0;
                 
-                // Dispara 12 requisições simultâneas (Performance máxima)
+                // Fetch Paralelo de todos os meses
                 const promises = CONFIG.months.map(async m => {
                     try {
                         const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
                         if(res.ok) return await res.text();
                     } catch(e) {}
-                    completed++;
-                    Engine.setLoading(true, `Baixando...`, Math.round((completed/12)*80));
+                    done++;
+                    Core.setLoading(true, `Baixando meses (${done}/12)...`, Math.round((done/12)*80));
                     return null;
                 });
 
                 const results = await Promise.all(promises);
-                
                 results.forEach(txt => {
                     if(txt) {
                         const p = Papa.parse(txt, {header:true, skipEmptyLines:true});
@@ -354,30 +295,23 @@
                     }
                 });
 
-                if(buffer.length > 0) Engine.processBuffer(buffer);
-                else {
-                    Engine.setLoading(false);
-                    document.getElementById('btnAnual').classList.remove('active');
-                    alert(`Nenhum dado encontrado no ano de ${CONFIG.year}.`);
-                }
+                if(buffer.length) Core.normalize(buffer);
+                else { Core.setLoading(false); alert("Nenhum dado anual encontrado."); }
             },
 
             processData: (csv) => {
-                Engine.setLoading(true, "Lendo...", 60);
+                Core.setLoading(true, "Processando...", 60);
                 Papa.parse(csv, {
                     header: true, skipEmptyLines: true, encoding: "UTF-8",
-                    complete: (res) => Engine.processBuffer(res.data)
+                    complete: (res) => Core.normalize(res.data)
                 });
             },
 
-            // --- PROCESSAMENTO E NORMALIZAÇÃO ---
-            processBuffer: (raw) => {
-                Engine.setLoading(true, "Organizando...", 90);
-                Engine.db = [];
+            normalize: (raw) => {
+                Core.setLoading(true, "Organizando...", 90);
+                Core.db = [];
+                if(!raw || !raw[0]) { Core.setLoading(false); return; }
 
-                if(!raw || !raw[0]) { Engine.setLoading(false); return; }
-
-                // Detecção de Colunas (Inteligente)
                 const keys = Object.keys(raw[0]);
                 const find = k => keys.find(x => x.toLowerCase().includes(k));
                 const cNat = find('natureza')||find('emerg');
@@ -385,21 +319,20 @@
                 const cSub = find('subgrupo')||find('detalhe');
                 const cVtr = find('viatura')||find('prefixo');
 
-                if(!cNat || !cObm) { Engine.setLoading(false); return alert("Erro: Estrutura do CSV inválida."); }
+                if(!cNat || !cObm) { Core.setLoading(false); return alert("Estrutura CSV inválida."); }
 
-                let id=1;
+                let id = 1;
                 raw.forEach(row => {
                     if(!row[cNat]) return;
-                    const s = (row[cObm]||"").toUpperCase();
-                    const v = (cVtr ? row[cVtr]||"" : "").toUpperCase();
-                    const nRaw = (row[cNat]||"N/A").toUpperCase();
+                    const s = (row[cObm] || "").toUpperCase();
+                    const v = (cVtr ? row[cVtr] || "" : "").toUpperCase();
+                    const nRaw = (row[cNat] || "N/A").toUpperCase();
 
-                    // 1. Pelotão
                     let pel = "OUTROS";
                     if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                     else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
-                    else if(s.includes("AQUATICA")||s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
-                    else if(s.includes("TERRESTRE")||(s.includes("BBS")&&!s.includes("1º"))) pel = "BBS (POA) - TERRESTRE";
+                    else if(s.includes("AQUATICA") || s.includes("AQUÁTICA")) pel = "BBS (POA) - AQUÁTICA";
+                    else if(s.includes("TERRESTRE") || s.includes("BBS")) pel = "BBS (POA) - TERRESTRE";
                     else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
                     else if(s.includes("FLORESTA")) pel = "FLORESTA";
                     else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
@@ -407,36 +340,35 @@
                     else if(s.includes("PARTENON")) pel = "PARTENON";
                     else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
                     else if(s.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
-                    else if(s.includes("TERESÓPOLIS")||s.includes("TERESOPOLIS")) pel = (v.includes("AR")||s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
-                    else if(s.includes("RESGATE")||s.includes("GBS")) pel = "AUTO RESGATE";
+                    else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) pel = (v.includes("AR") || s.includes("RESGATE")) ? "AUTO RESGATE" : "TERESÓPOLIS";
+                    else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
                     else {
                         const clean = s.replace("1º BBM / ","").replace("CIA / ","").replace("PEL / ","").trim();
                         if(clean.length > 2) pel = clean;
                     }
 
-                    // 2. Natureza
                     let nat = nRaw.trim();
                     if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                     else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
-                    else if(nRaw.includes("SALVAMENTO")||nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                    else if(nRaw.includes("SALVAMENTO") || nRaw.includes("BUSCA")) nat = "BUSCA E RESGATE";
                     else if(nRaw.includes("ÁRVORE")) nat = "CORTE DE ÁRVORE";
                     else if(nRaw.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
                     else if(nRaw.includes("APH")) nat = "PRÉ-HOSPITALAR";
                     else if(nRaw.includes("PERIGOSO")) nat = "PRODUTOS PERIGOSOS";
-                    else if(nRaw.includes("VISTORIA")&&nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
+                    else if(nRaw.includes("VISTORIA") && nRaw.includes("INC")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
 
                     let sub = row[cSub] ? row[cSub].trim() : "";
                     if(sub === "N/A" || sub === "0") sub = "";
 
-                    // 3. Mapa
                     let map = null;
                     if(row['Latitude'] && row['Longitude']) {
                         const la = String(row['Latitude']).replace(',','.').trim();
                         const lo = String(row['Longitude']).replace(',','.').trim();
+                        // Google Maps Pin Link Universal
                         map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
                     }
 
-                    Engine.db.push({
+                    Core.db.push({
                         id: row['Nº Oc.'] || id++,
                         date: row['Data'] || '--',
                         nat, sub, pel, map,
@@ -444,21 +376,21 @@
                     });
                 });
 
-                Engine.initFilters();
-                Engine.renderView(Engine.db);
-                Engine.setLoading(false);
+                Core.initFilters();
+                Core.renderView(Core.db);
+                Core.setLoading(false);
             },
 
-            // --- RENDERIZAÇÃO (Motor Gráfico v4.0) ---
             initFilters: () => {
                 const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                Engine.db.forEach(d => {
+                Core.db.forEach(d => {
                     s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
                     if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
                 });
                 const fill = (id, set) => {
                     const el = document.getElementById(id);
-                    el.innerHTML = `<option value="">${el.options[0].text}</option>`;
+                    const lbl = el.options[0].text;
+                    el.innerHTML = `<option value="">${lbl}</option>`;
                     Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
                 };
                 fill('fNat', s.n); fill('fSub', s.s); fill('fBai', s.b); fill('fPel', s.p);
@@ -471,32 +403,32 @@
                     b: document.getElementById('fBai').value,
                     p: document.getElementById('fPel').value
                 };
-                const res = Engine.db.filter(d => 
+                const res = Core.db.filter(d => 
                     (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
                     (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
                 );
-                Engine.renderView(res, true);
+                Core.renderView(res, true);
             },
 
             resetFilters: () => {
                 document.querySelectorAll('select').forEach(s => s.value = "");
-                Engine.renderView(Engine.db);
+                Core.renderView(Core.db);
             },
 
             renderView: (data, isFiltered=false) => {
                 const tot = data.length;
                 document.getElementById('kpiValue').innerText = tot.toLocaleString('pt-BR');
-                document.getElementById('kpiTitle').innerText = Engine.ctxLabel.includes("ANO") ? 
-                    `TOTAL DE OCORRÊNCIAS NO ANO DE ${CONFIG.year}` : 
-                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Engine.ctxLabel}`;
+                document.getElementById('kpiTitle').innerText = Core.ctxLabel.includes("ANO") ? 
+                    "TOTAL DE OCORRÊNCIAS ATENDIDAS NO ANO DE 2025" : 
+                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Core.ctxLabel}`;
                 document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
                 
-                document.getElementById('statusBadge').innerText = "Dados Carregados";
-                document.getElementById('statusBadge').className = "mt-2 inline-block text-xs text-emerald-400 font-bold border border-emerald-500/30 px-2 py-1 rounded bg-emerald-900/20";
+                document.getElementById('statusBadge').innerText = "Dados Visualizados";
+                document.getElementById('statusBadge').classList = "mt-2 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-[10px] text-emerald-400 font-mono uppercase";
 
                 const tbody = document.getElementById('tblBody');
-                // Batch Rendering (Rápido)
-                const html = data.slice(0, 500).map((d, i) => {
+                // Tabela em batch (rápida)
+                const html = data.slice(0, 800).map((d, i) => {
                     const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
                     const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
                     return `
@@ -511,49 +443,53 @@
                         <td class="p-3 text-right text-slate-600">#${d.id}</td>
                     </tr>`;
                 }).join('');
+                
                 tbody.innerHTML = html;
 
-                if(tot > 0) setTimeout(() => Engine.buildCharts(data), 50);
+                if(tot > 0) setTimeout(() => Core.buildCharts(data), 50);
             },
 
             buildCharts: (data) => {
                 const agg = { p:{}, n:{}, s:{} };
                 data.forEach(d => {
-                    agg.p[d.pel] = (agg.p[d.pel]||0)+1;
-                    agg.n[d.nat] = (agg.n[d.nat]||0)+1;
-                    if(d.sub) agg.s[`${d.nat}___${d.sub}`] = (agg.s[`${d.nat}___${d.sub}`]||0)+1;
+                    agg.p[d.pel] = (agg.p[d.pel] || 0) + 1;
+                    agg.n[d.nat] = (agg.n[d.nat] || 0) + 1;
+                    if(d.sub) agg.s[`${d.nat}___${d.sub}`] = (agg.s[`${d.nat}___${d.sub}`] || 0) + 1;
                 });
 
-                const sort = o => Object.entries(o).sort((a,b)=>b[1]-a[1]);
-                Engine.draw('cvsPelotoes', 'p', sort(agg.p));
-                Engine.draw('cvsNatureza', 'n', sort(agg.n));
-                Engine.draw('cvsSubgrupos', 's', sort(agg.s).filter(x=>x[1]>=1));
+                const sort = o => Object.entries(o).sort((a,b) => b[1] - a[1]);
+                Core.draw('cvsPelotoes', 'p', sort(agg.p));
+                Core.draw('cvsNatureza', 'n', sort(agg.n));
+                Core.draw('cvsSubgrupos', 's', sort(agg.s).filter(x => x[1] >= 1));
             },
 
             draw: (id, type, dataset) => {
-                if(Engine.charts[id]) Engine.charts[id].destroy();
+                if(Core.charts[id]) Core.charts[id].destroy();
 
                 const ctx = document.getElementById(id).getContext('2d');
                 
                 const labels = dataset.map(x => {
-                    if(type==='n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
-                    if(type==='s') {
+                    if(type === 'n' && x[0].includes("VISTORIA")) return ["📋 VISTORIA DE SEGURANÇA", "CONTRA INCÊNDIO"];
+                    if(type === 's') {
                         const [n,s] = x[0].split('___');
-                        const i = (THEME[n]||{i:"📄"}).i;
-                        return `${i} ${n} [${s}]`;
+                        const icon = (THEME[n] || {i:"📄"}).i;
+                        return `${icon} ${n} [${s}]`;
                     }
-                    if(type==='n') return `${(THEME[x[0]]||{i:"📄"}).i} ${x[0]}`;
+                    if(type === 'n') {
+                        const icon = (THEME[x[0]] || {i:"📄"}).i;
+                        return `${icon} ${x[0]}`;
+                    }
                     return x[0];
                 });
 
                 const values = dataset.map(x => x[1]);
 
-                if(type==='s') {
+                if(type === 's') {
                     const h = Math.max(500, values.length * 28);
                     document.getElementById('wrapSubgrupos').style.height = h + 'px';
                 }
 
-                Engine.charts[id] = new Chart(ctx, {
+                Core.charts[id] = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -563,9 +499,9 @@
                             barPercentage: 0.7,
                             backgroundColor: (c) => {
                                 const i = c.dataIndex;
-                                if(type==='p') return CONFIG.poa.includes(dataset[i][0]) ? '#10B981' : '#64748B';
-                                const key = type==='s' ? dataset[i][0].split('___')[0] : dataset[i][0];
-                                return (THEME[key]||{c:"#64748B"}).c;
+                                if(type === 'p') return CONFIG.poa.includes(dataset[i][0]) ? '#10B981' : '#64748B';
+                                const key = type === 's' ? dataset[i][0].split('___')[0] : dataset[i][0];
+                                return (THEME[key] || {c:"#64748B"}).c;
                             },
                             hoverBorderWidth: 2, hoverBorderColor: '#fff'
                         }]
@@ -593,16 +529,16 @@
                                 ticks: {
                                     autoSkip: false,
                                     color: (c) => {
-                                        if(type==='p') {
-                                            const l = Engine.charts[id].data.labels[c.index];
-                                            return CONFIG.poa.includes(l) ? '#10B981' : '#94a3b8';
+                                        if(type === 'p') {
+                                            const l = Core.charts[id].data.labels[c.index];
+                                            return CONFIG.poa.includes(l) ? '#10B981' : '#64748B';
                                         }
                                         return '#94a3b8';
                                     },
                                     font: (c) => {
                                         let size = 10;
-                                        if(type==='p') {
-                                            const l = Engine.charts[id].data.labels[c.index];
+                                        if(type === 'p') {
+                                            const l = Core.charts[id].data.labels[c.index];
                                             if(CONFIG.poa.includes(l)) size = 13;
                                         }
                                         return { size: size, family: 'monospace' };
@@ -615,7 +551,7 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', Engine.init);
+        document.addEventListener('DOMContentLoaded', Core.init);
     </script>
 </body>
 </html>
