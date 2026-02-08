@@ -1,460 +1,652 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnição Operacional em Porto Alegre</title>
+    <title>Sistema E-193 | Estatísticas 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'bombeiros-orange': '#FF8C00',
-                        'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'moss-green': '#9BE36D',
-                        'total-green': '#4ade80'
+                        'fire-yellow': '#FFD700',
+                        'bombeiros-orange': '#F97316',
+                        'dark-bg': '#0f172a',
+                        'cb-green': '#10B981',
+                        'insect-brown': '#D97706' // Cor Favorita para Insetos
                     },
-                    fontFamily: {
+                    fontFamily: { 
                         sans: ['Inter', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
                     }
                 }
             }
         }
     </script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        .hero-background { position: relative; min-height: 100vh; }
-        .hero-background::before { 
-            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
-            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center; background-repeat: no-repeat; background-size: 500px;
-            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .hero-bg::before {
+            content: ''; position: absolute; top: 20%; left: 10%; right: 10%; bottom: 0;
+            background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
+            background-size: contain; opacity: 0.08; filter: grayscale(100%); pointer-events: none;
         }
-        .hero-background::after {
-            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
-            z-index: 1; pointer-events: none;
-        }
-        .content-wrapper { position: relative; z-index: 10; }
-
-        .card-monitor {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: row; 
-            /* Importante para o layout Masonry não quebrar o card no meio */
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-        .card-monitor:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-            background: rgba(30, 41, 59, 0.98);
-            border-color: rgba(255, 140, 0, 0.5);
-            z-index: 50;
+        .hero-bg::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.95) 100%);
+            pointer-events: none;
         }
 
-        .vertical-text {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .stats-container {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
             border-radius: 1rem;
-            padding: 1rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        .tooltip-box {
-            visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
-            width: max-content; min-width: 150px; z-index: 100; transition: 0.2s; pointer-events: none;
-            box-shadow: 0 10px 40px black; margin-top: 10px;
+        .btn-mes { transition: all 0.2s ease-in-out; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-mes:hover { background: rgba(255,255,255,0.1); border-color: #10B981; }
+        .btn-mes.active { 
+            background: linear-gradient(45deg, #10B981, #059669); color: white; 
+            border-color: #A7F3D0; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); transform: scale(1.05);
         }
-        .group:hover .tooltip-box { visibility: visible; opacity: 1; }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
+        /* Barra de Progresso */
+        #progressContainer { transition: opacity 0.3s; }
+        .progress-bar-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
 
-        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .table-scroll { max-height: 600px; overflow-y: auto; will-change: scroll-position; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        
+        thead th { position: sticky; top: 0; z-index: 10; background-color: #0f172a; }
+
+        .filter-select {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .filter-select:focus { border-color: #F97316; }
     </style>
 </head>
-<body class="hero-background">
+<body class="min-h-screen flex flex-col">
 
-    <div id="loading">
-        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando guarnições...</p>
-    </div>
+    <div class="hero-bg"></div>
 
-    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
+    <div class="container mx-auto px-4 py-6 relative z-10 flex-grow">
         
-        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
-            <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
-            </div>
-
-            <div class="text-center flex-grow">
-                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
-                    Guarnição Operacional
+        <header class="flex flex-col md:flex-row items-center justify-between mb-6 gap-6 glass-card p-6">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 drop-shadow-lg opacity-90">
+            
+            <div class="text-center flex-1">
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-white mb-1 leading-none">
+                    Estatísticas de Ocorrências
                 </h1>
-                <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
-                    EM PORTO ALEGRE
+                <h2 class="text-xl font-bold text-fire-yellow tracking-widest uppercase">
+                    1º BBM - PORTO ALEGRE (<span id="anoTitulo">2025</span>)
                 </h2>
-                
-                <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
-                    <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
-                    <span>|</span>
-                    <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
-                </div>
+                <div class="mt-2 text-sm text-gray-400 font-mono" id="statusMsg">Sistema Online. Aguardando seleção.</div>
             </div>
 
-            <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
-            </div>
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 drop-shadow-lg opacity-90">
         </header>
 
-        <main class="w-full max-w-7xl mx-auto flex-grow">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-                
-                <div class="stats-container border-l-4 border-bombeiros-orange">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA 24H)
-                    </h3>
-                    <div class="flex justify-around items-center">
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
-                            <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
-                            <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
-                            <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
-                            <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
-                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
-                            <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="w-px h-10 bg-white/10 mx-2"></div>
-                        <div class="group relative text-center">
-                            <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
-                        </div>
-                    </div>
-                </div>
+        <div id="progressContainer" class="hidden mb-6 glass-card p-4">
+            <div class="flex justify-between mb-1">
+                <span class="text-sm font-bold text-blue-400 font-mono" id="progressText">Inicializando...</span>
+                <span class="text-sm font-bold text-white font-mono" id="progressPercent">0%</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-4 border border-gray-600">
+                <div id="progressBar" class="bg-blue-500 h-3.5 rounded-full progress-bar-striped transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
 
-                <div class="stats-container border-l-4 border-fire-red">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
-                    </h3>
-                    <div class="flex justify-around items-center">
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-abt">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box"><ul id="list-abt" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="w-px h-10 bg-white/10"></div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR / AEM)</span>
-                            <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                    </div>
+        <div class="glass-card p-4 mb-6">
+            <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-2" id="mesesContainer"></div>
+        </div>
+
+        <div id="dashboardArea" class="hidden opacity-0 transition-opacity duration-700">
+            
+            <div class="flex justify-center mb-8">
+                <div class="bg-emerald-900/40 border border-emerald-500/50 text-emerald-400 px-10 py-4 rounded-2xl text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] backdrop-blur-md">
+                    <p class="text-xs uppercase font-bold tracking-[0.2em] mb-1 text-emerald-200" id="tituloTotalLabel">TOTAL DE OCORRÊNCIAS ATENDIDAS</p>
+                    <p class="text-5xl font-black text-white drop-shadow-md" id="totalDisplay">0</p>
                 </div>
             </div>
 
-            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="glass-card p-4">
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
+                    <div class="relative h-[500px]"><canvas id="chartPelotoes"></canvas></div>
+                </div>
+                <div class="glass-card p-4">
+                    <h3 class="text-base font-bold text-white mb-2 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
+                    <div class="relative h-[500px]"><canvas id="chartNatureza"></canvas></div>
+                </div>
+            </div>
+
+            <div class="glass-card p-4 mb-6">
+                <h3 class="text-base font-bold text-white mb-2 border-l-4 border-blue-500 pl-3 uppercase">Detalhamento dos Subgrupos (>= 1 Ocorrência)</h3>
+                <div id="subgrupoContainer" class="relative" style="height: 600px;"><canvas id="chartSubgrupos"></canvas></div>
+            </div>
+
+            <div class="glass-card p-1 overflow-hidden">
+                <div class="p-4 bg-black/30 border-b border-white/10">
+                    <h3 class="text-base font-bold text-white border-l-4 border-blue-500 pl-3 uppercase mb-4">Registro de Ocorrências</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-2">
+                        <select id="filterNatureza" class="filter-select"><option value="">Todas as Naturezas</option></select>
+                        <select id="filterSubgrupo" class="filter-select"><option value="">Todos os Subgrupos</option></select>
+                        <select id="filterBairro" class="filter-select"><option value="">Todos os Bairros</option></select>
+                        <select id="filterPelotao" class="filter-select"><option value="">Todos os Pelotões</option></select>
+                        <button onclick="resetFilters()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors flex items-center justify-center">
+                            <i class="fas fa-undo mr-2"></i> Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-xs text-gray-400 font-mono">Linhas: <span id="totalLista" class="text-white font-bold">0</span></span>
+                    </div>
                 </div>
 
-        </main>
+                <div class="table-scroll">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="text-xs text-gray-400 uppercase font-bold bg-slate-900">
+                            <tr>
+                                <th class="p-3 text-center w-12 border-b border-gray-700">#</th>
+                                <th class="p-3 border-b border-gray-700">Data</th>
+                                <th class="p-3 border-b border-gray-700">Natureza</th>
+                                <th class="p-3 border-b border-gray-700">Subgrupo</th>
+                                <th class="p-3 border-b border-gray-700">Bairro</th>
+                                <th class="p-3 border-b border-gray-700">Pelotão</th>
+                                <th class="p-3 text-center border-b border-gray-700">Map</th>
+                                <th class="p-3 text-right border-b border-gray-700">ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaBody" class="text-sm text-gray-300 font-mono"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-        <footer class="mt-auto py-6 text-center border-t border-white/5">
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
-                Sistema de Controle Operacional - 1º BBM - 2026
-            </p>
-            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
-        </footer>
+        <div class="h-10"></div>
     </div>
 
     <script>
-        // ============================================================
-        // CONFIGURAÇÃO
-        // ============================================================
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
-        // ============================================================
+        // ================= CONFIGURAÇÕES =================
+        const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main'; 
+        const ANO_ATUAL = 2025;
+        
+        Chart.register(ChartDataLabels);
 
-        // --- ORDEM OTIMIZADA PARA PAREAMENTO ---
-        const ORDEM_QUARTEIS = [
-            "OFICIAL DE DIA", 
-            "COBOM", 
-            "AÇORIANOS", 
-            "ASSUNÇÃO", 
-            "TERESÓPOLIS", 
-            "RESTINGA", 
-            "BELÉM NOVO", 
-            "FLORESTA", 
-            "PASSO D'AREIA", 
-            "PARTENON", 
-            "CANIL", 
-            "AQUÁTICA", 
-            "MERGULHO"
+        // --- DEFINIÇÃO DE CORES E ESTILOS ---
+        const naturezasStyle = {
+            "INCÊNDIO": { color: "#FFD700", icon: "🔥", cssClass: "text-fire-yellow" },
+            "MANEJO DE INSETOS": { color: "#D97706", icon: "🐝", cssClass: "text-amber-600" }, 
+            "BUSCA E RESGATE": { color: "#F97316", icon: "🛟", cssClass: "text-orange-500" },
+            "CORTE DE ÁRVORE": { color: "#4ADE80", icon: "🌳", cssClass: "text-green-400" },
+            "AÇÕES PREVENTIVAS": { color: "#9CA3AF", icon: "🛡️", cssClass: "text-gray-400" },
+            "PRÉ-HOSPITALAR": { color: "#EF4444", icon: "🚑", cssClass: "text-red-500" },
+            "PRODUTOS PERIGOSOS": { color: "#FFFFFF", icon: "☢️", cssClass: "text-white" },
+            "OUTROS": { color: "#64748B", icon: "⚠️", cssClass: "text-bombeiros-orange" }
+        };
+
+        const meses = [
+            { id: 'JAN', nome: 'JANEIRO' }, { id: 'FEV', nome: 'FEVEREIRO' },
+            { id: 'MAR', nome: 'MARÇO' }, { id: 'ABR', nome: 'ABRIL' },
+            { id: 'MAI', nome: 'MAIO' }, { id: 'JUN', nome: 'JUNHO' },
+            { id: 'JUL', nome: 'JULHO' }, { id: 'AGO', nome: 'AGOSTO' },
+            { id: 'SET', nome: 'SETEMBRO' }, { id: 'OUT', nome: 'OUTUBRO' },
+            { id: 'NOV', nome: 'NOVEMBRO' }, { id: 'DEZ', nome: 'DEZEMBRO' }
         ];
 
-        function getDataOperacional() {
-            const agora = new Date();
-            if (agora.getHours() < 8) {
-                agora.setDate(agora.getDate() - 1);
-            }
-            return agora;
-        }
+        let chartP = null, chartN = null, chartS = null;
+        let mesSelecionadoNome = "";
+        let dadosGlobais = [];
 
-        function atualizarRelogio() {
-            const dataOp = getDataOperacional();
-            const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
-            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
-        }
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
-
-        async function iniciarSistema() {
-            try {
-                const req = await fetch(URL_DADOS);
-                const dados = await req.json();
-
-                if(dados.erro) {
-                    document.getElementById('msg-loading').innerText = "Aguardando envio do PC...";
-                    setTimeout(iniciarSistema, 5000); 
-                    return;
-                }
-
-                // V18: Sem filtro de hora, mostra escala completa
-                processarDados(dados);
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-
-            } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
-        }
-
-        function formatarTurno(raw) {
-            if(!raw) return "24h";
-            
-            const nums = raw.match(/(\d{2}:\d{2})/g);
-            if(nums && nums.length >= 2) {
-                const h1 = nums[0];
-                const h2 = nums[1];
-                
-                const [hh1] = h1.split(':').map(Number);
-                const [hh2] = h2.split(':').map(Number);
-                let diff = hh2 - hh1;
-                if(diff < 0) diff += 24;
-
-                let carga = "";
-                if(diff >= 23 || diff === 0) carga = "(24h)";
-                else if(diff >= 11 && diff <= 13) carga = "(12h)";
-
-                return `${h1} às ${h2} ${carga}`;
-            }
-            return raw;
-        }
-
-        function extrairID(nomeCompleto) {
-            const match = nomeCompleto.match(/(\d{7})/);
-            return match ? match[1] : null; 
-        }
-
-        function limparNome(nomeCompleto) {
-            return nomeCompleto.replace(/\d{7}\s+/, '').trim();
-        }
-
-        function processarDados(dados) {
-            const estrutura = {};
-            const mapOficiais = new Map();
-            const mapSargentos = new Map();
-            const mapPracas = new Map();
-            const statsViaturas = { abt: new Set(), ar: new Set() };
-
-            dados.forEach(d => {
-                let obmRaw = (d.obm || "").toUpperCase();
-                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                let nomeCompleto = (d.nome || "").trim().toUpperCase();
-                
-                let idMilitar = extrairID(nomeCompleto);
-                let idUnico = idMilitar ? idMilitar : nomeCompleto;
-                let nomeExibicao = limparNome(nomeCompleto);
-                
-                let func = (d.func || "").trim();
-                let hora = formatarTurno(d.horario || "");
-
-                let obmKey = "OUTROS";
-                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
-                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
-                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
-                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
-                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
-                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
-                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
-                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
-                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
-                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
-                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
-                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
-                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
-
-                if(!estrutura[obmKey]) estrutura[obmKey] = [];
-                
-                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
-                if(!viaturaObj) {
-                    viaturaObj = { nome: vtr, guarnicao: [] };
-                    estrutura[obmKey].push(viaturaObj);
-                }
-                
-                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: hora });
-
-                    if(nomeCompleto.includes("SGT")) mapSargentos.set(idUnico, nomeExibicao);
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) mapOficiais.set(idUnico, nomeExibicao);
-                    else mapPracas.set(idUnico, nomeExibicao);
-                }
-
-                if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
-                if(vtr.includes("AR") || vtr.includes("AEM")) statsViaturas.ar.add(vtr);
+        // ================= INICIALIZAÇÃO =================
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('mesesContainer');
+            meses.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 px-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-white/10 hover:bg-white/10 hover:border-emerald-500';
+                btn.innerText = m.id;
+                btn.onclick = () => iniciarProcesso(m.id, m.nome, btn);
+                container.appendChild(btn);
             });
 
-            atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
-            renderizarCards(estrutura);
+            ['filterNatureza', 'filterSubgrupo', 'filterBairro', 'filterPelotao'].forEach(id => {
+                document.getElementById(id).addEventListener('change', aplicarFiltros);
+            });
+        });
+
+        // ================= GERENCIADOR DE PROCESSO =================
+        function updateProgress(percent, text) {
+            const bar = document.getElementById('progressBar');
+            const txt = document.getElementById('progressText');
+            const per = document.getElementById('progressPercent');
+            const container = document.getElementById('progressContainer');
+
+            container.classList.remove('hidden');
+            bar.style.width = percent + '%';
+            txt.innerText = text;
+            per.innerText = Math.floor(percent) + '%';
+
+            if (percent >= 100) {
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                    bar.style.width = '0%'; 
+                }, 1500);
+            }
         }
 
-        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
-            const capArr = Array.from(mapOficiais.values());
-            const sgtArr = Array.from(mapSargentos.values());
-            const sdArr = Array.from(mapPracas.values());
-            const abtArr = Array.from(statsViaturas.abt);
-            const arArr = Array.from(statsViaturas.ar);
+        async function iniciarProcesso(mesId, mesNome, btnElement) {
+            mesSelecionadoNome = mesNome;
 
-            const fill = (idC, idL, arr) => {
-                document.getElementById(idC).innerText = arr.length;
-                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
+            document.querySelectorAll('.btn-mes').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+            });
+            btnElement.classList.add('active');
+            
+            const dashboard = document.getElementById('dashboardArea');
+            dashboard.classList.add('hidden');
+            dashboard.classList.remove('opacity-100');
+            dashboard.classList.add('opacity-0');
+
+            try {
+                updateProgress(10, `Conectando ao servidor...`);
+                const url = `${GITHUB_BASE_URL}/dados/${mesId}_${ANO_ATUAL}.csv`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Arquivo não encontrado: ${url}`);
+
+                updateProgress(40, "Baixando dados...");
+                const csvText = await response.text();
+                
+                updateProgress(60, "Processando CSV...");
+
+                setTimeout(() => {
+                    parseAndRender(csvText);
+                }, 100);
+
+            } catch (error) {
+                console.error(error);
+                updateProgress(0, "Erro fatal.");
+                document.getElementById('statusMsg').innerHTML = `<span class="text-red-500">Erro: ${error.message}</span>`;
+                alert(error.message);
+            }
+        }
+
+        function parseAndRender(csvText) {
+            Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true,
+                encoding: "UTF-8",
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        updateProgress(80, "Organizando Gráficos...");
+                        
+                        setTimeout(() => {
+                            try {
+                                processarDadosOtimizado(results.data);
+                                updateProgress(100, "Concluído!");
+                                
+                                const dashboard = document.getElementById('dashboardArea');
+                                dashboard.classList.remove('hidden');
+                                requestAnimationFrame(() => {
+                                    dashboard.classList.remove('opacity-0');
+                                    dashboard.classList.add('opacity-100');
+                                });
+                                
+                                document.getElementById('statusMsg').innerText = "Dados carregados com sucesso.";
+                            } catch (e) {
+                                alert("Erro no processamento: " + e.message);
+                            }
+                        }, 50);
+                    } else {
+                        alert("Arquivo vazio.");
+                    }
+                }
+            });
+        }
+
+        // ================= PROCESSAMENTO LÓGICO =================
+        function processarDadosOtimizado(data) {
+            dadosGlobais = [];
+
+            const chaves = Object.keys(data[0]);
+            const colNat = chaves.find(k => k.match(/Emerg/i) || k.match(/Natureza/i));
+            const colObm = chaves.find(k => k.match(/Obm/i) || k.match(/Guarni/i));
+            const colSub = chaves.find(k => k.match(/subgrupo/i) || k.match(/detalhe/i) || k.match(/tipo/i));
+
+            if (!colNat || !colObm) throw new Error("Colunas obrigatórias não encontradas.");
+
+            let total = 0;
+
+            data.forEach((row, index) => {
+                total++;
+                const obmValor = row[colObm];
+                const natValor = row[colNat];
+                let subValor = colSub ? (row[colSub] || "N/A") : "N/A";
+                
+                let pel = "OUTROS";
+                const s = obmValor ? String(obmValor).toUpperCase() : "";
+                if(s.includes("AÇORIANOS") || s.includes("ACORIANOS")) pel = "AÇORIANOS";
+                else if(s.includes("FLORESTA")) pel = "FLORESTA";
+                else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
+                else if(s.includes("RESTINGA")) pel = "RESTINGA";
+                else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) pel = "TERESÓPOLIS";
+                else if(s.includes("PARTENON")) pel = "PARTENON";
+                else if(s.includes("BELÉM") || s.includes("BELEM")) pel = "BELÉM NOVO";
+                else if(s.includes("ASSUNÇÃO") || s.includes("ASSUNCAO")) pel = "ASSUNÇÃO";
+                else if(s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
+
+                let nat = "OUTROS";
+                const n = natValor ? String(natValor).toUpperCase() : "OUTROS";
+                if(n.includes("INSETO")) nat = "MANEJO DE INSETOS";
+                else if(n.includes("INCÊNDIO") || n.includes("INCENDIO")) nat = "INCÊNDIO";
+                else if(n.includes("SALVAMENTO") || n.includes("BUSCA")) nat = "BUSCA E RESGATE";
+                else if(n.includes("ÁRVORE") || n.includes("ARVORE")) nat = "CORTE DE ÁRVORE";
+                else if(n.includes("PREVENTIVA")) nat = "AÇÕES PREVENTIVAS";
+                else if(n.includes("APH") || n.includes("HOSPITALAR")) nat = "PRÉ-HOSPITALAR";
+                else if(n.includes("PERIGOSO") || n.includes("HAZMAT")) nat = "PRODUTOS PERIGOSOS";
+
+                if (!subValor || subValor === "N/A") subValor = "";
+                else subValor = subValor.trim();
+
+                dadosGlobais.push({
+                    id: row['Nº Oc.'] || row['ID'] || total,
+                    data: row['Data'] || row['DATA'] || '--',
+                    nat: nat,
+                    sub: subValor,
+                    bairro: (row['Bairro'] || row['BAIRRO'] || '--').toUpperCase(),
+                    pel: pel,
+                    lat: row['Latitude'] || row['LATITUDE'],
+                    lon: row['Longitude'] || row['LONGITUDE']
+                });
+            });
+
+            popularFiltros();
+            renderizarTabelaEGraficos(dadosGlobais);
+        }
+
+        function popularFiltros() {
+            const naturezas = new Set();
+            const subgrupos = new Set();
+            const bairros = new Set();
+            const pelotoes = new Set();
+
+            dadosGlobais.forEach(d => {
+                if(d.nat) naturezas.add(d.nat);
+                if(d.sub) subgrupos.add(d.sub);
+                if(d.bairro && d.bairro !== '--') bairros.add(d.bairro);
+                if(d.pel) pelotoes.add(d.pel);
+            });
+
+            const fillSelect = (id, set) => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = sel.options[0].outerHTML; 
+                Array.from(set).sort().forEach(val => {
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerText = val;
+                    sel.appendChild(opt);
+                });
             };
 
-            fill('count-cap', 'list-cap', capArr);
-            fill('count-sgt', 'list-sgt', sgtArr);
-            fill('count-sd', 'list-sd', sdArr);
-            
-            const total = capArr.length + sgtArr.length + sdArr.length;
-            document.getElementById('count-total').innerText = total;
-
-            document.getElementById('count-abt').innerText = abtArr.length;
-            document.getElementById('count-ar').innerText = arArr.length;
-            
-            document.getElementById('list-abt').innerHTML = abtArr.map(x => `<li>• ${x}</li>`).join('');
-            document.getElementById('list-ar').innerHTML = arArr.map(x => `<li>• ${x}</li>`).join('');
+            fillSelect('filterNatureza', naturezas);
+            fillSelect('filterSubgrupo', subgrupos);
+            fillSelect('filterBairro', bairros);
+            fillSelect('filterPelotao', pelotoes);
         }
 
-        function renderizarCards(estrutura) {
-            const grid = document.getElementById('grid-cards');
-            grid.innerHTML = "";
+        function aplicarFiltros() {
+            const fNat = document.getElementById('filterNatureza').value;
+            const fSub = document.getElementById('filterSubgrupo').value;
+            const fBai = document.getElementById('filterBairro').value;
+            const fPel = document.getElementById('filterPelotao').value;
 
-            const keysOrdenadas = [
-                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
-                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
-            ];
+            const dadosFiltrados = dadosGlobais.filter(d => {
+                return (fNat === "" || d.nat === fNat) &&
+                       (fSub === "" || d.sub === fSub) &&
+                       (fBai === "" || d.bairro === fBai) &&
+                       (fPel === "" || d.pel === fPel);
+            });
 
-            keysOrdenadas.forEach(obmName => {
-                const viaturasRaw = estrutura[obmName];
-                const gruposUnicos = [];
+            renderizarTabelaEGraficos(dadosFiltrados, true);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterNatureza').value = "";
+            document.getElementById('filterSubgrupo').value = "";
+            document.getElementById('filterBairro').value = "";
+            document.getElementById('filterPelotao').value = "";
+            renderizarTabelaEGraficos(dadosGlobais);
+        }
+
+        function renderizarTabelaEGraficos(dados, isFiltrado = false) {
+            const total = dados.length;
+            const totalGlobal = dadosGlobais.length;
+            
+            document.getElementById('totalDisplay').innerText = total;
+            document.getElementById('tituloTotalLabel').innerText = `TOTAL DE OCORRÊNCIAS ATENDIDAS ${mesSelecionadoNome} ${ANO_ATUAL}`;
+            
+            const textoLinhas = isFiltrado 
+                ? `${total} (Filtrado de ${totalGlobal})` 
+                : total;
+            document.getElementById('totalLista').innerText = textoLinhas;
+
+            const countPelotao = {};
+            const countNatureza = {};
+            const countSubgrupo = {}; 
+
+            let tableRowsHTML = "";
+
+            dados.forEach((d, index) => {
+                countPelotao[d.pel] = (countPelotao[d.pel] || 0) + 1;
+                countNatureza[d.nat] = (countNatureza[d.nat] || 0) + 1;
                 
-                viaturasRaw.forEach(vtr => {
-                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
-                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
-                    
-                    if(grupoExistente && assinatura.length > 0) {
-                        grupoExistente.nomesVtrs.push(vtr.nome);
-                    } else {
-                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
-                    }
-                });
+                if (d.sub) {
+                    let subKey = `${d.nat}___${d.sub}`; 
+                    countSubgrupo[subKey] = (countSubgrupo[subKey] || 0) + 1;
+                }
 
-                const card = document.createElement('div');
-                // IMPORTANTE: Adicionado mb-5 para espaçamento vertical no Masonry
-                card.className = "card-monitor break-inside-avoid mb-5"; 
+                const style = naturezasStyle[d.nat] || naturezasStyle["OUTROS"];
+                
+                let lat = d.lat;
+                let lon = d.lon;
+                let mapsBtn = `<span class="text-gray-600 cursor-not-allowed text-center block opacity-30"><i class="fas fa-map-marker-slash"></i></span>`;
+                
+                if(lat && lon) {
+                    lat = String(lat).replace(',', '.');
+                    lon = String(lon).replace(',', '.');
+                    mapsBtn = `<a href="https://www.google.com/maps/search/?api=1&query=$${lat},${lon}" target="_blank" class="text-blue-400 hover:text-white transition-colors block text-center transform hover:scale-125"><i class="fas fa-map-marker-alt fa-lg"></i></a>`;
+                }
 
-                let content = `
-                    <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
-                        <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
-                            ${obmName}
-                        </h2>
-                    </div>
+                tableRowsHTML += `
+                    <tr class="hover:bg-white/5 border-b border-gray-800/50 transition-colors odd:bg-white/5 even:bg-transparent">
+                        <td class="p-3 text-center font-bold text-gray-500 text-xs font-mono">${index + 1}</td>
+                        <td class="p-3 font-mono text-gray-400 whitespace-nowrap text-xs">${d.data}</td>
+                        <td class="p-3 font-bold ${style.cssClass} text-xs whitespace-nowrap font-mono"><span class="mr-2">${style.icon}</span>${d.nat}</td>
+                        <td class="p-3 text-xs text-blue-200/80 font-mono">${d.sub}</td>
+                        <td class="p-3 uppercase text-xs tracking-wider text-gray-400 font-mono">${d.bairro}</td>
+                        <td class="p-3"><span class="text-fire-yellow font-bold text-xs whitespace-nowrap font-mono">${d.pel}</span></td>
+                        <td class="p-3">${mapsBtn}</td>
+                        <td class="p-3 text-right font-mono opacity-30 text-xs">#${d.id}</td>
+                    </tr>
                 `;
+            });
 
-                content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
+            document.getElementById('tabelaBody').innerHTML = tableRowsHTML;
 
-                gruposUnicos.forEach(grupo => {
-                    grupo.guarnicao.sort((a,b) => {
-                        const getScore = (role) => {
-                            let r = role.toUpperCase();
-                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
-                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
-                            return 3;
-                        }
-                        // Ordena por patente/função E depois por horário
-                        let scoreA = getScore(a.f);
-                        let scoreB = getScore(b.f);
-                        if(scoreA !== scoreB) return scoreA - scoreB;
-                        return a.h.localeCompare(b.h); 
-                    });
+            if (total > 0) {
+                prepararGraficos(countPelotao, countNatureza, countSubgrupo);
+            }
+        }
 
-                    const listaVtrs = grupo.nomesVtrs.join(' / ');
+        function prepararGraficos(countPelotao, countNatureza, countSubgrupo) {
+            const sortedPelotao = Object.entries(countPelotao).sort((a,b) => b[1] - a[1]);
+            const sortedNatureza = Object.entries(countNatureza).sort((a,b) => b[1] - a[1]);
+            
+            const sortedSubgrupo = Object.entries(countSubgrupo)
+                .filter(([key, count]) => count >= 1)
+                .sort((a,b) => b[1] - a[1]);
 
-                    content += `
-                        <div class="w-full flex flex-col items-center">
-                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
-                                ${listaVtrs}
-                            </span>
-                            <div class="w-full flex flex-col gap-2">
-                                ${grupo.guarnicao.map(m => `
-                                    <div class="text-center group">
-                                        <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
-                                            ${m.n}
-                                        </div>
-                                        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                });
+            const maxVal = sortedPelotao.length > 0 ? sortedPelotao[0][1] : 1;
+            const pelotoesColors = sortedPelotao.map(([nome, val]) => {
+                const intensity = 0.3 + (0.7 * (val / maxVal)); 
+                return `rgba(77, 124, 15, ${intensity})`; 
+            });
 
-                content += `</div>`;
-                card.innerHTML = content;
-                grid.appendChild(card);
+            const natLabels = sortedNatureza.map(x => {
+                const style = naturezasStyle[x[0]] || naturezasStyle["OUTROS"];
+                return `${style.icon} ${x[0]}`;
+            });
+            const natColors = sortedNatureza.map(x => (naturezasStyle[x[0]] || naturezasStyle["OUTROS"]).color);
+
+            const subLabels = sortedSubgrupo.map(item => {
+                const [natPai, subNome] = item[0].split('___');
+                const style = naturezasStyle[natPai] || naturezasStyle["OUTROS"];
+                return `${style.icon} ${natPai} [${subNome}]`;
+            });
+            const subColors = sortedSubgrupo.map(item => {
+                const natPai = item[0].split('___')[0];
+                return (naturezasStyle[natPai] || naturezasStyle["OUTROS"]).color;
+            });
+
+            renderizarGraficos({
+                pelotoes: { labels: sortedPelotao.map(x=>x[0]), data: sortedPelotao.map(x=>x[1]), colors: pelotoesColors },
+                natureza: { labels: natLabels, data: sortedNatureza.map(x=>x[1]), colors: natColors },
+                subgrupos: { labels: subLabels, data: sortedSubgrupo.map(x=>x[1]), colors: subColors }
             });
         }
 
-        iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
+        function renderizarGraficos(dados) {
+            // AJUSTE: Fonte Monoespaçada Global para Gráficos
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+            Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+
+            const commonOptions = {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 500 },
+                layout: { padding: { right: 40 } },
+                plugins: { 
+                    legend: { display: false },
+                    datalabels: {
+                        color: '#e2e8f0', anchor: 'end', align: 'end', offset: 4,
+                        font: { weight: 'bold', size: 11 },
+                        formatter: Math.round
+                    },
+                    tooltip: {
+                        enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1
+                    }
+                },
+                scales: { 
+                    x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.02)' } },
+                    y: { ticks: { font: { size: 11, weight: '600' }, autoSkip: false } } 
+                }
+            };
+
+            if(chartP) chartP.destroy();
+            if(chartN) chartN.destroy();
+            if(chartS) chartS.destroy();
+
+            chartP = new Chart(document.getElementById('chartPelotoes'), {
+                type: 'bar',
+                data: {
+                    labels: dados.pelotoes.labels,
+                    datasets: [{
+                        data: dados.pelotoes.data,
+                        backgroundColor: dados.pelotoes.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: commonOptions
+            });
+
+            chartN = new Chart(document.getElementById('chartNatureza'), {
+                type: 'bar',
+                data: {
+                    labels: dados.natureza.labels,
+                    datasets: [{
+                        data: dados.natureza.data,
+                        backgroundColor: dados.natureza.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' }, autoSkip: false,
+                                color: dados.natureza.colors
+                            }
+                        }
+                    }
+                }
+            });
+
+            const containerS = document.getElementById('subgrupoContainer');
+            if(dados.subgrupos.labels.length > 0) {
+                const height = Math.max(600, dados.subgrupos.labels.length * 30);
+                containerS.style.height = height + 'px';
+            }
+
+            chartS = new Chart(document.getElementById('chartSubgrupos'), {
+                type: 'bar',
+                data: {
+                    labels: dados.subgrupos.labels,
+                    datasets: [{
+                        data: dados.subgrupos.data,
+                        backgroundColor: dados.subgrupos.colors,
+                        borderRadius: 3, barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        ...commonOptions.scales,
+                        y: {
+                            ticks: {
+                                font: { size: 11, weight: 'bold' }, autoSkip: false,
+                                color: dados.subgrupos.colors
+                            }
+                        }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
