@@ -20,11 +20,11 @@
                         'fire-yellow': '#FFD700',
                         'bombeiros-orange': '#F97316',
                         'cb-green': '#10B981',
-                        'insect-brown': '#8B4513', // Marrom restaurado
+                        'insect-brown': '#8B4513', // Marrom Correto
                         'dark-base': '#0f172a'
                     },
                     fontFamily: { 
-                        // Fonte Mono (Estilo Tático v4.0)
+                        // Fonte Tática da v4.0
                         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'] 
                     }
                 }
@@ -33,14 +33,7 @@
     </script>
 
     <style>
-        /* Otimizações Mobile */
-        body { 
-            background-color: #0f172a; 
-            color: #e2e8f0; 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         /* Background Fixo */
         .fixed-bg { position: fixed; inset: 0; z-index: -1; }
@@ -70,13 +63,11 @@
             letter-spacing: 0.05em; 
         }
         .btn.active { 
-            background: linear-gradient(135deg, #10B981, #059669); 
-            color: white; border-color: #A7F3D0; 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); 
-            transform: scale(1.02);
+            background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); transform: scale(1.02);
         }
         .btn:disabled { 
-            opacity: 0.3; cursor: not-allowed; 
+            opacity: 0.2; cursor: not-allowed; 
             background: #0f172a; border-color: transparent; box-shadow: none; 
         }
 
@@ -125,6 +116,10 @@
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                        <option value="2019">2019</option>
                     </select>
                 </div>
             </div>
@@ -132,7 +127,7 @@
         </header>
 
         <div id="loader" class="hidden glass p-6 text-center text-blue-400 font-mono text-sm font-bold">
-            <i class="fas fa-spinner fa-spin mr-2"></i>PROCESSANDO DADOS...
+            <i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO DADOS...
         </div>
 
         <div class="glass p-4">
@@ -180,7 +175,7 @@
                     <select id="fSub" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Subgrupo</option></select>
                     <select id="fBai" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Bairro</option></select>
                     <select id="fPel" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Pelotão</option></select>
-                    <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold">LIMPAR</button>
+                    <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition-colors">LIMPAR</button>
                 </div>
 
                 <div class="table-container">
@@ -209,12 +204,14 @@
     </footer>
 
     <script>
-        // --- CONFIGURAÇÃO ---
-        const REPO = 'https://raw.githubusercontent.com/ciabm-1bbm/site/main';
-        const MONTHS = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
-        const POA = ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"];
-        
-        // TEMAS E CORES (V4.0 - ÍCONES E CORES RESTAURADOS)
+        const CONFIG = {
+            repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
+            year: 2026, 
+            months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
+            poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
+        };
+
+        // ESTILOS E ÍCONES (V4.0 Restaurada)
         const STYLES = {
             "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-fire-yellow" },
             "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" }, 
@@ -227,7 +224,6 @@
             "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
         };
 
-        // Estado Global
         let curYear = 2026;
         let instances = {}; 
 
@@ -236,13 +232,13 @@
             db: [],
             
             init: () => {
-                // Configurar Fonte Global dos Gráficos (Monoespaçada v4.0)
+                // Fonte Global Monoespaçada
                 Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
                 Chart.register(ChartDataLabels);
                 
-                // Gerar Botões
+                // Botões de Mês
                 const container = document.getElementById('monthContainer');
-                MONTHS.forEach((m, i) => {
+                CONFIG.months.forEach((m, i) => {
                     const btn = document.createElement('button');
                     btn.className = 'btn bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold w-full';
                     btn.innerText = m;
@@ -257,7 +253,7 @@
                 
                 ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
 
-                Core.setYear(2026); // Start
+                Core.setYear(2026); 
             },
 
             // --- LÓGICA DE ANO ---
@@ -268,7 +264,7 @@
                 const now = new Date();
                 const limit = (y === now.getFullYear()) ? now.getMonth() : 12;
 
-                MONTHS.forEach((_, i) => {
+                CONFIG.months.forEach((_, i) => {
                     const btn = document.getElementById(`btn_${i}`);
                     if (i < limit) {
                         btn.disabled = false;
@@ -300,7 +296,7 @@
                 Core.toggleLoad(true);
 
                 try {
-                    const req = await fetch(`${REPO}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
+                    const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
                     if(!req.ok) throw new Error("404");
                     const txt = await req.text();
                     Core.processData(txt);
@@ -317,7 +313,7 @@
                 Core.toggleLoad(true);
 
                 try {
-                    const req = await fetch(`${REPO}/dados/ANUAL_${curYear}.csv?t=${Date.now()}`);
+                    const req = await fetch(`${CONFIG.repo}/dados/ANUAL_${curYear}.csv?t=${Date.now()}`);
                     if(req.ok) {
                         const txt = await req.text();
                         return Core.processData(txt);
@@ -327,13 +323,13 @@
                 // Fallback
                 const now = new Date();
                 const limit = (curYear === now.getFullYear()) ? now.getMonth() : 12;
-                const valid = MONTHS.slice(0, limit);
+                const valid = CONFIG.months.slice(0, limit);
                 let buffer = "";
                 let count = 0;
 
                 for (const m of valid) {
                     try {
-                        const req = await fetch(`${REPO}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
+                        const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
                         if(req.ok) {
                             const txt = await req.text();
                             if(count > 0) {
@@ -354,7 +350,6 @@
                 }
             },
 
-            // --- PROCESSAMENTO ---
             processData: (csv) => {
                 Papa.parse(csv, {
                     header: true, skipEmptyLines: true,
@@ -437,8 +432,7 @@
                 });
                 const fill = (id, set) => {
                     const el = document.getElementById(id);
-                    const lbl = el.options[0].text;
-                    el.innerHTML = `<option value="">${lbl}</option>`;
+                    el.innerHTML = `<option value="">${el.options[0].text}</option>`;
                     Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
                 };
                 fill('fNat', s.n); fill('fSub', s.s); fill('fBai', s.b); fill('fPel', s.p);
@@ -471,6 +465,7 @@
                 const tbody = document.getElementById('tableBody');
                 tbody.innerHTML = data.slice(0, 500).map(d => {
                     const st = STYLES[d.nat] || { i: "📄", cl: "text-slate-400" };
+                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
                     return `
                     <tr class="hover:bg-white/5 border-b border-white/5">
                         <td class="p-3 text-center text-slate-500">${d.id}</td>
@@ -479,7 +474,7 @@
                         <td class="p-3 text-blue-200/70 text-[10px]">${d.sub}</td>
                         <td class="p-3">${d.bairro}</td>
                         <td class="p-3 text-fire-yellow font-bold whitespace-nowrap">${d.pel}</td>
-                        <td class="p-3 text-center">${d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : ''}</td>
+                        <td class="p-3 text-center">${mapBtn}</td>
                     </tr>
                 `}).join('');
 
@@ -530,7 +525,7 @@
                             barPercentage: 0.7,
                             backgroundColor: (c) => {
                                 const i = c.dataIndex;
-                                if(type==='p') return POA.includes(sorted[i][0]) ? '#10B981' : '#64748B';
+                                if(type==='p') return CONFIG.poa.includes(sorted[i][0]) ? '#10B981' : '#64748B';
                                 const k = type==='s' ? sorted[i][0].split('___')[0] : sorted[i][0];
                                 return (STYLES[k] || {c:'#64748B'}).c;
                             },
@@ -560,7 +555,7 @@
                                     color: (c) => {
                                         if(type==='p') {
                                             const l = instances[id].data.labels[c.index];
-                                            return POA.includes(l) ? '#10B981' : '#94a3b8';
+                                            return CONFIG.poa.includes(l) ? '#10B981' : '#94a3b8';
                                         }
                                         return '#94a3b8';
                                     },
@@ -568,7 +563,7 @@
                                         let size = 10;
                                         if(type==='p') {
                                             const l = instances[id].data.labels[c.index];
-                                            if(POA.includes(l)) size = 13;
+                                            if(CONFIG.poa.includes(l)) size = 13;
                                         }
                                         return { size: size, family: 'monospace' };
                                     }
