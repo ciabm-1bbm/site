@@ -199,36 +199,30 @@
         // ============================================================
 
         const ORDEM_QUARTEIS = [
-            "OFICIAL DE DIA", 
-            "COBOM", 
-            "AÇORIANOS", 
-            "ASSUNÇÃO", 
-            "TERESÓPOLIS", 
-            "RESTINGA", 
-            "BELÉM NOVO", 
-            "FLORESTA", 
-            "PASSO D'AREIA", 
-            "PARTENON", 
-            "CANIL", 
-            "AQUÁTICA", 
-            "MERGULHO"
+            "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
+            "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
+            "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
 
-        // --- CORREÇÃO DA DATA (V20) ---
+        // Determina o "Dia Operacional" (Se for antes das 08:00, é o dia anterior)
         function getDataOperacional() {
             const agora = new Date();
-            // Se for antes das 08h da manhã, pertence ao dia operacional anterior.
             if (agora.getHours() < 8) {
                 agora.setDate(agora.getDate() - 1);
             }
-            // Retorna a data corrigida (sem avançar para o dia seguinte)
             return agora;
+        }
+
+        // Formata data para "09Fev"
+        function formatarDataCurta(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+            return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
-            // Data em português correto
             document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
@@ -239,51 +233,83 @@
             try {
                 const req = await fetch(URL_DADOS);
                 const dados = await req.json();
-
                 if(dados.erro) {
                     document.getElementById('msg-loading').innerText = "Aguardando envio do PC...";
                     setTimeout(iniciarSistema, 5000); 
                     return;
                 }
-
                 processarDados(dados);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('app').classList.remove('hidden');
-
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
-        // --- CORREÇÃO DOS TURNOS (V20) ---
+        // =========================================================
+        // NOVA LÓGICA DE FORMATAÇÃO DE TURNO (PEDIDO)
+        // =========================================================
         function formatarTurno(raw) {
-            if(!raw) return "24h";
-            
-            // Limpa espaços extras
+            if(!raw) return "";
+
+            // Limpa string
             raw = raw.replace(/\s+/g, ' ').trim();
-
             const nums = raw.match(/(\d{2}:\d{2})/g);
-            
-            // Caso 1: Veio 08:00 - 08:00 (Isso é 24h)
+
             if (nums && nums.length >= 2) {
-                const inicio = nums[0];
-                const fim = nums[1];
+                const horaInicio = nums[0]; // ex: 08:00
+                const horaFim = nums[1];    // ex: 08:00 ou 20:00
 
-                if (inicio === "08:00" && fim === "08:00") return "08:00 às 08:00 (24h)";
-                if (inicio === "08:00" && fim === "20:00") return "08:00 às 20:00 (12h)";
-                if (inicio === "20:00" && fim === "08:00") return "20:00 às 08:00 (12h)";
+                // Datas Base
+                const dataBase = getDataOperacional();
+                const diaInicio = new Date(dataBase);
+                const diaFim = new Date(dataBase);
 
-                // Cálculo genérico se for horário quebrado
-                const [h1] = inicio.split(':').map(Number);
-                const [h2] = fim.split(':').map(Number);
-                let diff = h2 - h1;
-                if(diff < 0) diff += 24;
+                let duracaoTxt = "24h";
 
-                let carga = "";
-                if(diff >= 23 || diff === 0) carga = "(24h)";
-                else if(diff >= 11 && diff <= 13) carga = "(12h)";
-                
-                return `${inicio} às ${fim} ${carga}`;
+                // Lógica de Datas
+                // Se 24h (08:00 as 08:00) -> DiaFim = DiaBase + 1
+                if (horaInicio === horaFim) {
+                    duracaoTxt = "24h";
+                    diaFim.setDate(diaInicio.getDate() + 1);
+                } 
+                // Se 12h (08:00 as 20:00) -> DiaFim = DiaBase (Mesmo dia)
+                else if (horaInicio === "08:00" && horaFim === "20:00") {
+                    duracaoTxt = "12h";
+                    // diaFim continua sendo hoje
+                }
+                // Se 12h Noite (20:00 as 08:00) -> DiaFim = DiaBase + 1
+                else if (horaInicio === "20:00" && horaFim === "08:00") {
+                    duracaoTxt = "12h";
+                    diaFim.setDate(diaInicio.getDate() + 1);
+                } 
+                // Genérico (se hora final for menor que inicial, virou o dia)
+                else {
+                    const h1 = parseInt(horaInicio.split(':')[0]);
+                    const h2 = parseInt(horaFim.split(':')[0]);
+                    if(h2 < h1) diaFim.setDate(diaInicio.getDate() + 1);
+                    
+                    let diff = h2 - h1;
+                    if(diff < 0) diff += 24;
+                    duracaoTxt = (diff > 12) ? "24h" : "12h"; 
+                }
+
+                // Strings Formatadas
+                const strDataInicio = formatarDataCurta(diaInicio);
+                const strDataFim = formatarDataCurta(diaFim);
+
+                // HTML COLORIDO (AZUL CELESTE)
+                return `
+                    <span class="text-sky-400 font-bold">${duracaoTxt}</span>
+                    <span class="text-gray-400 font-normal">- das</span>
+                    <span class="text-sky-400 font-bold">${horaInicio}</span>
+                    <span class="text-gray-400 font-normal">de</span>
+                    <span class="text-sky-400 font-bold">${strDataInicio}</span>
+                    <span class="text-gray-400 font-normal">às</span>
+                    <span class="text-sky-400 font-bold">${horaFim}</span>
+                    <span class="text-gray-400 font-normal">de</span>
+                    <span class="text-sky-400 font-bold">${strDataFim}</span>
+                `;
             }
-            
+
             return raw;
         }
 
@@ -313,8 +339,7 @@
                 let nomeExibicao = limparNome(nomeCompleto);
                 
                 let func = (d.func || "").trim();
-                // APLICA A NOVA FORMATAÇÃO DE TURNO
-                let hora = formatarTurno(d.horario || "");
+                let horaHTML = formatarTurno(d.horario || ""); // Agora retorna HTML
 
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
@@ -340,7 +365,7 @@
                 }
                 
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: hora });
+                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: horaHTML });
 
                     if(nomeCompleto.includes("SGT")) mapSargentos.set(idUnico, nomeExibicao);
                     else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) mapOficiais.set(idUnico, nomeExibicao);
@@ -370,10 +395,7 @@
             fill('count-cap', 'list-cap', capArr);
             fill('count-sgt', 'list-sgt', sgtArr);
             fill('count-sd', 'list-sd', sdArr);
-            
-            const total = capArr.length + sgtArr.length + sdArr.length;
-            document.getElementById('count-total').innerText = total;
-
+            document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
             document.getElementById('count-abt').innerText = abtArr.length;
             document.getElementById('count-ar').innerText = arArr.length;
             
@@ -406,7 +428,6 @@
                 });
 
                 const card = document.createElement('div');
-                // break-inside-avoid e mb-5 são cruciais para o layout Masonry
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
                 let content = `
@@ -429,8 +450,7 @@
                         }
                         let scoreA = getScore(a.f);
                         let scoreB = getScore(b.f);
-                        if(scoreA !== scoreB) return scoreA - scoreB;
-                        return a.h.localeCompare(b.h); 
+                        return scoreA - scoreB;
                     });
 
                     const listaVtrs = grupo.nomesVtrs.join(' / ');
@@ -446,8 +466,9 @@
                                         <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
                                             ${m.n}
                                         </div>
-                                        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">
-                                            ${m.f} <span class="text-gray-500 font-normal normal-case ml-1">${m.h}</span>
+                                        <div class="text-[10px] uppercase tracking-wide">
+                                            <span class="font-bold text-gray-400">${m.f}</span>
+                                            <div class="mt-0.5">${m.h}</div>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -461,9 +482,6 @@
                 grid.appendChild(card);
             });
         }
-
-        iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
     </script>
 </body>
 </html>
