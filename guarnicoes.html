@@ -100,7 +100,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando visual...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Formatando nomes...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -247,7 +247,7 @@
             return limpa; 
         }
 
-        // CALCULADORA DE TURNO V3
+        // CALCULADORA DE TURNO
         function calcularTurno(raw) {
             if(!raw) return "";
 
@@ -439,6 +439,7 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
+                // CARD LATERAL: LARANJA E GIGANTE
                 let content = `
                     <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-2xl md:text-3xl tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
@@ -466,16 +467,19 @@
                             <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
                                 ${listaVtrs}
                             </span>
-                            <div class="w-full flex flex-col gap-2">
-                                ${grupo.guarnicao.map(m => `
-                                    <div class="text-center group mb-2">
-                                        <div class="text-moss-green font-black text-lg leading-none drop-shadow-md">
+                            <div class="w-full flex flex-col gap-3"> ${grupo.guarnicao.map(m => `
+                                    <div class="flex flex-col items-center w-full mb-1">
+                                        <div class="text-moss-green font-black text-xl leading-none drop-shadow-md text-center">
                                             ${m.n}
                                         </div>
-                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-0.5 whitespace-nowrap">
+                                        
+                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-1 text-center w-full block">
                                             ${m.f}
                                         </div>
-                                        <div class="mt-0.5">${m.h}</div>
+                                        
+                                        <div class="w-full flex justify-center">
+                                            ${m.h}
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
