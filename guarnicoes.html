@@ -53,6 +53,8 @@
             transition: all 0.3s ease;
             break-inside: avoid;
             page-break-inside: avoid;
+            display: flex; /* Garante altura total */
+            overflow: hidden;
         }
         .card-monitor:hover {
             transform: translateY(-3px);
@@ -215,21 +217,48 @@
         }
 
         function formatarTurno(raw) {
-            if(!raw) return "";
+            if(!raw) return ""; 
+
             try {
-                // Limpa string
+                // Remove espaços duplos e limpa
                 raw = raw.replace(/\s+/g, ' ').trim();
                 const nums = raw.match(/(\d{2}:\d{2})/g);
 
-                if (nums && nums.length >= 2) {
-                    const horaInicio = nums[0]; 
-                    const horaFim = nums[1];    
+                // Se não achou horário, não retorna nada (remove data suja)
+                if (!nums || nums.length === 0) return "";
 
-                    const dataBase = getDataOperacional();
-                    const diaInicio = new Date(dataBase);
-                    const diaFim = new Date(dataBase);
+                // Datas Base (Considerando dia operacional)
+                const dataBase = getDataOperacional();
+                const diaInicio = new Date(dataBase);
+                const diaFim = new Date(dataBase);
 
-                    let duracaoTxt = "24h";
+                let horaInicio = "08:00";
+                let horaFim = "08:00";
+                let duracaoTxt = "24h";
+
+                // CASO 1: Apenas 1 horário encontrado (ex: "20:00" do Bottini ou "08:00" do 24h)
+                if (nums.length === 1) {
+                    const hEncontrada = nums[0];
+                    
+                    if (hEncontrada === "20:00") {
+                        // CASO BOTTINI: Veio só 20:00 -> Significa saída às 20h. Entrada foi 08h.
+                        horaInicio = "08:00";
+                        horaFim = "20:00";
+                        duracaoTxt = "12h";
+                        // DiaFim é o mesmo dia (Hoje)
+                    } 
+                    else if (hEncontrada === "08:00") {
+                        // CASO 24H PADRÃO: Veio só 08:00 -> Significa saída às 08h de amanhã.
+                        horaInicio = "08:00";
+                        horaFim = "08:00";
+                        duracaoTxt = "24h";
+                        diaFim.setDate(diaInicio.getDate() + 1);
+                    }
+                }
+                // CASO 2: Dois horários encontrados (ex: "08:00 08:00" ou "20:00 08:00")
+                else if (nums.length >= 2) {
+                    horaInicio = nums[0];
+                    horaFim = nums[1];
 
                     if (horaInicio === horaFim) {
                         duracaoTxt = "24h";
@@ -243,6 +272,7 @@
                         diaFim.setDate(diaInicio.getDate() + 1);
                     } 
                     else {
+                        // Cálculo Genérico
                         const h1 = parseInt(horaInicio.split(':')[0]);
                         const h2 = parseInt(horaFim.split(':')[0]);
                         if(h2 < h1) diaFim.setDate(diaInicio.getDate() + 1);
@@ -251,24 +281,27 @@
                         if(diff < 0) diff += 24;
                         duracaoTxt = (diff > 12) ? "24h" : "12h"; 
                     }
-
-                    const strDataInicio = formatarDataCurta(diaInicio);
-                    const strDataFim = formatarDataCurta(diaFim);
-
-                    return `
-                        <span class="text-sky-400 font-bold">${duracaoTxt}</span>
-                        <span class="text-gray-400 font-normal">- das</span>
-                        <span class="text-sky-400 font-bold">${horaInicio}</span>
-                        <span class="text-gray-400 font-normal">de</span>
-                        <span class="text-sky-400 font-bold">${strDataInicio}</span>
-                        <span class="text-gray-400 font-normal">às</span>
-                        <span class="text-sky-400 font-bold">${horaFim}</span>
-                        <span class="text-gray-400 font-normal">de</span>
-                        <span class="text-sky-400 font-bold">${strDataFim}</span>
-                    `;
                 }
-            } catch (e) { console.error("Erro formatar turno", e); }
-            return raw;
+
+                const strDataInicio = formatarDataCurta(diaInicio);
+                const strDataFim = formatarDataCurta(diaFim);
+
+                return `
+                    <span class="text-sky-400 font-bold">${duracaoTxt}</span>
+                    <span class="text-gray-400 font-normal">- das</span>
+                    <span class="text-sky-400 font-bold">${horaInicio}</span>
+                    <span class="text-gray-400 font-normal">de</span>
+                    <span class="text-sky-400 font-bold">${strDataInicio}</span>
+                    <span class="text-gray-400 font-normal">às</span>
+                    <span class="text-sky-400 font-bold">${horaFim}</span>
+                    <span class="text-gray-400 font-normal">de</span>
+                    <span class="text-sky-400 font-bold">${strDataFim}</span>
+                `;
+
+            } catch (e) { 
+                console.error("Erro formatar turno", e); 
+                return ""; // Retorna vazio se der erro, nunca a data suja
+            }
         }
 
         function extrairID(nomeCompleto) {
@@ -325,9 +358,23 @@
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: horaHTML });
 
-                    if(nomeCompleto.includes("SGT")) mapSargentos.set(idUnico, nomeExibicao);
-                    else if(nomeCompleto.match(/(CAP|TEN|MAJ|TC|CEL|ASP)/)) mapOficiais.set(idUnico, nomeExibicao);
-                    else mapPracas.set(idUnico, nomeExibicao);
+                    // CLASSIFICAÇÃO CORRIGIDA
+                    // 1. Se tem "SD" ou "SOLDADO" -> É Praça (Correção para SD Porcelis)
+                    if (nomeCompleto.includes("SD ") || nomeCompleto.includes("SOLDADO ")) {
+                        mapPracas.set(idUnico, nomeExibicao);
+                    }
+                    // 2. Senão, verifica se é Sargento
+                    else if(nomeCompleto.includes("SGT")) {
+                        mapSargentos.set(idUnico, nomeExibicao);
+                    }
+                    // 3. Senão, verifica se é Oficial (usando \b para palavra exata)
+                    else if(nomeCompleto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
+                        mapOficiais.set(idUnico, nomeExibicao);
+                    }
+                    // 4. Se não caiu em nada, joga pra Praça por padrão
+                    else {
+                        mapPracas.set(idUnico, nomeExibicao);
+                    }
                 }
 
                 if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
@@ -388,8 +435,9 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
+                // CARD LATERAL AGORA É LARANJA E OCUPA ALTURA TOTAL
                 let content = `
-                    <div class="bg-fire-red w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
+                    <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-lg md:text-xl tracking-widest uppercase shadow-black drop-shadow-md">
                             ${obmName}
                         </h2>
