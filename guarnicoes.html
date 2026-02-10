@@ -100,7 +100,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Padronizando funções...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando visual...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -218,22 +218,21 @@
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        // --- TRADUTOR DE FUNÇÕES (PADRONIZAÇÃO) ---
+        // TRADUTOR DE FUNÇÕES
         function normalizarFuncao(funcRaw) {
             if(!funcRaw) return "";
             const f = funcRaw.toUpperCase();
 
-            // 1. Limpeza de sujeira ("ND", números soltos)
-            // Remove "ND", "2º 24", números como "10 24", etc
+            // Limpeza
             let limpa = f.replace(/\bND\b/g, '')
-                         .replace(/\d+º\s*\d+/g, '') // Remove coisas como "2º 24"
-                         .replace(/\b\d+\b/g, '')    // Remove números soltos
+                         .replace(/\d+º\s*\d+/g, '') 
+                         .replace(/\b\d+\b/g, '')    
                          .replace(/[-]/g, '')
                          .trim();
 
             if(limpa === "") return "";
 
-            // 2. Padronização
+            // Padronização
             if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA")) return "COV";
             if(limpa.includes("CMT") || limpa.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
             if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "LINHA (CHEFE)";
@@ -245,9 +244,10 @@
             if(limpa.includes("MOTORISTA") && limpa.includes("DIA")) return "MOTORISTA DE DIA";
             if(limpa.includes("OFICIAL") && limpa.includes("SERVIÇO")) return "OFICIAL DE SERVIÇO";
 
-            return limpa; // Se não cair em nenhuma regra, retorna o texto limpo
+            return limpa; 
         }
 
+        // CALCULADORA DE TURNO V3
         function calcularTurno(raw) {
             if(!raw) return "";
 
@@ -296,16 +296,13 @@
                 const strDataFim = formatarDataCurta(dFim);
 
                 return `
-                    <div class="mt-1 leading-snug">
+                    <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
                         <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
-                        <span class="text-gray-500 text-[10px]">- das</span> 
+                        <span class="text-gray-500 text-[10px]">|</span> 
                         <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
-                        <span class="text-gray-500 text-[10px]">de</span> 
-                        <span class="text-gray-400 font-bold text-[10px]">${strDataIni}</span> 
-                        <span class="text-gray-500 text-[10px]">às</span> 
+                        <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
                         <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
-                        <span class="text-gray-500 text-[10px]">de</span> 
-                        <span class="text-gray-400 font-bold text-[10px]">${strDataFim}</span>
+                        <span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>
                     </div>
                 `;
 
@@ -326,7 +323,6 @@
             const mapOficiais = new Map();
             const mapSargentos = new Map();
             const mapPracas = new Map();
-            // Nova estrutura de stats
             const statsViaturas = { combate: new Set(), apoio: new Set() };
 
             dados.forEach(d => {
@@ -338,7 +334,6 @@
                 let idUnico = idMilitar ? idMilitar : nomeCompleto;
                 let nomeExibicao = limparNome(nomeCompleto);
                 
-                // APLICA O NOVO TRADUTOR DE FUNÇÃO
                 let func = normalizarFuncao(d.func || "");
                 let horaHTML = calcularTurno(d.horario || ""); 
 
@@ -382,11 +377,9 @@
                     }
                 }
 
-                // LÓGICA DE ESTATÍSTICA DE VIATURAS
                 if(vtr.includes("ABT")) {
                     statsViaturas.combate.add(vtr);
                 }
-                // Regex para apoio (AR, AEM, AT, ATP, EMN)
                 else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
                     statsViaturas.apoio.add(vtr);
                 }
@@ -400,7 +393,6 @@
             const capArr = Array.from(mapOficiais.values());
             const sgtArr = Array.from(mapSargentos.values());
             const sdArr = Array.from(mapPracas.values());
-            
             const combArr = Array.from(statsViaturas.combate);
             const apoioArr = Array.from(statsViaturas.apoio);
 
@@ -414,7 +406,6 @@
             fill('count-sd', 'list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
             
-            // Novos contadores de VTR
             document.getElementById('count-combate').innerText = combArr.length;
             document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
 
@@ -477,14 +468,14 @@
                             </span>
                             <div class="w-full flex flex-col gap-2">
                                 ${grupo.guarnicao.map(m => `
-                                    <div class="text-center group">
-                                        <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
+                                    <div class="text-center group mb-2">
+                                        <div class="text-moss-green font-black text-lg leading-none drop-shadow-md">
                                             ${m.n}
                                         </div>
-                                        <div class="text-[10px] uppercase tracking-wide">
-                                            <span class="font-bold text-gray-400">${m.f}</span>
-                                            <div>${m.h}</div>
+                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-0.5 whitespace-nowrap">
+                                            ${m.f}
                                         </div>
+                                        <div class="mt-0.5">${m.h}</div>
                                     </div>
                                 `).join('')}
                             </div>
