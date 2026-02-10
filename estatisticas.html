@@ -30,10 +30,10 @@
     </script>
 
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
-        /* Background */
-        .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transform: translateZ(0); }
+        /* Background Fixo */
+        .layer-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .layer-bg::before {
             content: ''; position: absolute; top: 380px; left: 10%; right: 10%; bottom: 0;
             background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
@@ -46,32 +46,31 @@
         }
 
         .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(30, 41, 59, 0.8); /* Mais opaco para garantir leitura */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            contain: content;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* Botões Meses */
-        .btn-mes { transition: background 0.2s; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-mes.active { 
+        /* Botões */
+        .btn-mes { transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-mes:active, .btn-mes.active { 
             background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
-        .btn-mes:disabled { opacity: 0.3; cursor: not-allowed; border-color: transparent; background: rgba(0,0,0,0.2); }
+        .btn-mes:disabled { opacity: 0.3; cursor: not-allowed; background: #1e293b; border-color: transparent; box-shadow: none; }
 
-        /* Botão Anual */
         .btn-anual { border-color: rgba(234, 179, 8, 0.3); color: #FEF08A; }
         .btn-anual.active {
-            background: linear-gradient(135deg, #CA8A04, #EAB308); color: white; border-color: #FEF08A;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+            background: linear-gradient(135deg, #CA8A04, #EAB308); color: white;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); border-color: #FEF08A;
         }
 
         /* Dropdown de Ano */
         .year-select {
             background-color: #1e293b; color: #fff; border: 1px solid #475569;
-            padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: bold; font-family: monospace;
+            padding: 0.2rem 1rem; border-radius: 0.5rem; font-weight: bold; font-family: monospace;
             cursor: pointer; outline: none; transition: border-color 0.2s;
         }
         .year-select:focus { border-color: #F97316; }
@@ -80,8 +79,8 @@
         .table-wrap { max-height: 500px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
 
-        /* Charts */
-        .chart-box { position: relative; width: 100%; height: 300px; min-height: 300px; }
+        /* Gráficos */
+        .chart-box { position: relative; width: 100%; height: 350px; min-height: 350px; }
         @media (min-width: 1024px) { .chart-box { height: 500px; min-height: 500px; } }
 
         /* Loader */
@@ -128,7 +127,7 @@
             <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthGrid"></div>
             <div class="flex justify-center pt-4 border-t border-white/5">
                 <button id="btnAnual" class="btn-mes btn-anual py-3 px-12 rounded-lg text-sm font-bold uppercase tracking-widest bg-yellow-900/10 w-full md:w-auto hover:bg-yellow-900/30">
-                    RELATÓRIO ANUAL <span id="lblAnualYear">2026</span>
+                    ANUAL <span id="lblAnualYear">2026</span>
                 </button>
             </div>
         </div>
@@ -170,7 +169,7 @@
                         <select id="fSub" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Subgrupo</option></select>
                         <select id="fBai" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Bairro</option></select>
                         <select id="fPel" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-2 outline-none"><option value="">Pelotão</option></select>
-                        <button onclick="Engine.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
+                        <button onclick="App.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition-colors">LIMPAR</button>
                     </div>
                 </div>
                 <div class="p-2 bg-slate-900/80 text-right text-[10px] font-mono text-gray-400">
@@ -223,7 +222,7 @@
             "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
         };
 
-        const Engine = {
+        const App = {
             db: [],
             charts: {},
             ctxLabel: '',
@@ -231,40 +230,43 @@
             init: () => {
                 Chart.register(ChartDataLabels);
                 
-                // Renderiza Botões de Mês
+                // 1. Gerar Botões de Mês
                 const mContainer = document.getElementById('monthGrid');
                 CONFIG.months.forEach((m, index) => {
                     const btn = document.createElement('button');
                     btn.className = 'btn-mes bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold uppercase tracking-wider w-full';
                     btn.innerText = m;
-                    btn.id = `btnMonth_${index}`;
-                    btn.onclick = () => Engine.fetchMonth(m, btn);
+                    btn.id = `btnMonth_${index}`; // ID para controle
+                    btn.onclick = () => App.fetchMonth(m, btn);
                     mContainer.appendChild(btn);
                 });
 
-                document.getElementById('btnAnual').onclick = Engine.fetchAnnual;
-                document.getElementById('yearMenu').addEventListener('change', (e) => Engine.updateYear(parseInt(e.target.value)));
-                
-                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Engine.applyFilters));
+                // 2. Listeners
+                document.getElementById('btnAnual').onclick = App.fetchAnnual;
+                document.getElementById('yearMenu').addEventListener('change', (e) => App.updateYear(parseInt(e.target.value)));
+                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', App.applyFilters));
 
-                // Inicializa com o ano selecionado (2026) e aplica a regra de data
-                Engine.updateYear(2026);
+                // 3. Inicializar com 2026
+                App.updateYear(2026);
             },
 
+            // --- LÓGICA DE ANO E TRAVAS ---
             updateYear: (y) => {
                 CONFIG.year = y;
                 document.getElementById('lblAnualYear').innerText = y;
-                document.getElementById('lblYearDisplay').innerText = y;
-                Engine.resetButtons();
+                
+                // Reseta a Tela
+                App.resetButtons();
                 document.getElementById('appContent').classList.add('hidden');
                 document.getElementById('statusBadge').innerText = `Ano ${y} Selecionado`;
 
-                // REGRA DE NEGÓCIO: Mês anterior à data atual
+                // --- REGRA DE DATA ---
                 const now = new Date();
                 const currentYear = now.getFullYear();
-                const currentMonthIndex = now.getMonth(); // 0 = Jan, 1 = Fev...
+                const currentMonthIndex = now.getMonth(); // 0 = Janeiro
 
-                // Limite: Se for o ano atual, libera até o mês anterior. Se for ano passado, libera tudo.
+                // Se for o ano atual, libera até o mês anterior (ex: se é Fev, libera Jan -> index < 1)
+                // Se for ano passado, libera tudo (12 meses)
                 const limitIndex = (y === currentYear) ? currentMonthIndex : 12;
 
                 CONFIG.months.forEach((m, index) => {
@@ -282,6 +284,7 @@
             setLoading: (active, msg="", pct=0) => {
                 const load = document.getElementById('loadingState');
                 const content = document.getElementById('appContent');
+                
                 if(active) {
                     content.classList.add('hidden');
                     load.classList.remove('hidden');
@@ -297,51 +300,53 @@
 
             resetButtons: () => document.querySelectorAll('.btn-mes, .btn-anual').forEach(b => b.classList.remove('active')),
 
+            // --- BUSCA DE DADOS ---
             fetchMonth: async (month, btn) => {
                 if(btn.disabled) return;
-                Engine.resetButtons();
+                App.resetButtons();
                 btn.classList.add('active');
-                Engine.ctxLabel = `EM ${month} ${CONFIG.year}`;
-                Engine.setLoading(true, "Buscando dados...", 20);
+                App.ctxLabel = `EM ${month} ${CONFIG.year}`;
+                App.setLoading(true, "Buscando dados...", 20);
 
                 try {
+                    // ?t=${Date.now()} evita cache do navegador
                     const res = await fetch(`${CONFIG.repo}/dados/${month}_${CONFIG.year}.csv?t=${Date.now()}`);
                     if(!res.ok) throw new Error("404");
                     const txt = await res.text();
-                    Engine.parseData(txt);
+                    App.parseData(txt);
                 } catch(e) {
-                    Engine.setLoading(false);
+                    App.setLoading(false);
                     btn.classList.remove('active');
-                    alert(`Dados de ${month}/${CONFIG.year} não encontrados.`);
+                    alert(`Dados de ${month}/${CONFIG.year} não encontrados ou ainda não publicados.`);
                 }
             },
 
             fetchAnnual: async () => {
-                Engine.resetButtons();
+                App.resetButtons();
                 document.getElementById('btnAnual').classList.add('active');
-                Engine.ctxLabel = `NO ANO DE ${CONFIG.year}`;
-                Engine.setLoading(true, "Compilando ano...", 5);
+                App.ctxLabel = `NO ANO DE ${CONFIG.year}`;
+                App.setLoading(true, "Compilando ano...", 5);
 
                 let buffer = [];
                 let completed = 0;
                 
-                // Regra Anual: Baixa apenas os meses disponíveis
+                // Baixa apenas meses disponíveis (respeita a regra de data)
                 const now = new Date();
                 const limitIndex = (CONFIG.year === now.getFullYear()) ? now.getMonth() : 12;
-                const monthsToFetch = CONFIG.months.slice(0, limitIndex);
+                const validMonths = CONFIG.months.slice(0, limitIndex);
 
-                if(monthsToFetch.length === 0) {
-                    Engine.setLoading(false);
+                if(validMonths.length === 0) {
+                    App.setLoading(false);
                     return alert("Ainda não há meses fechados neste ano.");
                 }
 
-                const promises = monthsToFetch.map(async m => {
+                const promises = validMonths.map(async m => {
                     try {
                         const res = await fetch(`${CONFIG.repo}/dados/${m}_${CONFIG.year}.csv?t=${Date.now()}`);
                         if(res.ok) return await res.text();
                     } catch(e) {}
                     completed++;
-                    Engine.setLoading(true, `Baixando...`, Math.round((completed/monthsToFetch.length)*80));
+                    App.setLoading(true, `Baixando...`, Math.round((completed/validMonths.length)*80));
                     return null;
                 });
 
@@ -353,27 +358,27 @@
                     }
                 });
 
-                if(buffer.length > 0) Engine.processBuffer(buffer);
+                if(buffer.length > 0) App.processBuffer(buffer);
                 else {
-                    Engine.setLoading(false);
+                    App.setLoading(false);
                     alert(`Nenhum dado encontrado.`);
                 }
             },
 
-            processData: (csv) => {
-                Engine.setLoading(true, "Lendo...", 60);
+            parseData: (csv) => {
                 Papa.parse(csv, {
                     header: true, skipEmptyLines: true, encoding: "UTF-8",
-                    complete: (res) => Engine.processBuffer(res.data)
+                    complete: (res) => App.processBuffer(res.data)
                 });
             },
 
             processBuffer: (raw) => {
-                Engine.setLoading(true, "Organizando...", 90);
-                Engine.db = [];
+                App.setLoading(true, "Processando...", 90);
+                App.db = [];
 
-                if(!raw || !raw[0]) { Engine.setLoading(false); return; }
+                if(!raw || !raw[0]) { App.setLoading(false); return; }
 
+                // Detecção de Colunas
                 const keys = Object.keys(raw[0]);
                 const find = k => keys.find(x => x.toLowerCase().includes(k));
                 const cNat = find('natureza')||find('emerg');
@@ -381,7 +386,7 @@
                 const cSub = find('subgrupo')||find('detalhe');
                 const cVtr = find('viatura')||find('prefixo');
 
-                if(!cNat || !cObm) { Engine.setLoading(false); return alert("Erro CSV."); }
+                if(!cNat || !cObm) { App.setLoading(false); return alert("Erro no formato do arquivo CSV."); }
 
                 let id=1;
                 raw.forEach(row => {
@@ -390,6 +395,7 @@
                     const v = (cVtr ? row[cVtr]||"" : "").toUpperCase();
                     const nRaw = (row[cNat]||"N/A").toUpperCase();
 
+                    // Pelotão Logic
                     let pel = "OUTROS";
                     if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
                     else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
@@ -409,6 +415,7 @@
                         if(clean.length > 2) pel = clean;
                     }
 
+                    // Natureza Logic
                     let nat = nRaw.trim();
                     if(nRaw.includes("INSETO")) nat = "MANEJO DE INSETOS";
                     else if(nRaw.includes("INCÊNDIO")) nat = "INCÊNDIO";
@@ -429,7 +436,7 @@
                         map = `https://www.google.com/maps/search/?api=1&query=${la},${lo}`;
                     }
 
-                    Engine.db.push({
+                    App.db.push({
                         id: row['Nº Oc.'] || id++,
                         date: row['Data'] || '--',
                         nat, sub, pel, map,
@@ -437,14 +444,14 @@
                     });
                 });
 
-                Engine.initFilters();
-                Engine.renderView(Engine.db);
-                Engine.setLoading(false);
+                App.initFilters();
+                App.renderView(App.db);
+                App.setLoading(false);
             },
 
             initFilters: () => {
                 const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                Engine.db.forEach(d => {
+                App.db.forEach(d => {
                     s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
                     if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
                 });
@@ -463,30 +470,31 @@
                     b: document.getElementById('fBai').value,
                     p: document.getElementById('fPel').value
                 };
-                const res = Engine.db.filter(d => 
+                const res = App.db.filter(d => 
                     (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
                     (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
                 );
-                Engine.renderView(res, true);
+                App.renderView(res, true);
             },
 
             resetFilters: () => {
                 document.querySelectorAll('select').forEach(s => s.value = "");
-                Engine.renderView(Engine.db);
+                App.renderView(App.db);
             },
 
             renderView: (data, isFiltered=false) => {
                 const tot = data.length;
                 document.getElementById('kpiValue').innerText = tot.toLocaleString('pt-BR');
-                document.getElementById('kpiTitle').innerText = Engine.ctxLabel.includes("ANO") ? 
+                document.getElementById('kpiTitle').innerText = App.ctxLabel.includes("ANO") ? 
                     `TOTAL DE OCORRÊNCIAS NO ANO DE ${CONFIG.year}` : 
-                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${Engine.ctxLabel}`;
+                    `TOTAL DE OCORRÊNCIAS ATENDIDAS ${App.ctxLabel}`;
                 document.getElementById('lblRows').innerText = isFiltered ? `${tot} (Filtrado)` : tot;
                 
                 document.getElementById('statusBadge').innerText = "Dados Carregados";
                 document.getElementById('statusBadge').className = "mt-3 inline-block px-3 py-1 rounded-full bg-emerald-900/50 border border-emerald-600 text-emerald-400 text-xs font-bold";
 
                 const tbody = document.getElementById('tblBody');
+                // Tabela em batch (Segura para Mobile)
                 const html = data.slice(0, 500).map((d, i) => {
                     const st = THEME[d.nat] || { i: "📄", cl: "text-slate-400" };
                     const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
@@ -504,9 +512,10 @@
                 }).join('');
                 tbody.innerHTML = html;
 
-                if(tot > 0) setTimeout(() => Engine.buildCharts(data), 50);
+                if(tot > 0) setTimeout(() => App.buildCharts(data), 50);
             },
 
+            // --- GRÁFICOS (Chart.js 4.x - V4.0 Logic) ---
             buildCharts: (data) => {
                 const agg = { p:{}, n:{}, s:{} };
                 data.forEach(d => {
@@ -516,13 +525,13 @@
                 });
 
                 const sort = o => Object.entries(o).sort((a,b)=>b[1]-a[1]);
-                Engine.draw('cvsPelotoes', 'p', sort(agg.p));
-                Engine.draw('cvsNatureza', 'n', sort(agg.n));
-                Engine.draw('cvsSubgrupos', 's', sort(agg.s).filter(x=>x[1]>=1));
+                App.draw('cvsPelotoes', 'p', sort(agg.p));
+                App.draw('cvsNatureza', 'n', sort(agg.n));
+                App.draw('cvsSubgrupos', 's', sort(agg.s).filter(x=>x[1]>=1));
             },
 
             draw: (id, type, dataset) => {
-                if(Engine.charts[id]) Engine.charts[id].destroy();
+                if(App.charts[id]) App.charts[id].destroy();
 
                 const ctx = document.getElementById(id).getContext('2d');
                 
@@ -544,7 +553,7 @@
                     document.getElementById('wrapSubgrupos').style.height = h + 'px';
                 }
 
-                Engine.charts[id] = new Chart(ctx, {
+                App.charts[id] = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -585,15 +594,15 @@
                                     autoSkip: false,
                                     color: (c) => {
                                         if(type==='p') {
-                                            const l = Engine.charts[id].data.labels[c.index];
-                                            return CONFIG.poa.includes(l) ? '#10B981' : '#64748B';
+                                            const l = App.charts[id].data.labels[c.index];
+                                            return CONFIG.poa.includes(l) ? '#10B981' : '#94a3b8';
                                         }
                                         return '#94a3b8';
                                     },
                                     font: (c) => {
                                         let size = 10;
                                         if(type==='p') {
-                                            const l = Engine.charts[id].data.labels[c.index];
+                                            const l = App.charts[id].data.labels[c.index];
                                             if(CONFIG.poa.includes(l)) size = 13;
                                         }
                                         return { size: size, family: 'monospace' };
@@ -606,7 +615,7 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', Engine.init);
+        document.addEventListener('DOMContentLoaded', App.init);
     </script>
 </body>
 </html>
