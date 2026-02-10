@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>ESTATÍSTICAS - 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,183 +12,335 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'fire-yellow': '#FFD700',
-                        'bombeiros-orange': '#F97316',
-                        'cb-green': '#10B981',
-                        'insect-brown': '#8B4513', // Marrom Correto
-                        'dark-base': '#0f172a'
-                    },
-                    fontFamily: { 
-                        // Fonte Tática da v4.0
-                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'] 
-                    }
-                }
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: clamp(300px, 50vh, 500px);
+            min-height: 300px;
+            max-height: 500px;
+        }
+        
+        .chart-container-lg {
+            height: auto;
+            min-height: 400px;
+        }
+        
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 280px;
+                min-height: 280px;
+            }
+            .chart-container-lg {
+                min-height: 380px;
             }
         }
-    </script>
-
-    <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Background Fixo */
-        .fixed-bg { position: fixed; inset: 0; z-index: -1; }
-        .fixed-bg::before {
-            content: ''; position: absolute; top: 380px; left: 10%; right: 10%; bottom: 0;
-            background: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') no-repeat center top;
-            background-size: contain; opacity: 0.08; filter: grayscale(100%);
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .chart-container {
+                height: 350px;
+                min-height: 350px;
+            }
+            .chart-container-lg {
+                min-height: 420px;
+            }
         }
-        .fixed-bg::after {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.98) 100%);
+        
+        @media (min-width: 1025px) {
+            .chart-container-lg {
+                min-height: 480px;
+            }
         }
-
+        
         .glass {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
-
-        /* Botões Estilizados (v4.0) */
-        .btn { 
-            transition: all 0.2s; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            font-family: 'ui-monospace', monospace; 
-            letter-spacing: 0.05em; 
+        
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .btn.active { 
-            background: linear-gradient(135deg, #10B981, #059669); color: white; border-color: #A7F3D0; 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); transform: scale(1.02);
+        
+        @media (max-width: 768px) {
+            .table-container {
+                max-height: 400px;
+            }
         }
-        .btn:disabled { 
-            opacity: 0.2; cursor: not-allowed; 
-            background: #0f172a; border-color: transparent; box-shadow: none; 
+        
+        .month-btn {
+            min-height: 48px;
+            font-size: 0.7rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
         }
-
-        .btn-anual { border-color: rgba(234, 179, 8, 0.3); color: #FEF08A; }
-        .btn-anual.active {
-            background: linear-gradient(135deg, #CA8A04, #EAB308); color: white; border-color: #FEF08A;
+        
+        .month-btn.active {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border-color: #A7F3D0;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            transform: scale(1.02);
+        }
+        
+        .month-btn:hover:not(.active):not(:disabled) {
+            background: rgba(100, 116, 139, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (min-width: 768px) {
+            .month-btn {
+                min-height: 52px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .month-btn {
+                min-height: 56px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Botão do ano */
+        .year-select-btn {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #10b981;
+            color: #10b981;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            font-family: 'ui-monospace', monospace;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            text-align: center;
+            appearance: none;
+            position: relative;
+            padding-right: 2.5rem;
+        }
+        
+        .year-select-btn:hover {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        .year-select-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Botão anual estilizado */
+        .btn-anual {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #eab308;
+            color: #fef08a;
+            padding: 0.75rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            font-family: 'ui-monospace', monospace;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .btn-anual:hover {
+            background: #eab308;
+            color: white;
+            border-color: #fef08a;
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
         }
-
-        /* Select de Ano */
-        .year-select {
-            background: #1e293b; color: #fff; border: 1px solid #475569;
-            padding: 0.2rem 1rem; border-radius: 0.5rem; 
-            font-weight: bold; font-family: monospace;
-            cursor: pointer; outline: none; transition: border-color 0.2s;
+        
+        .btn-anual.active {
+            background: linear-gradient(135deg, #ca8a04, #eab308);
+            color: white;
+            border-color: #fef08a;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
         }
-        .year-select:focus { border-color: #F97316; }
-
-        /* Tabela */
-        .table-container { max-height: 500px; overflow-y: auto; }
-        thead th { position: sticky; top: 0; z-index: 10; background-color: #1e293b; }
         
-        /* Gráficos Mobile */
-        .chart-box { position: relative; width: 100%; height: 320px; min-height: 320px; }
-        @media (min-width: 1024px) { .chart-box { height: 500px; min-height: 500px; } }
+        /* Estilo para o ícone do seletor de ano */
+        .year-select-wrapper {
+            position: relative;
+            display: inline-block;
+        }
         
-        /* Loader */
-        .loader-bar { width: 0%; transition: width 0.2s linear; }
+        .year-select-wrapper::after {
+            content: "▼";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #10b981;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.7);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.9);
+        }
+        
+        /* Gradiente para pelotões */
+        .pelotao-gradient-0 { background-color: #065f46; }
+        .pelotao-gradient-1 { background-color: #047857; }
+        .pelotao-gradient-2 { background-color: #059669; }
+        .pelotao-gradient-3 { background-color: #10b981; }
+        .pelotao-gradient-4 { background-color: #34d399; }
+        .pelotao-gradient-5 { background-color: #6ee7b7; }
+        .pelotao-gradient-6 { background-color: #a7f3d0; }
+        .pelotao-gradient-7 { background-color: #d1fae5; }
     </style>
+    
+    <link rel="icon" type="image/x-icon" href="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true">
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="bg-slate-900 text-gray-100 min-h-screen flex flex-col">
 
-    <div class="fixed-bg"></div>
-
-    <main class="container mx-auto px-4 py-6 flex-grow z-10 space-y-6">
+    <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow space-y-4 sm:space-y-6">
         
-        <header class="flex flex-col md:flex-row items-center justify-between gap-4 glass p-6">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 opacity-90">
+        <header class="glass p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" 
+                 class="h-12 sm:h-16 opacity-90 w-auto">
+            
             <div class="text-center w-full md:w-auto">
-                <h1 class="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none mb-2">ESTATÍSTICAS - 1º BBM</h1>
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight mb-2">
+                    ESTATÍSTICAS - 1º BBM
+                </h1>
                 
-                <div class="flex items-center justify-center gap-3">
-                    <span class="text-lg font-bold text-fire-yellow tracking-[0.2em] uppercase">PORTO ALEGRE</span>
-                    <select id="yearSelect" class="year-select">
-                        <option value="2026" selected>2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                        <option value="2019">2019</option>
-                    </select>
+                <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+                    <span class="text-sm sm:text-lg font-bold text-yellow-400 tracking-[0.1em] sm:tracking-[0.2em] uppercase">
+                        PORTO ALEGRE
+                    </span>
+                    <div class="year-select-wrapper">
+                        <select id="yearSelect" class="year-select-btn">
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 opacity-90 hidden md:block">
+            
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" 
+                 class="h-12 sm:h-16 opacity-90 w-auto hidden md:block">
         </header>
 
-        <div id="loader" class="hidden glass p-6 text-center text-blue-400 font-mono text-sm font-bold">
-            <i class="fas fa-spinner fa-spin mr-2"></i> PROCESSANDO DADOS...
+        <div id="loader" class="hidden glass p-4 sm:p-6 text-center text-blue-400 font-mono text-xs sm:text-sm font-bold">
+            <i class="fas fa-spinner fa-spin mr-2"></i> CARREGANDO DADOS...
         </div>
 
-        <div class="glass p-4">
-            <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2 mb-4" id="monthContainer"></div>
-            <div class="flex justify-center pt-4 border-t border-white/5">
-                <button id="btnAnual" class="btn btn-anual py-3 px-10 rounded-lg text-sm font-bold uppercase tracking-widest w-full md:w-auto">
-                    RELATÓRIO ANUAL <span id="lblAnual">2026</span>
+        <div class="glass p-3 sm:p-4">
+            <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1.5 sm:gap-2 mb-3 sm:mb-4" id="monthContainer"></div>
+            <div class="flex justify-center pt-3 sm:pt-4 border-t border-white/10">
+                <button id="btnAnual" class="btn-anual py-3 px-8 rounded-lg font-bold uppercase tracking-widest">
+                    <i class="fas fa-chart-bar mr-2"></i>RELATÓRIO ANUAL <span id="lblAnual">2026</span>
                 </button>
             </div>
         </div>
 
-        <div id="dashboard" class="hidden space-y-6">
+        <div id="dashboard" class="hidden space-y-4 sm:space-y-6">
             
             <div class="flex justify-center">
-                <div class="glass px-10 py-6 text-center border-t-4 border-emerald-500 bg-slate-900/80">
-                    <p class="text-xs font-bold tracking-[0.2em] text-emerald-400 mb-2 font-mono">TOTAL DE OCORRÊNCIAS</p>
-                    <p class="text-5xl font-black text-white font-mono drop-shadow-lg" id="totalVal">0</p>
+                <div class="glass px-6 sm:px-10 py-4 sm:py-6 text-center border-t-4 border-emerald-500 bg-slate-900/80 w-full max-w-md">
+                    <p class="text-xs font-bold tracking-[0.15em] text-emerald-400 mb-2 font-mono">
+                        TOTAL DE OCORRÊNCIAS
+                    </p>
+                    <p class="text-4xl sm:text-5xl font-black text-white font-mono drop-shadow-lg" id="totalVal">0</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass p-4 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-bombeiros-orange pl-3 uppercase">CONTAGEM POR PELOTÃO</h3>
-                    <div class="chart-box"><canvas id="chartPel"></canvas></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <div class="glass p-3 sm:p-4 flex flex-col">
+                    <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-emerald-500 pl-2 sm:pl-3 uppercase">
+                        CONTAGEM POR PELOTÃO
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chartPel"></canvas>
+                    </div>
                 </div>
-                <div class="glass p-4 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-fire-red pl-3 uppercase">POR TIPO DE OCORRÊNCIA</h3>
-                    <div class="chart-box"><canvas id="chartNat"></canvas></div>
+                
+                <div class="glass p-3 sm:p-4 flex flex-col">
+                    <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-orange-500 pl-2 sm:pl-3 uppercase">
+                        POR TIPO DE OCORRÊNCIA
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="chartNat"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="glass p-4">
-                <h3 class="text-sm font-bold text-white mb-4 border-l-4 border-blue-500 pl-3 uppercase">DETALHAMENTO DOS SUBGRUPOS</h3>
-                <div id="boxSub" class="chart-box" style="height: auto;"><canvas id="chartSub"></canvas></div>
+            <div class="glass p-3 sm:p-4">
+                <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-blue-400 pl-2 sm:pl-3 uppercase">
+                    DETALHAMENTO DOS SUBGRUPOS
+                </h3>
+                <div class="chart-container-lg" id="subChartContainer">
+                    <canvas id="chartSub"></canvas>
+                </div>
             </div>
 
             <div class="glass overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-white/5 bg-slate-900/50 text-xs flex justify-between items-center text-gray-400">
-                    <span class="font-bold text-white uppercase"><i class="fas fa-list mr-2"></i> REGISTRO DE DADOS</span>
-                    <span><span id="rowsVal" class="text-white font-bold">0</span> registros.</span>
+                <div class="p-3 sm:p-4 border-b border-white/5 bg-slate-900/50 text-xs flex justify-between items-center text-gray-400">
+                    <span class="font-bold text-white uppercase">
+                        <i class="fas fa-list mr-2"></i> REGISTRO DE DADOS
+                    </span>
+                    <span><span id="rowsVal" class="text-white font-bold">0</span> registros</span>
                 </div>
                 
-                <div class="p-2 bg-slate-800/50 flex gap-2 overflow-x-auto">
-                    <select id="fNat" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Natureza</option></select>
-                    <select id="fSub" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Subgrupo</option></select>
-                    <select id="fBai" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Bairro</option></select>
-                    <select id="fPel" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none"><option value="">Pelotão</option></select>
-                    <button onclick="Core.resetFilters()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition-colors">LIMPAR</button>
+                <div class="p-2 bg-slate-800/50 flex gap-1.5 sm:gap-2 overflow-x-auto">
+                    <select id="fNat" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
+                        <option value="">Natureza</option>
+                    </select>
+                    <select id="fSub" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
+                        <option value="">Subgrupo</option>
+                    </select>
+                    <select id="fBai" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
+                        <option value="">Bairro</option>
+                    </select>
+                    <select id="fPel" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
+                        <option value="">Pelotão</option>
+                    </select>
+                    <button onclick="Core.resetFilters()" 
+                            class="bg-red-600 hover:bg-red-700 text-white px-2 sm:px-3 py-1 rounded text-xs font-bold transition-colors whitespace-nowrap">
+                        LIMPAR
+                    </button>
                 </div>
 
                 <div class="table-container">
-                    <table class="w-full text-left border-collapse text-xs">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
                         <thead class="bg-slate-900 text-gray-400 font-bold sticky top-0 uppercase font-mono">
                             <tr>
-                                <th class="p-3 text-center">#</th>
-                                <th class="p-3">Data</th>
-                                <th class="p-3">Natureza</th>
-                                <th class="p-3">Subgrupo</th>
-                                <th class="p-3">Bairro</th>
-                                <th class="p-3">Pelotão</th>
-                                <th class="p-3 text-center">Map</th>
+                                <th class="p-2 sm:p-3 text-center">#</th>
+                                <th class="p-2 sm:p-3">Data</th>
+                                <th class="p-2 sm:p-3">Natureza</th>
+                                <th class="p-2 sm:p-3">Subgrupo</th>
+                                <th class="p-2 sm:p-3">Bairro</th>
+                                <th class="p-2 sm:p-3">Pelotão</th>
+                                <th class="p-2 sm:p-3 text-center">Mapa</th>
+                                <th class="p-2 sm:p-3 text-center">Nº BA</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="text-gray-300 font-mono divide-y divide-white/5"></tbody>
@@ -196,70 +348,152 @@
                 </div>
             </div>
         </div>
-        <div class="h-8"></div>
+        
+        <div class="h-4 sm:h-6"></div>
     </main>
 
-    <footer class="text-center py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
+    <footer class="text-center py-4 sm:py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
         © 1º BBM - Gustavo Medeiros
     </footer>
 
     <script>
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2026, 
+            year: 2026,
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
         };
 
-        // ESTILOS E ÍCONES (V4.0 Restaurada)
         const STYLES = {
-            "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-fire-yellow" },
-            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-insect-brown" }, 
-            "BUSCA E RESGATE": { c: "#F97316", i: "🛟", cl: "text-orange-500" },
-            "CORTE DE ÁRVORE": { c: "#4ADE80", i: "🌳", cl: "text-green-400" },
-            "AÇÕES PREVENTIVAS": { c: "#9CA3AF", i: "🛡️", cl: "text-gray-400" },
-            "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO": { c: "#60A5FA", i: "📋", cl: "text-blue-400" },
-            "PRÉ-HOSPITALAR": { c: "#EF4444", i: "🚑", cl: "text-red-500" },
-            "PRODUTOS PERIGOSOS": { c: "#FFFFFF", i: "☢️", cl: "text-white" },
-            "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-bombeiros-orange" }
+            "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-yellow-400", bg: "rgba(255, 215, 0, 0.8)" },
+            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-brown-600", bg: "rgba(139, 69, 19, 0.8)" },
+            "BUSCA E RESGATE": { c: "#F97316", i: "🛟", cl: "text-orange-500", bg: "rgba(249, 115, 22, 0.8)" },
+            "CORTE DE ÁRVORE": { c: "#4ADE80", i: "🌳", cl: "text-green-400", bg: "rgba(74, 222, 128, 0.8)" },
+            "AÇÕES PREVENTIVAS": { c: "#87CEEB", i: "🛡️", cl: "text-sky-400", bg: "rgba(135, 206, 235, 0.8)" },
+            "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO": { c: "#60A5FA", i: "📋", cl: "text-blue-400", bg: "rgba(96, 165, 250, 0.8)" },
+            "PRÉ-HOSPITALAR": { c: "#EF4444", i: "🚑", cl: "text-red-500", bg: "rgba(239, 68, 68, 0.8)" },
+            "PRODUTOS PERIGOSOS": { c: "#FFFFFF", i: "☢️", cl: "text-white", bg: "rgba(255, 255, 255, 0.8)" },
+            "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-slate-400", bg: "rgba(100, 116, 139, 0.8)" },
+            "TROTE": { c: "#A78BFA", i: "🎭", cl: "text-purple-400", bg: "rgba(167, 139, 250, 0.8)" }
         };
 
-        let curYear = 2026;
-        let instances = {}; 
+        // Mapeamento de pelotões simplificados
+        const PELOTAO_SIMPLIFICADO = {
+            "BBS (POA) - MERGULHO": "BBS / MERGULHO",
+            "BBS (POA) - CANIL": "BBS / CANIL",
+            "BBS (POA) - AQUÁTICA": "BBS / AQUÁTICA",
+            "BBS (POA) - TERRESTRE": "BBS / TERRESTRE",
+            "BBS / 1ª 2º CANIL": "BBS / CANIL",
+            "BBS / 2ª 1º AQUÁTICA": "BBS / AQUÁTICA",
+            "8º BBM / 1ª 1º 1º GR CANOAS": "8º BBM CANOAS",
+            "AODC / DOA / AEREO": "AODC / AÉREO",
+            "AODC": "AODC / AÉREO",
+            "COBOM": "COBOM",
+            "BBS": "BBS / TERRESTRE"
+        };
 
-        // --- INICIALIZAÇÃO ---
+        const GREEN_GRADIENTS = [
+            '#065f46', '#047857', '#059669', '#10b981', 
+            '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'
+        ];
+
+        let curYear = 2026;
+        let instances = {};
+
+        const isMobile = () => window.innerWidth < 768;
+        const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024;
+
+        const getChartConfig = () => {
+            if (isMobile()) {
+                return {
+                    barThickness: 18,
+                    categoryPercentage: 0.85,
+                    fontSize: 10,
+                    tickPadding: 5,
+                    datalabelsSize: 9,
+                    subBarThickness: 8,
+                    subSpacing: 0.6, // Reduzido para menos espaçamento
+                    subItemHeight: 22 // Reduzido para menos entrelinha
+                };
+            } else if (isTablet()) {
+                return {
+                    barThickness: 22,
+                    categoryPercentage: 0.85,
+                    fontSize: 11,
+                    tickPadding: 8,
+                    datalabelsSize: 10,
+                    subBarThickness: 10,
+                    subSpacing: 0.65, // Reduzido
+                    subItemHeight: 26 // Reduzido
+                };
+            } else {
+                return {
+                    barThickness: 25,
+                    categoryPercentage: 0.85,
+                    fontSize: 12,
+                    tickPadding: 10,
+                    datalabelsSize: 11,
+                    subBarThickness: 12,
+                    subSpacing: 0.7, // Reduzido
+                    subItemHeight: 30 // Reduzido
+                };
+            }
+        };
+
         const Core = {
             db: [],
             
             init: () => {
-                // Fonte Global Monoespaçada
-                Chart.defaults.font.family = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace';
+                Chart.defaults.font.family = "'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace";
+                Chart.defaults.font.size = getChartConfig().fontSize;
                 Chart.register(ChartDataLabels);
                 
-                // Botões de Mês
+                // Criar botões dos meses
                 const container = document.getElementById('monthContainer');
                 CONFIG.months.forEach((m, i) => {
                     const btn = document.createElement('button');
-                    btn.className = 'btn bg-slate-800 text-gray-300 py-3 rounded text-xs font-bold w-full';
+                    btn.className = 'month-btn bg-slate-800 text-gray-300 font-bold w-full';
                     btn.innerText = m;
                     btn.id = `btn_${i}`;
                     btn.onclick = () => Core.loadMonth(m, btn);
                     container.appendChild(btn);
                 });
 
-                // Listeners
-                document.getElementById('yearSelect').addEventListener('change', (e) => Core.setYear(parseInt(e.target.value)));
+                // Event listeners
+                document.getElementById('yearSelect').addEventListener('change', (e) => {
+                    Core.setYear(parseInt(e.target.value));
+                });
+                
                 document.getElementById('btnAnual').onclick = Core.loadAnnual;
                 
-                ['fNat','fSub','fBai','fPel'].forEach(id => document.getElementById(id).addEventListener('change', Core.applyFilters));
+                ['fNat','fSub','fBai','fPel'].forEach(id => {
+                    document.getElementById(id).addEventListener('change', Core.applyFilters);
+                });
 
-                Core.setYear(2026); 
+                window.addEventListener('resize', Core.handleResize);
+
+                Core.setYear(2026);
             },
 
-            // --- LÓGICA DE ANO ---
+            handleResize: () => {
+                Chart.defaults.font.size = getChartConfig().fontSize;
+                
+                Object.keys(instances).forEach(id => {
+                    if (instances[id]) {
+                        instances[id].destroy();
+                        delete instances[id];
+                    }
+                });
+                
+                if (Core.db.length > 0) {
+                    Core.drawCharts(Core.db);
+                }
+            },
+
             setYear: (y) => {
                 curYear = y;
                 document.getElementById('lblAnual').innerText = y;
+                document.getElementById('yearSelect').value = y;
                 
                 const now = new Date();
                 const limit = (y === now.getFullYear()) ? now.getMonth() : 12;
@@ -275,35 +509,38 @@
                     }
                     btn.classList.remove('active');
                 });
+                
                 document.getElementById('btnAnual').classList.remove('active');
                 document.getElementById('dashboard').classList.add('hidden');
             },
 
-            // --- FETCHING ---
             toggleLoad: (show) => {
                 document.getElementById('loader').classList.toggle('hidden', !show);
                 document.getElementById('dashboard').classList.toggle('hidden', show);
             },
 
             resetBtns: () => {
-                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('btnAnual').classList.remove('active');
             },
 
             loadMonth: async (m, btn) => {
                 if(btn.disabled) return;
+                
                 Core.resetBtns();
                 btn.classList.add('active');
                 Core.toggleLoad(true);
 
                 try {
                     const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
-                    if(!req.ok) throw new Error("404");
+                    if(!req.ok) throw new Error("Arquivo não encontrado");
+                    
                     const txt = await req.text();
-                    Core.processData(txt);
+                    Core.processData(txt, `${m}/${curYear}`);
                 } catch(e) {
                     Core.toggleLoad(false);
                     btn.classList.remove('active');
-                    alert(`Dados não encontrados.`);
+                    alert(`Dados para ${m}/${curYear} não encontrados.`);
                 }
             },
 
@@ -316,48 +553,62 @@
                     const req = await fetch(`${CONFIG.repo}/dados/ANUAL_${curYear}.csv?t=${Date.now()}`);
                     if(req.ok) {
                         const txt = await req.text();
-                        return Core.processData(txt);
+                        Core.processData(txt, `ANUAL/${curYear}`);
+                        return;
                     }
                 } catch(e) {}
 
-                // Fallback
                 const now = new Date();
                 const limit = (curYear === now.getFullYear()) ? now.getMonth() : 12;
-                const valid = CONFIG.months.slice(0, limit);
-                let buffer = "";
-                let count = 0;
+                const validMonths = CONFIG.months.slice(0, limit);
+                
+                let allData = [];
+                let loadedCount = 0;
 
-                for (const m of valid) {
+                for (const m of validMonths) {
                     try {
                         const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
                         if(req.ok) {
                             const txt = await req.text();
-                            if(count > 0) {
-                                const lines = txt.split('\n');
-                                buffer += lines.slice(1).join('\n') + "\n";
-                            } else {
-                                buffer += txt + "\n";
-                            }
-                            count++;
+                            const data = await new Promise((resolve) => {
+                                Papa.parse(txt, {
+                                    header: true,
+                                    skipEmptyLines: true,
+                                    complete: (res) => resolve(res.data)
+                                });
+                            });
+                            allData = allData.concat(data);
+                            loadedCount++;
                         }
                     } catch(e) {}
                 }
 
-                if(count > 0) Core.processData(buffer);
-                else {
+                if(loadedCount > 0) {
+                    Core.db = Core.normalize(allData);
+                    Core.initFilters();
+                    Core.render(Core.db);
                     Core.toggleLoad(false);
-                    alert("Nenhum dado encontrado.");
+                } else {
+                    Core.toggleLoad(false);
+                    document.getElementById('btnAnual').classList.remove('active');
+                    alert("Nenhum dado encontrado para o ano selecionado.");
                 }
             },
 
-            processData: (csv) => {
+            processData: (csv, source) => {
                 Papa.parse(csv, {
-                    header: true, skipEmptyLines: true,
+                    header: true,
+                    skipEmptyLines: true,
                     complete: (res) => {
                         Core.db = Core.normalize(res.data);
                         Core.initFilters();
                         Core.render(Core.db);
                         Core.toggleLoad(false);
+                    },
+                    error: (err) => {
+                        console.error('Erro ao parsear CSV:', err);
+                        Core.toggleLoad(false);
+                        alert('Erro ao processar dados.');
                     }
                 });
             },
@@ -365,210 +616,531 @@
             normalize: (raw) => {
                 if(!raw || !raw.length) return [];
                 
-                const k = Object.keys(raw[0]);
-                const getK = (s) => k.find(x => x.toLowerCase().includes(s));
-                const cN = getK('nat')||getK('emerg');
-                const cO = getK('obm')||getK('guarni');
-                const cS = getK('sub')||getK('detalhe');
-                const cD = getK('data');
-                const cV = getK('viatura')||getK('prefixo');
-                const cL = getK('lat');
-                const cG = getK('long');
+                const firstRow = raw[0];
+                const keys = Object.keys(firstRow);
+                
+                const findKey = (patterns) => {
+                    const lowerKeys = keys.map(k => k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+                    for (const pattern of patterns) {
+                        const idx = lowerKeys.findIndex(k => k.includes(pattern));
+                        if (idx !== -1) return keys[idx];
+                    }
+                    return null;
+                };
 
-                if(!cN || !cO) { alert("Erro CSV"); return []; }
+                const colNatureza = findKey(['nat', 'emerg', 'tipo', 'ocorrencia']);
+                const colPelotao = findKey(['obm', 'guarni', 'pel', 'pelotao']);
+                const colSubgrupo = findKey(['sub', 'detalhe', 'subgrupo']);
+                const colData = findKey(['data', 'date']);
+                const colBairro = findKey(['bairro', 'local']);
+                const colViatura = findKey(['viatura', 'prefixo', 'vtr']);
+                const colLat = findKey(['lat', 'latitude']);
+                const colLon = findKey(['lon', 'long', 'longitude']);
+                
+                // Procurar por coluna "Nº Oc." (número de ocorrência de 6 dígitos)
+                let colBA = null;
+                
+                // Primeiro, procurar por padrão exato
+                for (const key of keys) {
+                    if (key.toLowerCase().includes('nº oc') || key.toLowerCase().includes('numero oc') || 
+                        key.toLowerCase().includes('num oc') || key.toLowerCase().includes('n oc')) {
+                        colBA = key;
+                        break;
+                    }
+                }
+                
+                // Se não encontrar, procurar por números de 6 dígitos
+                if (!colBA) {
+                    for (const key of keys) {
+                        const value = firstRow[key];
+                        if (value && value.toString().match(/^\d{6}$/)) {
+                            colBA = key;
+                            break;
+                        }
+                    }
+                }
+                
+                // Se ainda não encontrou, tentar padrões comuns
+                if (!colBA) {
+                    colBA = findKey(['ba', 'numero', 'num', 'relatorio', 'protocolo', 'ocorrencia']);
+                }
 
                 return raw.map((r, i) => {
-                    if(!r[cN]) return null;
+                    if(!r[colNatureza]) return null;
                     
-                    const s = (r[cO]||"").toUpperCase();
-                    const v = (r[cV]||"").toUpperCase();
+                    let natureza = (r[colNatureza] || "").toUpperCase().trim();
+                    let pelotao = (r[colPelotao] || "").toUpperCase().trim();
+                    const viatura = (r[colViatura] || "").toUpperCase();
+                    const numeroBA = colBA ? (r[colBA] || '') : '';
                     
-                    // LÓGICA DE PELOTÕES (Viatura AR tem prioridade)
-                    let pel = "OUTROS";
-                    if (v.includes("AR") || s.includes("RESGATE") || s.includes("GBS")) pel = "AUTO RESGATE";
-                    else if(s.includes("TERESÓPOLIS") || s.includes("TERESOPOLIS")) pel = "TERESÓPOLIS";
-                    else if(s.includes("AÇORIANOS")) pel = "AÇORIANOS";
-                    else if(s.includes("FLORESTA")) pel = "FLORESTA";
-                    else if(s.includes("PASSO")) pel = "PASSO D'AREIA";
-                    else if(s.includes("RESTINGA")) pel = "RESTINGA";
-                    else if(s.includes("PARTENON")) pel = "PARTENON";
-                    else if(s.includes("BELÉM")) pel = "BELÉM NOVO";
-                    else if(s.includes("ASSUNÇÃO")) pel = "ASSUNÇÃO";
-                    else if(s.includes("MERGULHO")) pel = "BBS (POA) - MERGULHO";
-                    else if(s.includes("CANIL")) pel = "BBS (POA) - CANIL";
-                    else {
-                        const clean = s.replace("1º BBM / ","").replace("CIA / ","").replace("PEL / ","").trim();
-                        if(clean.length > 2) pel = clean;
+                    // Normalizar natureza
+                    if(natureza.includes("INCÊNDIO")) natureza = "INCÊNDIO";
+                    else if(natureza.includes("INSETO")) natureza = "MANEJO DE INSETOS";
+                    else if(natureza.includes("SALVAMENTO") || natureza.includes("BUSCA") || natureza.includes("RESGATE")) 
+                        natureza = "BUSCA E RESGATE";
+                    else if(natureza.includes("APH") || natureza.includes("PRÉ-HOSPITALAR")) natureza = "PRÉ-HOSPITALAR";
+                    else if(natureza.includes("VISTORIA")) natureza = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
+                    else if(natureza.includes("CORTE") && natureza.includes("ÁRVORE")) natureza = "CORTE DE ÁRVORE";
+                    else if(natureza.includes("PREVENTIVA")) natureza = "AÇÕES PREVENTIVAS";
+                    else if(natureza.includes("PRODUTO") && natureza.includes("PERIGOSO")) natureza = "PRODUTOS PERIGOSOS";
+                    else if(natureza.includes("TROTE")) natureza = "TROTE";
+                    
+                    // Corrigir o nome do pelotão PASSO D'AREIA
+                    if (pelotao.includes("PASSO") || pelotao.includes("PASSO D'AREIA") || pelotao.includes("2ª 2º")) {
+                        pelotao = "PASSO D'AREIA";
+                    } else if (viatura.includes("AR") || pelotao.includes("RESGATE") || pelotao.includes("GBS")) {
+                        pelotao = "AUTO RESGATE";
+                    } else {
+                        CONFIG.poa.forEach(p => {
+                            if (pelotao.includes(p.replace("'", "").toUpperCase())) {
+                                pelotao = p;
+                            }
+                        });
                     }
-
-                    let nat = (r[cN]||"").toUpperCase().trim();
-                    if(nat.includes("INSETO")) nat = "MANEJO DE INSETOS";
-                    else if(nat.includes("INCÊNDIO")) nat = "INCÊNDIO";
-                    else if(nat.includes("SALVAMENTO")||nat.includes("BUSCA")) nat = "BUSCA E RESGATE";
-                    else if(nat.includes("APH")) nat = "PRÉ-HOSPITALAR";
-                    else if(nat.includes("VISTORIA")) nat = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-
-                    let map = null;
-                    if(r[cL] && r[cG]) {
-                        const la = r[cL].replace(',','.');
-                        const lo = r[cG].replace(',','.');
-                        map = `https://www.google.com/maps?q=${la},${lo}`;
+                    
+                    // Simplificar nomes de pelotões especiais
+                    if (PELOTAO_SIMPLIFICADO[pelotao]) {
+                        pelotao = PELOTAO_SIMPLIFICADO[pelotao];
+                    } else if (!CONFIG.poa.includes(pelotao) && pelotao) {
+                        // Procurar por padrões nos mapeamentos
+                        for (const [key, value] of Object.entries(PELOTAO_SIMPLIFICADO)) {
+                            if (pelotao.includes(key.replace(" (POA)", ""))) {
+                                pelotao = value;
+                                break;
+                            }
+                        }
+                        
+                        // Limpar nome do pelotão
+                        pelotao = pelotao.replace("1º BBM / ", "")
+                                        .replace("CIA / ", "")
+                                        .replace("PEL / ", "")
+                                        .replace("PEL.", "")
+                                        .replace("PELOTÃO", "")
+                                        .replace("2ª 2º ", "")
+                                        .replace("1ª 1º ", "")
+                                        .replace("1º GR ", "")
+                                        .trim();
+                        if (pelotao.length <= 2) pelotao = "OUTROS";
+                    }
+                    
+                    // Corrigir AQUÁTICO para AQUÁTICA
+                    if (pelotao.includes("AQUÁTICO")) {
+                        pelotao = pelotao.replace("AQUÁTICO", "AQUÁTICA");
+                    }
+                    
+                    let mapUrl = null;
+                    if (r[colLat] && r[colLon]) {
+                        const lat = r[colLat].replace(',', '.').trim();
+                        const lon = r[colLon].replace(',', '.').trim();
+                        if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
+                            mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                        }
                     }
 
                     return {
-                        id: i+1, date: r[cD]||'--', nat, 
-                        sub: r[cS]||'', pel, map, 
-                        bairro: (r['Bairro']||'--').toUpperCase()
+                        id: i + 1,
+                        date: r[colData] || '--/--/----',
+                        nat: natureza,
+                        sub: (r[colSubgrupo] || '').toUpperCase().trim(),
+                        pel: pelotao || "OUTROS",
+                        bairro: (r[colBairro] || '--').toUpperCase().trim(),
+                        map: mapUrl,
+                        ba: numeroBA
                     };
-                }).filter(x => x);
+                }).filter(x => x !== null);
             },
 
-            // --- FILTROS ---
             initFilters: () => {
-                const s = { n: new Set(), s: new Set(), b: new Set(), p: new Set() };
-                Core.db.forEach(d => {
-                    s.n.add(d.nat); if(d.sub) s.s.add(d.sub);
-                    if(d.bairro !== '--') s.b.add(d.bairro); s.p.add(d.pel);
-                });
-                const fill = (id, set) => {
-                    const el = document.getElementById(id);
-                    el.innerHTML = `<option value="">${el.options[0].text}</option>`;
-                    Array.from(set).sort().forEach(v => el.add(new Option(v,v)));
+                const sets = {
+                    nat: new Set(),
+                    sub: new Set(),
+                    bai: new Set(),
+                    pel: new Set()
                 };
-                fill('fNat', s.n); fill('fSub', s.s); fill('fBai', s.b); fill('fPel', s.p);
+                
+                Core.db.forEach(d => {
+                    sets.nat.add(d.nat);
+                    if(d.sub && d.sub !== '') sets.sub.add(d.sub);
+                    if(d.bairro && d.bairro !== '--') sets.bai.add(d.bairro);
+                    sets.pel.add(d.pel);
+                });
+
+                const populateFilter = (id, values, placeholder) => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = `<option value="">${placeholder}</option>`;
+                    Array.from(values)
+                        .sort()
+                        .forEach(value => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = value;
+                            select.appendChild(option);
+                        });
+                };
+
+                populateFilter('fNat', sets.nat, 'Todas as Naturezas');
+                populateFilter('fSub', sets.sub, 'Todos os Subgrupos');
+                populateFilter('fBai', sets.bai, 'Todos os Bairros');
+                populateFilter('fPel', sets.pel, 'Todos os Pelotões');
             },
 
             applyFilters: () => {
-                const v = {
-                    n: document.getElementById('fNat').value,
-                    s: document.getElementById('fSub').value,
-                    b: document.getElementById('fBai').value,
-                    p: document.getElementById('fPel').value
+                const filters = {
+                    nat: document.getElementById('fNat').value,
+                    sub: document.getElementById('fSub').value,
+                    bai: document.getElementById('fBai').value,
+                    pel: document.getElementById('fPel').value
                 };
-                const res = Core.db.filter(d => 
-                    (v.n===""||d.nat===v.n) && (v.s===""||d.sub===v.s) &&
-                    (v.b===""||d.bairro===v.b) && (v.p===""||d.pel===v.p)
-                );
-                Core.render(res);
+
+                const filtered = Core.db.filter(item => {
+                    return (!filters.nat || item.nat === filters.nat) &&
+                           (!filters.sub || item.sub === filters.sub) &&
+                           (!filters.bai || item.bairro === filters.bai) &&
+                           (!filters.pel || item.pel === filters.pel);
+                });
+
+                Core.render(filtered);
             },
 
             resetFilters: () => {
-                document.querySelectorAll('select').forEach(s => s.value = "");
+                document.querySelectorAll('#fNat, #fSub, #fBai, #fPel').forEach(select => {
+                    select.value = '';
+                });
                 Core.render(Core.db);
             },
 
-            // --- RENDER ---
             render: (data) => {
-                document.getElementById('totalVal').innerText = data.length.toLocaleString('pt-BR');
-                document.getElementById('rowsVal').innerText = data.length;
+                document.getElementById('totalVal').textContent = data.length.toLocaleString('pt-BR');
+                document.getElementById('rowsVal').textContent = data.length.toLocaleString('pt-BR');
 
                 const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = data.slice(0, 500).map(d => {
-                    const st = STYLES[d.nat] || { i: "📄", cl: "text-slate-400" };
-                    const mapBtn = d.map ? `<a href="${d.map}" target="_blank" class="text-blue-400 hover:text-white transition-transform hover:scale-125 inline-block"><i class="fas fa-map-marker-alt fa-lg"></i></a>` : '';
-                    return `
-                    <tr class="hover:bg-white/5 border-b border-white/5">
-                        <td class="p-3 text-center text-slate-500">${d.id}</td>
-                        <td class="p-3 whitespace-nowrap">${d.date}</td>
-                        <td class="p-3 font-bold ${st.cl} whitespace-nowrap"><span class="mr-2">${st.i}</span>${d.nat}</td>
-                        <td class="p-3 text-blue-200/70 text-[10px]">${d.sub}</td>
-                        <td class="p-3">${d.bairro}</td>
-                        <td class="p-3 text-fire-yellow font-bold whitespace-nowrap">${d.pel}</td>
-                        <td class="p-3 text-center">${mapBtn}</td>
-                    </tr>
-                `}).join('');
+                tbody.innerHTML = '';
+
+                const displayData = data.slice(0, 100);
+                
+                displayData.forEach(item => {
+                    const style = STYLES[item.nat] || { i: "📄", cl: "text-slate-400" };
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-white/5 border-b border-white/5';
+                    row.innerHTML = `
+                        <td class="p-2 sm:p-3 text-center text-slate-500 font-mono">${item.id}</td>
+                        <td class="p-2 sm:p-3 whitespace-nowrap">${item.date}</td>
+                        <td class="p-2 sm:p-3 font-bold ${style.cl}">
+                            <span class="mr-2">${style.i}</span>${item.nat}
+                        </td>
+                        <td class="p-2 sm:p-3 text-blue-200/70 text-xs truncate max-w-[150px]" title="${item.sub}">
+                            ${item.sub || '-'}
+                        </td>
+                        <td class="p-2 sm:p-3 truncate max-w-[120px]" title="${item.bairro}">
+                            ${item.bairro}
+                        </td>
+                        <td class="p-2 sm:p-3 text-emerald-400 font-bold truncate max-w-[120px]" title="${item.pel}">
+                            ${item.pel}
+                        </td>
+                        <td class="p-2 sm:p-3 text-center">
+                            ${item.map ? 
+                                `<a href="${item.map}" target="_blank" class="text-blue-400 hover:text-white transition-colors" title="Abrir no Google Maps">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </a>` : 
+                                '<span class="text-slate-600">-</span>'
+                            }
+                        </td>
+                        <td class="p-2 sm:p-3 text-center text-slate-400 font-mono">
+                            ${item.ba || '<span class="text-slate-600">-</span>'}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
 
                 Core.drawCharts(data);
             },
 
             drawCharts: (data) => {
-                const agg = { p:{}, n:{}, s:{} };
-                data.forEach(d => {
-                    agg.p[d.pel] = (agg.p[d.pel]||0)+1;
-                    agg.n[d.nat] = (agg.n[d.nat]||0)+1;
-                    if(d.sub) agg.s[`${d.nat}___${d.sub}`] = (agg.s[`${d.nat}___${d.sub}`]||0)+1;
+                const aggregations = {
+                    pel: {},
+                    nat: {},
+                    sub: {}
+                };
+
+                data.forEach(item => {
+                    aggregations.pel[item.pel] = (aggregations.pel[item.pel] || 0) + 1;
+                    aggregations.nat[item.nat] = (aggregations.nat[item.nat] || 0) + 1;
+                    if (item.sub && item.sub !== '') {
+                        const key = `${item.nat} - ${item.sub}`;
+                        aggregations.sub[key] = (aggregations.sub[key] || 0) + 1;
+                    }
                 });
 
-                Core.makeChart('chartPel', agg.p, 'p');
-                Core.makeChart('chartNat', agg.n, 'n');
-                Core.makeChart('chartSub', agg.s, 's');
+                const sortObject = (obj) => 
+                    Object.entries(obj).sort((a, b) => b[1] - a[1]);
+
+                Core.createChart('chartPel', sortObject(aggregations.pel), 'pel');
+                Core.createChart('chartNat', sortObject(aggregations.nat), 'nat');
+                Core.createChart('chartSub', sortObject(aggregations.sub), 'sub');
             },
 
-            makeChart: (id, dataObj, type) => {
-                if(instances[id]) instances[id].destroy();
+            createChart: (canvasId, data, type) => {
+                if (instances[canvasId]) {
+                    instances[canvasId].destroy();
+                }
 
-                const sorted = Object.entries(dataObj).sort((a,b)=>b[1]-a[1]);
-                const labels = sorted.map(x => {
-                    if(type==='s') {
-                        const [n,s] = x[0].split('___');
-                        const i = (STYLES[n]||{i:"📄"}).i;
-                        return `${i} ${n} [${s}]`;
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                const config = getChartConfig();
+                
+                let labels = data.map(item => {
+                    if (type === 'sub') {
+                        const maxLength = isMobile() ? 40 : isTablet() ? 50 : 60;
+                        let label = item[0].split(' - ')[1] || item[0];
+                        if (label.length > maxLength) {
+                            label = label.substring(0, maxLength) + '...';
+                        }
+                        return label;
                     }
-                    if(type==='n') {
-                        const i = (STYLES[x[0]]||{i:"📄"}).i;
-                        return `${i} ${x[0]}`;
-                    }
-                    return x[0];
+                    return item[0];
                 });
-                const vals = sorted.map(x => x[1]);
+                
+                const values = data.map(item => item[1]);
+                const total = values.reduce((a, b) => a + b, 0);
 
-                if(type==='s') document.getElementById('boxSub').style.height = Math.max(350, vals.length * 28) + "px";
+                let backgroundColors;
+                let tickColors;
+                let barThickness;
+                let categoryPercentage;
+                let barPercentage;
 
-                const ctx = document.getElementById(id).getContext('2d');
-                instances[id] = new Chart(ctx, {
+                if (type === 'pel') {
+                    // Definir quais pelotões são POA (verde) e quais são outros (cinza)
+                    const isPoaPelotao = (label) => {
+                        return CONFIG.poa.includes(label) || label === "PASSO D'AREIA";
+                    };
+                    
+                    const isBBS = (label) => {
+                        return label.includes("BBS") || label.includes("AODC") || label.includes("COBOM") || label.includes("8º BBM");
+                    };
+                    
+                    // Para os pelotões POA, aplicar gradiente por ranking
+                    const poaItems = data.filter(item => isPoaPelotao(item[0]));
+                    const sortedPoa = [...poaItems].sort((a, b) => b[1] - a[1]);
+                    const poaRanking = {};
+                    sortedPoa.forEach((item, index) => {
+                        poaRanking[item[0]] = index;
+                    });
+                    const totalPoa = sortedPoa.length;
+                    
+                    backgroundColors = labels.map(label => {
+                        if (poaRanking.hasOwnProperty(label)) {
+                            const rank = poaRanking[label];
+                            const gradientIndex = Math.min(
+                                Math.floor((rank / Math.max(1, totalPoa - 1)) * (GREEN_GRADIENTS.length - 1)),
+                                GREEN_GRADIENTS.length - 1
+                            );
+                            return GREEN_GRADIENTS[gradientIndex];
+                        }
+                        // BBS e outros em cinza
+                        return '#64748B';
+                    });
+                    
+                    tickColors = labels.map(label => {
+                        if (isPoaPelotao(label)) return '#10B981'; // Verde para POA
+                        if (isBBS(label)) return '#94a3b8'; // Cinza para BBS
+                        return '#94a3b8'; // Cinza para outros
+                    });
+                    
+                    // Mesmo espaçamento do gráfico de natureza
+                    barThickness = config.barThickness;
+                    categoryPercentage = config.categoryPercentage;
+                    barPercentage = 0.8;
+                    
+                } else if (type === 'nat') {
+                    // Para natureza: ícones no final
+                    const newLabels = data.map(item => {
+                        const style = STYLES[item[0]] || { i: "⚠️" };
+                        return `${item[0]} ${style.i}`;
+                    });
+                    labels = newLabels;
+                    
+                    backgroundColors = data.map(item => {
+                        const style = STYLES[item[0]] || { c: '#64748B' };
+                        return style.c;
+                    });
+                    
+                    tickColors = data.map(item => {
+                        const style = STYLES[item[0]] || { cl: '#94a3b8' };
+                        const colorClass = style.cl.replace('text-', '');
+                        const colorMap = {
+                            'yellow-400': '#FBBF24',
+                            'brown-600': '#8B4513',
+                            'orange-500': '#F97316',
+                            'green-400': '#34D399',
+                            'sky-400': '#38BDF8',
+                            'blue-400': '#60A5FA',
+                            'red-500': '#EF4444',
+                            'white': '#FFFFFF',
+                            'purple-400': '#A78BFA',
+                            'slate-400': '#94A3B8'
+                        };
+                        return colorMap[colorClass] || '#94A3B8';
+                    });
+                    
+                    barThickness = config.barThickness;
+                    categoryPercentage = config.categoryPercentage;
+                    barPercentage = 0.8;
+                    
+                } else if (type === 'sub') {
+                    // Para subgrupos: cor da natureza correspondente
+                    backgroundColors = data.map(item => {
+                        const nat = item[0].split(' - ')[0];
+                        const style = STYLES[nat] || { bg: 'rgba(100, 116, 139, 0.8)' };
+                        return style.bg;
+                    });
+                    
+                    // Para subgrupos: cor da fonte da natureza correspondente
+                    tickColors = data.map(item => {
+                        const nat = item[0].split(' - ')[0];
+                        const style = STYLES[nat] || { cl: '#94a3b8', i: "⚠️" };
+                        const colorClass = style.cl.replace('text-', '');
+                        const colorMap = {
+                            'yellow-400': '#FBBF24',
+                            'brown-600': '#8B4513',
+                            'orange-500': '#F97316',
+                            'green-400': '#34D399',
+                            'sky-400': '#38BDF8',
+                            'blue-400': '#60A5FA',
+                            'red-500': '#EF4444',
+                            'white': '#FFFFFF',
+                            'purple-400': '#A78BFA',
+                            'slate-400': '#94A3B8'
+                        };
+                        return colorMap[colorClass] || '#94A3B8';
+                    });
+                    
+                    // Ajustar labels para incluir ícones no final
+                    labels = data.map((item) => {
+                        const nat = item[0].split(' - ')[0];
+                        const sub = item[0].split(' - ')[1] || '';
+                        const style = STYLES[nat] || { i: "⚠️" };
+                        const maxLength = isMobile() ? 35 : isTablet() ? 45 : 55;
+                        let displaySub = sub;
+                        if (displaySub.length > maxLength) {
+                            displaySub = displaySub.substring(0, maxLength) + '...';
+                        }
+                        return `${displaySub} ${style.i}`;
+                    });
+                    
+                    // Ajustar altura do container do gráfico com base no número de itens (MENOS espaçamento)
+                    const container = document.getElementById('subChartContainer');
+                    const minHeight = isMobile() ? 380 : isTablet() ? 420 : 480;
+                    const itemHeight = config.subItemHeight; // Usando valor configurado (menor)
+                    const calculatedHeight = Math.max(minHeight, data.length * itemHeight);
+                    container.style.height = `${calculatedHeight}px`;
+                    
+                    // Barras mais finas e mais próximas
+                    barThickness = config.subBarThickness;
+                    categoryPercentage = config.subSpacing; // Menos espaçamento
+                    barPercentage = 0.6;
+                } else {
+                    backgroundColors = '#60A5FA';
+                    tickColors = Array(labels.length).fill('#94a3b8');
+                    barThickness = config.barThickness;
+                    categoryPercentage = config.categoryPercentage;
+                    barPercentage = 0.8;
+                }
+
+                instances[canvasId] = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
-                            data: vals,
-                            borderRadius: 4,
-                            barPercentage: 0.7,
-                            backgroundColor: (c) => {
-                                const i = c.dataIndex;
-                                if(type==='p') return CONFIG.poa.includes(sorted[i][0]) ? '#10B981' : '#64748B';
-                                const k = type==='s' ? sorted[i][0].split('___')[0] : sorted[i][0];
-                                return (STYLES[k] || {c:'#64748B'}).c;
-                            },
-                            hoverBorderWidth: 2, hoverBorderColor: '#fff'
+                            data: values,
+                            backgroundColor: backgroundColors,
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            borderRadius: 2,
+                            barThickness: barThickness,
+                            categoryPercentage: categoryPercentage,
+                            barPercentage: barPercentage
                         }]
                     },
                     options: {
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: false,
-                        layout: { padding: { right: 40 } },
                         plugins: {
-                            legend: false,
-                            tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.95)' },
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 1,
+                                titleColor: '#e2e8f0',
+                                bodyColor: '#cbd5e1',
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (context) => {
+                                        const value = context.raw;
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${value.toLocaleString('pt-BR')} ocorrências (${percentage}%)`;
+                                    },
+                                    title: (context) => {
+                                        if (type === 'sub') {
+                                            return data[context[0].dataIndex][0];
+                                        }
+                                        return context[0].label;
+                                    }
+                                }
+                            },
                             datalabels: {
-                                color: '#fff', anchor: 'end', align: 'end', offset: 4,
-                                font: { weight: 'bold', size: 11 },
-                                formatter: v => v.toLocaleString('pt-BR')
+                                color: '#ffffff',
+                                anchor: 'end',
+                                align: 'end',
+                                font: {
+                                    family: "'ui-monospace', monospace",
+                                    weight: 'bold',
+                                    size: type === 'sub' ? (isMobile() ? 10 : isTablet() ? 11 : 12) : config.datalabelsSize
+                                },
+                                formatter: (value) => value.toLocaleString('pt-BR'),
+                                display: (context) => {
+                                    return context.dataset.data[context.dataIndex] > 0;
+                                }
                             }
                         },
                         scales: {
-                            x: { display: false },
-                            y: { 
+                            x: {
+                                display: false,
+                                grid: { 
+                                    color: 'rgba(255, 255, 255, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            y: {
                                 grid: { display: false },
-                                ticks: { 
-                                    color: (c) => {
-                                        if(type==='p') {
-                                            const l = instances[id].data.labels[c.index];
-                                            return CONFIG.poa.includes(l) ? '#10B981' : '#94a3b8';
+                                ticks: {
+                                    color: (context) => {
+                                        if (type === 'pel') {
+                                            return tickColors[context.index];
+                                        } else if (type === 'nat') {
+                                            return tickColors[context.index];
+                                        } else if (type === 'sub') {
+                                            return tickColors[context.index];
                                         }
                                         return '#94a3b8';
                                     },
-                                    font: (c) => {
-                                        let size = 10;
-                                        if(type==='p') {
-                                            const l = instances[id].data.labels[c.index];
-                                            if(CONFIG.poa.includes(l)) size = 13;
-                                        }
-                                        return { size: size, family: 'monospace' };
-                                    }
+                                    font: {
+                                        size: type === 'sub' ? (isMobile() ? 11 : isTablet() ? 12 : 13) : config.fontSize,
+                                        family: "'ui-monospace', monospace",
+                                        weight: type === 'sub' ? 'bold' : 'normal'
+                                    },
+                                    padding: type === 'sub' ? 6 : config.tickPadding, // Menos padding
                                 }
                             }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
                         }
                     }
                 });
