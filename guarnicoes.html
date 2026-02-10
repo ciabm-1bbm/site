@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guarnição Operacional em Porto Alegre</title>
+    <title>Guarnição Operacional - 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -51,10 +51,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.5rem;
             transition: all 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: row; 
-            /* Importante para o layout Masonry não quebrar o card no meio */
             break-inside: avoid;
             page-break-inside: avoid;
         }
@@ -100,7 +96,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando guarnições...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Sincronizando dados...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -136,7 +132,7 @@
                 
                 <div class="stats-container border-l-4 border-bombeiros-orange">
                     <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA 24H)
+                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA DO DIA)
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
@@ -182,7 +178,7 @@
                 </div>
             </div>
 
-            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10">
+            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10 space-y-5">
                 </div>
 
         </main>
@@ -202,7 +198,6 @@
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
         // ============================================================
 
-        // --- ORDEM OTIMIZADA PARA PAREAMENTO ---
         const ORDEM_QUARTEIS = [
             "OFICIAL DE DIA", 
             "COBOM", 
@@ -219,17 +214,21 @@
             "MERGULHO"
         ];
 
+        // --- CORREÇÃO DA DATA (V20) ---
         function getDataOperacional() {
             const agora = new Date();
+            // Se for antes das 08h da manhã, pertence ao dia operacional anterior.
             if (agora.getHours() < 8) {
                 agora.setDate(agora.getDate() - 1);
             }
+            // Retorna a data corrigida (sem avançar para o dia seguinte)
             return agora;
         }
 
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
+            // Data em português correto
             document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
@@ -247,34 +246,44 @@
                     return;
                 }
 
-                // V18: Sem filtro de hora, mostra escala completa
                 processarDados(dados);
-                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('app').classList.remove('hidden');
 
             } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
         }
 
+        // --- CORREÇÃO DOS TURNOS (V20) ---
         function formatarTurno(raw) {
             if(!raw) return "24h";
             
+            // Limpa espaços extras
+            raw = raw.replace(/\s+/g, ' ').trim();
+
             const nums = raw.match(/(\d{2}:\d{2})/g);
-            if(nums && nums.length >= 2) {
-                const h1 = nums[0];
-                const h2 = nums[1];
-                
-                const [hh1] = h1.split(':').map(Number);
-                const [hh2] = h2.split(':').map(Number);
-                let diff = hh2 - hh1;
+            
+            // Caso 1: Veio 08:00 - 08:00 (Isso é 24h)
+            if (nums && nums.length >= 2) {
+                const inicio = nums[0];
+                const fim = nums[1];
+
+                if (inicio === "08:00" && fim === "08:00") return "08:00 às 08:00 (24h)";
+                if (inicio === "08:00" && fim === "20:00") return "08:00 às 20:00 (12h)";
+                if (inicio === "20:00" && fim === "08:00") return "20:00 às 08:00 (12h)";
+
+                // Cálculo genérico se for horário quebrado
+                const [h1] = inicio.split(':').map(Number);
+                const [h2] = fim.split(':').map(Number);
+                let diff = h2 - h1;
                 if(diff < 0) diff += 24;
 
                 let carga = "";
                 if(diff >= 23 || diff === 0) carga = "(24h)";
                 else if(diff >= 11 && diff <= 13) carga = "(12h)";
-
-                return `${h1} às ${h2} ${carga}`;
+                
+                return `${inicio} às ${fim} ${carga}`;
             }
+            
             return raw;
         }
 
@@ -304,6 +313,7 @@
                 let nomeExibicao = limparNome(nomeCompleto);
                 
                 let func = (d.func || "").trim();
+                // APLICA A NOVA FORMATAÇÃO DE TURNO
                 let hora = formatarTurno(d.horario || "");
 
                 let obmKey = "OUTROS";
@@ -396,7 +406,7 @@
                 });
 
                 const card = document.createElement('div');
-                // IMPORTANTE: Adicionado mb-5 para espaçamento vertical no Masonry
+                // break-inside-avoid e mb-5 são cruciais para o layout Masonry
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
                 let content = `
@@ -417,7 +427,6 @@
                             if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
                             return 3;
                         }
-                        // Ordena por patente/função E depois por horário
                         let scoreA = getScore(a.f);
                         let scoreB = getScore(b.f);
                         if(scoreA !== scoreB) return scoreA - scoreB;
