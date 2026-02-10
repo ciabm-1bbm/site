@@ -178,8 +178,7 @@
                 </div>
             </div>
 
-            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10 space-y-5">
-                </div>
+            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10 space-y-5"></div>
 
         </main>
 
@@ -192,11 +191,8 @@
     </div>
 
     <script>
-        // ============================================================
         // CONFIGURAÇÃO
-        // ============================================================
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
-        // ============================================================
 
         const ORDEM_QUARTEIS = [
             "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
@@ -204,7 +200,6 @@
             "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
 
-        // Determina o "Dia Operacional" (Se for antes das 08:00, é o dia anterior)
         function getDataOperacional() {
             const agora = new Date();
             if (agora.getHours() < 8) {
@@ -213,103 +208,66 @@
             return agora;
         }
 
-        // Formata data para "09Fev"
         function formatarDataCurta(data) {
             const dia = String(data.getDate()).padStart(2, '0');
             const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        function atualizarRelogio() {
-            const dataOp = getDataOperacional();
-            const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
-            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
-        }
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
-
-        async function iniciarSistema() {
-            try {
-                const req = await fetch(URL_DADOS);
-                const dados = await req.json();
-                if(dados.erro) {
-                    document.getElementById('msg-loading').innerText = "Aguardando envio do PC...";
-                    setTimeout(iniciarSistema, 5000); 
-                    return;
-                }
-                processarDados(dados);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-            } catch(e) { console.error(e); setTimeout(iniciarSistema, 5000); }
-        }
-
-        // =========================================================
-        // NOVA LÓGICA DE FORMATAÇÃO DE TURNO (PEDIDO)
-        // =========================================================
         function formatarTurno(raw) {
             if(!raw) return "";
+            try {
+                // Limpa string
+                raw = raw.replace(/\s+/g, ' ').trim();
+                const nums = raw.match(/(\d{2}:\d{2})/g);
 
-            // Limpa string
-            raw = raw.replace(/\s+/g, ' ').trim();
-            const nums = raw.match(/(\d{2}:\d{2})/g);
+                if (nums && nums.length >= 2) {
+                    const horaInicio = nums[0]; 
+                    const horaFim = nums[1];    
 
-            if (nums && nums.length >= 2) {
-                const horaInicio = nums[0]; // ex: 08:00
-                const horaFim = nums[1];    // ex: 08:00 ou 20:00
+                    const dataBase = getDataOperacional();
+                    const diaInicio = new Date(dataBase);
+                    const diaFim = new Date(dataBase);
 
-                // Datas Base
-                const dataBase = getDataOperacional();
-                const diaInicio = new Date(dataBase);
-                const diaFim = new Date(dataBase);
+                    let duracaoTxt = "24h";
 
-                let duracaoTxt = "24h";
+                    if (horaInicio === horaFim) {
+                        duracaoTxt = "24h";
+                        diaFim.setDate(diaInicio.getDate() + 1);
+                    } 
+                    else if (horaInicio === "08:00" && horaFim === "20:00") {
+                        duracaoTxt = "12h";
+                    }
+                    else if (horaInicio === "20:00" && horaFim === "08:00") {
+                        duracaoTxt = "12h";
+                        diaFim.setDate(diaInicio.getDate() + 1);
+                    } 
+                    else {
+                        const h1 = parseInt(horaInicio.split(':')[0]);
+                        const h2 = parseInt(horaFim.split(':')[0]);
+                        if(h2 < h1) diaFim.setDate(diaInicio.getDate() + 1);
+                        
+                        let diff = h2 - h1;
+                        if(diff < 0) diff += 24;
+                        duracaoTxt = (diff > 12) ? "24h" : "12h"; 
+                    }
 
-                // Lógica de Datas
-                // Se 24h (08:00 as 08:00) -> DiaFim = DiaBase + 1
-                if (horaInicio === horaFim) {
-                    duracaoTxt = "24h";
-                    diaFim.setDate(diaInicio.getDate() + 1);
-                } 
-                // Se 12h (08:00 as 20:00) -> DiaFim = DiaBase (Mesmo dia)
-                else if (horaInicio === "08:00" && horaFim === "20:00") {
-                    duracaoTxt = "12h";
-                    // diaFim continua sendo hoje
+                    const strDataInicio = formatarDataCurta(diaInicio);
+                    const strDataFim = formatarDataCurta(diaFim);
+
+                    return `
+                        <span class="text-sky-400 font-bold">${duracaoTxt}</span>
+                        <span class="text-gray-400 font-normal">- das</span>
+                        <span class="text-sky-400 font-bold">${horaInicio}</span>
+                        <span class="text-gray-400 font-normal">de</span>
+                        <span class="text-sky-400 font-bold">${strDataInicio}</span>
+                        <span class="text-gray-400 font-normal">às</span>
+                        <span class="text-sky-400 font-bold">${horaFim}</span>
+                        <span class="text-gray-400 font-normal">de</span>
+                        <span class="text-sky-400 font-bold">${strDataFim}</span>
+                    `;
                 }
-                // Se 12h Noite (20:00 as 08:00) -> DiaFim = DiaBase + 1
-                else if (horaInicio === "20:00" && horaFim === "08:00") {
-                    duracaoTxt = "12h";
-                    diaFim.setDate(diaInicio.getDate() + 1);
-                } 
-                // Genérico (se hora final for menor que inicial, virou o dia)
-                else {
-                    const h1 = parseInt(horaInicio.split(':')[0]);
-                    const h2 = parseInt(horaFim.split(':')[0]);
-                    if(h2 < h1) diaFim.setDate(diaInicio.getDate() + 1);
-                    
-                    let diff = h2 - h1;
-                    if(diff < 0) diff += 24;
-                    duracaoTxt = (diff > 12) ? "24h" : "12h"; 
-                }
-
-                // Strings Formatadas
-                const strDataInicio = formatarDataCurta(diaInicio);
-                const strDataFim = formatarDataCurta(diaFim);
-
-                // HTML COLORIDO (AZUL CELESTE)
-                return `
-                    <span class="text-sky-400 font-bold">${duracaoTxt}</span>
-                    <span class="text-gray-400 font-normal">- das</span>
-                    <span class="text-sky-400 font-bold">${horaInicio}</span>
-                    <span class="text-gray-400 font-normal">de</span>
-                    <span class="text-sky-400 font-bold">${strDataInicio}</span>
-                    <span class="text-gray-400 font-normal">às</span>
-                    <span class="text-sky-400 font-bold">${horaFim}</span>
-                    <span class="text-gray-400 font-normal">de</span>
-                    <span class="text-sky-400 font-bold">${strDataFim}</span>
-                `;
-            }
-
+            } catch (e) { console.error("Erro formatar turno", e); }
             return raw;
         }
 
@@ -339,7 +297,7 @@
                 let nomeExibicao = limparNome(nomeCompleto);
                 
                 let func = (d.func || "").trim();
-                let horaHTML = formatarTurno(d.horario || ""); // Agora retorna HTML
+                let horaHTML = formatarTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
@@ -436,9 +394,8 @@
                             ${obmName}
                         </h2>
                     </div>
+                    <div class="flex-grow p-3 flex flex-col gap-4">
                 `;
-
-                content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
 
                 gruposUnicos.forEach(grupo => {
                     grupo.guarnicao.sort((a,b) => {
@@ -448,9 +405,7 @@
                             if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
                             return 3;
                         }
-                        let scoreA = getScore(a.f);
-                        let scoreB = getScore(b.f);
-                        return scoreA - scoreB;
+                        return getScore(a.f) - getScore(b.f);
                     });
 
                     const listaVtrs = grupo.nomesVtrs.join(' / ');
@@ -482,6 +437,36 @@
                 grid.appendChild(card);
             });
         }
+
+        function atualizarRelogio() {
+            const dataOp = getDataOperacional();
+            const agora = new Date();
+            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
+        }
+
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        async function iniciarSistema() {
+            try {
+                const req = await fetch(URL_DADOS);
+                const dados = await req.json();
+                if(dados.erro) {
+                    throw new Error("Dados inválidos");
+                }
+                processarDados(dados);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').classList.remove('hidden');
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('msg-loading').innerText = "Tentando reconectar...";
+                setTimeout(iniciarSistema, 5000); 
+            }
+        }
+
+        iniciarSistema();
+        setInterval(iniciarSistema, 60000); 
     </script>
 </body>
 </html>
