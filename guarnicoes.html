@@ -15,10 +15,10 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'moss-green': '#9BE36D',
+                        'moss-green': '#10B981',
                         'total-green': '#4ade80',
                         'sky-blue': '#38bdf8',
-                        'card-hover': 'rgba(255, 140, 0, 0.1)'
+                        'funcao-cinza': '#9CA3AF'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -29,7 +29,7 @@
     </script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body { 
@@ -38,6 +38,7 @@
             overflow-x: hidden; 
             font-family: 'Inter', sans-serif; 
             cursor: default;
+            -webkit-font-smoothing: antialiased;
         }
         
         .hero-background { 
@@ -55,23 +56,11 @@
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
             background-position: center; 
             background-repeat: no-repeat; 
-            background-size: 500px;
+            background-size: 400px;
             z-index: 0; 
-            opacity: 0.08; 
+            opacity: 0.06; 
             filter: grayscale(100%); 
             pointer-events: none; 
-        }
-        
-        .hero-background::after {
-            content: ''; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.95) 100%);
-            z-index: 1; 
-            pointer-events: none;
         }
         
         .content-wrapper { 
@@ -79,72 +68,43 @@
             z-index: 10; 
         }
 
-        /* Cards menores e mais compactos */
+        /* CARDS COMPACTOS E FUNCIONAIS */
         .card-monitor {
-            background: rgba(30, 41, 59, 0.92);
+            background: rgba(30, 41, 59, 0.95);
             backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 140, 0, 0.15);
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            break-inside: avoid;
-            page-break-inside: avoid;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            border-radius: 6px;
+            transition: all 0.25s ease;
             display: flex; 
             overflow: hidden;
-            min-height: 120px;
-            max-height: 320px;
+            min-height: auto;
             position: relative;
             cursor: grab;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .card-monitor:active {
             cursor: grabbing;
         }
 
-        /* Efeito de brilho nas bordas ao passar mouse */
-        .card-monitor::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 140, 0, 0.3),
-                rgba(255, 215, 0, 0.2),
-                transparent
-            );
-            border-radius: 10px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .card-monitor:hover::before {
-            opacity: 1;
-        }
-
-        /* Efeito de zoom e elevação */
+        /* Efeito sutil ao passar mouse */
         .card-monitor:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 
-                        0 0 0 2px rgba(255, 140, 0, 0.4),
-                        inset 0 0 20px rgba(255, 140, 0, 0.1);
-            z-index: 100;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 140, 0, 0.3);
+            border-color: rgba(255, 140, 0, 0.4);
         }
 
         /* Indicador visual de que é arrastável */
         .card-monitor::after {
-            content: '≡';
+            content: '⋮⋮';
             position: absolute;
             top: 8px;
             right: 8px;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 12px;
             font-weight: bold;
+            letter-spacing: 2px;
             pointer-events: none;
         }
 
@@ -154,17 +114,19 @@
             text-align: center;
             white-space: nowrap;
             z-index: 2;
-            font-size: 0.9rem !important;
+            font-size: 0.85rem;
+            padding: 8px 0;
         }
 
         .stats-container {
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 0.75rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
+        /* TOOLTIPS SIMPLES E LIMPOS */
         .tooltip-box {
             visibility: hidden; 
             opacity: 0; 
@@ -172,65 +134,49 @@
             top: 100%; 
             left: 50%; 
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.95); 
+            background: rgba(0, 0, 0, 0.98); 
             border: 1px solid #FF8C00; 
-            padding: 10px 12px; 
-            border-radius: 6px;
+            padding: 8px 10px; 
+            border-radius: 4px;
             width: max-content; 
             min-width: 180px; 
-            max-width: 280px;
+            max-width: 250px;
             z-index: 1000; 
-            transition: all 0.3s ease; 
+            transition: all 0.2s ease; 
             pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); 
-            margin-top: 8px;
-            backdrop-filter: blur(10px);
+            margin-top: 5px;
         }
         
         .group:hover .tooltip-box { 
             visibility: visible; 
             opacity: 1; 
-            transform: translateX(-50%) translateY(5px);
+            transform: translateX(-50%) translateY(2px);
         }
 
+        /* Lista de tooltip simplificada */
         .tooltip-item {
             display: flex;
-            flex-direction: column;
-            margin-bottom: 6px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: baseline;
+            margin-bottom: 4px;
+            line-height: 1.2;
         }
         
-        .tooltip-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .tooltip-posto {
-            color: #FFD700 !important;
-            font-weight: 800 !important;
+        .tooltip-nome {
+            color: #FFD700 !important; /* Amarelo para nome */
+            font-weight: 500 !important;
             font-size: 11px !important;
-            text-transform: uppercase !important;
-            margin-bottom: 1px !important;
+            flex-shrink: 0;
         }
         
         .tooltip-funcao {
-            color: #ffffff !important;
+            color: #E5E7EB !important; /* Branco suave para função */
             font-size: 10px !important;
             font-weight: 400 !important;
-            opacity: 0.9 !important;
+            margin-left: 6px;
+            opacity: 0.9;
         }
 
-        ::-webkit-scrollbar { 
-            width: 3px; 
-        }
-        
-        ::-webkit-scrollbar-thumb { 
-            background: #FF8C00; 
-            border-radius: 1px; 
-        }
-
+        /* LOADING */
         #loading { 
             position: fixed; 
             inset: 0; 
@@ -242,93 +188,67 @@
             flex-direction: column; 
         }
 
-        /* ========== ESTILOS COMPACTOS DOS MILITARES ========== */
-        .militar-nome {
-            color: white !important;
-            font-weight: 800 !important;
-            font-size: 14px !important;
-            text-transform: uppercase !important;
-            letter-spacing: -0.2px !important;
-            line-height: 1.1 !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
-            margin-bottom: 3px !important;
-        }
-
-        .militar-funcao {
-            color: #38bdf8 !important; /* Azul para funções */
-            font-weight: 600 !important;
-            font-size: 10px !important;
-            text-transform: none !important;
-            letter-spacing: 0.3px !important;
-            background: rgba(56, 189, 248, 0.1) !important;
-            padding: 2px 6px !important;
-            border-radius: 8px !important;
-            border: 1px solid rgba(56, 189, 248, 0.2) !important;
-            display: inline-block !important;
-            margin: 1px 0 5px 0 !important;
-        }
-
-        /* Efeito de brilho no card interno do militar */
+        /* ========== LAYOUT COMPACTO DOS MILITARES ========== */
         .militar-container {
-            margin-bottom: 8px !important;
-            padding: 8px !important;
-            background: rgba(30, 41, 59, 0.6) !important;
-            border-radius: 6px !important;
+            margin-bottom: 6px !important;
+            padding: 6px 8px !important;
+            background: rgba(30, 41, 59, 0.7) !important;
+            border-radius: 4px !important;
             border: 1px solid rgba(255, 255, 255, 0.05) !important;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Efeito de borda luminosa ao passar mouse */
-        .militar-container::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 140, 0, 0.4),
-                transparent
-            );
-            border-radius: 7px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .militar-container:hover::before {
-            opacity: 1;
+            transition: all 0.15s ease !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         .militar-container:hover {
-            background: rgba(30, 41, 59, 0.85) !important;
-            border-color: rgba(255, 140, 0, 0.3) !important;
-            transform: translateY(-2px) scale(1.03) !important;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 140, 0, 0.2) !important;
+            background: rgba(30, 41, 59, 0.9) !important;
+            border-color: rgba(255, 140, 0, 0.2) !important;
         }
 
-        /* Estilo compacto do turno */
+        /* Nome à esquerda em VERDE */
+        .militar-nome {
+            color: #10B981 !important; /* Verde bombeiros */
+            font-weight: 700 !important;
+            font-size: 12px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.1px !important;
+            line-height: 1.1 !important;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Função à direita em CINZA */
+        .militar-funcao {
+            color: #9CA3AF !important; /* Cinza para função */
+            font-weight: 500 !important;
+            font-size: 10px !important;
+            text-transform: none !important;
+            letter-spacing: 0.2px !important;
+            background: rgba(156, 163, 175, 0.1) !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            border: 1px solid rgba(156, 163, 175, 0.15) !important;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        /* Turno compacto - SEM TRAÇO, mais próximo */
         .turno-display {
-            background: rgba(15, 23, 42, 0.9) !important;
-            border: 1px solid rgba(56, 189, 248, 0.25) !important;
-            border-radius: 6px !important;
-            padding: 4px 6px !important;
             margin-top: 4px !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
+            justify-content: flex-start !important;
             gap: 6px !important;
-            flex-wrap: nowrap !important;
+            flex-wrap: wrap !important;
         }
 
         .turno-carga {
             color: #FF8C00 !important;
-            font-weight: 800 !important;
+            font-weight: 700 !important;
             font-size: 9px !important;
         }
 
@@ -351,77 +271,62 @@
         }
 
         .grupo-viatura {
-            margin-bottom: 10px !important;
+            margin-bottom: 8px !important;
             padding: 8px !important;
-            background: rgba(15, 23, 42, 0.7) !important;
-            border-radius: 8px !important;
+            background: rgba(15, 23, 42, 0.6) !important;
+            border-radius: 4px !important;
             border: 1px solid rgba(255, 215, 0, 0.1) !important;
-            transition: all 0.25s ease !important;
-            position: relative;
         }
 
-        .grupo-viatura:hover {
-            border-color: rgba(255, 215, 0, 0.25) !important;
-            background: rgba(15, 23, 42, 0.8) !important;
-        }
-
-        /* Destaques para funções específicas - Cores diferentes */
+        /* Cores específicas para funções */
         .militar-funcao[class*="CMT"] {
-            background: rgba(220, 38, 38, 0.15) !important;
             color: #F87171 !important;
-            border-color: rgba(220, 38, 38, 0.3) !important;
-            font-weight: 700 !important;
+            background: rgba(220, 38, 38, 0.1) !important;
+            border-color: rgba(220, 38, 38, 0.2) !important;
         }
 
-        .militar-funcao[class*="Cov"],
-        .militar-funcao[class*="COV"] {
-            background: rgba(56, 189, 248, 0.15) !important;
-            color: #7DD3FC !important;
-            border-color: rgba(56, 189, 248, 0.3) !important;
+        .militar-funcao[class*="Cov"] {
+            color: #60A5FA !important;
+            background: rgba(56, 189, 248, 0.1) !important;
+            border-color: rgba(56, 189, 248, 0.2) !important;
         }
 
         .militar-funcao[class*="Oficial"] {
-            background: rgba(255, 215, 0, 0.15) !important;
             color: #FBBF24 !important;
-            border-color: rgba(255, 215, 0, 0.3) !important;
+            background: rgba(245, 158, 11, 0.1) !important;
+            border-color: rgba(245, 158, 11, 0.2) !important;
         }
 
         .militar-funcao[class*="Linha"] {
-            background: rgba(139, 92, 246, 0.15) !important;
-            color: #A78BFA !important;
-            border-color: rgba(139, 92, 246, 0.3) !important;
+            color: #C084FC !important;
+            background: rgba(168, 85, 247, 0.1) !important;
+            border-color: rgba(168, 85, 247, 0.2) !important;
         }
 
-        .militar-funcao[class*="Cobom"] {
-            background: rgba(16, 185, 129, 0.15) !important;
-            color: #34D399 !important;
-            border-color: rgba(16, 185, 129, 0.3) !important;
-        }
-
-        /* Container dos cards com Sortable */
+        /* Grid responsivo */
         #grid-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px;
-            padding-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+            padding-bottom: 15px;
         }
 
-        /* Ordem salva visualmente */
+        /* Efeitos do Sortable */
         .sortable-chosen {
-            opacity: 0.8;
-            transform: rotate(1deg);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+            opacity: 0.9;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4) !important;
         }
 
         .sortable-ghost {
-            opacity: 0.3;
-            background: rgba(255, 140, 0, 0.1) !important;
-            border: 2px dashed rgba(255, 140, 0, 0.5) !important;
+            opacity: 0.4;
+            background: rgba(255, 140, 0, 0.05) !important;
+            border: 1px dashed rgba(255, 140, 0, 0.4) !important;
         }
 
+        /* Responsividade */
         @media (max-width: 768px) {
             .militar-nome {
-                font-size: 13px !important;
+                font-size: 11px !important;
             }
             
             .militar-funcao {
@@ -431,7 +336,6 @@
             
             .card-monitor {
                 flex-direction: column !important;
-                min-height: 110px !important;
             }
             
             .vertical-text {
@@ -440,14 +344,9 @@
                 padding: 6px 0 !important;
                 width: 100% !important;
                 text-align: center !important;
-                font-size: 0.9rem !important;
+                font-size: 0.8rem !important;
             }
             
-            .turno-display {
-                padding: 3px 5px !important;
-                gap: 4px !important;
-            }
-
             #grid-cards {
                 grid-template-columns: 1fr;
             }
@@ -470,114 +369,132 @@
                 grid-template-columns: repeat(4, 1fr);
             }
         }
+
+        /* Scrollbar minimalista */
+        .scroll-cards::-webkit-scrollbar {
+            width: 2px;
+        }
+        
+        .scroll-cards::-webkit-scrollbar-thumb {
+            background: rgba(255, 140, 0, 0.3);
+            border-radius: 1px;
+        }
     </style>
 </head>
 <body class="hero-background">
 
     <div id="loading">
-        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Formatando nomes...</p>
+        <div class="relative">
+            <i class="fas fa-fire text-bombeiros-orange text-5xl mb-4"></i>
+            <i class="fas fa-fire-flame-curved text-fire-red text-3xl absolute top-0 right-0 animate-pulse"></i>
+        </div>
+        <h2 class="text-xl font-bold tracking-wide text-white">GUARNIÇÃO OPERACIONAL</h2>
+        <p class="text-xs text-gray-400 mt-2 font-mono" id="msg-loading">Carregando escala...</p>
     </div>
 
-    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
+    <div class="content-wrapper flex flex-col min-h-screen p-3 hidden" id="app">
         
-        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 mb-6 border-b border-white/10 gap-4">
+        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 mb-4 border-b border-white/10 gap-3">
             <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 drop-shadow-lg">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-14 md:h-16 drop-shadow-lg">
             </div>
 
             <div class="text-center flex-grow">
-                <h1 class="text-2xl md:text-4xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                <h1 class="text-xl md:text-2xl font-bold text-white uppercase leading-tight tracking-tight">
                     Guarnição Operacional
                 </h1>
-                <h2 class="text-sm md:text-lg font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
-                    EM PORTO ALEGRE
+                <h2 class="text-sm md:text-base font-semibold text-bombeiros-orange mt-0.5 uppercase tracking-wide">
+                    1º BBM - PORTO ALEGRE
                 </h2>
                 
-                <div class="flex justify-center items-center gap-3 mt-3 text-xs font-mono text-gray-400 bg-black/30 px-3 py-1 rounded-full border border-white/5 inline-flex">
-                    <span id="data-topo" class="font-bold text-white uppercase text-[10px]">--/--/----</span>
-                    <span>|</span>
-                    <span class="text-[10px]">ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
+                <div class="flex justify-center items-center gap-3 mt-2 text-xs font-mono text-gray-400 bg-black/20 px-3 py-1 rounded-full border border-white/5 inline-flex">
+                    <span id="data-topo" class="font-medium text-white uppercase text-[10px]">--/--/----</span>
+                    <span class="text-gray-500">•</span>
+                    <span class="text-[10px]">ATUALIZADO: <span id="hora-topo" class="text-green-400 font-medium">--:--</span></span>
                 </div>
             </div>
 
             <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 drop-shadow-lg opacity-90">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-14 md:h-16 drop-shadow-lg opacity-90">
             </div>
         </header>
 
         <main class="w-full max-w-7xl mx-auto flex-grow">
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
                 
                 <div class="stats-container border-l-4 border-bombeiros-orange">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-2 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange text-sm"></i> EFETIVO (ESCALA DO DIA)
+                    <h3 class="text-gray-400 font-medium uppercase text-xs mb-2 tracking-wider flex items-center gap-1">
+                        <i class="fas fa-users text-bombeiros-orange text-xs"></i> EFETIVO DO DIA
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
-                            <span class="text-[9px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                            <span class="block text-xl md:text-2xl font-bold text-white leading-none" id="count-cap">0</span>
+                            <span class="text-[9px] font-medium text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
                             <div class="tooltip-box">
-                                <div class="text-[10px] font-bold text-bombeiros-orange mb-1 uppercase">OFICIAIS ESCALADOS</div>
+                                <div class="text-[10px] font-medium text-bombeiros-orange mb-1 uppercase">OFICIAIS</div>
                                 <ul id="list-cap" class="text-left"></ul>
                             </div>
                         </div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
-                            <span class="text-[9px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                            <span class="block text-xl md:text-2xl font-bold text-white leading-none" id="count-sgt">0</span>
+                            <span class="text-[9px] font-medium text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
                             <div class="tooltip-box">
-                                <div class="text-[10px] font-bold text-bombeiros-yellow mb-1 uppercase">SARGENTOS ESCALADOS</div>
+                                <div class="text-[10px] font-medium text-bombeiros-yellow mb-1 uppercase">SARGENTOS</div>
                                 <ul id="list-sgt" class="text-left"></ul>
                             </div>
                         </div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
-                            <span class="text-[9px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                            <span class="block text-xl md:text-2xl font-bold text-white leading-none" id="count-sd">0</span>
+                            <span class="text-[9px] font-medium text-blue-400 uppercase tracking-wide">SOLDADOS</span>
                             <div class="tooltip-box">
-                                <div class="text-[10px] font-bold text-blue-400 mb-1 uppercase">SOLDADOS ESCALADOS</div>
+                                <div class="text-[10px] font-medium text-blue-400 mb-1 uppercase">SOLDADOS</div>
                                 <ul id="list-sd" class="text-left"></ul>
                             </div>
                         </div>
-                        <div class="w-px h-8 bg-white/10 mx-1"></div>
+                        <div class="w-px h-6 bg-white/10 mx-1"></div>
                         <div class="group relative text-center">
-                            <span class="block text-3xl md:text-4xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
+                            <span class="block text-2xl md:text-3xl font-bold text-total-green leading-none" id="count-total">0</span>
+                            <span class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">TOTAL</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-container border-l-4 border-fire-red">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-2 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-truck text-fire-red text-sm"></i> VIATURAS EM QAP
+                    <h3 class="text-gray-400 font-medium uppercase text-xs mb-2 tracking-wider flex items-center gap-1">
+                        <i class="fas fa-truck text-fire-red text-xs"></i> VIATURAS EM QAP
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
+                            <span class="block text-2xl md:text-3xl font-bold text-fire-red leading-none" id="count-combate">0</span>
+                            <span class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">COMBATE</span>
+                            <div class="tooltip-box text-left">
+                                <div class="text-[10px] font-medium text-fire-red mb-1 uppercase">ABT</div>
+                                <ul id="list-combate" class="text-[10px] text-gray-300"></ul>
+                            </div>
                         </div>
-                        <div class="w-px h-8 bg-white/10"></div>
+                        <div class="w-px h-6 bg-white/10"></div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
-                            <div class="tooltip-box"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
+                            <span class="block text-2xl md:text-3xl font-bold text-white leading-none" id="count-apoio">0</span>
+                            <span class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">APOIO</span>
+                            <div class="tooltip-box text-left">
+                                <div class="text-[10px] font-medium text-sky-blue mb-1 uppercase">APOIO</div>
+                                <ul id="list-apoio" class="text-[10px] text-gray-300"></ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="grid-cards" class="pb-8"></div>
+            <div id="grid-cards" class="pb-4"></div>
 
         </main>
 
-        <footer class="mt-auto py-4 text-center border-t border-white/5">
-            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">
-                Sistema de Controle Operacional - 1º BBM - 2026
+        <footer class="mt-auto py-3 text-center border-t border-white/5">
+            <p class="text-[9px] text-gray-500 uppercase font-medium tracking-wider">
+                1º BBM - Controle Operacional
             </p>
-            <p class="text-[8px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
-            <p class="text-[8px] text-gray-700 mt-0.5">Arraste os cards para reorganizar</p>
+            <p class="text-[8px] text-gray-600 mt-0.5">Arraste para reorganizar • Atualiza automaticamente</p>
         </footer>
     </div>
 
@@ -607,7 +524,6 @@
         function capitalizarFuncao(func) {
             if (!func) return "";
             
-            // Primeiro, aplicar as normalizações específicas
             func = func.trim();
             
             // Converter abreviações comuns
@@ -660,7 +576,7 @@
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        // TRADUTOR DE FUNÇÕES - ATUALIZADO CONFORME SOLICITADO
+        // TRADUTOR DE FUNÇÕES - SIMPLIFICADO
         function normalizarFuncao(funcRaw) {
             if(!funcRaw) return "";
             const f = funcRaw.toUpperCase().trim();
@@ -679,30 +595,31 @@
             if(limpa.includes("AUXILIAR DE LINHA ESQUERDA")) return "Linha Esquerda";
             if(limpa.includes("AUXILIAR DE LINHA DIREITA")) return "Linha Direita";
             
-            if(limpa.includes("OPERADOR COBOM")) return "Cobom (Operador)";
-            if(limpa.includes("OPERADOR CCOB")) return "CCOB (Operador)";
+            if(limpa.includes("OPERADOR COBOM")) return "Cobom";
+            if(limpa.includes("OPERADOR CCOB")) return "CCOB";
             
             if(limpa.includes("COMANDANTE DE GUARNIÇÃO") || limpa.includes("CMT GUARNIÇÃO") || 
-               limpa.includes("CMT DA GUARNIÇÃO")) return "CMT de GU";
+               limpa.includes("CMT DA GUARNIÇÃO")) return "CMT";
             
-            if(limpa.includes("MOTORISTA DE DIA")) return "Motorista de Dia";
-            if(limpa.includes("OFICIAL DE SV") || limpa.includes("OFICIAL DE SERVIÇO")) return "Oficial de SV";
+            if(limpa.includes("MOTORISTA DE DIA")) return "Motorista";
+            if(limpa.includes("OFICIAL DE SV") || limpa.includes("OFICIAL DE SERVIÇO")) return "Oficial SV";
             
-            if(limpa.includes("CINOTÉCNICO") || limpa.includes("CANIL")) return "Cinotécnico";
-            if(limpa.includes("CONDUTOR NAVAL")) return "Condutor Naval";
-            if(limpa.includes("MERGULHADOR")) return "Mergulhador";
+            if(limpa.includes("CINOTÉCNICO") || limpa.includes("CANIL")) return "Canil";
+            if(limpa.includes("CONDUTOR NAVAL")) return "Naval";
+            if(limpa.includes("MERGULHADOR")) return "Mergulho";
             
             // Depois os genéricos
             if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA") || limpa === "COV") return "Cov";
-            if(limpa.includes("LINHA") && limpa.includes("AUXILIAR")) return "Linha Auxiliar";
-            if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "Linha Chefe";
+            if(limpa.includes("LINHA") && limpa.includes("AUXILIAR")) return "Linha";
+            if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "Linha";
             if(limpa.includes("LINHA")) return "Linha";
             if(limpa.includes("OPERADOR")) return "Operador";
             
-            return limpa;
+            // Se não reconheceu, retorna original
+            return limpa.length > 12 ? limpa.substring(0, 12) + '...' : limpa;
         }
 
-        // CALCULADORA DE TURNO
+        // CALCULADORA DE TURNO - SIMPLIFICADA
         function calcularTurno(raw) {
             if(!raw) return "";
 
@@ -717,7 +634,6 @@
 
                 let hInicio = "08:00";
                 let hFim = "08:00";
-                let dInicio = hoje;
                 let dFim = amanha;
                 let carga = "24h";
 
@@ -726,22 +642,22 @@
                     if (horaUnica === "20:00") {
                         hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
                     } else {
-                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
+                        carga = "24h";
                     }
                 }
                 else if (horasMatch.length >= 2) {
                     hInicio = horasMatch[0];
                     hFim = horasMatch[1];
                     if (hInicio === hFim) {
-                        dFim = amanha; carga = "24h";
+                        carga = "24h";
                     } else if (hInicio === "08:00" && hFim === "20:00") {
                         dFim = hoje; carga = "12h";
                     } else if (hInicio === "20:00" && hFim === "08:00") {
-                        dFim = amanha; carga = "12h";
+                        carga = "12h";
                     } else {
                         const h1 = parseInt(hInicio.split(':')[0]);
                         const h2 = parseInt(hFim.split(':')[0]);
-                        if (h2 < h1) dFim = amanha; else dFim = hoje;
+                        if (h2 < h1) dFim = amanha;
                         let diff = h2 - h1; if(diff < 0) diff += 24;
                         carga = diff > 12 ? "24h" : "12h";
                     }
@@ -752,12 +668,10 @@
                 return `
                     <div class="turno-display">
                         <span class="turno-carga">${carga}</span>
-                        <div class="turno-horas">
+                        <span class="turno-horas">
                             <i class="fas fa-clock text-sky-blue text-[8px]"></i>
-                            <span>${hInicio}</span>
-                            <i class="fas fa-arrow-right text-gray-500 text-[6px]"></i>
-                            <span>${hFim}</span>
-                        </div>
+                            ${hInicio} → ${hFim}
+                        </span>
                         <span class="turno-data">
                             <i class="far fa-calendar text-gray-500 text-[6px]"></i>
                             ${strDataFim}
@@ -765,7 +679,7 @@
                     </div>
                 `;
 
-            } catch(e) { console.error(e); return ""; }
+            } catch(e) { return ""; }
         }
 
         function extrairID(nomeCompleto) {
@@ -873,12 +787,13 @@
             const combArr = Array.from(statsViaturas.combate);
             const apoioArr = Array.from(statsViaturas.apoio);
 
+            // Função para preencher tooltips SIMPLES
             const fill = (idC, idL, arr) => {
                 document.getElementById(idC).innerText = arr.length;
                 const listElement = document.getElementById(idL);
                 listElement.innerHTML = arr.map(item => 
                     `<li class="tooltip-item">
-                        <span class="tooltip-posto">${item.posto} ${item.nome}</span>
+                        <span class="tooltip-nome">${item.posto} ${item.nome}</span>
                         <span class="tooltip-funcao">${item.funcao}</span>
                     </li>`
                 ).join('');
@@ -889,11 +804,16 @@
             fill('count-sd', 'list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
             
+            // Viaturas - tooltip simples
             document.getElementById('count-combate').innerText = combArr.length;
-            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li class="text-[10px] text-gray-300">• ${x}</li>`).join('');
+            document.getElementById('list-combate').innerHTML = combArr.map(x => 
+                `<li class="text-[10px] text-gray-300 mb-1">${x}</li>`
+            ).join('');
 
             document.getElementById('count-apoio').innerText = apoioArr.length;
-            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li class="text-[10px] text-gray-300">• ${x}</li>`).join('');
+            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => 
+                `<li class="text-[10px] text-gray-300 mb-1">${x}</li>`
+            ).join('');
         }
 
         function renderizarCards(estrutura) {
@@ -927,23 +847,23 @@
                 card.setAttribute('data-quartel', obmName);
 
                 let content = `
-                    <div class="bg-gradient-to-b from-bombeiros-orange to-orange-700 w-12 md:w-14 flex items-center justify-center py-3 flex-shrink-0">
-                        <h2 class="vertical-text text-white font-black text-base md:text-lg tracking-wider uppercase shadow-black drop-shadow-md whitespace-nowrap">
-                            ${obmName}
+                    <div class="bg-gradient-to-b from-bombeiros-orange/90 to-bombeiros-orange w-10 md:w-12 flex items-center justify-center py-2 flex-shrink-0">
+                        <h2 class="vertical-text text-white font-bold text-sm tracking-wide uppercase">
+                            ${obmName.replace("DE DIA", "").replace("DE ", "").substring(0, 12)}
                         </h2>
                     </div>
-                    <div class="flex-grow p-2 flex flex-col gap-2 overflow-y-auto max-h-[280px]">
+                    <div class="flex-grow p-2 flex flex-col gap-1 overflow-y-auto max-h-[280px] scroll-cards">
                 `;
 
                 gruposUnicos.forEach(grupo => {
+                    // Ordenar: CMT primeiro, depois Cov, depois outros
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
                             if(r.includes("CMT")) return 1;
                             if(r.includes("COV")) return 2;
                             if(r.includes("OFICIAL")) return 3;
-                            if(r.includes("LINHA")) return 4;
-                            return 5;
+                            return 4;
                         }
                         return getScore(a.f) - getScore(b.f);
                     });
@@ -952,16 +872,16 @@
 
                     content += `
                         <div class="grupo-viatura">
-                            <span class="text-bombeiros-yellow font-bold text-[10px] tracking-wider uppercase border-b border-bombeiros-yellow/20 pb-1 mb-2 inline-block">
+                            <span class="text-bombeiros-yellow font-medium text-[10px] uppercase mb-1 inline-block">
                                 ${listaVtrs}
                             </span>
-                            <div class="w-full grid grid-cols-1 gap-2">
+                            <div class="w-full grid grid-cols-1 gap-1">
                                 ${grupo.guarnicao.map(m => `
                                     <div class="militar-container">
-                                        <div class="militar-nome">${m.n}</div>
+                                        <div class="militar-nome" title="${m.n}">${m.n}</div>
                                         <div class="militar-funcao">${m.f}</div>
-                                        ${m.h}
                                     </div>
+                                    ${m.h}
                                 `).join('')}
                             </div>
                         </div>
@@ -973,10 +893,10 @@
                 grid.appendChild(card);
             });
 
-            // Inicializar SortableJS para arrastar e reordenar
+            // Inicializar SortableJS
             if (typeof Sortable !== 'undefined') {
                 const sortable = Sortable.create(grid, {
-                    animation: 150,
+                    animation: 120,
                     ghostClass: 'sortable-ghost',
                     chosenClass: 'sortable-chosen',
                     onEnd: function(evt) {
@@ -987,37 +907,30 @@
                         
                         salvarOrdem(novaOrdem);
                         
-                        // Mostrar notificação visual
-                        mostrarFeedbackOrdem();
+                        // Feedback visual simples
+                        const card = evt.item;
+                        card.style.boxShadow = '0 0 0 2px rgba(255, 140, 0, 0.5)';
+                        setTimeout(() => {
+                            card.style.boxShadow = '';
+                        }, 500);
                     }
                 });
             }
         }
 
-        function mostrarFeedbackOrdem() {
-            // Criar feedback visual
-            const feedback = document.createElement('div');
-            feedback.className = 'fixed bottom-4 right-4 bg-bombeiros-orange text-white px-3 py-2 rounded-lg text-sm font-bold shadow-lg z-50 animate-pulse';
-            feedback.innerHTML = 'Ordem salva!';
-            feedback.id = 'feedback-ordem';
-            
-            document.body.appendChild(feedback);
-            
-            // Remover após 2 segundos
-            setTimeout(() => {
-                feedback.remove();
-            }, 2000);
-        }
-
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { 
+            
+            // Data compacta: "Qua, 10 Fev 2026"
+            const dataFormatada = dataOp.toLocaleDateString('pt-BR', { 
                 weekday: 'short', 
                 day: '2-digit', 
                 month: 'short', 
                 year: 'numeric' 
-            }).toUpperCase();
+            }).replace('.', '').toUpperCase();
+            
+            document.getElementById('data-topo').innerText = dataFormatada;
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR', { 
                 hour: '2-digit', 
                 minute: '2-digit' 
@@ -1038,18 +951,12 @@
             } catch(e) { 
                 console.error(e); 
                 document.getElementById('msg-loading').innerText = "Reconectando...";
-                setTimeout(iniciarSistema, 5000); 
+                setTimeout(iniciarSistema, 3000); 
             }
         }
 
-        // Função para resetar ordem (para debug)
-        window.resetarOrdem = function() {
-            localStorage.removeItem('ordemQuarteis');
-            iniciarSistema();
-        };
-
         iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
+        setInterval(iniciarSistema, 45000); // Atualiza a cada 45 segundos
     </script>
 </body>
 </html>
