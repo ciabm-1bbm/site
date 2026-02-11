@@ -93,6 +93,127 @@
         ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
 
         #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+
+        /* ========== NOVOS ESTILOS ========== */
+        .militar-nome {
+            color: white !important;
+            font-weight: 900 !important;
+            font-size: 20px !important;
+            text-transform: uppercase !important;
+            letter-spacing: -0.5px !important;
+            line-height: 1.1 !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7) !important;
+            margin-bottom: 2px !important;
+        }
+
+        .militar-funcao {
+            color: #FFD700 !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1.5px !important;
+            background: rgba(255, 140, 0, 0.15) !important;
+            padding: 3px 8px !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(255, 140, 0, 0.3) !important;
+            display: inline-block !important;
+            margin: 2px 0 !important;
+        }
+
+        .turno-display {
+            background: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid rgba(56, 189, 248, 0.3) !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            margin-top: 5px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .turno-carga {
+            color: #FF8C00 !important;
+            font-weight: 900 !important;
+            font-size: 12px !important;
+        }
+
+        .turno-horas {
+            color: #38bdf8 !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+        }
+
+        .turno-data {
+            color: #9CA3AF !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+        }
+
+        .militar-container {
+            margin-bottom: 15px !important;
+            padding: 12px !important;
+            background: rgba(30, 41, 59, 0.5) !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .militar-container:hover {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: rgba(255, 140, 0, 0.2) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .grupo-viatura {
+            margin-bottom: 20px !important;
+            padding: 15px !important;
+            background: rgba(15, 23, 42, 0.6) !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(255, 215, 0, 0.1) !important;
+        }
+
+        .militar-funcao[class*="COMANDANTE"] {
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.3), rgba(220, 38, 38, 0.3)) !important;
+            color: #FFD700 !important;
+            border-color: #FF8C00 !important;
+            font-weight: 900 !important;
+        }
+
+        .militar-funcao[class*="COV"],
+        .militar-funcao[class*="CONDUTOR"] {
+            background: rgba(56, 189, 248, 0.2) !important;
+            color: #7DD3FC !important;
+            border-color: #38bdf8 !important;
+        }
+
+        @media (max-width: 768px) {
+            .militar-nome {
+                font-size: 18px !important;
+            }
+            
+            .militar-funcao {
+                font-size: 10px !important;
+                padding: 2px 6px !important;
+            }
+            
+            .card-monitor {
+                flex-direction: column !important;
+            }
+            
+            .vertical-text {
+                writing-mode: horizontal-tb !important;
+                transform: none !important;
+                padding: 10px 0 !important;
+                width: 100% !important;
+                text-align: center !important;
+                font-size: 1.5rem !important;
+            }
+        }
     </style>
 </head>
 <body class="hero-background">
@@ -223,7 +344,6 @@
             if(!funcRaw) return "";
             const f = funcRaw.toUpperCase();
 
-            // Limpeza
             let limpa = f.replace(/\bND\b/g, '')
                          .replace(/\d+º\s*\d+/g, '') 
                          .replace(/\b\d+\b/g, '')    
@@ -232,7 +352,6 @@
 
             if(limpa === "") return "";
 
-            // Padronização
             if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA")) return "COV";
             if(limpa.includes("CMT") || limpa.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
             if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "LINHA (CHEFE)";
@@ -247,7 +366,7 @@
             return limpa; 
         }
 
-        // CALCULADORA DE TURNO
+        // CALCULADORA DE TURNO (ATUALIZADA)
         function calcularTurno(raw) {
             if(!raw) return "";
 
@@ -263,7 +382,7 @@
                 let hInicio = "08:00";
                 let hFim = "08:00";
                 let dInicio = hoje;
-                let dFim = amanha; 
+                let dFim = amanha;
                 let carga = "24h";
 
                 if (horasMatch.length === 1) {
@@ -276,7 +395,7 @@
                 }
                 else if (horasMatch.length >= 2) {
                     hInicio = horasMatch[0];
-                    hFim = horasMatch[1]; 
+                    hFim = horasMatch[1];
                     if (hInicio === hFim) {
                         dFim = amanha; carga = "24h";
                     } else if (hInicio === "08:00" && hFim === "20:00") {
@@ -292,17 +411,21 @@
                     }
                 }
 
-                const strDataIni = formatarDataCurta(dInicio);
                 const strDataFim = formatarDataCurta(dFim);
 
                 return `
-                    <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                        <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
-                        <span class="text-gray-500 text-[10px]">|</span> 
-                        <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
-                        <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                        <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
-                        <span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>
+                    <div class="turno-display">
+                        <span class="turno-carga">${carga}</span>
+                        <div class="turno-horas">
+                            <i class="fas fa-clock text-sky-blue text-xs"></i>
+                            <span>${hInicio}</span>
+                            <i class="fas fa-arrow-right text-gray-500 text-[8px]"></i>
+                            <span>${hFim}</span>
+                        </div>
+                        <span class="turno-data">
+                            <i class="far fa-calendar text-gray-500 text-[8px]"></i>
+                            ${strDataFim}
+                        </span>
                     </div>
                 `;
 
@@ -439,7 +562,6 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
-                // CARD LATERAL: LARANJA E GIGANTE
                 let content = `
                     <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-2xl md:text-3xl tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
@@ -463,23 +585,16 @@
                     const listaVtrs = grupo.nomesVtrs.join(' / ');
 
                     content += `
-                        <div class="w-full flex flex-col items-center">
-                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
+                        <div class="grupo-viatura">
+                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-3 inline-block">
                                 ${listaVtrs}
                             </span>
-                            <div class="w-full flex flex-col gap-3"> ${grupo.guarnicao.map(m => `
-                                    <div class="flex flex-col items-center w-full mb-1">
-                                        <div class="text-moss-green font-black text-xl leading-none drop-shadow-md text-center">
-                                            ${m.n}
-                                        </div>
-                                        
-                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-1 text-center w-full block">
-                                            ${m.f}
-                                        </div>
-                                        
-                                        <div class="w-full flex justify-center">
-                                            ${m.h}
-                                        </div>
+                            <div class="w-full grid grid-cols-1 gap-3">
+                                ${grupo.guarnicao.map(m => `
+                                    <div class="militar-container">
+                                        <div class="militar-nome">${m.n}</div>
+                                        <div class="militar-funcao">${m.f}</div>
+                                        ${m.h}
                                     </div>
                                 `).join('')}
                             </div>
