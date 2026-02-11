@@ -188,7 +188,7 @@
             flex-direction: column; 
         }
 
-        /* ========== LAYOUT COMPACTO DOS MILITARES ========== */
+        /* ========== LAYOT COMPLETAMENTE SIMPLIFICADO ========== */
         .militar-container {
             margin-bottom: 6px !important;
             padding: 6px 8px !important;
@@ -207,55 +207,99 @@
             border-color: rgba(255, 140, 0, 0.2) !important;
         }
 
-        /* Nome à esquerda em VERDE */
+        /* Container do nome centralizado */
+        .nome-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 40px;
+        }
+
+        /* Nome centralizado em VERDE - SEMPRE VISÍVEL */
         .militar-nome {
             color: #10B981 !important; /* Verde bombeiros */
-            font-weight: 700 !important;
-            font-size: 12px !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
             text-transform: uppercase !important;
             letter-spacing: 0.1px !important;
-            line-height: 1.1 !important;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.2 !important;
+            text-align: center;
+            padding: 4px 0;
+            cursor: help;
+            transition: all 0.2s ease;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Função à direita em CINZA */
-        .militar-funcao {
-            color: #9CA3AF !important; /* Cinza para função */
-            font-weight: 500 !important;
+        /* Efeito hover: aumenta o nome e mostra função */
+        .militar-nome:hover {
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Função só aparece no hover */
+        .funcao-hover {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            background: rgba(0, 0, 0, 0.9);
+            color: #9CA3AF !important;
             font-size: 10px !important;
-            text-transform: none !important;
-            letter-spacing: 0.2px !important;
-            background: rgba(156, 163, 175, 0.1) !important;
-            padding: 2px 6px !important;
-            border-radius: 4px !important;
-            border: 1px solid rgba(156, 163, 175, 0.15) !important;
-            flex-shrink: 0;
+            font-weight: 500 !important;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 140, 0, 0.3);
             white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
-        /* Turno compacto - SEM TRAÇO, mais próximo */
+        .militar-nome:hover + .funcao-hover,
+        .funcao-hover:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(2px);
+        }
+
+        /* Container do turno alinhado à direita */
+        .turno-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        /* Turno compacto - alinhado à direita */
         .turno-display {
-            margin-top: 4px !important;
             display: flex !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            gap: 6px !important;
-            flex-wrap: wrap !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            gap: 2px !important;
         }
 
         .turno-carga {
             color: #FF8C00 !important;
             font-weight: 700 !important;
-            font-size: 9px !important;
+            font-size: 10px !important;
         }
 
         .turno-horas {
             color: #7DD3FC !important;
             font-weight: 600 !important;
-            font-size: 9px !important;
+            font-size: 10px !important;
             display: flex !important;
             align-items: center !important;
             gap: 3px !important;
@@ -263,11 +307,20 @@
 
         .turno-data {
             color: #9CA3AF !important;
-            font-size: 8px !important;
+            font-size: 9px !important;
             font-weight: 500 !important;
             display: flex !important;
             align-items: center !important;
             gap: 2px !important;
+            justify-content: flex-end;
+        }
+
+        /* Linha horizontal fina entre nome e turno */
+        .separador {
+            width: 1px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 8px;
         }
 
         .grupo-viatura {
@@ -278,35 +331,10 @@
             border: 1px solid rgba(255, 215, 0, 0.1) !important;
         }
 
-        /* Cores específicas para funções */
-        .militar-funcao[class*="CMT"] {
-            color: #F87171 !important;
-            background: rgba(220, 38, 38, 0.1) !important;
-            border-color: rgba(220, 38, 38, 0.2) !important;
-        }
-
-        .militar-funcao[class*="Cov"] {
-            color: #60A5FA !important;
-            background: rgba(56, 189, 248, 0.1) !important;
-            border-color: rgba(56, 189, 248, 0.2) !important;
-        }
-
-        .militar-funcao[class*="Oficial"] {
-            color: #FBBF24 !important;
-            background: rgba(245, 158, 11, 0.1) !important;
-            border-color: rgba(245, 158, 11, 0.2) !important;
-        }
-
-        .militar-funcao[class*="Linha"] {
-            color: #C084FC !important;
-            background: rgba(168, 85, 247, 0.1) !important;
-            border-color: rgba(168, 85, 247, 0.2) !important;
-        }
-
         /* Grid responsivo */
         #grid-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 10px;
             padding-bottom: 15px;
         }
@@ -326,12 +354,11 @@
         /* Responsividade */
         @media (max-width: 768px) {
             .militar-nome {
-                font-size: 11px !important;
+                font-size: 12px !important;
             }
             
-            .militar-funcao {
-                font-size: 9px !important;
-                padding: 1px 4px !important;
+            .militar-nome:hover {
+                font-size: 13px !important;
             }
             
             .card-monitor {
@@ -349,6 +376,23 @@
             
             #grid-cards {
                 grid-template-columns: 1fr;
+            }
+            
+            .turno-container {
+                min-width: 80px;
+            }
+            
+            .separador {
+                display: none;
+            }
+            
+            .militar-container {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .turno-display {
+                align-items: center !important;
             }
         }
 
@@ -494,7 +538,7 @@
             <p class="text-[9px] text-gray-500 uppercase font-medium tracking-wider">
                 1º BBM - Controle Operacional
             </p>
-            <p class="text-[8px] text-gray-600 mt-0.5">Arraste para reorganizar • Atualiza automaticamente</p>
+            <p class="text-[8px] text-gray-600 mt-0.5">Passe o mouse sobre o nome para ver a função • Arraste para reorganizar</p>
         </footer>
     </div>
 
@@ -668,14 +712,14 @@
                 return `
                     <div class="turno-display">
                         <span class="turno-carga">${carga}</span>
-                        <span class="turno-horas">
+                        <div class="turno-horas">
                             <i class="fas fa-clock text-sky-blue text-[8px]"></i>
                             ${hInicio} → ${hFim}
-                        </span>
-                        <span class="turno-data">
-                            <i class="far fa-calendar text-gray-500 text-[6px]"></i>
+                        </div>
+                        <div class="turno-data">
+                            <i class="far fa-calendar text-gray-500 text-[8px]"></i>
                             ${strDataFim}
-                        </span>
+                        </div>
                     </div>
                 `;
 
@@ -872,16 +916,21 @@
 
                     content += `
                         <div class="grupo-viatura">
-                            <span class="text-bombeiros-yellow font-medium text-[10px] uppercase mb-1 inline-block">
+                            <span class="text-bombeiros-yellow font-medium text-[10px] uppercase mb-2 inline-block text-center w-full">
                                 ${listaVtrs}
                             </span>
-                            <div class="w-full grid grid-cols-1 gap-1">
+                            <div class="w-full grid grid-cols-1 gap-2">
                                 ${grupo.guarnicao.map(m => `
                                     <div class="militar-container">
-                                        <div class="militar-nome" title="${m.n}">${m.n}</div>
-                                        <div class="militar-funcao">${m.f}</div>
+                                        <div class="nome-container">
+                                            <div class="militar-nome">${m.n}</div>
+                                            <div class="funcao-hover">${m.f}</div>
+                                        </div>
+                                        <div class="separador"></div>
+                                        <div class="turno-container">
+                                            ${m.h}
+                                        </div>
                                     </div>
-                                    ${m.h}
                                 `).join('')}
                             </div>
                         </div>
