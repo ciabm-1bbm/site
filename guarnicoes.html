@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
     <title>Guarnição Operacional - 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,10 +15,10 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'moss-green': '#9BE36D',
+                        'moss-green': '#10B981',
                         'total-green': '#4ade80',
                         'sky-blue': '#38bdf8',
-                        'card-hover': 'rgba(255, 140, 0, 0.1)'
+                        'slate-750': '#1e2b3c',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -29,1027 +29,655 @@
     </script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        /* Reset e base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background-color: #0f172a; 
-            color: white; 
-            overflow-x: hidden; 
-            font-family: 'Inter', sans-serif; 
-            cursor: default;
+            background: #0a0f1c; 
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            line-height: 1.4;
         }
-        
-        .hero-background { 
-            position: relative; 
-            min-height: 100vh; 
-        }
-        
-        .hero-background::before { 
-            content: ''; 
-            position: fixed; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            top: 0;
-            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-size: 500px;
-            z-index: 0; 
-            opacity: 0.08; 
-            filter: grayscale(100%); 
-            pointer-events: none; 
-        }
-        
-        .hero-background::after {
-            content: ''; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.3) 0%, rgba(15, 23, 42, 0.95) 100%);
-            z-index: 1; 
+        .hero-bg {
+            position: fixed;
+            inset: 0;
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 400px;
+            opacity: 0.04;
+            filter: grayscale(1);
             pointer-events: none;
+            z-index: 0;
         }
-        
-        .content-wrapper { 
-            position: relative; 
-            z-index: 10; 
-        }
-
-        /* Cards menores e mais compactos */
-        .card-monitor {
-            background: rgba(30, 41, 59, 0.92);
-            backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 140, 0, 0.15);
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            break-inside: avoid;
-            page-break-inside: avoid;
-            display: flex; 
-            overflow: hidden;
-            min-height: 120px;
-            max-height: 320px;
+        .content {
             position: relative;
-            cursor: grab;
-            margin-bottom: 12px;
+            z-index: 10;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .card-monitor:active {
-            cursor: grabbing;
+        /* Cards principais – sem barra de rolagem interna */
+        .card-quartel {
+            background: rgba(18, 26, 40, 0.9);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,140,0,0.15);
+            border-radius: 16px;
+            transition: all 0.2s ease;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.3);
+            height: 100%; /* para usar com grid */
+        }
+        .card-quartel:hover {
+            border-color: rgba(255,140,0,0.5);
+            background: rgba(22, 32, 48, 0.95);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 24px -6px rgba(0,0,0,0.5);
         }
 
-        /* Efeito de brilho nas bordas ao passar mouse */
-        .card-monitor::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255, 140, 0, 0.3),
-                rgba(255, 215, 0, 0.2),
-                transparent
-            );
-            border-radius: 10px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .card-monitor:hover::before {
-            opacity: 1;
-        }
-
-        /* Efeito de zoom e elevação */
-        .card-monitor:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 
-                        0 0 0 2px rgba(255, 140, 0, 0.4),
-                        inset 0 0 20px rgba(255, 140, 0, 0.1);
-            z-index: 100;
-        }
-
-        /* Indicador visual de que é arrastável */
-        .card-monitor::after {
-            content: '≡';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 14px;
-            font-weight: bold;
-            pointer-events: none;
-        }
-
-        .vertical-text {
+        .vertical-title {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
-            text-align: center;
-            white-space: nowrap;
-            z-index: 2;
-            font-size: 0.9rem !important;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: white;
+            background: linear-gradient(to bottom, #FF8C00, #CC7000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 4px;
+            width: 36px;
+            border-radius: 16px 0 0 16px;
         }
 
-        .stats-container {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 0.75rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .tooltip-box {
-            visibility: hidden; 
-            opacity: 0; 
-            position: absolute; 
-            top: 100%; 
-            left: 50%; 
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.95); 
-            border: 1px solid #FF8C00; 
-            padding: 10px 12px; 
-            border-radius: 6px;
-            width: max-content; 
-            min-width: 180px; 
-            max-width: 280px;
-            z-index: 1000; 
-            transition: all 0.3s ease; 
-            pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); 
-            margin-top: 8px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .group:hover .tooltip-box { 
-            visibility: visible; 
-            opacity: 1; 
-            transform: translateX(-50%) translateY(5px);
-        }
-
-        .tooltip-item {
+        .conteudo-quartel {
+            flex: 1;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            margin-bottom: 6px;
+            gap: 12px;
+        }
+
+        /* Grupo de viatura – sem rolagem, layout compacto */
+        .grupo-vtr {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid rgba(255,215,0,0.1);
+        }
+        .vtr-titulo {
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
             padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+            text-align: center;
         }
-        
-        .tooltip-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+
+        /* Militar – layout em duas linhas, compacto */
+        .militar-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
         }
-        
-        .tooltip-posto {
+        .militar-item:hover {
+            background: rgba(45, 60, 80, 0.9);
+            border-color: #FF8C00;
+            transform: scale(1.01);
+        }
+        /* Destacar toda a guarnição ao passar no grupo */
+        .grupo-vtr:hover .militar-nome {
             color: #FFD700 !important;
-            font-weight: 800 !important;
-            font-size: 11px !important;
-            text-transform: uppercase !important;
-            margin-bottom: 1px !important;
-        }
-        
-        .tooltip-funcao {
-            color: #ffffff !important;
-            font-size: 10px !important;
-            font-weight: 400 !important;
-            opacity: 0.9 !important;
+            text-shadow: 0 0 8px rgba(255,215,0,0.3);
         }
 
-        ::-webkit-scrollbar { 
-            width: 3px; 
+        .info-militar {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
-        
-        ::-webkit-scrollbar-thumb { 
-            background: #FF8C00; 
-            border-radius: 1px; 
-        }
-
-        #loading { 
-            position: fixed; 
-            inset: 0; 
-            background: #0f172a; 
-            z-index: 9999; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            flex-direction: column; 
-        }
-
-        /* ========== ESTILOS COMPACTOS DOS MILITARES ========== */
         .militar-nome {
-            color: white !important;
-            font-weight: 800 !important;
-            font-size: 14px !important;
-            text-transform: uppercase !important;
-            letter-spacing: -0.2px !important;
-            line-height: 1.1 !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
-            margin-bottom: 3px !important;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            line-height: 1.2;
+            transition: color 0.2s;
         }
-
         .militar-funcao {
-            color: #38bdf8 !important; /* Azul para funções */
-            font-weight: 600 !important;
-            font-size: 10px !important;
-            text-transform: none !important;
-            letter-spacing: 0.3px !important;
-            background: rgba(56, 189, 248, 0.1) !important;
-            padding: 2px 6px !important;
-            border-radius: 8px !important;
-            border: 1px solid rgba(56, 189, 248, 0.2) !important;
-            display: inline-block !important;
-            margin: 1px 0 5px 0 !important;
+            color: #9CA3AF;
+            font-size: 10px;
+            font-weight: 500;
+            background: rgba(156,163,175,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            width: fit-content;
+            margin-top: 2px;
+            border: 1px solid rgba(156,163,175,0.2);
         }
 
-        /* Efeito de brilho no card interno do militar */
-        .militar-container {
-            margin-bottom: 8px !important;
-            padding: 8px !important;
-            background: rgba(30, 41, 59, 0.6) !important;
-            border-radius: 6px !important;
-            border: 1px solid rgba(255, 255, 255, 0.05) !important;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-            position: relative;
-            overflow: hidden;
+        /* Turno – compacto e alinhado à direita */
+        .turno-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            min-width: 100px;
+        }
+        .turno-carga {
+            font-weight: 700;
+            font-size: 10px;
+            color: #FF8C00;
+            background: rgba(255,140,0,0.15);
+            padding: 2px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,140,0,0.3);
+        }
+        .turno-horario {
+            color: #7DD3FC;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .turno-data {
+            color: #94a3b8;
+            font-size: 9px;
         }
 
-        /* Efeito de borda luminosa ao passar mouse */
-        .militar-container::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 140, 0, 0.4),
-                transparent
-            );
-            border-radius: 7px;
-            z-index: -1;
+        /* Estatísticas superiores – clean */
+        .stats-panel {
+            background: rgba(12, 20, 30, 0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Grid de cards – sem necessidade de rolagem interna */
+        #grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        /* Efeitos de hover suaves */
+        .hover-lift {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -8px rgba(0,0,0,0.4);
+        }
+
+        /* Tooltips simples (para o efetivo) */
+        .tooltip-simples {
+            visibility: hidden;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            border: 1px solid #FF8C00;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 11px;
+            white-space: nowrap;
+            transition: 0.1s;
             pointer-events: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin-bottom: 8px;
+            z-index: 50;
         }
-
-        .militar-container:hover::before {
+        .group-tooltip:hover .tooltip-simples {
+            visibility: visible;
             opacity: 1;
         }
 
-        .militar-container:hover {
-            background: rgba(30, 41, 59, 0.85) !important;
-            border-color: rgba(255, 140, 0, 0.3) !important;
-            transform: translateY(-2px) scale(1.03) !important;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 140, 0, 0.2) !important;
-        }
-
-        /* Estilo compacto do turno */
-        .turno-display {
-            background: rgba(15, 23, 42, 0.9) !important;
-            border: 1px solid rgba(56, 189, 248, 0.25) !important;
-            border-radius: 6px !important;
-            padding: 4px 6px !important;
-            margin-top: 4px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 6px !important;
-            flex-wrap: nowrap !important;
-        }
-
-        .turno-carga {
-            color: #FF8C00 !important;
-            font-weight: 800 !important;
-            font-size: 9px !important;
-        }
-
-        .turno-horas {
-            color: #7DD3FC !important;
-            font-weight: 600 !important;
-            font-size: 9px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 3px !important;
-        }
-
-        .turno-data {
-            color: #9CA3AF !important;
-            font-size: 8px !important;
-            font-weight: 500 !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 2px !important;
-        }
-
-        .grupo-viatura {
-            margin-bottom: 10px !important;
-            padding: 8px !important;
-            background: rgba(15, 23, 42, 0.7) !important;
-            border-radius: 8px !important;
-            border: 1px solid rgba(255, 215, 0, 0.1) !important;
-            transition: all 0.25s ease !important;
-            position: relative;
-        }
-
-        .grupo-viatura:hover {
-            border-color: rgba(255, 215, 0, 0.25) !important;
-            background: rgba(15, 23, 42, 0.8) !important;
-        }
-
-        /* Destaques para funções específicas - Cores diferentes */
-        .militar-funcao[class*="CMT"] {
-            background: rgba(220, 38, 38, 0.15) !important;
-            color: #F87171 !important;
-            border-color: rgba(220, 38, 38, 0.3) !important;
-            font-weight: 700 !important;
-        }
-
-        .militar-funcao[class*="Cov"],
-        .militar-funcao[class*="COV"] {
-            background: rgba(56, 189, 248, 0.15) !important;
-            color: #7DD3FC !important;
-            border-color: rgba(56, 189, 248, 0.3) !important;
-        }
-
-        .militar-funcao[class*="Oficial"] {
-            background: rgba(255, 215, 0, 0.15) !important;
-            color: #FBBF24 !important;
-            border-color: rgba(255, 215, 0, 0.3) !important;
-        }
-
-        .militar-funcao[class*="Linha"] {
-            background: rgba(139, 92, 246, 0.15) !important;
-            color: #A78BFA !important;
-            border-color: rgba(139, 92, 246, 0.3) !important;
-        }
-
-        .militar-funcao[class*="Cobom"] {
-            background: rgba(16, 185, 129, 0.15) !important;
-            color: #34D399 !important;
-            border-color: rgba(16, 185, 129, 0.3) !important;
-        }
-
-        /* Container dos cards com Sortable */
-        #grid-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px;
-            padding-bottom: 20px;
-        }
-
-        /* Ordem salva visualmente */
-        .sortable-chosen {
-            opacity: 0.8;
-            transform: rotate(1deg);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
-        }
-
-        .sortable-ghost {
-            opacity: 0.3;
-            background: rgba(255, 140, 0, 0.1) !important;
-            border: 2px dashed rgba(255, 140, 0, 0.5) !important;
-        }
-
+        /* Responsividade */
         @media (max-width: 768px) {
-            .militar-nome {
-                font-size: 13px !important;
+            .vertical-title {
+                writing-mode: horizontal-tb;
+                transform: none;
+                width: 100%;
+                border-radius: 16px 16px 0 0;
+                padding: 8px;
             }
-            
-            .militar-funcao {
-                font-size: 9px !important;
-                padding: 1px 4px !important;
+            .card-quartel {
+                flex-direction: column;
             }
-            
-            .card-monitor {
-                flex-direction: column !important;
-                min-height: 110px !important;
-            }
-            
-            .vertical-text {
-                writing-mode: horizontal-tb !important;
-                transform: none !important;
-                padding: 6px 0 !important;
-                width: 100% !important;
-                text-align: center !important;
-                font-size: 0.9rem !important;
-            }
-            
-            .turno-display {
-                padding: 3px 5px !important;
-                gap: 4px !important;
-            }
-
             #grid-cards {
                 grid-template-columns: 1fr;
             }
         }
 
-        @media (min-width: 769px) and (max-width: 1024px) {
-            #grid-cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 1025px) and (max-width: 1440px) {
-            #grid-cards {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 1441px) {
-            #grid-cards {
-                grid-template-columns: repeat(4, 1fr);
-            }
+        /* Scroll só da página, não dos cards */
+        body {
+            overflow-y: auto;
+            overflow-x: hidden;
         }
     </style>
 </head>
-<body class="hero-background">
+<body>
 
-    <div id="loading">
-        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
-        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Formatando nomes...</p>
+<div class="hero-bg"></div>
+
+<div id="loading" class="fixed inset-0 bg-[#0a0f1c] z-50 flex flex-col items-center justify-center">
+    <div class="relative">
+        <i class="fas fa-fire text-bombeiros-orange text-5xl mb-4"></i>
+        <i class="fas fa-fire-flame-curved text-fire-red text-3xl absolute -top-2 -right-4 animate-pulse"></i>
+    </div>
+    <h2 class="text-xl font-bold text-white">GUARNIÇÃO OPERACIONAL</h2>
+    <p class="text-xs text-gray-500 mt-2" id="msg-loading">Carregando dados...</p>
+</div>
+
+<div id="app" class="content hidden">
+
+    <!-- HEADER -->
+    <header class="flex flex-col md:flex-row items-center justify-between py-4 border-b border-white/10 mb-6">
+        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-14 md:h-16 drop-shadow-lg">
+        <div class="text-center flex-1 px-4">
+            <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">Guarnição Operacional</h1>
+            <h2 class="text-base md:text-lg font-bold text-bombeiros-orange uppercase tracking-wide">1º BBM – Porto Alegre</h2>
+            <div class="inline-flex items-center gap-3 mt-2 bg-black/30 px-4 py-1.5 rounded-full border border-white/10 text-gray-400 text-xs">
+                <span id="data-topo" class="text-white font-medium">--/--/----</span>
+                <span class="text-gray-600">|</span>
+                <span>Atualizado: <span id="hora-topo" class="text-green-400 font-medium">--:--</span></span>
+            </div>
+        </div>
+        <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-14 md:h-16 opacity-90 drop-shadow-lg">
+    </header>
+
+    <!-- ESTATÍSTICAS SUPERIORES -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div class="stats-panel border-l-4 border-bombeiros-orange">
+            <h3 class="text-gray-400 font-semibold uppercase text-xs flex items-center gap-2 mb-3">
+                <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO DO DIA
+            </h3>
+            <div class="flex items-center justify-around">
+                <div class="group-tooltip relative text-center cursor-help">
+                    <span class="text-2xl font-bold text-white" id="count-cap">0</span>
+                    <span class="text-[10px] font-medium text-bombeiros-orange uppercase block">OFICIAIS</span>
+                    <div class="tooltip-simples"><ul id="list-cap" class="text-left text-[10px]"></ul></div>
+                </div>
+                <div class="group-tooltip relative text-center cursor-help">
+                    <span class="text-2xl font-bold text-white" id="count-sgt">0</span>
+                    <span class="text-[10px] font-medium text-bombeiros-yellow uppercase block">SARGENTOS</span>
+                    <div class="tooltip-simples"><ul id="list-sgt" class="text-left text-[10px]"></ul></div>
+                </div>
+                <div class="group-tooltip relative text-center cursor-help">
+                    <span class="text-2xl font-bold text-white" id="count-sd">0</span>
+                    <span class="text-[10px] font-medium text-blue-400 uppercase block">SOLDADOS</span>
+                    <div class="tooltip-simples"><ul id="list-sd" class="text-left text-[10px]"></ul></div>
+                </div>
+                <div class="w-px h-8 bg-white/10 mx-2"></div>
+                <div class="text-center">
+                    <span class="text-3xl font-bold text-total-green" id="count-total">0</span>
+                    <span class="text-[10px] font-medium text-gray-400 uppercase block">TOTAL</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel border-l-4 border-fire-red">
+            <h3 class="text-gray-400 font-semibold uppercase text-xs flex items-center gap-2 mb-3">
+                <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
+            </h3>
+            <div class="flex items-center justify-around">
+                <div class="group-tooltip relative text-center cursor-help">
+                    <span class="text-2xl font-bold text-fire-red" id="count-combate">0</span>
+                    <span class="text-[10px] font-medium text-gray-400 uppercase">COMBATE</span>
+                    <div class="tooltip-simples text-left"><ul id="list-combate" class="text-[10px]"></ul></div>
+                </div>
+                <div class="w-px h-8 bg-white/10"></div>
+                <div class="group-tooltip relative text-center cursor-help">
+                    <span class="text-2xl font-bold text-white" id="count-apoio">0</span>
+                    <span class="text-[10px] font-medium text-gray-400 uppercase">APOIO</span>
+                    <div class="tooltip-simples text-left"><ul id="list-apoio" class="text-[10px]"></ul></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
-        
-        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 mb-6 border-b border-white/10 gap-4">
-            <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 drop-shadow-lg">
-            </div>
+    <!-- CARDS DOS QUARTÉIS (GRID SEM BARRA DE ROLAGEM INTERNA) -->
+    <div id="grid-cards"></div>
 
-            <div class="text-center flex-grow">
-                <h1 class="text-2xl md:text-4xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
-                    Guarnição Operacional
-                </h1>
-                <h2 class="text-sm md:text-lg font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
-                    EM PORTO ALEGRE
-                </h2>
-                
-                <div class="flex justify-center items-center gap-3 mt-3 text-xs font-mono text-gray-400 bg-black/30 px-3 py-1 rounded-full border border-white/5 inline-flex">
-                    <span id="data-topo" class="font-bold text-white uppercase text-[10px]">--/--/----</span>
-                    <span>|</span>
-                    <span class="text-[10px]">ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
-                </div>
-            </div>
+    <!-- RODAPÉ -->
+    <footer class="mt-10 py-4 text-center border-t border-white/5 text-[10px] text-gray-500 uppercase tracking-wider">
+        <p>1º BBM – Controle Operacional • Arraste os cards para reorganizar</p>
+    </footer>
+</div>
 
-            <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 drop-shadow-lg opacity-90">
-            </div>
-        </header>
+<script>
+    // ---------- CONFIGURAÇÃO ----------
+    const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
+    const ORDEM_INICIAL = [
+        "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS",
+        "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON",
+        "CANIL", "AQUÁTICA", "MERGULHO"
+    ];
 
-        <main class="w-full max-w-7xl mx-auto flex-grow">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                
-                <div class="stats-container border-l-4 border-bombeiros-orange">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-2 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-users text-bombeiros-orange text-sm"></i> EFETIVO (ESCALA DO DIA)
-                    </h3>
-                    <div class="flex justify-around items-center">
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
-                            <span class="text-[9px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
-                            <div class="tooltip-box">
-                                <div class="text-[10px] font-bold text-bombeiros-orange mb-1 uppercase">OFICIAIS ESCALADOS</div>
-                                <ul id="list-cap" class="text-left"></ul>
-                            </div>
-                        </div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
-                            <span class="text-[9px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
-                            <div class="tooltip-box">
-                                <div class="text-[10px] font-bold text-bombeiros-yellow mb-1 uppercase">SARGENTOS ESCALADOS</div>
-                                <ul id="list-sgt" class="text-left"></ul>
-                            </div>
-                        </div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
-                            <span class="text-[9px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
-                            <div class="tooltip-box">
-                                <div class="text-[10px] font-bold text-blue-400 mb-1 uppercase">SOLDADOS ESCALADOS</div>
-                                <ul id="list-sd" class="text-left"></ul>
-                            </div>
-                        </div>
-                        <div class="w-px h-8 bg-white/10 mx-1"></div>
-                        <div class="group relative text-center">
-                            <span class="block text-3xl md:text-4xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
-                        </div>
-                    </div>
-                </div>
+    // ---------- FUNÇÕES AUXILIARES ----------
+    function getDataOperacional() {
+        const agora = new Date();
+        if (agora.getHours() < 8) agora.setDate(agora.getDate() - 1);
+        return agora;
+    }
 
-                <div class="stats-container border-l-4 border-fire-red">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-2 tracking-wider flex items-center gap-2">
-                        <i class="fas fa-truck text-fire-red text-sm"></i> VIATURAS EM QAP
-                    </h3>
-                    <div class="flex justify-around items-center">
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                        <div class="w-px h-8 bg-white/10"></div>
-                        <div class="group relative text-center cursor-help">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
-                            <div class="tooltip-box"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    function formatarDataCurta(data) {
+        const dia = String(data.getDate()).padStart(2, '0');
+        const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+        return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
+    }
 
-            <div id="grid-cards" class="pb-8"></div>
-
-        </main>
-
-        <footer class="mt-auto py-4 text-center border-t border-white/5">
-            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">
-                Sistema de Controle Operacional - 1º BBM - 2026
-            </p>
-            <p class="text-[8px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
-            <p class="text-[8px] text-gray-700 mt-0.5">Arraste os cards para reorganizar</p>
-        </footer>
-    </div>
-
-    <script>
-        // CONFIGURAÇÃO
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
-
-        // Ordem inicial dos quarteis
-        const ORDEM_INICIAL_QUARTEIS = [
-            "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
-            "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
-            "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
+    // Separa nome e função
+    function separarNomeFuncao(texto) {
+        if (!texto) return { nome: texto || "", funcao: "" };
+        const padroes = [
+            { regex: /\s+(OFICIAL DE SV|OFICIAL DE SERVIÇO|OFICIAL DE DIA|CMT DE GU|COMANDANTE|COV|MOTORISTA|LINHA|COBOM|CCOB|CINOTÉCNICO|CANIL|NAVAL|MERGULHO|SENTINELA)$/i, flag: 'final' }
         ];
-
-        // Carregar ordem salva do localStorage
-        function carregarOrdemSalva() {
-            const salva = localStorage.getItem('ordemQuarteis');
-            return salva ? JSON.parse(salva) : ORDEM_INICIAL_QUARTEIS;
-        }
-
-        // Salvar ordem no localStorage
-        function salvarOrdem(ordem) {
-            localStorage.setItem('ordemQuarteis', JSON.stringify(ordem));
-        }
-
-        // FUNÇÃO PARA CAPITALIZAR FUNÇÃO (Primeira letra maiúscula)
-        function capitalizarFuncao(func) {
-            if (!func) return "";
-            
-            // Primeiro, aplicar as normalizações específicas
-            func = func.trim();
-            
-            // Converter abreviações comuns
-            const abreviacoes = {
-                'SV': 'SV',
-                'COV': 'Cov',
-                'CMT': 'CMT',
-                'APH': 'APH',
-                'ABT': 'ABT',
-                'AEM': 'AEM',
-                'AR': 'AR',
-                'AT': 'AT',
-                'CCOB': 'CCOB'
-            };
-            
-            // Lista de palavras que devem ficar em minúsculo
-            const palavrasMenores = ['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'para', 'com', 'por', 'sem', 'a', 'o', 'as', 'os'];
-            
-            return func.toLowerCase()
-                .split(' ')
-                .map((palavra, index) => {
-                    // Verificar se é uma abreviação
-                    const palavraUpper = palavra.toUpperCase();
-                    if (abreviacoes[palavraUpper]) {
-                        return abreviacoes[palavraUpper];
-                    }
-                    
-                    // Se for palavra menor e não for a primeira palavra, mantém minúscula
-                    if (index > 0 && palavrasMenores.includes(palavra)) {
-                        return palavra;
-                    }
-                    
-                    // Capitaliza primeira letra
-                    return palavra.charAt(0).toUpperCase() + palavra.slice(1);
-                })
-                .join(' ');
-        }
-
-        function getDataOperacional() {
-            const agora = new Date();
-            if (agora.getHours() < 8) {
-                agora.setDate(agora.getDate() - 1);
-            }
-            return agora;
-        }
-
-        function formatarDataCurta(data) {
-            const dia = String(data.getDate()).padStart(2, '0');
-            const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-            return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
-        }
-
-        // TRADUTOR DE FUNÇÕES - ATUALIZADO CONFORME SOLICITADO
-        function normalizarFuncao(funcRaw) {
-            if(!funcRaw) return "";
-            const f = funcRaw.toUpperCase().trim();
-
-            let limpa = f.replace(/\bND\b/g, '')
-                         .replace(/\d+º\s*\d+/g, '') 
-                         .replace(/\b\d+\b/g, '')    
-                         .replace(/[-]/g, '')
-                         .trim();
-
-            if(limpa === "") return "";
-
-            // MAIS ESPECÍFICOS PRIMEIRO
-            if(limpa.includes("CHEFE DE LINHA ESQUERDA") || limpa.includes("LINHA ESQUERDA")) return "Linha Esquerda";
-            if(limpa.includes("CHEFE DE LINHA DIREITA") || limpa.includes("LINHA DIREITA")) return "Linha Direita";
-            if(limpa.includes("AUXILIAR DE LINHA ESQUERDA")) return "Linha Esquerda";
-            if(limpa.includes("AUXILIAR DE LINHA DIREITA")) return "Linha Direita";
-            
-            if(limpa.includes("OPERADOR COBOM")) return "Cobom (Operador)";
-            if(limpa.includes("OPERADOR CCOB")) return "CCOB (Operador)";
-            
-            if(limpa.includes("COMANDANTE DE GUARNIÇÃO") || limpa.includes("CMT GUARNIÇÃO") || 
-               limpa.includes("CMT DA GUARNIÇÃO")) return "CMT de GU";
-            
-            if(limpa.includes("MOTORISTA DE DIA")) return "Motorista de Dia";
-            if(limpa.includes("OFICIAL DE SV") || limpa.includes("OFICIAL DE SERVIÇO")) return "Oficial de SV";
-            
-            if(limpa.includes("CINOTÉCNICO") || limpa.includes("CANIL")) return "Cinotécnico";
-            if(limpa.includes("CONDUTOR NAVAL")) return "Condutor Naval";
-            if(limpa.includes("MERGULHADOR")) return "Mergulhador";
-            
-            // Depois os genéricos
-            if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA") || limpa === "COV") return "Cov";
-            if(limpa.includes("LINHA") && limpa.includes("AUXILIAR")) return "Linha Auxiliar";
-            if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "Linha Chefe";
-            if(limpa.includes("LINHA")) return "Linha";
-            if(limpa.includes("OPERADOR")) return "Operador";
-            
-            return limpa;
-        }
-
-        // CALCULADORA DE TURNO
-        function calcularTurno(raw) {
-            if(!raw) return "";
-
-            try {
-                const horasMatch = raw.match(/(\d{2}:\d{2})/g);
-                if (!horasMatch || horasMatch.length === 0) return "";
-
-                const dataOp = getDataOperacional();
-                const hoje = new Date(dataOp);
-                const amanha = new Date(dataOp);
-                amanha.setDate(amanha.getDate() + 1);
-
-                let hInicio = "08:00";
-                let hFim = "08:00";
-                let dInicio = hoje;
-                let dFim = amanha;
-                let carga = "24h";
-
-                if (horasMatch.length === 1) {
-                    const horaUnica = horasMatch[0];
-                    if (horaUnica === "20:00") {
-                        hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
-                    } else {
-                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
-                    }
-                }
-                else if (horasMatch.length >= 2) {
-                    hInicio = horasMatch[0];
-                    hFim = horasMatch[1];
-                    if (hInicio === hFim) {
-                        dFim = amanha; carga = "24h";
-                    } else if (hInicio === "08:00" && hFim === "20:00") {
-                        dFim = hoje; carga = "12h";
-                    } else if (hInicio === "20:00" && hFim === "08:00") {
-                        dFim = amanha; carga = "12h";
-                    } else {
-                        const h1 = parseInt(hInicio.split(':')[0]);
-                        const h2 = parseInt(hFim.split(':')[0]);
-                        if (h2 < h1) dFim = amanha; else dFim = hoje;
-                        let diff = h2 - h1; if(diff < 0) diff += 24;
-                        carga = diff > 12 ? "24h" : "12h";
-                    }
-                }
-
-                const strDataFim = formatarDataCurta(dFim);
-
-                return `
-                    <div class="turno-display">
-                        <span class="turno-carga">${carga}</span>
-                        <div class="turno-horas">
-                            <i class="fas fa-clock text-sky-blue text-[8px]"></i>
-                            <span>${hInicio}</span>
-                            <i class="fas fa-arrow-right text-gray-500 text-[6px]"></i>
-                            <span>${hFim}</span>
-                        </div>
-                        <span class="turno-data">
-                            <i class="far fa-calendar text-gray-500 text-[6px]"></i>
-                            ${strDataFim}
-                        </span>
-                    </div>
-                `;
-
-            } catch(e) { console.error(e); return ""; }
-        }
-
-        function extrairID(nomeCompleto) {
-            const match = nomeCompleto.match(/(\d{7})/);
-            return match ? match[1] : null; 
-        }
-
-        function limparNome(nomeCompleto) {
-            return nomeCompleto.replace(/\d{7}\s+/, '').trim();
-        }
-
-        // EXTRAIR POSTO/GRADUAÇÃO DO NOME
-        function extrairPosto(nomeCompleto) {
-            const nome = nomeCompleto.toUpperCase();
-            if (nome.match(/\b(CEL|TC|MAJ|CAP|TEN|ASP|SUB|SGT|SD|CB)\b/)) {
-                const match = nome.match(/\b(CEL|TC|MAJ|CAP|TEN|ASP|SUB|SGT|SD|CB)\b/);
-                return match[0];
-            }
-            return "";
-        }
-
-        function processarDados(dados) {
-            const estrutura = {};
-            const mapOficiais = new Map();
-            const mapSargentos = new Map();
-            const mapPracas = new Map();
-            const statsViaturas = { combate: new Set(), apoio: new Set() };
-
-            dados.forEach(d => {
-                let obmRaw = (d.obm || "").toUpperCase();
-                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                let nomeCompleto = (d.nome || "").trim().toUpperCase();
-                
-                let idMilitar = extrairID(nomeCompleto);
-                let idUnico = idMilitar ? idMilitar : nomeCompleto;
-                let nomeExibicao = limparNome(nomeCompleto);
-                let posto = extrairPosto(nomeCompleto);
-                
-                let func = normalizarFuncao(d.func || "");
-                let horaHTML = calcularTurno(d.horario || ""); 
-                let funcaoFormatada = capitalizarFuncao(func);
-
-                let obmKey = "OUTROS";
-                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
-                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
-                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
-                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
-                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
-                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
-                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
-                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
-                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
-                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
-                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
-                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
-                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
-
-                if(!estrutura[obmKey]) estrutura[obmKey] = [];
-                
-                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
-                if(!viaturaObj) {
-                    viaturaObj = { nome: vtr, guarnicao: [] };
-                    estrutura[obmKey].push(viaturaObj);
-                }
-                
-                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ 
-                        f: funcaoFormatada, 
-                        n: nomeExibicao, 
-                        id: idUnico, 
-                        h: horaHTML,
-                        p: posto 
-                    });
-
-                    if (nomeCompleto.includes("SD ") || nomeCompleto.includes("SOLDADO ")) {
-                        mapPracas.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
-                    }
-                    else if(nomeCompleto.includes("SGT")) {
-                        mapSargentos.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
-                    }
-                    else if(nomeCompleto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
-                        mapOficiais.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
-                    }
-                    else {
-                        mapPracas.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
-                    }
-                }
-
-                if(vtr.includes("ABT")) {
-                    statsViaturas.combate.add(vtr);
-                }
-                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
-                    statsViaturas.apoio.add(vtr);
-                }
-            });
-
-            atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
-            renderizarCards(estrutura);
-        }
-
-        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
-            const capArr = Array.from(mapOficiais.values());
-            const sgtArr = Array.from(mapSargentos.values());
-            const sdArr = Array.from(mapPracas.values());
-            const combArr = Array.from(statsViaturas.combate);
-            const apoioArr = Array.from(statsViaturas.apoio);
-
-            const fill = (idC, idL, arr) => {
-                document.getElementById(idC).innerText = arr.length;
-                const listElement = document.getElementById(idL);
-                listElement.innerHTML = arr.map(item => 
-                    `<li class="tooltip-item">
-                        <span class="tooltip-posto">${item.posto} ${item.nome}</span>
-                        <span class="tooltip-funcao">${item.funcao}</span>
-                    </li>`
-                ).join('');
-            };
-
-            fill('count-cap', 'list-cap', capArr);
-            fill('count-sgt', 'list-sgt', sgtArr);
-            fill('count-sd', 'list-sd', sdArr);
-            document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
-            
-            document.getElementById('count-combate').innerText = combArr.length;
-            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li class="text-[10px] text-gray-300">• ${x}</li>`).join('');
-
-            document.getElementById('count-apoio').innerText = apoioArr.length;
-            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li class="text-[10px] text-gray-300">• ${x}</li>`).join('');
-        }
-
-        function renderizarCards(estrutura) {
-            const grid = document.getElementById('grid-cards');
-            grid.innerHTML = "";
-
-            const ordemSalva = carregarOrdemSalva();
-            
-            // Combinar ordem salva com quaisquer novos quarteis
-            const keysOrdenadas = [
-                ...ordemSalva.filter(k => estrutura[k]), 
-                ...Object.keys(estrutura).filter(k => !ordemSalva.includes(k))
-            ];
-
-            keysOrdenadas.forEach(obmName => {
-                const viaturasRaw = estrutura[obmName];
-                const gruposUnicos = [];
-                
-                viaturasRaw.forEach(vtr => {
-                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
-                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
-                    if(grupoExistente && assinatura.length > 0) {
-                        grupoExistente.nomesVtrs.push(vtr.nome);
-                    } else {
-                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
-                    }
-                });
-
-                const card = document.createElement('div');
-                card.className = "card-monitor";
-                card.setAttribute('data-quartel', obmName);
-
-                let content = `
-                    <div class="bg-gradient-to-b from-bombeiros-orange to-orange-700 w-12 md:w-14 flex items-center justify-center py-3 flex-shrink-0">
-                        <h2 class="vertical-text text-white font-black text-base md:text-lg tracking-wider uppercase shadow-black drop-shadow-md whitespace-nowrap">
-                            ${obmName}
-                        </h2>
-                    </div>
-                    <div class="flex-grow p-2 flex flex-col gap-2 overflow-y-auto max-h-[280px]">
-                `;
-
-                gruposUnicos.forEach(grupo => {
-                    grupo.guarnicao.sort((a,b) => {
-                        const getScore = (role) => {
-                            let r = role.toUpperCase();
-                            if(r.includes("CMT")) return 1;
-                            if(r.includes("COV")) return 2;
-                            if(r.includes("OFICIAL")) return 3;
-                            if(r.includes("LINHA")) return 4;
-                            return 5;
-                        }
-                        return getScore(a.f) - getScore(b.f);
-                    });
-
-                    const listaVtrs = grupo.nomesVtrs.join(' / ');
-
-                    content += `
-                        <div class="grupo-viatura">
-                            <span class="text-bombeiros-yellow font-bold text-[10px] tracking-wider uppercase border-b border-bombeiros-yellow/20 pb-1 mb-2 inline-block">
-                                ${listaVtrs}
-                            </span>
-                            <div class="w-full grid grid-cols-1 gap-2">
-                                ${grupo.guarnicao.map(m => `
-                                    <div class="militar-container">
-                                        <div class="militar-nome">${m.n}</div>
-                                        <div class="militar-funcao">${m.f}</div>
-                                        ${m.h}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                content += `</div>`;
-                card.innerHTML = content;
-                grid.appendChild(card);
-            });
-
-            // Inicializar SortableJS para arrastar e reordenar
-            if (typeof Sortable !== 'undefined') {
-                const sortable = Sortable.create(grid, {
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
-                    onEnd: function(evt) {
-                        // Atualizar ordem no localStorage
-                        const novaOrdem = Array.from(grid.children).map(child => 
-                            child.getAttribute('data-quartel')
-                        ).filter(Boolean);
-                        
-                        salvarOrdem(novaOrdem);
-                        
-                        // Mostrar notificação visual
-                        mostrarFeedbackOrdem();
-                    }
-                });
+        let nome = texto, funcao = "";
+        for (let p of padroes) {
+            const match = texto.match(p.regex);
+            if (match) {
+                funcao = match[1];
+                nome = texto.substring(0, texto.length - match[0].length).trim();
+                break;
             }
         }
+        return { nome, funcao };
+    }
 
-        function mostrarFeedbackOrdem() {
-            // Criar feedback visual
-            const feedback = document.createElement('div');
-            feedback.className = 'fixed bottom-4 right-4 bg-bombeiros-orange text-white px-3 py-2 rounded-lg text-sm font-bold shadow-lg z-50 animate-pulse';
-            feedback.innerHTML = 'Ordem salva!';
-            feedback.id = 'feedback-ordem';
-            
-            document.body.appendChild(feedback);
-            
-            // Remover após 2 segundos
-            setTimeout(() => {
-                feedback.remove();
-            }, 2000);
-        }
+    // Normalizar função para exibição
+    function normalizarFuncao(funcRaw) {
+        if (!funcRaw) return "";
+        let f = funcRaw.toUpperCase().trim();
+        f = f.replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/\b\d+\b/g, '').replace(/[-]/g, '').trim();
+        if (f === "") return "";
+        if (f.includes("CHEFE DE LINHA ESQUERDA") || f.includes("LINHA ESQUERDA")) return "Linha Esquerda";
+        if (f.includes("CHEFE DE LINHA DIREITA") || f.includes("LINHA DIREITA")) return "Linha Direita";
+        if (f.includes("AUXILIAR DE LINHA")) return "Linha";
+        if (f.includes("OPERADOR COBOM")) return "Cobom";
+        if (f.includes("OPERADOR CCOB")) return "CCOB";
+        if (f.includes("COMANDANTE DE GUARNIÇÃO") || f.includes("CMT")) return "CMT de GU";
+        if (f.includes("MOTORISTA DE DIA")) return "Motorista";
+        if (f.includes("OFICIAL DE SV") || f.includes("OFICIAL DE SERVIÇO")) return "Oficial SV";
+        if (f.includes("CINOTÉCNICO") || f.includes("CANIL")) return "Canil";
+        if (f.includes("CONDUTOR NAVAL")) return "Naval";
+        if (f.includes("MERGULHADOR")) return "Mergulho";
+        if (f.includes("CONDUTOR") || f.includes("MOTORISTA") || f === "COV") return "Cov";
+        if (f.includes("LINHA")) return "Linha";
+        if (f.includes("OPERADOR")) return "Operador";
+        return f.charAt(0) + f.slice(1).toLowerCase();
+    }
 
-        function atualizarRelogio() {
+    // Capitalizar função
+    function capitalizarFuncao(str) {
+        if (!str) return "";
+        return str.split(' ').map((p, i) => {
+            if (i > 0 && ['de','da','do','das','dos','e','em','para'].includes(p.toLowerCase())) return p.toLowerCase();
+            return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
+        }).join(' ');
+    }
+
+    // Calcular turno – agora mais limpo e com 12h/24h visível
+    function calcularTurno(raw) {
+        if (!raw) return "";
+        try {
+            const horas = raw.match(/(\d{2}:\d{2})/g) || [];
+            if (horas.length === 0) return "";
+
             const dataOp = getDataOperacional();
-            const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { 
-                weekday: 'short', 
-                day: '2-digit', 
-                month: 'short', 
-                year: 'numeric' 
-            }).toUpperCase();
-            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+            const amanha = new Date(dataOp); amanha.setDate(amanha.getDate() + 1);
+            let hInicio = "08:00", hFim = "08:00", dataFim = amanha, carga = "24h";
+
+            if (horas.length === 1) {
+                if (horas[0] === "20:00") { hInicio = "08:00"; hFim = "20:00"; dataFim = dataOp; carga = "12h"; }
+            } else if (horas.length >= 2) {
+                hInicio = horas[0]; hFim = horas[1];
+                if (hInicio === "08:00" && hFim === "20:00") { dataFim = dataOp; carga = "12h"; }
+                else if (hInicio === "20:00" && hFim === "08:00") { carga = "12h"; }
+                else if (hInicio === hFim) { carga = "24h"; }
+                else {
+                    let h1 = parseInt(hInicio.split(':')[0]), h2 = parseInt(hFim.split(':')[0]);
+                    if (h2 < h1) dataFim = amanha;
+                    let diff = h2 - h1; if (diff < 0) diff += 24;
+                    carga = diff > 12 ? "24h" : "12h";
+                }
+            }
+            const strDataFim = formatarDataCurta(dataFim);
+            return `
+                <div class="turno-info">
+                    <span class="turno-carga">${carga}</span>
+                    <span class="turno-horario">
+                        <i class="fas fa-clock text-sky-blue text-[9px]"></i> ${hInicio}–${hFim}
+                    </span>
+                    <span class="turno-data">
+                        <i class="far fa-calendar-alt text-gray-500 text-[8px]"></i> ${strDataFim}
+                    </span>
+                </div>
+            `;
+        } catch (e) { return ""; }
+    }
+
+    // Extrair posto e ID
+    function extrairPosto(nome) {
+        const match = nome.toUpperCase().match(/\b(CEL|TC|MAJ|CAP|TEN|ASP|SUB|SGT|SD|CB)\b/);
+        return match ? match[1] : "";
+    }
+    function extrairID(nome) {
+        const match = nome.match(/(\d{7})/); return match ? match[1] : null;
+    }
+    function limparNome(nomeCompleto) {
+        let nome = nomeCompleto.replace(/\d{7}\s+/, '').trim();
+        const sep = separarNomeFuncao(nome);
+        return { nome: sep.nome || nome, funcao: sep.funcao };
+    }
+
+    // ---------- PROCESSAMENTO DOS DADOS ----------
+    function processarDados(dados) {
+        const estrutura = {};
+        const mapOficiais = new Map(), mapSargentos = new Map(), mapPracas = new Map();
+        const statsViaturas = { combate: new Set(), apoio: new Set() };
+
+        dados.forEach(d => {
+            let obmRaw = (d.obm || "").toUpperCase();
+            let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
+            let nomeCompleto = (d.nome || "").trim().toUpperCase();
+            let idMilitar = extrairID(nomeCompleto);
+            let idUnico = idMilitar || nomeCompleto;
+            let posto = extrairPosto(nomeCompleto);
+            
+            // Separa nome e função
+            const separado = limparNome(nomeCompleto);
+            let nomeExibicao = separado.nome;
+            let funcaoBruta = separado.funcao || d.func || "";
+            let func = normalizarFuncao(funcaoBruta);
+            let funcaoFormatada = capitalizarFuncao(func);
+            let horaHTML = calcularTurno(d.horario || "");
+
+            // Mapear OBM
+            let obmKey = "OUTROS";
+            if (obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+            else if (obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+            else if (obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+            else if (obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+            else if (obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+            else if (obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+            else if (obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+            else if (obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+            else if (obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+            else if (obmRaw.includes("COBOM")) obmKey = "COBOM";
+            else if (obmRaw.includes("CANIL")) obmKey = "CANIL";
+            else if (obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+            else if (obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
+
+            if (!estrutura[obmKey]) estrutura[obmKey] = [];
+            let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
+            if (!viaturaObj) {
+                viaturaObj = { nome: vtr, guarnicao: [] };
+                estrutura[obmKey].push(viaturaObj);
+            }
+
+            if (nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
+                viaturaObj.guarnicao.push({ f: funcaoFormatada, n: nomeExibicao, id: idUnico, h: horaHTML, p: posto });
+
+                // Classificação para estatísticas
+                if (nomeCompleto.includes("SD ") || nomeCompleto.includes("SOLDADO ")) {
+                    mapPracas.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto });
+                } else if (nomeCompleto.includes("SGT")) {
+                    mapSargentos.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto });
+                } else if (nomeCompleto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
+                    mapOficiais.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto });
+                } else {
+                    mapPracas.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto });
+                }
+            }
+
+            // Contagem de viaturas
+            if (vtr.includes("ABT")) statsViaturas.combate.add(vtr);
+            else if (vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) statsViaturas.apoio.add(vtr);
+        });
+
+        atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
+        renderizarCards(estrutura);
+    }
+
+    function atualizarStats(oficiais, sgt, pracas, viaturas) {
+        const capArr = Array.from(oficiais.values()), sgtArr = Array.from(sgt.values()), sdArr = Array.from(pracas.values());
+        const fill = (idC, idL, arr) => {
+            document.getElementById(idC).innerText = arr.length;
+            document.getElementById(idL).innerHTML = arr.map(i => 
+                `<li class="flex items-baseline gap-1 py-0.5"><span class="text-[#FFD700] font-medium">${i.posto} ${i.nome}</span> <span class="text-gray-300 text-[9px]">${i.funcao}</span></li>`
+            ).join('');
+        };
+        fill('count-cap', 'list-cap', capArr);
+        fill('count-sgt', 'list-sgt', sgtArr);
+        fill('count-sd', 'list-sd', sdArr);
+        document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
+
+        document.getElementById('count-combate').innerText = viaturas.combate.size;
+        document.getElementById('list-combate').innerHTML = Array.from(viaturas.combate).map(v => `<li class="py-0.5">${v}</li>`).join('');
+        document.getElementById('count-apoio').innerText = viaturas.apoio.size;
+        document.getElementById('list-apoio').innerHTML = Array.from(viaturas.apoio).map(v => `<li class="py-0.5">${v}</li>`).join('');
+    }
+
+    // Renderização sem barra de rolagem interna
+    function renderizarCards(estrutura) {
+        const grid = document.getElementById('grid-cards');
+        grid.innerHTML = "";
+
+        let ordemSalva = localStorage.getItem('ordemQuarteis');
+        ordemSalva = ordemSalva ? JSON.parse(ordemSalva) : ORDEM_INICIAL;
+        const keys = [...ordemSalva.filter(k => estrutura[k]), ...Object.keys(estrutura).filter(k => !ordemSalva.includes(k))];
+
+        keys.forEach(obm => {
+            const viaturas = estrutura[obm];
+            const card = document.createElement('div');
+            card.className = "card-quartel hover-lift";
+            card.setAttribute('data-quartel', obm);
+
+            let html = `<div class="vertical-title">${obm.substring(0, 12)}</div>`;
+            html += `<div class="conteudo-quartel">`;
+
+            // Agrupa por viatura/guarnição
+            const grupos = [];
+            viaturas.forEach(vtr => {
+                const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
+                let grupo = grupos.find(g => g.assinatura === assinatura);
+                if (grupo) grupo.nomesVtrs.push(vtr.nome);
+                else grupos.push({ assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+            });
+
+            grupos.forEach(grupo => {
+                // Ordenar: CMT > Cov > outros
+                grupo.guarnicao.sort((a,b) => {
+                    let r1 = a.f.toUpperCase(), r2 = b.f.toUpperCase();
+                    if (r1.includes("CMT")) return -1;
+                    if (r2.includes("CMT")) return 1;
+                    if (r1.includes("COV")) return -1;
+                    if (r2.includes("COV")) return 1;
+                    return 0;
+                });
+
+                html += `<div class="grupo-vtr">`;
+                html += `<div class="vtr-titulo">${grupo.nomesVtrs.join(' / ')}</div>`;
+                grupo.guarnicao.forEach(m => {
+                    html += `<div class="militar-item">`;
+                    html += `<div class="info-militar">`;
+                    html += `<span class="militar-nome">${m.n}</span>`;
+                    if (m.f) html += `<span class="militar-funcao">${m.f}</span>`;
+                    html += `</div>`;
+                    html += m.h; // turno já formatado
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            });
+
+            html += `</div>`; // fecha conteudo-quartel
+            card.innerHTML = html;
+            grid.appendChild(card);
+        });
+
+        // Ativar Sortable
+        if (typeof Sortable !== 'undefined') {
+            Sortable.create(grid, {
+                animation: 150,
+                ghostClass: 'opacity-30 bg-orange-500/10 border-dashed border-orange-400',
+                chosenClass: 'shadow-2xl scale-[1.02]',
+                onEnd: (evt) => {
+                    const novaOrdem = Array.from(grid.children).map(c => c.dataset.quartel).filter(Boolean);
+                    localStorage.setItem('ordemQuarteis', JSON.stringify(novaOrdem));
+                }
             });
         }
+    }
 
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
+    // Relógio
+    function atualizarRelogio() {
+        const data = getDataOperacional();
+        const agora = new Date();
+        document.getElementById('data-topo').innerText = data.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }).replace('.','').toUpperCase();
+        document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    }
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
 
-        async function iniciarSistema() {
-            try {
-                const req = await fetch(URL_DADOS);
-                const dados = await req.json();
-                if(dados.erro) throw new Error("Dados inválidos");
-                processarDados(dados);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-            } catch(e) { 
-                console.error(e); 
-                document.getElementById('msg-loading').innerText = "Reconectando...";
-                setTimeout(iniciarSistema, 5000); 
-            }
+    // Iniciar
+    async function iniciar() {
+        try {
+            const req = await fetch(URL_DADOS);
+            const dados = await req.json();
+            if (dados.erro) throw new Error('Aguardando dados...');
+            processarDados(dados);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
+        } catch (e) {
+            document.getElementById('msg-loading').innerText = 'Reconectando...';
+            setTimeout(iniciar, 3000);
         }
-
-        // Função para resetar ordem (para debug)
-        window.resetarOrdem = function() {
-            localStorage.removeItem('ordemQuarteis');
-            iniciarSistema();
-        };
-
-        iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
-    </script>
+    }
+    iniciar();
+    setInterval(iniciar, 45000);
+</script>
 </body>
 </html>
