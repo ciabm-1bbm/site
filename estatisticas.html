@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
+        /* ========== ESTILOS GLOBAIS - VERSÃO STATS_BBM_v4_FINAL ========== */
         .chart-container {
             position: relative;
             width: 100%;
@@ -349,10 +350,11 @@
     </main>
 
     <footer class="text-center py-4 sm:py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
-        © 1º BBM - Gustavo Medeiros
+        © 1º BBM - Gustavo Medeiros | v4_FINAL
     </footer>
 
     <script>
+        // ========== CONFIGURAÇÕES GLOBAIS - STATS_BBM_v4_FINAL ==========
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
             year: 2026,
@@ -373,7 +375,6 @@
             "TROTE": { c: "#A78BFA", i: "🎭", cl: "text-purple-400", bg: "rgba(167, 139, 250, 0.8)" }
         };
 
-        // Mapeamento de pelotões simplificados
         const PELOTAO_SIMPLIFICADO = {
             "BBS (POA) - MERGULHO": "BBS / MERGULHO",
             "BBS (POA) - CANIL": "BBS / CANIL",
@@ -395,6 +396,7 @@
 
         let curYear = 2026;
         let instances = {};
+        let currentPeriod = { type: 'month', monthName: null }; // 'month' ou 'annual'
 
         const isMobile = () => window.innerWidth < 768;
         const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024;
@@ -402,7 +404,7 @@
         const getChartConfig = () => {
             if (isMobile()) {
                 return {
-                    barThickness: 16, // Reduzido para não colar
+                    barThickness: 16,
                     categoryPercentage: 0.8,
                     fontSize: 10,
                     tickPadding: 5,
@@ -413,7 +415,7 @@
                 };
             } else if (isTablet()) {
                 return {
-                    barThickness: 18, // Reduzido
+                    barThickness: 18,
                     categoryPercentage: 0.8,
                     fontSize: 11,
                     tickPadding: 8,
@@ -424,7 +426,7 @@
                 };
             } else {
                 return {
-                    barThickness: 20, // Reduzido para dar espaço
+                    barThickness: 20,
                     categoryPercentage: 0.8,
                     fontSize: 12,
                     tickPadding: 10,
@@ -435,6 +437,26 @@
                 };
             }
         };
+
+        // ========== FUNÇÃO AUXILIAR PARA DIAS NO PERÍODO ==========
+        function getDaysInPeriod(year, monthName = null) {
+            if (monthName) {
+                const monthIndex = CONFIG.months.indexOf(monthName);
+                if (monthIndex === -1) return 30; // fallback
+                // Verifica ano bissexto para fevereiro
+                if (monthIndex === 1) { // FEV
+                    const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+                    return isLeap ? 29 : 28;
+                }
+                // Meses com 31 dias
+                if ([0, 2, 4, 6, 7, 9, 11].includes(monthIndex)) return 31;
+                return 30;
+            } else {
+                // Ano inteiro: 365 ou 366
+                const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+                return isLeap ? 366 : 365;
+            }
+        }
 
         const Core = {
             db: [],
@@ -506,6 +528,7 @@
                 
                 document.getElementById('btnAnual').classList.remove('active');
                 document.getElementById('dashboard').classList.add('hidden');
+                currentPeriod = { type: 'month', monthName: null };
             },
 
             toggleLoad: (show) => {
@@ -524,6 +547,7 @@
                 Core.resetBtns();
                 btn.classList.add('active');
                 Core.toggleLoad(true);
+                currentPeriod = { type: 'month', monthName: m };
 
                 try {
                     const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
@@ -542,6 +566,7 @@
                 Core.resetBtns();
                 document.getElementById('btnAnual').classList.add('active');
                 Core.toggleLoad(true);
+                currentPeriod = { type: 'annual', monthName: null };
 
                 try {
                     const req = await fetch(`${CONFIG.repo}/dados/ANUAL_${curYear}.csv?t=${Date.now()}`);
@@ -633,7 +658,7 @@
                 
                 let colBA = null;
                 
-                // Procurar por "Nº Oc." ou números de 6 dígitos
+                // Procura pela coluna "Nº Oc." ou números de 6 dígitos
                 for (const key of keys) {
                     if (key.toLowerCase().includes('nº oc') || key.toLowerCase().includes('numero oc') || 
                         key.toLowerCase().includes('num oc') || key.toLowerCase().includes('n oc')) {
@@ -688,6 +713,13 @@
                             }
                         });
                     }
+
+                    // --- FILTRO: cidades que devem ser omitidas do gráfico (viram OUTROS) ---
+                    const cidadesExcluir = ["CACHOEIRINHA", "CANOAS", "CAXIAS DO SUL", "CAXIAS"];
+                    if (cidadesExcluir.some(cidade => pelotao.includes(cidade))) {
+                        pelotao = "OUTROS";
+                    }
+                    // -----------------------------------------------------------------------
                     
                     // Simplificar pelotões especiais
                     if (PELOTAO_SIMPLIFICADO[pelotao]) {
@@ -862,12 +894,20 @@
                 const sortObject = (obj) => 
                     Object.entries(obj).sort((a, b) => b[1] - a[1]);
 
-                Core.createChart('chartPel', sortObject(aggregations.pel), 'pel');
-                Core.createChart('chartNat', sortObject(aggregations.nat), 'nat');
-                Core.createChart('chartSub', sortObject(aggregations.sub), 'sub');
+                // Calcula os dias do período atual para usar nos tooltips
+                let daysInPeriod = 30; // fallback
+                if (currentPeriod.type === 'month' && currentPeriod.monthName) {
+                    daysInPeriod = getDaysInPeriod(curYear, currentPeriod.monthName);
+                } else {
+                    daysInPeriod = getDaysInPeriod(curYear);
+                }
+
+                Core.createChart('chartPel', sortObject(aggregations.pel), 'pel', daysInPeriod);
+                Core.createChart('chartNat', sortObject(aggregations.nat), 'nat', daysInPeriod);
+                Core.createChart('chartSub', sortObject(aggregations.sub), 'sub', daysInPeriod);
             },
 
-            createChart: (canvasId, data, type) => {
+            createChart: (canvasId, data, type, daysInPeriod) => {
                 if (instances[canvasId]) {
                     instances[canvasId].destroy();
                 }
@@ -931,10 +971,9 @@
                         return '#94a3b8';
                     });
                     
-                    // Configuração melhorada para gráfico de pelotão: mais espaço entre barras e barras mais finas
-                    barThickness = config.barThickness; // reduzido
-                    categoryPercentage = config.categoryPercentage; // 0.8
-                    barPercentage = 0.7; // reduzido para dar mais espaço entre barras
+                    barThickness = config.barThickness;
+                    categoryPercentage = config.categoryPercentage;
+                    barPercentage = 0.7;
                     
                 } else if (type === 'nat') {
                     const newLabels = data.map(item => {
@@ -1046,7 +1085,7 @@
                         maintainAspectRatio: false,
                         layout: {
                             padding: {
-                                right: 50 // Aumenta espaço para os números não cortarem
+                                right: 50
                             }
                         },
                         plugins: {
@@ -1063,7 +1102,11 @@
                                     label: (context) => {
                                         const value = context.raw;
                                         const percentage = ((value / total) * 100).toFixed(1);
-                                        return `${value.toLocaleString('pt-BR')} ocorrências (${percentage}%)`;
+                                        const dailyAvg = (value / daysInPeriod).toFixed(1).replace('.', ',');
+                                        return [
+                                            `${value.toLocaleString('pt-BR')} ocorrências (${percentage}%)`,
+                                            `Média diária: ${dailyAvg} por dia`
+                                        ];
                                     },
                                     title: (context) => {
                                         if (type === 'sub') {
@@ -1119,7 +1162,6 @@
                             }
                         },
                         interaction: {
-                            // CORREÇÃO: ao passar o mouse verticalmente (na barra), mostra apenas aquela barra
                             mode: 'nearest',
                             intersect: true,
                             axis: 'y'
