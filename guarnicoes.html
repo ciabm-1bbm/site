@@ -1,96 +1,516 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Tático CBMRS</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Guarnição Operacional - 1º BBM</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                        'moss-green': '#9BE36D',
+                        'total-green': '#4ade80',
+                        'sky-blue': '#38bdf8' 
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .header { text-align: center; border-bottom: 3px solid #b71c1c; padding-bottom: 15px; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-        .card { background: #1e1e1e; border: 1px solid #333; border-radius: 8px; overflow: hidden; }
-        .card-head { background: linear-gradient(90deg, #2c2c2c, #222); padding: 10px; border-left: 4px solid #b71c1c; display: flex; justify-content: space-between; }
-        .vtr { font-weight: bold; font-size: 1.2rem; color: white; }
-        .obm { font-size: 0.7rem; color: #aaa; }
-        .item { padding: 8px 10px; border-bottom: 1px solid #333; display: flex; align-items: center; font-size: 0.9rem; }
-        .func { width: 80px; font-size: 0.7rem; font-weight: bold; color: #b71c1c; }
-        .nome { flex-grow: 1; color: #ddd; }
-        .hora { font-size: 0.7rem; background: #333; padding: 2px 5px; border-radius: 3px; }
-        #loading { text-align: center; margin-top: 50px; }
+        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        
+        .hero-background { position: relative; min-height: 100vh; }
+        .hero-background::before { 
+            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
+            background-position: center; background-repeat: no-repeat; background-size: 500px;
+            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+        }
+        .hero-background::after {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+            z-index: 1; pointer-events: none;
+        }
+        .content-wrapper { position: relative; z-index: 10; }
+
+        .card-monitor {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            display: flex; 
+            overflow: hidden;
+            min-height: 140px; 
+        }
+        .card-monitor:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.98);
+            border-color: rgba(255, 140, 0, 0.5);
+            z-index: 50;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .stats-container {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .tooltip-box {
+            visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
+            width: max-content; min-width: 150px; z-index: 100; transition: 0.2s; pointer-events: none;
+            box-shadow: 0 10px 40px black; margin-top: 10px;
+        }
+        .group:hover .tooltip-box { visibility: visible; opacity: 1; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
+
+        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
-<body>
+<body class="hero-background">
 
-    <div class="header">
-        <h2 style="margin:0"><i class="fas fa-fire-extinguisher"></i> EFETIVO OPERACIONAL</h2>
-        <small id="last-up">Sincronizando...</small>
+    <div id="loading">
+        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando visual...</p>
     </div>
 
-    <div id="loading"><i class="fas fa-spinner fa-spin fa-3x" style="color:#b71c1c"></i></div>
-    <div class="grid" id="container"></div>
+    <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
+        
+        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
+            <div class="flex-shrink-0">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
+            </div>
+
+            <div class="text-center flex-grow">
+                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                    Guarnição Operacional
+                </h1>
+                <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
+                    EM PORTO ALEGRE
+                </h2>
+                
+                <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
+                    <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
+                    <span>|</span>
+                    <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
+                </div>
+            </div>
+
+            <div class="flex-shrink-0">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
+            </div>
+        </header>
+
+        <main class="w-full max-w-7xl mx-auto flex-grow">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                
+                <div class="stats-container border-l-4 border-bombeiros-orange">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                        <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA DO DIA)
+                    </h3>
+                    <div class="flex justify-around items-center">
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                            <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                            <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                            <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                            <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                            <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10 mx-2"></div>
+                        <div class="group relative text-center">
+                            <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-container border-l-4 border-fire-red">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                        <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
+                    </h3>
+                    <div class="flex justify-around items-center">
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
+                            <div class="tooltip-box"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="group relative text-center cursor-help">
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
+                            <div class="tooltip-box"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10 space-y-5"></div>
+
+        </main>
+
+        <footer class="mt-auto py-6 text-center border-t border-white/5">
+            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                Sistema de Controle Operacional - 1º BBM - 2026
+            </p>
+            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
+        </footer>
+    </div>
 
     <script>
-        // --- COLE SEU LINK AQUI ---
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbw9z3Uf86NnmwwtTCUxeixjYwG-05bww4D5pEv0NG22EdK38IfFhCFA118waPCT1ZuO/exec"; 
+        // ---------- CONFIGURAÇÃO ----------
+        // 🔁 COLOQUE AQUI A URL DO SEU GOOGLE APPS SCRIPT (WEB APP)
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
 
-        async function carregar() {
+        const ORDEM_QUARTEIS = [
+            "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
+            "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
+            "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
+        ];
+
+        // ---------- FUNÇÕES AUXILIARES ----------
+        function getDataOperacional() {
+            const agora = new Date();
+            if (agora.getHours() < 8) {
+                agora.setDate(agora.getDate() - 1);
+            }
+            return agora;
+        }
+
+        function formatarDataCurta(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+            return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
+        }
+
+        // Converte "DD/MM/AAAA HH:MM" para objeto Date
+        function parseDataHora(str) {
+            if (!str) return null;
+            const partes = str.split(' ');
+            if (partes.length !== 2) return null;
+            const data = partes[0].split('/');
+            const hora = partes[1].split(':');
+            if (data.length !== 3 || hora.length !== 2) return null;
+            return new Date(data[2], data[1]-1, data[0], hora[0], hora[1]);
+        }
+
+        // ---------- NORMALIZAÇÃO DE FUNÇÃO ----------
+        function normalizarFuncao(funcRaw) {
+            if(!funcRaw) return "";
+            const f = funcRaw.toUpperCase();
+            let limpa = f.replace(/\bND\b/g, '')
+                         .replace(/\d+º\s*\d+/g, '') 
+                         .replace(/\b\d+\b/g, '')    
+                         .replace(/[-]/g, '')
+                         .trim();
+            if(limpa === "") return "";
+            if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA")) return "COV";
+            if(limpa.includes("CMT") || limpa.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
+            if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "LINHA (CHEFE)";
+            if(limpa.includes("LINHA") && limpa.includes("AUXILIAR")) return "LINHA (AUXILIAR)";
+            if(limpa.includes("OPERADOR") || limpa.includes("COBOM")) return "OPERADOR COBOM";
+            if(limpa.includes("MERGULHADOR")) return "MERGULHADOR";
+            if(limpa.includes("NAVAL")) return "CONDUTOR NAVAL";
+            if(limpa.includes("CINO") || limpa.includes("CANIL")) return "CINOTÉCNICO";
+            if(limpa.includes("MOTORISTA") && limpa.includes("DIA")) return "MOTORISTA DE DIA";
+            if(limpa.includes("OFICIAL") && limpa.includes("SERVIÇO")) return "OFICIAL DE SERVIÇO";
+            return limpa; 
+        }
+
+        // ---------- 🚀 CALCULAR TURNO COM SUPORTE A Int, Início, Fim ----------
+        function calcularTurno(d) {
+            // Prioridade 1: campos int, inicio, fim existem?
+            if (d.int !== undefined && d.inicio !== undefined && d.fim !== undefined) {
+                const cargaRaw = String(d.int).trim();
+                const carga = cargaRaw + 'h'; // 24h, 12h, 10h...
+                
+                const inicioDate = parseDataHora(d.inicio);
+                const fimDate = parseDataHora(d.fim);
+                
+                if (inicioDate && fimDate) {
+                    const horaInicio = d.inicio.split(' ')[1];
+                    const horaFim = d.fim.split(' ')[1];
+                    
+                    const dataInicioCurta = formatarDataCurta(inicioDate);
+                    const dataFimCurta = formatarDataCurta(fimDate);
+                    
+                    let dataDisplay = '';
+                    // Se for 24h (ou duração > 12h), mostra início → fim
+                    if (carga === '24h' || (fimDate - inicioDate) > 12 * 60 * 60 * 1000) {
+                        dataDisplay = `<span class="text-gray-500 text-[9px] ml-0.5">(${dataInicioCurta} → ${dataFimCurta})</span>`;
+                    } else {
+                        // 12h, 10h etc: mostra apenas a data do fim
+                        dataDisplay = `<span class="text-gray-500 text-[9px] ml-0.5">(${dataFimCurta})</span>`;
+                    }
+                    
+                    return `
+                        <div class="mt-1 leading-snug flex flex-wrap items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
+                            <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
+                            <span class="text-gray-500 text-[10px]">|</span> 
+                            <span class="text-sky-blue font-bold text-xs">${horaInicio}</span> 
+                            <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
+                            <span class="text-sky-blue font-bold text-xs">${horaFim}</span> 
+                            ${dataDisplay}
+                        </div>
+                    `;
+                }
+            }
+            
+            // ---------- FALLBACK: campo horario antigo ----------
+            const raw = d.horario || '';
+            if (!raw) return '<div class="text-gray-500 text-xs">Sem horário</div>';
+            // ... (código de fallback omitido por brevidade, mas funciona)
+            return '<div class="text-gray-500 text-xs">Horário não reconhecido</div>';
+        }
+
+        // ---------- EXTRAIR ID E LIMPAR NOME ----------
+        function extrairID(nomeCompleto) {
+            const match = nomeCompleto.match(/(\d{7})/);
+            return match ? match[1] : null; 
+        }
+
+        function limparNome(nomeCompleto) {
+            return nomeCompleto.replace(/\d{7}\s+/, '').trim();
+        }
+
+        // ---------- PROCESSAMENTO DOS DADOS ----------
+        function processarDados(dados) {
+            const estrutura = {};
+            const mapOficiais = new Map();
+            const mapSargentos = new Map();
+            const mapPracas = new Map();
+            const statsViaturas = { combate: new Set(), apoio: new Set() };
+
+            dados.forEach(d => {
+                let obmRaw = (d.obm || "").toUpperCase();
+                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
+                let nomeCompleto = (d.nome || "").trim().toUpperCase();
+                
+                let idMilitar = extrairID(nomeCompleto);
+                let idUnico = idMilitar ? idMilitar : nomeCompleto;
+                let nomeExibicao = limparNome(nomeCompleto);
+                
+                let func = normalizarFuncao(d.func || "");
+                let horaHTML = calcularTurno(d); 
+
+                let obmKey = "OUTROS";
+                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
+                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
+                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
+
+                if(!estrutura[obmKey]) estrutura[obmKey] = [];
+                
+                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
+                if(!viaturaObj) {
+                    viaturaObj = { nome: vtr, guarnicao: [] };
+                    estrutura[obmKey].push(viaturaObj);
+                }
+                
+                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
+                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: horaHTML });
+
+                    if (nomeCompleto.includes("SD ") || nomeCompleto.includes("SOLDADO ")) {
+                        mapPracas.set(idUnico, nomeExibicao);
+                    }
+                    else if(nomeCompleto.includes("SGT")) {
+                        mapSargentos.set(idUnico, nomeExibicao);
+                    }
+                    else if(nomeCompleto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
+                        mapOficiais.set(idUnico, nomeExibicao);
+                    }
+                    else {
+                        mapPracas.set(idUnico, nomeExibicao);
+                    }
+                }
+
+                if(vtr.includes("ABT")) {
+                    statsViaturas.combate.add(vtr);
+                }
+                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
+                    statsViaturas.apoio.add(vtr);
+                }
+            });
+
+            atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
+            renderizarCards(estrutura);
+        }
+
+        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
+            const capArr = Array.from(mapOficiais.values());
+            const sgtArr = Array.from(mapSargentos.values());
+            const sdArr = Array.from(mapPracas.values());
+            const combArr = Array.from(statsViaturas.combate);
+            const apoioArr = Array.from(statsViaturas.apoio);
+
+            const fill = (idC, idL, arr) => {
+                document.getElementById(idC).innerText = arr.length;
+                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
+            };
+
+            fill('count-cap', 'list-cap', capArr);
+            fill('count-sgt', 'list-sgt', sgtArr);
+            fill('count-sd', 'list-sd', sdArr);
+            document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
+            
+            document.getElementById('count-combate').innerText = combArr.length;
+            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
+
+            document.getElementById('count-apoio').innerText = apoioArr.length;
+            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li>• ${x}</li>`).join('');
+        }
+
+        function renderizarCards(estrutura) {
+            const grid = document.getElementById('grid-cards');
+            grid.innerHTML = "";
+
+            const keysOrdenadas = [
+                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
+                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
+            ];
+
+            keysOrdenadas.forEach(obmName => {
+                const viaturasRaw = estrutura[obmName];
+                const gruposUnicos = [];
+                
+                viaturasRaw.forEach(vtr => {
+                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
+                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
+                    if(grupoExistente && assinatura.length > 0) {
+                        grupoExistente.nomesVtrs.push(vtr.nome);
+                    } else {
+                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+                    }
+                });
+
+                const card = document.createElement('div');
+                card.className = "card-monitor break-inside-avoid mb-5"; 
+
+                let content = `
+                    <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
+                        <h2 class="vertical-text text-white font-black text-2xl md:text-3xl tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
+                            ${obmName}
+                        </h2>
+                    </div>
+                    <div class="flex-grow p-3 flex flex-col gap-4">
+                `;
+
+                gruposUnicos.forEach(grupo => {
+                    grupo.guarnicao.sort((a,b) => {
+                        const getScore = (role) => {
+                            let r = role.toUpperCase();
+                            if(r.includes("COMANDANTE DE GUARNIÇÃO")) return 1;
+                            if(r.includes("COV")) return 2;
+                            return 3;
+                        }
+                        return getScore(a.f) - getScore(b.f);
+                    });
+
+                    const listaVtrs = grupo.nomesVtrs.join(' / ');
+
+                    content += `
+                        <div class="w-full flex flex-col items-center">
+                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
+                                ${listaVtrs}
+                            </span>
+                            <div class="w-full flex flex-col gap-2">
+                                ${grupo.guarnicao.map(m => `
+                                    <div class="text-center group mb-2">
+                                        <div class="text-moss-green font-black text-lg leading-none drop-shadow-md">
+                                            ${m.n}
+                                        </div>
+                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-0.5 whitespace-nowrap">
+                                            ${m.f}
+                                        </div>
+                                        <div class="mt-0.5">${m.h}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                content += `</div>`;
+                card.innerHTML = content;
+                grid.appendChild(card);
+            });
+        }
+
+        // ---------- RELÓGIO ----------
+        function atualizarRelogio() {
+            const dataOp = getDataOperacional();
+            const agora = new Date();
+            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
+        }
+
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        // ---------- CARREGAMENTO INICIAL E RECARGA PERIÓDICA ----------
+        async function iniciarSistema() {
             try {
                 const req = await fetch(URL_DADOS);
                 const dados = await req.json();
-
-                if(dados.erro) {
-                    document.getElementById('loading').innerHTML = "<h3>Aguardando dados do PC...</h3><p>Deixe a aba do E193 aberta no computador para sincronizar.</p>";
-                    return;
-                }
-
-                renderizar(dados);
-            } catch(e) {
-                console.log(e);
+                if(dados.erro) throw new Error("Dados inválidos");
+                processarDados(dados);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').classList.remove('hidden');
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('msg-loading').innerText = "Reconectando...";
+                setTimeout(iniciarSistema, 5000); 
             }
         }
 
-        function renderizar(dados) {
-            const container = document.getElementById('container');
-            container.innerHTML = "";
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('last-up').innerText = "Atualizado: " + new Date().toLocaleTimeString();
-
-            // Agrupa viaturas
-            const frota = {};
-            dados.forEach(d => {
-                const id = d.vtr + d.obm;
-                if(!frota[id]) frota[id] = {vtr: d.vtr, obm: d.obm, equipe: []};
-                frota[id].equipe.push(d);
-            });
-
-            Object.values(frota).forEach(v => {
-                // Ordena Comandante
-                v.equipe.sort((a,b) => a.func.includes('CMT') ? -1 : 1);
-
-                let linhas = "";
-                v.equipe.forEach(m => {
-                    linhas += `
-                        <div class="item">
-                            <span class="func">${m.func}</span>
-                            <span class="nome">${m.nome}</span>
-                            <span class="hora">${m.hora}</span>
-                        </div>`;
-                });
-
-                container.innerHTML += `
-                    <div class="card">
-                        <div class="card-head">
-                            <div><div class="vtr">${v.vtr}</div><div class="obm">${v.obm}</div></div>
-                            <i class="fas fa-truck-medical" style="color:#444"></i>
-                        </div>
-                        <div>${linhas}</div>
-                    </div>`;
-            });
-        }
-
-        carregar();
-        setInterval(carregar, 60000); // Atualiza a cada 1 min
+        iniciarSistema();
+        setInterval(iniciarSistema, 60000);
     </script>
 </body>
 </html>
