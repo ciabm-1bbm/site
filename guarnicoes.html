@@ -195,7 +195,7 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO
+        // ---------- CONFIGURAÇÃO ----------
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
 
         const ORDEM_QUARTEIS = [
@@ -204,8 +204,10 @@
             "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
 
+        // ---------- FUNÇÕES AUXILIARES ----------
         function getDataOperacional() {
             const agora = new Date();
+            // Antes das 08:00, considera o dia anterior como o "dia operacional"
             if (agora.getHours() < 8) {
                 agora.setDate(agora.getDate() - 1);
             }
@@ -218,21 +220,16 @@
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        // TRADUTOR DE FUNÇÕES
+        // ---------- NORMALIZAÇÃO DE FUNÇÃO ----------
         function normalizarFuncao(funcRaw) {
             if(!funcRaw) return "";
             const f = funcRaw.toUpperCase();
-
-            // Limpeza
             let limpa = f.replace(/\bND\b/g, '')
                          .replace(/\d+º\s*\d+/g, '') 
                          .replace(/\b\d+\b/g, '')    
                          .replace(/[-]/g, '')
                          .trim();
-
             if(limpa === "") return "";
-
-            // Padronização
             if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA")) return "COV";
             if(limpa.includes("CMT") || limpa.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
             if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "LINHA (CHEFE)";
@@ -243,72 +240,106 @@
             if(limpa.includes("CINO") || limpa.includes("CANIL")) return "CINOTÉCNICO";
             if(limpa.includes("MOTORISTA") && limpa.includes("DIA")) return "MOTORISTA DE DIA";
             if(limpa.includes("OFICIAL") && limpa.includes("SERVIÇO")) return "OFICIAL DE SERVIÇO";
-
             return limpa; 
         }
 
-        // CALCULADORA DE TURNO V3
+        // ---------- 🚀 NOVA FUNÇÃO CALCULAR TURNO (CORRIGIDA) ----------
         function calcularTurno(raw) {
-            if(!raw) return "";
-
-            try {
-                const horasMatch = raw.match(/(\d{2}:\d{2})/g);
-                if (!horasMatch || horasMatch.length === 0) return "";
-
-                const dataOp = getDataOperacional();
-                const hoje = new Date(dataOp);
-                const amanha = new Date(dataOp);
-                amanha.setDate(amanha.getDate() + 1);
-
-                let hInicio = "08:00";
-                let hFim = "08:00";
-                let dInicio = hoje;
-                let dFim = amanha; 
-                let carga = "24h";
-
-                if (horasMatch.length === 1) {
-                    const horaUnica = horasMatch[0];
-                    if (horaUnica === "20:00") {
-                        hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
+            if (!raw) return '<div class="text-gray-500 text-xs">Sem horário</div>';
+            
+            // Regex que captura HH:MM ou HHhMM (aceita 8:00, 08:00, 8h00, 08h00)
+            const regexHora = /(\d{1,2})[:h](\d{2})/g;
+            const horasMatch = [...raw.matchAll(regexHora)];
+            
+            if (!horasMatch || horasMatch.length === 0) {
+                // Fallback: exibe o texto bruto para depuração
+                return `<div class="text-gray-500 text-xs">${raw}</div>`;
+            }
+            
+            // Normaliza para o formato HH:MM
+            const normalizar = (match) => {
+                const h = match[1].padStart(2, '0');
+                const m = match[2];
+                return `${h}:${m}`;
+            };
+            
+            const horarios = horasMatch.map(m => normalizar(m));
+            
+            const dataOp = getDataOperacional();
+            const hoje = new Date(dataOp);
+            const amanha = new Date(dataOp);
+            amanha.setDate(amanha.getDate() + 1);
+            
+            let hInicio, hFim;
+            let dInicio = hoje;
+            let dFim;
+            let carga;
+            
+            // ----- LÓGICA DE INTERPRETAÇÃO DO TURNO -----
+            if (horarios.length === 1) {
+                // Apenas um horário: assume turno de 24h começando naquele horário
+                hInicio = horarios[0];
+                hFim = hInicio;
+                dFim = amanha;
+                carga = '24h';
+            } else {
+                // Dois ou mais horários: usa o primeiro como início, segundo como fim
+                hInicio = horarios[0];
+                hFim = horarios[1];
+                
+                if (hInicio === hFim) {
+                    dFim = amanha;
+                    carga = '24h';
+                } else if (hInicio === '08:00' && hFim === '20:00') {
+                    dFim = hoje;
+                    carga = '12h';
+                } else if (hInicio === '20:00' && hFim === '08:00') {
+                    dFim = amanha;
+                    carga = '12h';
+                } else {
+                    // Calcula diferença em minutos
+                    const [h1, m1] = hInicio.split(':').map(Number);
+                    const [h2, m2] = hFim.split(':').map(Number);
+                    let inicioMin = h1 * 60 + m1;
+                    let fimMin = h2 * 60 + m2;
+                    if (fimMin <= inicioMin) fimMin += 24 * 60;
+                    const diffHoras = (fimMin - inicioMin) / 60;
+                    
+                    if (diffHoras > 12) {
+                        dFim = amanha;
+                        carga = '24h';
                     } else {
-                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
+                        dFim = hoje;
+                        carga = '12h';
                     }
                 }
-                else if (horasMatch.length >= 2) {
-                    hInicio = horasMatch[0];
-                    hFim = horasMatch[1]; 
-                    if (hInicio === hFim) {
-                        dFim = amanha; carga = "24h";
-                    } else if (hInicio === "08:00" && hFim === "20:00") {
-                        dFim = hoje; carga = "12h";
-                    } else if (hInicio === "20:00" && hFim === "08:00") {
-                        dFim = amanha; carga = "12h";
-                    } else {
-                        const h1 = parseInt(hInicio.split(':')[0]);
-                        const h2 = parseInt(hFim.split(':')[0]);
-                        if (h2 < h1) dFim = amanha; else dFim = hoje;
-                        let diff = h2 - h1; if(diff < 0) diff += 24;
-                        carga = diff > 12 ? "24h" : "12h";
-                    }
-                }
-
-                const strDataIni = formatarDataCurta(dInicio);
-                const strDataFim = formatarDataCurta(dFim);
-
-                return `
-                    <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                        <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
-                        <span class="text-gray-500 text-[10px]">|</span> 
-                        <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
-                        <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                        <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
-                        <span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>
-                    </div>
-                `;
-
-            } catch(e) { console.error(e); return ""; }
+            }
+            
+            const strDataInicio = formatarDataCurta(dInicio);
+            const strDataFim = formatarDataCurta(dFim);
+            
+            // Montagem do HTML do turno com datas explícitas
+            let dataDisplay = '';
+            if (carga === '24h') {
+                dataDisplay = `<span class="text-gray-500 text-[9px] ml-0.5">(${strDataInicio} → ${strDataFim})</span>`;
+            } else {
+                // 12h: mostra apenas a data do fim (já que início é no próprio dia operacional)
+                dataDisplay = `<span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>`;
+            }
+            
+            return `
+                <div class="mt-1 leading-snug flex flex-wrap items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
+                    <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
+                    <span class="text-gray-500 text-[10px]">|</span> 
+                    <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
+                    <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
+                    <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
+                    ${dataDisplay}
+                </div>
+            `;
         }
 
+        // ---------- EXTRAIR ID E LIMPAR NOME ----------
         function extrairID(nomeCompleto) {
             const match = nomeCompleto.match(/(\d{7})/);
             return match ? match[1] : null; 
@@ -318,6 +349,7 @@
             return nomeCompleto.replace(/\d{7}\s+/, '').trim();
         }
 
+        // ---------- PROCESSAMENTO DOS DADOS ----------
         function processarDados(dados) {
             const estrutura = {};
             const mapOficiais = new Map();
@@ -335,6 +367,7 @@
                 let nomeExibicao = limparNome(nomeCompleto);
                 
                 let func = normalizarFuncao(d.func || "");
+                // Agora usamos a função melhorada
                 let horaHTML = calcularTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
@@ -489,6 +522,7 @@
             });
         }
 
+        // ---------- RELÓGIO ----------
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
@@ -499,6 +533,7 @@
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
+        // ---------- CARREGAMENTO INICIAL E RECARGA PERIÓDICA ----------
         async function iniciarSistema() {
             try {
                 const req = await fetch(URL_DADOS);
@@ -515,7 +550,7 @@
         }
 
         iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
+        setInterval(iniciarSistema, 60000); // atualização a cada 1 minuto
     </script>
 </body>
 </html>
