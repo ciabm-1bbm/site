@@ -107,7 +107,6 @@
             }
         }
         
-        /* Botão do ano */
         .year-select-btn {
             background: rgba(30, 41, 59, 0.9);
             border: 2px solid #10b981;
@@ -138,7 +137,6 @@
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
         }
         
-        /* Botão anual estilizado */
         .btn-anual {
             background: rgba(30, 41, 59, 0.9);
             border: 2px solid #eab308;
@@ -168,7 +166,6 @@
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
         }
         
-        /* Estilo para o ícone do seletor de ano */
         .year-select-wrapper {
             position: relative;
             display: inline-block;
@@ -204,7 +201,6 @@
             background: rgba(148, 163, 184, 0.9);
         }
         
-        /* Gradiente para pelotões */
         .pelotao-gradient-0 { background-color: #065f46; }
         .pelotao-gradient-1 { background-color: #047857; }
         .pelotao-gradient-2 { background-color: #059669; }
@@ -377,7 +373,6 @@
             "TROTE": { c: "#A78BFA", i: "🎭", cl: "text-purple-400", bg: "rgba(167, 139, 250, 0.8)" }
         };
 
-        // Mapeamento de pelotões simplificados
         const PELOTAO_SIMPLIFICADO = {
             "BBS (POA) - MERGULHO": "BBS / MERGULHO",
             "BBS (POA) - CANIL": "BBS / CANIL",
@@ -406,36 +401,36 @@
         const getChartConfig = () => {
             if (isMobile()) {
                 return {
-                    barThickness: 18,
-                    categoryPercentage: 0.85,
+                    barThickness: 16,
+                    categoryPercentage: 0.8,
                     fontSize: 10,
                     tickPadding: 5,
                     datalabelsSize: 9,
-                    subBarThickness: 8,
-                    subSpacing: 0.6, // Reduzido para menos espaçamento
-                    subItemHeight: 22 // Reduzido para menos entrelinha
+                    subBarThickness: 7,
+                    subSpacing: 0.6,
+                    subItemHeight: 22
                 };
             } else if (isTablet()) {
                 return {
-                    barThickness: 22,
-                    categoryPercentage: 0.85,
+                    barThickness: 18,
+                    categoryPercentage: 0.8,
                     fontSize: 11,
                     tickPadding: 8,
                     datalabelsSize: 10,
-                    subBarThickness: 10,
-                    subSpacing: 0.65, // Reduzido
-                    subItemHeight: 26 // Reduzido
+                    subBarThickness: 9,
+                    subSpacing: 0.65,
+                    subItemHeight: 26
                 };
             } else {
                 return {
-                    barThickness: 25,
-                    categoryPercentage: 0.85,
+                    barThickness: 20,
+                    categoryPercentage: 0.8,
                     fontSize: 12,
                     tickPadding: 10,
                     datalabelsSize: 11,
-                    subBarThickness: 12,
-                    subSpacing: 0.7, // Reduzido
-                    subItemHeight: 30 // Reduzido
+                    subBarThickness: 11,
+                    subSpacing: 0.7,
+                    subItemHeight: 30
                 };
             }
         };
@@ -448,7 +443,6 @@
                 Chart.defaults.font.size = getChartConfig().fontSize;
                 Chart.register(ChartDataLabels);
                 
-                // Criar botões dos meses
                 const container = document.getElementById('monthContainer');
                 CONFIG.months.forEach((m, i) => {
                     const btn = document.createElement('button');
@@ -459,7 +453,6 @@
                     container.appendChild(btn);
                 });
 
-                // Event listeners
                 document.getElementById('yearSelect').addEventListener('change', (e) => {
                     Core.setYear(parseInt(e.target.value));
                 });
@@ -637,10 +630,9 @@
                 const colLat = findKey(['lat', 'latitude']);
                 const colLon = findKey(['lon', 'long', 'longitude']);
                 
-                // Procurar por coluna "Nº Oc." (número de ocorrência de 6 dígitos)
                 let colBA = null;
                 
-                // Primeiro, procurar por padrão exato
+                // Procura pela coluna "Nº Oc." ou números de 6 dígitos
                 for (const key of keys) {
                     if (key.toLowerCase().includes('nº oc') || key.toLowerCase().includes('numero oc') || 
                         key.toLowerCase().includes('num oc') || key.toLowerCase().includes('n oc')) {
@@ -649,7 +641,6 @@
                     }
                 }
                 
-                // Se não encontrar, procurar por números de 6 dígitos
                 if (!colBA) {
                     for (const key of keys) {
                         const value = firstRow[key];
@@ -660,7 +651,6 @@
                     }
                 }
                 
-                // Se ainda não encontrou, tentar padrões comuns
                 if (!colBA) {
                     colBA = findKey(['ba', 'numero', 'num', 'relatorio', 'protocolo', 'ocorrencia']);
                 }
@@ -685,7 +675,7 @@
                     else if(natureza.includes("PRODUTO") && natureza.includes("PERIGOSO")) natureza = "PRODUTOS PERIGOSOS";
                     else if(natureza.includes("TROTE")) natureza = "TROTE";
                     
-                    // Corrigir o nome do pelotão PASSO D'AREIA
+                    // Corrigir PASSO D'AREIA
                     if (pelotao.includes("PASSO") || pelotao.includes("PASSO D'AREIA") || pelotao.includes("2ª 2º")) {
                         pelotao = "PASSO D'AREIA";
                     } else if (viatura.includes("AR") || pelotao.includes("RESGATE") || pelotao.includes("GBS")) {
@@ -697,12 +687,18 @@
                             }
                         });
                     }
+
+                    // --- FILTRO: cidades que devem ser omitidas do gráfico (viram OUTROS) ---
+                    const cidadesExcluir = ["CACHOEIRINHA", "CANOAS", "CAXIAS DO SUL", "CAXIAS"];
+                    if (cidadesExcluir.some(cidade => pelotao.includes(cidade))) {
+                        pelotao = "OUTROS";
+                    }
+                    // -----------------------------------------------------------------------
                     
-                    // Simplificar nomes de pelotões especiais
+                    // Simplificar pelotões especiais
                     if (PELOTAO_SIMPLIFICADO[pelotao]) {
                         pelotao = PELOTAO_SIMPLIFICADO[pelotao];
                     } else if (!CONFIG.poa.includes(pelotao) && pelotao) {
-                        // Procurar por padrões nos mapeamentos
                         for (const [key, value] of Object.entries(PELOTAO_SIMPLIFICADO)) {
                             if (pelotao.includes(key.replace(" (POA)", ""))) {
                                 pelotao = value;
@@ -710,7 +706,6 @@
                             }
                         }
                         
-                        // Limpar nome do pelotão
                         pelotao = pelotao.replace("1º BBM / ", "")
                                         .replace("CIA / ", "")
                                         .replace("PEL / ", "")
@@ -723,7 +718,6 @@
                         if (pelotao.length <= 2) pelotao = "OUTROS";
                     }
                     
-                    // Corrigir AQUÁTICO para AQUÁTICA
                     if (pelotao.includes("AQUÁTICO")) {
                         pelotao = pelotao.replace("AQUÁTICO", "AQUÁTICA");
                     }
@@ -909,7 +903,6 @@
                 let barPercentage;
 
                 if (type === 'pel') {
-                    // Definir quais pelotões são POA (verde) e quais são outros (cinza)
                     const isPoaPelotao = (label) => {
                         return CONFIG.poa.includes(label) || label === "PASSO D'AREIA";
                     };
@@ -918,7 +911,6 @@
                         return label.includes("BBS") || label.includes("AODC") || label.includes("COBOM") || label.includes("8º BBM");
                     };
                     
-                    // Para os pelotões POA, aplicar gradiente por ranking
                     const poaItems = data.filter(item => isPoaPelotao(item[0]));
                     const sortedPoa = [...poaItems].sort((a, b) => b[1] - a[1]);
                     const poaRanking = {};
@@ -936,23 +928,20 @@
                             );
                             return GREEN_GRADIENTS[gradientIndex];
                         }
-                        // BBS e outros em cinza
                         return '#64748B';
                     });
                     
                     tickColors = labels.map(label => {
-                        if (isPoaPelotao(label)) return '#10B981'; // Verde para POA
-                        if (isBBS(label)) return '#94a3b8'; // Cinza para BBS
-                        return '#94a3b8'; // Cinza para outros
+                        if (isPoaPelotao(label)) return '#10B981';
+                        if (isBBS(label)) return '#94a3b8';
+                        return '#94a3b8';
                     });
                     
-                    // Mesmo espaçamento do gráfico de natureza
                     barThickness = config.barThickness;
                     categoryPercentage = config.categoryPercentage;
-                    barPercentage = 0.8;
+                    barPercentage = 0.7; // mais espaçamento entre barras
                     
                 } else if (type === 'nat') {
-                    // Para natureza: ícones no final
                     const newLabels = data.map(item => {
                         const style = STYLES[item[0]] || { i: "⚠️" };
                         return `${item[0]} ${style.i}`;
@@ -987,14 +976,12 @@
                     barPercentage = 0.8;
                     
                 } else if (type === 'sub') {
-                    // Para subgrupos: cor da natureza correspondente
                     backgroundColors = data.map(item => {
                         const nat = item[0].split(' - ')[0];
                         const style = STYLES[nat] || { bg: 'rgba(100, 116, 139, 0.8)' };
                         return style.bg;
                     });
                     
-                    // Para subgrupos: cor da fonte da natureza correspondente
                     tickColors = data.map(item => {
                         const nat = item[0].split(' - ')[0];
                         const style = STYLES[nat] || { cl: '#94a3b8', i: "⚠️" };
@@ -1014,7 +1001,6 @@
                         return colorMap[colorClass] || '#94A3B8';
                     });
                     
-                    // Ajustar labels para incluir ícones no final
                     labels = data.map((item) => {
                         const nat = item[0].split(' - ')[0];
                         const sub = item[0].split(' - ')[1] || '';
@@ -1027,16 +1013,14 @@
                         return `${displaySub} ${style.i}`;
                     });
                     
-                    // Ajustar altura do container do gráfico com base no número de itens (MENOS espaçamento)
                     const container = document.getElementById('subChartContainer');
                     const minHeight = isMobile() ? 380 : isTablet() ? 420 : 480;
-                    const itemHeight = config.subItemHeight; // Usando valor configurado (menor)
+                    const itemHeight = config.subItemHeight;
                     const calculatedHeight = Math.max(minHeight, data.length * itemHeight);
                     container.style.height = `${calculatedHeight}px`;
                     
-                    // Barras mais finas e mais próximas
                     barThickness = config.subBarThickness;
-                    categoryPercentage = config.subSpacing; // Menos espaçamento
+                    categoryPercentage = config.subSpacing;
                     barPercentage = 0.6;
                 } else {
                     backgroundColors = '#60A5FA';
@@ -1065,6 +1049,11 @@
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                right: 50
+                            }
+                        },
                         plugins: {
                             legend: { display: false },
                             tooltip: {
@@ -1130,13 +1119,18 @@
                                         family: "'ui-monospace', monospace",
                                         weight: type === 'sub' ? 'bold' : 'normal'
                                     },
-                                    padding: type === 'sub' ? 6 : config.tickPadding, // Menos padding
+                                    padding: type === 'sub' ? 6 : config.tickPadding,
                                 }
                             }
                         },
                         interaction: {
-                            intersect: false,
-                            mode: 'index'
+                            mode: 'nearest',
+                            intersect: true,
+                            axis: 'y'
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
                         },
                         animation: {
                             duration: 500,
