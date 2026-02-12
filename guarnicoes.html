@@ -16,7 +16,8 @@
                         'fire-red': '#DC2626',
                         'moss-green': '#9BE36D',
                         'total-green': '#4ade80',
-                        'sky-blue': '#38bdf8' 
+                        'sky-blue': '#38bdf8',
+                        'card-hover': 'rgba(255, 140, 0, 0.1)'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -30,38 +31,93 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        body { 
+            background-color: #0f172a; 
+            color: white; 
+            overflow-x: hidden; 
+            font-family: 'Inter', sans-serif; 
+        }
         
-        .hero-background { position: relative; min-height: 100vh; }
+        .hero-background { 
+            position: relative; 
+            min-height: 100vh; 
+        }
+        
         .hero-background::before { 
-            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+            content: ''; 
+            position: fixed; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            top: 0;
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center; background-repeat: no-repeat; background-size: 500px;
-            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-size: 500px;
+            z-index: 0; 
+            opacity: 0.1; 
+            filter: grayscale(100%); 
+            pointer-events: none; 
         }
+        
         .hero-background::after {
-            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            content: ''; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
             background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
-            z-index: 1; pointer-events: none;
+            z-index: 1; 
+            pointer-events: none;
         }
-        .content-wrapper { position: relative; z-index: 10; }
+        
+        .content-wrapper { 
+            position: relative; 
+            z-index: 10; 
+        }
 
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             break-inside: avoid;
             page-break-inside: avoid;
             display: flex; 
             overflow: hidden;
-            min-height: 140px; 
+            min-height: 140px;
+            position: relative;
         }
+
+        /* Efeito de brilho ao passar o mouse no card principal */
+        .card-monitor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 140, 0, 0.15),
+                transparent 40%
+            );
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .card-monitor:hover::before {
+            opacity: 1;
+        }
+
         .card-monitor:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-            background: rgba(30, 41, 59, 0.98);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 140, 0, 0.3);
+            background: rgba(30, 41, 59, 0.95);
             border-color: rgba(255, 140, 0, 0.5);
             z-index: 50;
         }
@@ -71,6 +127,7 @@
             transform: rotate(180deg);
             text-align: center;
             white-space: nowrap;
+            z-index: 2;
         }
 
         .stats-container {
@@ -82,54 +139,161 @@
         }
 
         .tooltip-box {
-            visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
-            width: max-content; min-width: 150px; z-index: 100; transition: 0.2s; pointer-events: none;
-            box-shadow: 0 10px 40px black; margin-top: 10px;
+            visibility: hidden; 
+            opacity: 0; 
+            position: absolute; 
+            top: 100%; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.95); 
+            border: 1px solid #FF8C00; 
+            padding: 12px 15px; 
+            border-radius: 8px;
+            width: max-content; 
+            min-width: 200px; 
+            max-width: 300px;
+            z-index: 100; 
+            transition: all 0.3s ease; 
+            pointer-events: none;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8); 
+            margin-top: 10px;
+            backdrop-filter: blur(10px);
         }
-        .group:hover .tooltip-box { visibility: visible; opacity: 1; }
+        
+        .group:hover .tooltip-box { 
+            visibility: visible; 
+            opacity: 1; 
+            transform: translateX(-50%) translateY(5px);
+        }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
+        /* Estilo para as listas de tooltip */
+        .tooltip-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tooltip-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .tooltip-posto {
+            color: #FFD700 !important;
+            font-weight: 900 !important;
+            font-size: 13px !important;
+            text-transform: uppercase !important;
+            margin-bottom: 2px !important;
+        }
+        
+        .tooltip-funcao {
+            color: #ffffff !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            opacity: 0.9 !important;
+        }
 
-        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        ::-webkit-scrollbar { 
+            width: 4px; 
+        }
+        
+        ::-webkit-scrollbar-thumb { 
+            background: #FF8C00; 
+            border-radius: 2px; 
+        }
 
-        /* ========== NOVOS ESTILOS ========== */
+        #loading { 
+            position: fixed; 
+            inset: 0; 
+            background: #0f172a; 
+            z-index: 9999; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column; 
+        }
+
+        /* ========== ESTILOS DOS MILITARES ========== */
         .militar-nome {
             color: white !important;
             font-weight: 900 !important;
-            font-size: 20px !important;
+            font-size: 18px !important;
             text-transform: uppercase !important;
-            letter-spacing: -0.5px !important;
+            letter-spacing: -0.3px !important;
             line-height: 1.1 !important;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.7) !important;
-            margin-bottom: 2px !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7) !important;
+            margin-bottom: 4px !important;
         }
 
         .militar-funcao {
             color: #FFD700 !important;
-            font-weight: 700 !important;
-            font-size: 11px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1.5px !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            text-transform: none !important;
+            letter-spacing: 0.5px !important;
             background: rgba(255, 140, 0, 0.15) !important;
-            padding: 3px 8px !important;
+            padding: 4px 10px !important;
             border-radius: 12px !important;
             border: 1px solid rgba(255, 140, 0, 0.3) !important;
             display: inline-block !important;
-            margin: 2px 0 !important;
+            margin: 2px 0 8px 0 !important;
         }
 
+        /* Efeito de brilho no card interno do militar */
+        .militar-container {
+            margin-bottom: 12px !important;
+            padding: 12px !important;
+            background: rgba(30, 41, 59, 0.5) !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .militar-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                200px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 140, 0, 0.1),
+                transparent 40%
+            );
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .militar-container:hover::before {
+            opacity: 1;
+        }
+
+        .militar-container:hover {
+            background: rgba(30, 41, 59, 0.85) !important;
+            border-color: rgba(255, 140, 0, 0.4) !important;
+            transform: translateY(-3px) scale(1.02) !important;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 140, 0, 0.2) !important;
+        }
+
+        /* Estilo do turno - Melhorado */
         .turno-display {
-            background: rgba(15, 23, 42, 0.8) !important;
-            border: 1px solid rgba(56, 189, 248, 0.3) !important;
-            border-radius: 8px !important;
-            padding: 6px 10px !important;
-            margin-top: 5px !important;
+            background: rgba(15, 23, 42, 0.9) !important;
+            border: 1px solid rgba(56, 189, 248, 0.4) !important;
+            border-radius: 10px !important;
+            padding: 8px 12px !important;
+            margin-top: 8px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 8px !important;
+            gap: 10px !important;
             flex-wrap: wrap !important;
         }
 
@@ -142,41 +306,37 @@
         .turno-horas {
             color: #38bdf8 !important;
             font-weight: 700 !important;
+            font-size: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+        }
+
+        .turno-data {
+            color: #9CA3AF !important;
             font-size: 11px !important;
+            font-weight: 600 !important;
             display: flex !important;
             align-items: center !important;
             gap: 4px !important;
         }
 
-        .turno-data {
-            color: #9CA3AF !important;
-            font-size: 10px !important;
-            font-weight: 600 !important;
-        }
-
-        .militar-container {
-            margin-bottom: 15px !important;
-            padding: 12px !important;
-            background: rgba(30, 41, 59, 0.5) !important;
-            border-radius: 10px !important;
-            border: 1px solid rgba(255, 255, 255, 0.05) !important;
-            transition: all 0.2s ease !important;
-        }
-
-        .militar-container:hover {
-            background: rgba(30, 41, 59, 0.8) !important;
-            border-color: rgba(255, 140, 0, 0.2) !important;
-            transform: translateY(-2px) !important;
-        }
-
         .grupo-viatura {
             margin-bottom: 20px !important;
             padding: 15px !important;
-            background: rgba(15, 23, 42, 0.6) !important;
+            background: rgba(15, 23, 42, 0.7) !important;
             border-radius: 12px !important;
-            border: 1px solid rgba(255, 215, 0, 0.1) !important;
+            border: 1px solid rgba(255, 215, 0, 0.15) !important;
+            transition: all 0.3s ease !important;
+            position: relative;
         }
 
+        .grupo-viatura:hover {
+            border-color: rgba(255, 215, 0, 0.3) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+        }
+
+        /* Destaques para funções específicas */
         .militar-funcao[class*="COMANDANTE"] {
             background: linear-gradient(135deg, rgba(255, 140, 0, 0.3), rgba(220, 38, 38, 0.3)) !important;
             color: #FFD700 !important;
@@ -191,14 +351,20 @@
             border-color: #38bdf8 !important;
         }
 
+        .militar-funcao[class*="OFICIAL"] {
+            background: rgba(255, 215, 0, 0.2) !important;
+            color: #FFD700 !important;
+            border-color: #FFD700 !important;
+        }
+
         @media (max-width: 768px) {
             .militar-nome {
-                font-size: 18px !important;
+                font-size: 16px !important;
             }
             
             .militar-funcao {
-                font-size: 10px !important;
-                padding: 2px 6px !important;
+                font-size: 11px !important;
+                padding: 3px 8px !important;
             }
             
             .card-monitor {
@@ -212,6 +378,11 @@
                 width: 100% !important;
                 text-align: center !important;
                 font-size: 1.5rem !important;
+            }
+            
+            .turno-display {
+                padding: 6px 8px !important;
+                gap: 6px !important;
             }
         }
     </style>
@@ -263,17 +434,26 @@
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
-                            <div class="tooltip-box"><ul id="list-cap" class="text-xs text-left text-gray-300"></ul></div>
+                            <div class="tooltip-box">
+                                <div class="text-xs font-bold text-bombeiros-orange mb-2 uppercase">OFICIAIS ESCALADOS</div>
+                                <ul id="list-cap" class="text-left"></ul>
+                            </div>
                         </div>
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
-                            <div class="tooltip-box"><ul id="list-sgt" class="text-xs text-left text-gray-300"></ul></div>
+                            <div class="tooltip-box">
+                                <div class="text-xs font-bold text-bombeiros-yellow mb-2 uppercase">SARGENTOS ESCALADOS</div>
+                                <ul id="list-sgt" class="text-left"></ul>
+                            </div>
                         </div>
                         <div class="group relative text-center cursor-help">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
-                            <div class="tooltip-box"><ul id="list-sd" class="text-xs text-left text-gray-300"></ul></div>
+                            <div class="tooltip-box">
+                                <div class="text-xs font-bold text-blue-400 mb-2 uppercase">SOLDADOS ESCALADOS</div>
+                                <ul id="list-sd" class="text-left"></ul>
+                            </div>
                         </div>
                         <div class="w-px h-10 bg-white/10 mx-2"></div>
                         <div class="group relative text-center">
@@ -324,6 +504,37 @@
             "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
             "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
+
+        // FUNÇÃO PARA CAPITALIZAR FUNÇÃO (Primeira letra maiúscula)
+        function capitalizarFuncao(func) {
+            if (!func) return "";
+            
+            // Lista de palavras que devem ficar em minúsculo
+            const palavrasMenores = ['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'para', 'com', 'por', 'sem', 'a', 'o', 'as', 'os'];
+            
+            return func.toLowerCase()
+                .split(' ')
+                .map((palavra, index) => {
+                    // Tratamento especial para abreviações
+                    if (palavra === 'sv') return 'SV';
+                    if (palavra === 'cov') return 'COV';
+                    if (palavra === 'cmt') return 'CMT';
+                    if (palavra === 'aph') return 'APH';
+                    if (palavra === 'abt') return 'ABT';
+                    if (palavra === 'aem') return 'AEM';
+                    if (palavra === 'ar') return 'AR';
+                    if (palavra === 'at') return 'AT';
+                    
+                    // Se for palavra menor e não for a primeira palavra, mantém minúscula
+                    if (index > 0 && palavrasMenores.includes(palavra)) {
+                        return palavra;
+                    }
+                    
+                    // Capitaliza primeira letra
+                    return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+                })
+                .join(' ');
+        }
 
         function getDataOperacional() {
             const agora = new Date();
@@ -411,6 +622,7 @@
                     }
                 }
 
+                const strDataIni = formatarDataCurta(dInicio);
                 const strDataFim = formatarDataCurta(dFim);
 
                 return `
@@ -441,9 +653,19 @@
             return nomeCompleto.replace(/\d{7}\s+/, '').trim();
         }
 
+        // EXTRAIR POSTO/GRADUAÇÃO DO NOME
+        function extrairPosto(nomeCompleto) {
+            const nome = nomeCompleto.toUpperCase();
+            if (nome.match(/\b(CEL|TC|MAJ|CAP|TEN|ASP|SUB|SGT|SD|CB)\b/)) {
+                const match = nome.match(/\b(CEL|TC|MAJ|CAP|TEN|ASP|SUB|SGT|SD|CB)\b/);
+                return match[0];
+            }
+            return "";
+        }
+
         function processarDados(dados) {
             const estrutura = {};
-            const mapOficiais = new Map();
+            const mapOficiais = new Map(); // Armazena { nome, funcao, posto }
             const mapSargentos = new Map();
             const mapPracas = new Map();
             const statsViaturas = { combate: new Set(), apoio: new Set() };
@@ -456,9 +678,11 @@
                 let idMilitar = extrairID(nomeCompleto);
                 let idUnico = idMilitar ? idMilitar : nomeCompleto;
                 let nomeExibicao = limparNome(nomeCompleto);
+                let posto = extrairPosto(nomeCompleto);
                 
                 let func = normalizarFuncao(d.func || "");
                 let horaHTML = calcularTurno(d.horario || ""); 
+                let funcaoFormatada = capitalizarFuncao(func);
 
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
@@ -484,19 +708,25 @@
                 }
                 
                 if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: horaHTML });
+                    viaturaObj.guarnicao.push({ 
+                        f: funcaoFormatada, 
+                        n: nomeExibicao, 
+                        id: idUnico, 
+                        h: horaHTML,
+                        p: posto 
+                    });
 
                     if (nomeCompleto.includes("SD ") || nomeCompleto.includes("SOLDADO ")) {
-                        mapPracas.set(idUnico, nomeExibicao);
+                        mapPracas.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
                     }
                     else if(nomeCompleto.includes("SGT")) {
-                        mapSargentos.set(idUnico, nomeExibicao);
+                        mapSargentos.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
                     }
                     else if(nomeCompleto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
-                        mapOficiais.set(idUnico, nomeExibicao);
+                        mapOficiais.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
                     }
                     else {
-                        mapPracas.set(idUnico, nomeExibicao);
+                        mapPracas.set(idUnico, { nome: nomeExibicao, funcao: funcaoFormatada, posto: posto });
                     }
                 }
 
@@ -521,7 +751,13 @@
 
             const fill = (idC, idL, arr) => {
                 document.getElementById(idC).innerText = arr.length;
-                document.getElementById(idL).innerHTML = arr.map(x => `<li>• ${x}</li>`).join('');
+                const listElement = document.getElementById(idL);
+                listElement.innerHTML = arr.map(item => 
+                    `<li class="tooltip-item">
+                        <span class="tooltip-posto">${item.posto} ${item.nome}</span>
+                        <span class="tooltip-funcao">${item.funcao}</span>
+                    </li>`
+                ).join('');
             };
 
             fill('count-cap', 'list-cap', capArr);
@@ -577,7 +813,8 @@
                             let r = role.toUpperCase();
                             if(r.includes("COMANDANTE DE GUARNIÇÃO")) return 1;
                             if(r.includes("COV")) return 2;
-                            return 3;
+                            if(r.includes("OFICIAL")) return 3;
+                            return 4;
                         }
                         return getScore(a.f) - getScore(b.f);
                     });
@@ -606,12 +843,45 @@
                 card.innerHTML = content;
                 grid.appendChild(card);
             });
+
+            // Adicionar efeitos de mouse para os cards
+            adicionarEfeitosMouse();
+        }
+
+        // FUNÇÃO PARA ADICIONAR EFEITOS DE MOUSE
+        function adicionarEfeitosMouse() {
+            // Efeito para cards principais
+            document.querySelectorAll('.card-monitor').forEach(card => {
+                card.addEventListener('mousemove', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    this.style.setProperty('--mouse-x', `${x}px`);
+                    this.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+
+            // Efeito para cards internos (militar-container)
+            document.querySelectorAll('.militar-container').forEach(container => {
+                container.addEventListener('mousemove', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    this.style.setProperty('--mouse-x', `${x}px`);
+                    this.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
         }
 
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { 
+                weekday: 'long', 
+                day: '2-digit', 
+                month: 'long', 
+                year: 'numeric' 
+            }).toUpperCase();
             document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
         }
 
