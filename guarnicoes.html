@@ -100,7 +100,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Organizando visual...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Calculando turnos...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -168,15 +168,15 @@
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
+                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-abt">0</span>
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
+                            <div class="tooltip-box"><ul id="list-abt" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                         <div class="w-px h-10 bg-white/10"></div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
-                            <div class="tooltip-box"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR / AEM)</span>
+                            <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                     </div>
                 </div>
@@ -195,9 +195,8 @@
     </div>
 
     <script>
-        // ---------- CONFIGURAÇÃO ----------
-        // 🔁 COLOQUE AQUI A URL DO SEU GOOGLE APPS SCRIPT (WEB APP)
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbwW05xP2JbwE1UQf2Kqx67DIgcm5XdpT-HpH_rLKxviuSKpo8EPDo7fziidXkO0Ve-D/exec"; 
+        // CONFIGURAÇÃO
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
 
         const ORDEM_QUARTEIS = [
             "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
@@ -205,7 +204,10 @@
             "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
 
-        // ---------- FUNÇÕES AUXILIARES ----------
+        // --------------------------------------------------------
+        // FUNÇÃO DATA OPERACIONAL (O CORAÇÃO DA LÓGICA)
+        // Se for antes das 08:00, considera que ainda é "Ontem"
+        // --------------------------------------------------------
         function getDataOperacional() {
             const agora = new Date();
             if (agora.getHours() < 8) {
@@ -214,93 +216,114 @@
             return agora;
         }
 
+        // Formata data: 10Fev
         function formatarDataCurta(data) {
             const dia = String(data.getDate()).padStart(2, '0');
             const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        // Converte "DD/MM/AAAA HH:MM" para objeto Date
-        function parseDataHora(str) {
-            if (!str) return null;
-            const partes = str.split(' ');
-            if (partes.length !== 2) return null;
-            const data = partes[0].split('/');
-            const hora = partes[1].split(':');
-            if (data.length !== 3 || hora.length !== 2) return null;
-            return new Date(data[2], data[1]-1, data[0], hora[0], hora[1]);
-        }
+        // --------------------------------------------------------
+        // NOVA CALCULADORA DE TURNOS (V23 - ZERO DATA SUJA)
+        // --------------------------------------------------------
+        function calcularTurno(raw) {
+            if(!raw) return "";
 
-        // ---------- NORMALIZAÇÃO DE FUNÇÃO ----------
-        function normalizarFuncao(funcRaw) {
-            if(!funcRaw) return "";
-            const f = funcRaw.toUpperCase();
-            let limpa = f.replace(/\bND\b/g, '')
-                         .replace(/\d+º\s*\d+/g, '') 
-                         .replace(/\b\d+\b/g, '')    
-                         .replace(/[-]/g, '')
-                         .trim();
-            if(limpa === "") return "";
-            if(limpa.includes("CONDUTOR") || limpa.includes("MOTORISTA")) return "COV";
-            if(limpa.includes("CMT") || limpa.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
-            if(limpa.includes("LINHA") && limpa.includes("CHEFE")) return "LINHA (CHEFE)";
-            if(limpa.includes("LINHA") && limpa.includes("AUXILIAR")) return "LINHA (AUXILIAR)";
-            if(limpa.includes("OPERADOR") || limpa.includes("COBOM")) return "OPERADOR COBOM";
-            if(limpa.includes("MERGULHADOR")) return "MERGULHADOR";
-            if(limpa.includes("NAVAL")) return "CONDUTOR NAVAL";
-            if(limpa.includes("CINO") || limpa.includes("CANIL")) return "CINOTÉCNICO";
-            if(limpa.includes("MOTORISTA") && limpa.includes("DIA")) return "MOTORISTA DE DIA";
-            if(limpa.includes("OFICIAL") && limpa.includes("SERVIÇO")) return "OFICIAL DE SERVIÇO";
-            return limpa; 
-        }
+            try {
+                // 1. Extrair APENAS as horas (ignorando datas do Excel)
+                const horasMatch = raw.match(/(\d{2}:\d{2})/g);
+                
+                // Se não tem hora, retorna vazio
+                if (!horasMatch || horasMatch.length === 0) return "";
 
-        // ---------- 🚀 CALCULAR TURNO COM SUPORTE A Int, Início, Fim ----------
-        function calcularTurno(d) {
-            // Prioridade 1: campos int, inicio, fim existem?
-            if (d.int !== undefined && d.inicio !== undefined && d.fim !== undefined) {
-                const cargaRaw = String(d.int).trim();
-                const carga = cargaRaw + 'h'; // 24h, 12h, 10h...
-                
-                const inicioDate = parseDataHora(d.inicio);
-                const fimDate = parseDataHora(d.fim);
-                
-                if (inicioDate && fimDate) {
-                    const horaInicio = d.inicio.split(' ')[1];
-                    const horaFim = d.fim.split(' ')[1];
+                // 2. Definir Datas Base (Hoje e Amanhã)
+                const dataOp = getDataOperacional();
+                const hoje = new Date(dataOp);
+                const amanha = new Date(dataOp);
+                amanha.setDate(amanha.getDate() + 1);
+
+                // 3. Variáveis de Saída
+                let hInicio = "08:00";
+                let hFim = "08:00";
+                let dInicio = hoje;
+                let dFim = amanha; // Padrão 24h termina amanhã
+                let carga = "24h";
+
+                // --- CENÁRIO A: Único Horário (ex: "20:00" ou "08:00") ---
+                if (horasMatch.length === 1) {
+                    const horaUnica = horasMatch[0];
                     
-                    const dataInicioCurta = formatarDataCurta(inicioDate);
-                    const dataFimCurta = formatarDataCurta(fimDate);
-                    
-                    let dataDisplay = '';
-                    // Se for 24h (ou duração > 12h), mostra início → fim
-                    if (carga === '24h' || (fimDate - inicioDate) > 12 * 60 * 60 * 1000) {
-                        dataDisplay = `<span class="text-gray-500 text-[9px] ml-0.5">(${dataInicioCurta} → ${dataFimCurta})</span>`;
-                    } else {
-                        // 12h, 10h etc: mostra apenas a data do fim
-                        dataDisplay = `<span class="text-gray-500 text-[9px] ml-0.5">(${dataFimCurta})</span>`;
+                    if (horaUnica === "20:00") {
+                        // CASO BOTTINI: Sai às 20h. Logo, entrou às 08h de HOJE.
+                        hInicio = "08:00";
+                        hFim = "20:00";
+                        dFim = hoje; // Termina hoje
+                        carga = "12h";
+                    } 
+                    else {
+                        // CASO PADRÃO: Sai às 08h. Logo, entrou às 08h de hoje e sai amanhã.
+                        hInicio = "08:00";
+                        hFim = "08:00";
+                        dFim = amanha;
+                        carga = "24h";
                     }
-                    
-                    return `
-                        <div class="mt-1 leading-snug flex flex-wrap items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                            <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
-                            <span class="text-gray-500 text-[10px]">|</span> 
-                            <span class="text-sky-blue font-bold text-xs">${horaInicio}</span> 
-                            <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                            <span class="text-sky-blue font-bold text-xs">${horaFim}</span> 
-                            ${dataDisplay}
-                        </div>
-                    `;
                 }
-            }
-            
-            // ---------- FALLBACK: campo horario antigo ----------
-            const raw = d.horario || '';
-            if (!raw) return '<div class="text-gray-500 text-xs">Sem horário</div>';
-            // ... (código de fallback omitido por brevidade, mas funciona)
-            return '<div class="text-gray-500 text-xs">Horário não reconhecido</div>';
+                
+                // --- CENÁRIO B: Dois Horários (ex: "08:00 20:00" ou "20:00 08:00") ---
+                else if (horasMatch.length >= 2) {
+                    hInicio = horasMatch[0];
+                    hFim = horasMatch[1]; // Pega o último horário registrado
+
+                    if (hInicio === hFim) {
+                        // 24h Padrão
+                        dFim = amanha;
+                        carga = "24h";
+                    }
+                    else if (hInicio === "08:00" && hFim === "20:00") {
+                        // 12h Diurno
+                        dFim = hoje;
+                        carga = "12h";
+                    }
+                    else if (hInicio === "20:00" && hFim === "08:00") {
+                        // 12h Noturno
+                        dFim = amanha;
+                        carga = "12h";
+                    }
+                    else {
+                        // Genérico (Calcula se virou o dia)
+                        const h1 = parseInt(hInicio.split(':')[0]);
+                        const h2 = parseInt(hFim.split(':')[0]);
+                        if (h2 < h1) dFim = amanha;
+                        else dFim = hoje;
+                        
+                        let diff = h2 - h1;
+                        if(diff < 0) diff += 24;
+                        carga = diff > 12 ? "24h" : "12h";
+                    }
+                }
+
+                // 4. Montar Strings Finais
+                const strDataIni = formatarDataCurta(dInicio);
+                const strDataFim = formatarDataCurta(dFim);
+
+                // 5. Retornar HTML Formatado e Colorido
+                return `
+                    <div class="mt-1 leading-snug">
+                        <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
+                        <span class="text-gray-500 text-[10px]">- das</span> 
+                        <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
+                        <span class="text-gray-500 text-[10px]">de</span> 
+                        <span class="text-gray-400 font-bold text-[10px]">${strDataIni}</span> 
+                        <span class="text-gray-500 text-[10px]">às</span> 
+                        <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
+                        <span class="text-gray-500 text-[10px]">de</span> 
+                        <span class="text-gray-400 font-bold text-[10px]">${strDataFim}</span>
+                    </div>
+                `;
+
+            } catch(e) { console.error(e); return ""; }
         }
 
-        // ---------- EXTRAIR ID E LIMPAR NOME ----------
         function extrairID(nomeCompleto) {
             const match = nomeCompleto.match(/(\d{7})/);
             return match ? match[1] : null; 
@@ -310,13 +333,12 @@
             return nomeCompleto.replace(/\d{7}\s+/, '').trim();
         }
 
-        // ---------- PROCESSAMENTO DOS DADOS ----------
         function processarDados(dados) {
             const estrutura = {};
             const mapOficiais = new Map();
             const mapSargentos = new Map();
             const mapPracas = new Map();
-            const statsViaturas = { combate: new Set(), apoio: new Set() };
+            const statsViaturas = { abt: new Set(), ar: new Set() };
 
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
@@ -326,9 +348,10 @@
                 let idMilitar = extrairID(nomeCompleto);
                 let idUnico = idMilitar ? idMilitar : nomeCompleto;
                 let nomeExibicao = limparNome(nomeCompleto);
+                let func = (d.func || "").trim();
                 
-                let func = normalizarFuncao(d.func || "");
-                let horaHTML = calcularTurno(d); 
+                // CHAMA A NOVA FUNÇÃO LIMPA
+                let horaHTML = calcularTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
@@ -370,12 +393,8 @@
                     }
                 }
 
-                if(vtr.includes("ABT")) {
-                    statsViaturas.combate.add(vtr);
-                }
-                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
-                    statsViaturas.apoio.add(vtr);
-                }
+                if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
+                if(vtr.includes("AR") || vtr.includes("AEM")) statsViaturas.ar.add(vtr);
             });
 
             atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
@@ -386,8 +405,8 @@
             const capArr = Array.from(mapOficiais.values());
             const sgtArr = Array.from(mapSargentos.values());
             const sdArr = Array.from(mapPracas.values());
-            const combArr = Array.from(statsViaturas.combate);
-            const apoioArr = Array.from(statsViaturas.apoio);
+            const abtArr = Array.from(statsViaturas.abt);
+            const arArr = Array.from(statsViaturas.ar);
 
             const fill = (idC, idL, arr) => {
                 document.getElementById(idC).innerText = arr.length;
@@ -398,12 +417,11 @@
             fill('count-sgt', 'list-sgt', sgtArr);
             fill('count-sd', 'list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
+            document.getElementById('count-abt').innerText = abtArr.length;
+            document.getElementById('count-ar').innerText = arArr.length;
             
-            document.getElementById('count-combate').innerText = combArr.length;
-            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
-
-            document.getElementById('count-apoio').innerText = apoioArr.length;
-            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-abt').innerHTML = abtArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-ar').innerHTML = arArr.map(x => `<li>• ${x}</li>`).join('');
         }
 
         function renderizarCards(estrutura) {
@@ -432,6 +450,7 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
+                // NOME DO PELOTÃO GIGANTE (text-3xl) e LARANJA
                 let content = `
                     <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-2xl md:text-3xl tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
@@ -445,8 +464,8 @@
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
-                            if(r.includes("COMANDANTE DE GUARNIÇÃO")) return 1;
-                            if(r.includes("COV")) return 2;
+                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
+                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
                             return 3;
                         }
                         return getScore(a.f) - getScore(b.f);
@@ -461,14 +480,14 @@
                             </span>
                             <div class="w-full flex flex-col gap-2">
                                 ${grupo.guarnicao.map(m => `
-                                    <div class="text-center group mb-2">
-                                        <div class="text-moss-green font-black text-lg leading-none drop-shadow-md">
+                                    <div class="text-center group">
+                                        <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
                                             ${m.n}
                                         </div>
-                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-0.5 whitespace-nowrap">
-                                            ${m.f}
+                                        <div class="text-[10px] uppercase tracking-wide">
+                                            <span class="font-bold text-gray-400">${m.f}</span>
+                                            <div>${m.h}</div>
                                         </div>
-                                        <div class="mt-0.5">${m.h}</div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -482,7 +501,6 @@
             });
         }
 
-        // ---------- RELÓGIO ----------
         function atualizarRelogio() {
             const dataOp = getDataOperacional();
             const agora = new Date();
@@ -493,7 +511,6 @@
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
-        // ---------- CARREGAMENTO INICIAL E RECARGA PERIÓDICA ----------
         async function iniciarSistema() {
             try {
                 const req = await fetch(URL_DADOS);
@@ -510,8 +527,7 @@
         }
 
         iniciarSistema();
-        setInterval(iniciarSistema, 60000);
+        setInterval(iniciarSistema, 60000); 
     </script>
 </body>
 </html>
-
