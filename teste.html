@@ -1,341 +1,279 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organograma 1º BBM - Porto Alegre</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'bombeiros-orange': '#FF8C00',
-                        'bombeiros-yellow': '#FFD700',
-                        'fire-red': '#DC2626',
-                        'dark-slate': '#0f172a',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            background-color: #0f172a; 
-            color: white; 
-            overflow-x: auto; /* Permite rolagem horizontal para organogramas grandes */
-        }
-        
-        /* Background Marca d'água igual ao exemplo */
-        .hero-background { position: relative; min-height: 100vh; }
-        .hero-background::before { 
-            content: ''; position: fixed; left: 5%; right: 5%; bottom: 20px; top: 200px; 
-            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center top; background-repeat: no-repeat; background-size: contain; 
-            z-index: 0; opacity: 0.10; filter: grayscale(100%); pointer-events: none; 
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Organograma 1º BBM - Porto Alegre</title>
 
-        /* --- ESTILOS DA ÁRVORE HIERÁRQUICA (CSS TREE) --- */
-        .tree ul {
-            padding-top: 20px; position: relative;
-            transition: all 0.5s;
-            display: flex; justify-content: center;
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'bombeiros-orange': '#FF8C00',
+            'bombeiros-yellow': '#FFD700',
+            'fire-red': '#DC2626',
+            'bg-deep': '#0f172a'
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
+      }
+    }
+  </script>
 
-        .tree li {
-            float: left; text-align: center;
-            list-style-type: none;
-            position: relative;
-            padding: 20px 5px 0 5px;
-            transition: all 0.5s;
-        }
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
-        /* Linhas Conectoras */
-        .tree li::before, .tree li::after {
-            content: ''; position: absolute; top: 0; right: 50%;
-            border-top: 2px solid #FF8C00; /* Cor laranja bombeiros */
-            width: 50%; height: 20px;
-            z-index: 1;
-        }
-        .tree li::after {
-            right: auto; left: 50%;
-            border-left: 2px solid #FF8C00;
-        }
-
-        /* Remove conectores dos primeiros e últimos nós */
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 2px solid #FF8C00; border-radius: 0 5px 0 0; }
-        .tree li:first-child::after { border-radius: 5px 0 0 0; }
-
-        /* Linha vertical para baixo */
-        .tree ul ul::before {
-            content: ''; position: absolute; top: 0; left: 50%;
-            border-left: 2px solid #FF8C00;
-            width: 0; height: 20px;
-            z-index: 1;
-        }
-
-        /* --- ESTILO DOS CARTÕES (Nós da árvore) --- */
-        .node-card {
-            background: rgba(30, 41, 59, 0.9);
-            border: 1px solid rgba(255, 140, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            display: inline-block;
-            min-width: 180px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 10;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .node-card:hover {
-            background: #1e293b;
-            border-color: #FF8C00;
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
-            z-index: 20;
-        }
-
-        /* Títulos */
-        .role-title { font-weight: 900; text-transform: uppercase; font-size: 0.85rem; color: #FFD700; margin-bottom: 4px; }
-        .unit-name { font-weight: 700; color: white; font-size: 0.95rem; }
-
-        /* --- TOOLTIP DE EFETIVO (Aparece no Hover) --- */
-        .efetivo-tooltip {
-            visibility: hidden;
-            width: 220px;
-            background-color: rgba(15, 23, 42, 0.98);
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 100;
-            bottom: 120%; /* Aparece acima do card */
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            border: 1px solid #FF8C00;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            pointer-events: none; /* Evita flicker */
-        }
-
-        .node-card:hover .efetivo-tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Seta do Tooltip */
-        .efetivo-tooltip::after {
-            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
-            border-width: 5px; border-style: solid;
-            border-color: #FF8C00 transparent transparent transparent;
-        }
-
-        .stat-row { display: flex; justify-content: space-between; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 2px 0; }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: #94a3b8; }
-        .stat-val { font-weight: bold; color: #FF8C00; }
-
-        /* Ajuste para telas menores */
-        @media (max-width: 1024px) {
-            .tree { transform: scale(0.8); transform-origin: top center; }
-        }
-    </style>
+  <style>
+    body { background-color: #0f172a; color: #fff; font-family: Inter, sans-serif; }
+    .watermark {
+      position: fixed; left: 5%; right: 5%; top: 220px; bottom: 20px;
+      background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true');
+      background-position: center top; background-repeat: no-repeat; background-size: contain;
+      opacity: 0.08; filter: grayscale(100%); pointer-events: none; z-index: 0;
+    }
+    .node-card {
+      background: rgba(30,41,59,0.85); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 0.75rem; padding: 0.75rem 1rem; min-width: 220px;
+      transition: transform .18s ease, box-shadow .18s ease;
+      backdrop-filter: blur(6px);
+    }
+    .node-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
+    .node-title { font-weight: 800; letter-spacing: .6px; }
+    .node-sub { color: #cbd5e1; font-size: .85rem; margin-top: .25rem; }
+    .tooltip {
+      position: absolute; transform: translate(-50%, -120%); white-space: nowrap;
+      background: rgba(2,6,23,0.95); color: #fff; padding: .45rem .6rem; border-radius: .5rem;
+      font-size: .85rem; border: 1px solid rgba(255,255,255,0.06); z-index: 60; pointer-events: none;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    }
+    .connector { width: 2px; background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); }
+    .badge { background: linear-gradient(90deg,#FF8C00,#FFD700); color: #0b1220; font-weight:700; padding: .15rem .5rem; border-radius: 999px; font-size:.8rem; }
+    /* responsive tree */
+    .tree-row { display:flex; gap:1rem; align-items:flex-start; justify-content:center; flex-wrap:wrap; }
+    .collapse-btn { background: transparent; border: none; color: #9ca3af; cursor: pointer; }
+  </style>
 </head>
-<body class="hero-background font-sans">
+<body class="min-h-screen">
 
-    <header class="w-full flex flex-col md:flex-row justify-between items-center py-6 px-8 border-b border-white/10 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="flex items-center gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 drop-shadow-lg">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">Organograma Organizacional</h1>
-                <h2 class="text-sm md:text-base font-bold text-bombeiros-orange uppercase tracking-widest">1º BBM - Porto Alegre</h2>
-            </div>
+  <div class="watermark" aria-hidden="true"></div>
+
+  <div class="max-w-7xl mx-auto p-6 relative z-20">
+    <header class="flex items-center justify-between gap-4 mb-6">
+      <div class="flex items-center gap-4">
+        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="CBMRS" class="h-16">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-black">Organograma 1º BBM - Porto Alegre</h1>
+          <p class="text-sm text-gray-300 mt-1">Visualização hierárquica com quantitativos por posto/graduação</p>
         </div>
-        <div class="mt-4 md:mt-0">
-            <span class="text-xs font-mono bg-black/40 px-3 py-1 rounded text-gray-400 border border-white/10">
-                <i class="fas fa-info-circle mr-1"></i> Passe o mouse para ver o efetivo
-            </span>
-        </div>
+      </div>
+      <div class="text-right">
+        <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="Brasão" class="h-16 opacity-95">
+      </div>
     </header>
 
-    <div class="flex justify-center min-w-max p-10 pb-32">
-        <div class="tree">
-            <ul>
-                <li>
-                    <a href="#" class="node-card border-bombeiros-orange border-l-4">
-                        <div class="role-title"><i class="fas fa-star mr-1"></i> Comandante</div>
-                        <div class="unit-name">1º BBM</div>
-                        <div class="efetivo-tooltip">
-                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2 border-b border-gray-600 pb-1">Comando BBM</h4>
-                            <div class="stat-row"><span class="stat-label">TCel (Cmt):</span> <span class="stat-val">1</span></div>
-                            <div class="stat-row"><span class="stat-label">Maj (Sub):</span> <span class="stat-val">1</span></div>
-                        </div>
-                    </a>
+    <main class="bg-transparent">
+      <div id="org-root" class="flex flex-col items-center gap-6"></div>
+    </main>
 
-                    <ul>
-                        <li>
-                            <a href="#" class="node-card">
-                                <div class="role-title">Subcomandante</div>
-                                <div class="unit-name">1º BBM</div>
-                            </a>
-
-                            <ul>
-                                
-                                <li>
-                                    <a href="#" class="node-card border-l-4 border-gray-500">
-                                        <div class="role-title"><i class="fas fa-folder-open mr-1"></i> Administrativo</div>
-                                        <div class="unit-name">SAdmC / SODC</div>
-                                        <div class="efetivo-tooltip">
-                                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Estado Maior</h4>
-                                            <div class="stat-row"><span class="stat-label">Oficiais:</span> <span class="stat-val">6</span></div>
-                                            <div class="stat-row"><span class="stat-label">Sargentos:</span> <span class="stat-val">17</span></div>
-                                            <div class="stat-row"><span class="stat-label">Soldados:</span> <span class="stat-val">11</span></div>
-                                        </div>
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="#" class="node-card border-l-4 border-red-600">
-                                        <div class="role-title"><i class="fas fa-fire-extinguisher mr-1"></i> 1ª CIA BM</div>
-                                        <div class="unit-name">Sede: Porto Alegre</div>
-                                        <div class="efetivo-tooltip">
-                                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Total 1ª Cia</h4>
-                                            <div class="stat-row"><span class="stat-label">Majores:</span> <span class="stat-val">1</span></div>
-                                            <div class="stat-row"><span class="stat-label">Capitães:</span> <span class="stat-val">5</span></div>
-                                            <div class="stat-row"><span class="stat-label">Tenentes:</span> <span class="stat-val">10</span></div>
-                                            <div class="stat-row"><span class="stat-label">Sargentos:</span> <span class="stat-val">17</span></div>
-                                            <div class="stat-row"><span class="stat-label">Soldados:</span> <span class="stat-val">78</span></div>
-                                        </div>
-                                    </a>
-
-                                    <ul>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">1º Pelotão</div>
-                                                <div class="unit-name">Açorianos</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">2º Pelotão</div>
-                                                <div class="unit-name">Teresópolis</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">3º Pelotão</div>
-                                                <div class="unit-name">Assunção</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">2</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">4º Pelotão</div>
-                                                <div class="unit-name">Restinga</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">5º Pelotão</div>
-                                                <div class="unit-name">Belém Novo</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-
-                                <li>
-                                    <a href="#" class="node-card border-l-4 border-red-600">
-                                        <div class="role-title"><i class="fas fa-fire-extinguisher mr-1"></i> 2ª CIA BM</div>
-                                        <div class="unit-name">Sede: Porto Alegre</div>
-                                        <div class="efetivo-tooltip">
-                                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Total 2ª Cia</h4>
-                                            <div class="stat-row"><span class="stat-label">Majores:</span> <span class="stat-val">1</span></div>
-                                            <div class="stat-row"><span class="stat-label">Capitães:</span> <span class="stat-val">3</span></div>
-                                            <div class="stat-row"><span class="stat-label">Tenentes:</span> <span class="stat-val">7</span></div>
-                                            <div class="stat-row"><span class="stat-label">Sargentos:</span> <span class="stat-val">12</span></div>
-                                            <div class="stat-row"><span class="stat-label">Soldados:</span> <span class="stat-val">46</span></div>
-                                        </div>
-                                    </a>
-
-                                    <ul>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">1º Pelotão</div>
-                                                <div class="unit-name">Floresta</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">2º Pelotão</div>
-                                                <div class="unit-name">Passo D'Areia</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="node-card">
-                                                <div class="role-title">3º Pelotão</div>
-                                                <div class="unit-name">Partenon</div>
-                                                <div class="efetivo-tooltip">
-                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">2</span></div>
-                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
-                                                </div>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-
-                            </ul> </li> </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <footer class="fixed bottom-0 w-full text-center py-4 bg-slate-900/90 border-t border-white/5 z-40 backdrop-blur">
-        <p class="text-[10px] text-gray-400">
-            © 2026 1º Batalhão de Bombeiro Militar - Baseado no QO [cite: 4, 7]
-        </p>
+    <footer class="mt-8 text-center text-xs text-gray-400">
+      © 2026 1º Batalhão de Bombeiro Militar — Porto Alegre
     </footer>
+  </div>
 
+  <template id="node-template">
+    <div class="node-card relative">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="node-title text-white"></div>
+          <div class="node-sub"></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="badge"></div>
+          <button class="collapse-btn" aria-label="Expandir/Colapsar">
+            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <div id="tooltip" class="tooltip hidden"></div>
+
+  <script>
+    /*************************************************************************
+     * Dados do organograma (extraídos e organizados a partir do PDF)
+     * Ajuste os números conforme necessário. Cada nó pode ter:
+     *  - title: texto exibido
+     *  - subtitle: função/posto
+     *  - counts: objeto com chaves (Cel, TCel, Maj, Cap, 1Ten, 1Sgt, 2Sgt, Sd)
+     *  - children: array de nós filhos
+     *************************************************************************/
+
+    const orgData = {
+      title: "Comandante do 1º BBM",
+      subtitle: "Posto: (Comandante)",
+      counts: { "Cel":0,"TCel":0,"Maj":0,"Cap":0,"1º Ten":0,"1º Sgt":0,"2º Sgt":0,"Sd":1 },
+      children: [
+        {
+          title: "Setor de Comando e Correição (Batalhão)",
+          subtitle: "SAdmC / SODC / ALI",
+          counts: { "Cel":0,"TCel":1,"Maj":1,"Cap":0,"1º Ten":0,"1º Sgt":1,"2º Sgt":8,"Sd":7 },
+          children: []
+        },
+        {
+          title: "1ª Companhia de Bombeiro Militar",
+          subtitle: "Comandante e 5 Pelotões",
+          counts: { "Cel":0,"TCel":0,"Maj":0,"Cap":1,"1º Ten":5,"1º Sgt":10,"2º Sgt":17,"Sd":78 },
+          children: [
+            {
+              title: "1º Pel BM Açorianos",
+              subtitle: "Cmt / 1º GBM / 2º GBM",
+              counts: { "1º Ten":1,"1º Sgt":2,"2º Sgt":3,"Sd":19 } // resumo
+            },
+            {
+              title: "2º Pel BM Teresópolis",
+              subtitle: "Cmt / 1º GBM / 2º GBM",
+              counts: { "1º Ten":1,"1º Sgt":2,"2º Sgt":3,"Sd":21 }
+            },
+            {
+              title: "3º Pel BM Assunção",
+              subtitle: "Cmt / 1º GBM / 2º GBM",
+              counts: { "1º Ten":1,"1º Sgt":4,"2º Sgt":3,"Sd":21 }
+            },
+            {
+              title: "4º Pel BM Restinga",
+              subtitle: "Cmt / 1º GBM / 2º GBM",
+              counts: { "1º Ten":1,"1º Sgt":3,"2º Sgt":3,"Sd":20 }
+            },
+            {
+              title: "5º Pel BM Belém Novo",
+              subtitle: "Cmt / 1º GBM / 2º GBM",
+              counts: { "1º Ten":1,"1º Sgt":2,"2º Sgt":2,"Sd":20 }
+            }
+          ]
+        },
+        {
+          title: "2ª Companhia de Bombeiro Militar",
+          subtitle: "Comandante e 3 Pelotões",
+          counts: { "Cel":0,"TCel":0,"Maj":0,"Cap":1,"1º Ten":3,"1º Sgt":7,"2º Sgt":12,"Sd":46 },
+          children: [
+            { title: "1º Pel BM Floresta", subtitle: "Cmt / 1º GBM / 2º GBM", counts: { "1º Ten":1,"1º Sgt":2,"2º Sgt":2,"Sd":21 } },
+            { title: "2º Pel BM Passo D'Areia", subtitle: "Cmt / 1º GBM / 2º GBM", counts: { "1º Ten":1,"1º Sgt":2,"2º Sgt":2,"Sd":20 } },
+            { title: "3º Pel BM Partenon", subtitle: "Cmt / 1º GBM / 2º GBM", counts: { "1º Ten":1,"1º Sgt":3,"2º Sgt":3,"Sd":22 } }
+          ]
+        },
+        {
+          title: "Divisões e Seções (CRBM)",
+          subtitle: "Administração, Inteligência, Operações, Logística, Comunicação, Segurança",
+          counts: { "Cel":1,"TCel":0,"Maj":1,"Cap":2,"1º Ten":0,"1º Sgt":10,"2º Sgt":8,"Sd":16 },
+          children: [
+            { title: "Divisão Administrativa e Correcional", counts: { "Cap":1,"1º Sgt":3,"2º Sgt":2,"Sd":4 } },
+            { title: "Agência Regional de Inteligência", counts: { "Maj":1,"1º Sgt":1,"2º Sgt":1,"Sd":2 } },
+            { title: "Divisão de Operações e Defesa Civil", counts: { "1º Sgt":1,"2º Sgt":1,"Sd":1 } },
+            { title: "Divisão de Logística Patrimônio e Finanças", counts: { "Cap":1,"1º Sgt":4,"2º Sgt":2,"Sd":6 } },
+            { title: "Divisão de Comunicação Social", counts: { "Maj":1,"2º Sgt":1,"Sd":1 } },
+            { title: "Divisão de Segurança Contra Incêndio", counts: { "Maj":1,"1º Sgt":1,"2º Sgt":1,"Sd":2 } }
+          ]
+        }
+      ]
+    };
+
+    /*************************************************************************
+     * Funções de renderização
+     *************************************************************************/
+    const rootEl = document.getElementById('org-root');
+    const nodeTpl = document.getElementById('node-template');
+    const tooltip = document.getElementById('tooltip');
+
+    function formatCounts(counts) {
+      if (!counts) return 'Sem dados';
+      return Object.entries(counts).map(([k,v]) => `${k}: ${v ?? 0}`).join(' • ');
+    }
+
+    function createNode(nodeData) {
+      const tpl = nodeTpl.content.cloneNode(true);
+      const card = tpl.querySelector('.node-card');
+      const titleEl = tpl.querySelector('.node-title');
+      const subEl = tpl.querySelector('.node-sub');
+      const badge = tpl.querySelector('.badge');
+      const collapseBtn = tpl.querySelector('.collapse-btn');
+
+      titleEl.textContent = nodeData.title;
+      subEl.textContent = nodeData.subtitle || '';
+      badge.textContent = Object.values(nodeData.counts || {}).reduce((a,b)=>a+(b||0),0);
+
+      // tooltip on hover
+      card.addEventListener('mouseenter', (e) => {
+        tooltip.innerHTML = `<strong>${nodeData.title}</strong><div style="margin-top:.25rem;color:#cbd5e1">${formatCounts(nodeData.counts)}</div>`;
+        tooltip.classList.remove('hidden');
+        positionTooltip(e);
+      });
+      card.addEventListener('mousemove', positionTooltip);
+      card.addEventListener('mouseleave', () => tooltip.classList.add('hidden'));
+
+      // collapse behavior
+      collapseBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const parent = card.parentElement;
+        const childrenWrap = parent.querySelector(':scope > .children-wrap');
+        if (!childrenWrap) return;
+        const isHidden = childrenWrap.classList.toggle('hidden');
+        collapseBtn.querySelector('svg').style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+      });
+
+      return { el: tpl, cardEl: card };
+    }
+
+    function positionTooltip(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      tooltip.style.left = (rect.left + rect.width/2) + 'px';
+      tooltip.style.top = (rect.top - 8) + 'px';
+    }
+
+    function buildTree(node, container) {
+      // node wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex flex-col items-center gap-3';
+
+      // node element
+      const nodeFrag = createNode(node);
+      const nodeEl = document.createElement('div');
+      nodeEl.appendChild(nodeFrag.el);
+      wrapper.appendChild(nodeEl);
+
+      // children
+      if (node.children && node.children.length) {
+        // connector
+        const connector = document.createElement('div');
+        connector.className = 'w-px h-6 connector';
+        wrapper.appendChild(connector);
+
+        const childrenWrap = document.createElement('div');
+        childrenWrap.className = 'children-wrap tree-row';
+        childrenWrap.style.marginTop = '6px';
+
+        node.children.forEach(child => {
+          const childContainer = document.createElement('div');
+          childContainer.className = 'flex flex-col items-center gap-3';
+          buildTree(child, childContainer);
+          childrenWrap.appendChild(childContainer);
+        });
+
+        wrapper.appendChild(childrenWrap);
+      }
+
+      container.appendChild(wrapper);
+    }
+
+    // render
+    buildTree(orgData, rootEl);
+
+    // small accessibility: hide tooltip on scroll
+    window.addEventListener('scroll', () => tooltip.classList.add('hidden'));
+  </script>
 </body>
 </html>
