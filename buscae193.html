@@ -2,1146 +2,340 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>ESTATÍSTICAS - 1º BBM</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organograma 1º BBM - Porto Alegre</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                        'dark-slate': '#0f172a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        .chart-container {
+        body { 
+            background-color: #0f172a; 
+            color: white; 
+            overflow-x: auto; /* Permite rolagem horizontal para organogramas grandes */
+        }
+        
+        /* Background Marca d'água igual ao exemplo */
+        .hero-background { position: relative; min-height: 100vh; }
+        .hero-background::before { 
+            content: ''; position: fixed; left: 5%; right: 5%; bottom: 20px; top: 200px; 
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
+            background-position: center top; background-repeat: no-repeat; background-size: contain; 
+            z-index: 0; opacity: 0.10; filter: grayscale(100%); pointer-events: none; 
+        }
+
+        /* --- ESTILOS DA ÁRVORE HIERÁRQUICA (CSS TREE) --- */
+        .tree ul {
+            padding-top: 20px; position: relative;
+            transition: all 0.5s;
+            display: flex; justify-content: center;
+        }
+
+        .tree li {
+            float: left; text-align: center;
+            list-style-type: none;
             position: relative;
-            width: 100%;
-            height: clamp(300px, 50vh, 500px);
-            min-height: 300px;
-            max-height: 500px;
+            padding: 20px 5px 0 5px;
+            transition: all 0.5s;
         }
-        
-        .chart-container-lg {
-            height: auto;
-            min-height: 400px;
+
+        /* Linhas Conectoras */
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #FF8C00; /* Cor laranja bombeiros */
+            width: 50%; height: 20px;
+            z-index: 1;
         }
-        
-        @media (max-width: 640px) {
-            .chart-container {
-                height: 280px;
-                min-height: 280px;
-            }
-            .chart-container-lg {
-                min-height: 380px;
-            }
+        .tree li::after {
+            right: auto; left: 50%;
+            border-left: 2px solid #FF8C00;
         }
-        
-        @media (min-width: 641px) and (max-width: 1024px) {
-            .chart-container {
-                height: 350px;
-                min-height: 350px;
-            }
-            .chart-container-lg {
-                min-height: 420px;
-            }
+
+        /* Remove conectores dos primeiros e últimos nós */
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #FF8C00; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+
+        /* Linha vertical para baixo */
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #FF8C00;
+            width: 0; height: 20px;
+            z-index: 1;
         }
-        
-        @media (min-width: 1025px) {
-            .chart-container-lg {
-                min-height: 480px;
-            }
-        }
-        
-        .glass {
-            background: rgba(30, 41, 59, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
-        .table-container {
-            max-height: 500px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        @media (max-width: 768px) {
-            .table-container {
-                max-height: 400px;
-            }
-        }
-        
-        .month-btn {
-            min-height: 48px;
-            font-size: 0.7rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .month-btn.active {
-            background: linear-gradient(135deg, #10B981, #059669);
-            color: white;
-            border-color: #A7F3D0;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
-            transform: scale(1.02);
-        }
-        
-        .month-btn:hover:not(.active):not(:disabled) {
-            background: rgba(100, 116, 139, 0.3);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        @media (min-width: 768px) {
-            .month-btn {
-                min-height: 52px;
-                font-size: 0.75rem;
-            }
-        }
-        
-        @media (min-width: 1024px) {
-            .month-btn {
-                min-height: 56px;
-                font-size: 0.8rem;
-            }
-        }
-        
-        .year-select-btn {
+
+        /* --- ESTILO DOS CARTÕES (Nós da árvore) --- */
+        .node-card {
             background: rgba(30, 41, 59, 0.9);
-            border: 2px solid #10b981;
-            color: #10b981;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: bold;
-            font-family: 'ui-monospace', monospace;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 100px;
-            text-align: center;
-            appearance: none;
-            position: relative;
-            padding-right: 2.5rem;
-        }
-        
-        .year-select-btn:hover {
-            background: #10b981;
-            color: white;
-            border-color: #10b981;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
-        }
-        
-        .year-select-btn:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn-anual {
-            background: rgba(30, 41, 59, 0.9);
-            border: 2px solid #eab308;
-            color: #fef08a;
-            padding: 0.75rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: bold;
-            font-family: 'ui-monospace', monospace;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .btn-anual:hover {
-            background: #eab308;
-            color: white;
-            border-color: #fef08a;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
-        }
-        
-        .btn-anual.active {
-            background: linear-gradient(135deg, #ca8a04, #eab308);
-            color: white;
-            border-color: #fef08a;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
-        }
-        
-        .year-select-wrapper {
-            position: relative;
+            border: 1px solid rgba(255, 140, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
             display: inline-block;
+            min-width: 180px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        
-        .year-select-wrapper::after {
-            content: "▼";
+
+        .node-card:hover {
+            background: #1e293b;
+            border-color: #FF8C00;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+            z-index: 20;
+        }
+
+        /* Títulos */
+        .role-title { font-weight: 900; text-transform: uppercase; font-size: 0.85rem; color: #FFD700; margin-bottom: 4px; }
+        .unit-name { font-weight: 700; color: white; font-size: 0.95rem; }
+
+        /* --- TOOLTIP DE EFETIVO (Aparece no Hover) --- */
+        .efetivo-tooltip {
+            visibility: hidden;
+            width: 220px;
+            background-color: rgba(15, 23, 42, 0.98);
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
             position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #10b981;
-            font-size: 0.8rem;
-            pointer-events: none;
+            z-index: 100;
+            bottom: 120%; /* Aparece acima do card */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #FF8C00;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            pointer-events: none; /* Evita flicker */
         }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+
+        .node-card:hover .efetivo-tooltip {
+            visibility: visible;
+            opacity: 1;
         }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 4px;
+
+        /* Seta do Tooltip */
+        .efetivo-tooltip::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid;
+            border-color: #FF8C00 transparent transparent transparent;
         }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(100, 116, 139, 0.7);
-            border-radius: 4px;
+
+        .stat-row { display: flex; justify-content: space-between; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 2px 0; }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { color: #94a3b8; }
+        .stat-val { font-weight: bold; color: #FF8C00; }
+
+        /* Ajuste para telas menores */
+        @media (max-width: 1024px) {
+            .tree { transform: scale(0.8); transform-origin: top center; }
         }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.9);
-        }
-        
-        .pelotao-gradient-0 { background-color: #065f46; }
-        .pelotao-gradient-1 { background-color: #047857; }
-        .pelotao-gradient-2 { background-color: #059669; }
-        .pelotao-gradient-3 { background-color: #10b981; }
-        .pelotao-gradient-4 { background-color: #34d399; }
-        .pelotao-gradient-5 { background-color: #6ee7b7; }
-        .pelotao-gradient-6 { background-color: #a7f3d0; }
-        .pelotao-gradient-7 { background-color: #d1fae5; }
     </style>
-    
-    <link rel="icon" type="image/x-icon" href="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true">
 </head>
-<body class="bg-slate-900 text-gray-100 min-h-screen flex flex-col">
+<body class="hero-background font-sans">
 
-    <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow space-y-4 sm:space-y-6">
-        
-        <header class="glass p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" 
-                 class="h-12 sm:h-16 opacity-90 w-auto">
-            
-            <div class="text-center w-full md:w-auto">
-                <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight mb-2">
-                    ESTATÍSTICAS - 1º BBM
-                </h1>
-                
-                <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-                    <span class="text-sm sm:text-lg font-bold text-yellow-400 tracking-[0.1em] sm:tracking-[0.2em] uppercase">
-                        PORTO ALEGRE
-                    </span>
-                    <div class="year-select-wrapper">
-                        <select id="yearSelect" class="year-select-btn">
-                            <option value="2026" selected>2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" 
-                 class="h-12 sm:h-16 opacity-90 w-auto hidden md:block">
-        </header>
-
-        <div id="loader" class="hidden glass p-4 sm:p-6 text-center text-blue-400 font-mono text-xs sm:text-sm font-bold">
-            <i class="fas fa-spinner fa-spin mr-2"></i> CARREGANDO DADOS...
-        </div>
-
-        <div class="glass p-3 sm:p-4">
-            <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1.5 sm:gap-2 mb-3 sm:mb-4" id="monthContainer"></div>
-            <div class="flex justify-center pt-3 sm:pt-4 border-t border-white/10">
-                <button id="btnAnual" class="btn-anual py-3 px-8 rounded-lg font-bold uppercase tracking-widest">
-                    <i class="fas fa-chart-bar mr-2"></i>RELATÓRIO ANUAL <span id="lblAnual">2026</span>
-                </button>
+    <header class="w-full flex flex-col md:flex-row justify-between items-center py-6 px-8 border-b border-white/10 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="Logo CBMRS" class="h-16 drop-shadow-lg">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">Organograma Organizacional</h1>
+                <h2 class="text-sm md:text-base font-bold text-bombeiros-orange uppercase tracking-widest">1º BBM - Porto Alegre</h2>
             </div>
         </div>
-
-        <div id="dashboard" class="hidden space-y-4 sm:space-y-6">
-            
-            <div class="flex justify-center">
-                <div class="glass px-6 sm:px-10 py-4 sm:py-6 text-center border-t-4 border-emerald-500 bg-slate-900/80 w-full max-w-md">
-                    <p class="text-xs font-bold tracking-[0.15em] text-emerald-400 mb-2 font-mono">
-                        TOTAL DE OCORRÊNCIAS
-                    </p>
-                    <p class="text-4xl sm:text-5xl font-black text-white font-mono drop-shadow-lg" id="totalVal">0</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div class="glass p-3 sm:p-4 flex flex-col">
-                    <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-emerald-500 pl-2 sm:pl-3 uppercase">
-                        CONTAGEM POR PELOTÃO
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chartPel"></canvas>
-                    </div>
-                </div>
-                
-                <div class="glass p-3 sm:p-4 flex flex-col">
-                    <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-orange-500 pl-2 sm:pl-3 uppercase">
-                        POR TIPO DE OCORRÊNCIA
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chartNat"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass p-3 sm:p-4">
-                <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-blue-400 pl-2 sm:pl-3 uppercase">
-                    DETALHAMENTO DOS SUBGRUPOS
-                </h3>
-                <div class="chart-container-lg" id="subChartContainer">
-                    <canvas id="chartSub"></canvas>
-                </div>
-            </div>
-
-            <div class="glass overflow-hidden flex flex-col">
-                <div class="p-3 sm:p-4 border-b border-white/5 bg-slate-900/50 text-xs flex justify-between items-center text-gray-400">
-                    <span class="font-bold text-white uppercase">
-                        <i class="fas fa-list mr-2"></i> REGISTRO DE DADOS
-                    </span>
-                    <span><span id="rowsVal" class="text-white font-bold">0</span> registros</span>
-                </div>
-                
-                <div class="p-2 bg-slate-800/50 flex gap-1.5 sm:gap-2 overflow-x-auto">
-                    <select id="fNat" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Natureza</option>
-                    </select>
-                    <select id="fSub" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Subgrupo</option>
-                    </select>
-                    <select id="fBai" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Bairro</option>
-                    </select>
-                    <select id="fPel" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Pelotão</option>
-                    </select>
-                    <button onclick="Core.resetFilters()" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-2 sm:px-3 py-1 rounded text-xs font-bold transition-colors whitespace-nowrap">
-                        LIMPAR
-                    </button>
-                </div>
-
-                <div class="table-container">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                        <thead class="bg-slate-900 text-gray-400 font-bold sticky top-0 uppercase font-mono">
-                            <tr>
-                                <th class="p-2 sm:p-3 text-center">#</th>
-                                <th class="p-2 sm:p-3">Data</th>
-                                <th class="p-2 sm:p-3">Natureza</th>
-                                <th class="p-2 sm:p-3">Subgrupo</th>
-                                <th class="p-2 sm:p-3">Bairro</th>
-                                <th class="p-2 sm:p-3">Pelotão</th>
-                                <th class="p-2 sm:p-3 text-center">Mapa</th>
-                                <th class="p-2 sm:p-3 text-center">Nº BA</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="text-gray-300 font-mono divide-y divide-white/5"></tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="mt-4 md:mt-0">
+            <span class="text-xs font-mono bg-black/40 px-3 py-1 rounded text-gray-400 border border-white/10">
+                <i class="fas fa-info-circle mr-1"></i> Passe o mouse para ver o efetivo
+            </span>
         </div>
-        
-        <div class="h-4 sm:h-6"></div>
-    </main>
+    </header>
 
-    <footer class="text-center py-4 sm:py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
-        © 1º BBM - Gustavo Medeiros
+    <div class="flex justify-center min-w-max p-10 pb-32">
+        <div class="tree">
+            <ul>
+                <li>
+                    <a href="#" class="node-card border-bombeiros-orange border-l-4">
+                        <div class="role-title"><i class="fas fa-star mr-1"></i> Comandante</div>
+                        <div class="unit-name">1º BBM</div>
+                        <div class="efetivo-tooltip">
+                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2 border-b border-gray-600 pb-1">Comando BBM</h4>
+                            <div class="stat-row"><span class="stat-label">TCel (Cmt):</span> <span class="stat-val">1</span></div>
+                            <div class="stat-row"><span class="stat-label">Maj (Sub):</span> <span class="stat-val">1</span></div>
+                        </div>
+                    </a>
+
+                    <ul>
+                        <li>
+                            <a href="#" class="node-card">
+                                <div class="role-title">Subcomandante</div>
+                                <div class="unit-name">1º BBM</div>
+                            </a>
+
+                            <ul>
+                                
+                                <li>
+                                    <a href="#" class="node-card border-l-4 border-gray-500">
+                                        <div class="role-title"><i class="fas fa-folder-open mr-1"></i> Administrativo</div>
+                                        <div class="unit-name">SAdmC / SODC</div>
+                                        <div class="efetivo-tooltip">
+                                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Estado Maior</h4>
+                                            <div class="stat-row"><span class="stat-label">Oficiais:</span> <span class="stat-val">6</span></div>
+                                            <div class="stat-row"><span class="stat-label">Sargentos:</span> <span class="stat-val">17</span></div>
+                                            <div class="stat-row"><span class="stat-label">Soldados:</span> <span class="stat-val">11</span></div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="#" class="node-card border-l-4 border-red-600">
+                                        <div class="role-title"><i class="fas fa-fire-extinguisher mr-1"></i> 1ª CIA BM</div>
+                                        <div class="unit-name">Sede: Porto Alegre</div>
+                                        <div class="efetivo-tooltip">
+                                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Total 1ª Cia</h4>
+                                            <div class="stat-row"><span class="stat-label">Majores:</span> <span class="stat-val">1</span></div>
+                                            <div class="stat-row"><span class="stat-label">Capitães:</span> <span class="stat-val">5</span></div>
+                                            <div class="stat-row"><span class="stat-label">Tenentes:</span> <span class="stat-val">10</span></div>
+                                            <div class="stat-row"><span class="stat-label">Sargentos:</span> <span class="stat-val">17</span></div>
+                                            <div class="stat-row"><span class="stat-label">Soldados:</span> <span class="stat-val">78</span></div>
+                                        </div>
+                                    </a>
+
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">1º Pelotão</div>
+                                                <div class="unit-name">Açorianos</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">2º Pelotão</div>
+                                                <div class="unit-name">Teresópolis</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">3º Pelotão</div>
+                                                <div class="unit-name">Assunção</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">2</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">4º Pelotão</div>
+                                                <div class="unit-name">Restinga</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">5º Pelotão</div>
+                                                <div class="unit-name">Belém Novo</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li>
+                                    <a href="#" class="node-card border-l-4 border-red-600">
+                                        <div class="role-title"><i class="fas fa-fire-extinguisher mr-1"></i> 2ª CIA BM</div>
+                                        <div class="unit-name">Sede: Porto Alegre</div>
+                                        <div class="efetivo-tooltip">
+                                            <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Total 2ª Cia</h4>
+                                            <div class="stat-row"><span class="stat-label">Majores:</span> <span class="stat-val">1</span></div>
+                                            <div class="stat-row"><span class="stat-label">Capitães:</span> <span class="stat-val">3</span></div>
+                                            <div class="stat-row"><span class="stat-label">Tenentes:</span> <span class="stat-val">7</span></div>
+                                            <div class="stat-row"><span class="stat-label">Sargentos:</span> <span class="stat-val">12</span></div>
+                                            <div class="stat-row"><span class="stat-label">Soldados:</span> <span class="stat-val">46</span></div>
+                                        </div>
+                                    </a>
+
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">1º Pelotão</div>
+                                                <div class="unit-name">Floresta</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">2º Pelotão</div>
+                                                <div class="unit-name">Passo D'Areia</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">1</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">10</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="node-card">
+                                                <div class="role-title">3º Pelotão</div>
+                                                <div class="unit-name">Partenon</div>
+                                                <div class="efetivo-tooltip">
+                                                    <div class="stat-row"><span class="stat-label">Sgt:</span> <span class="stat-val">2</span></div>
+                                                    <div class="stat-row"><span class="stat-label">Sd:</span> <span class="stat-val">11</span></div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                            </ul> </li> </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-0 w-full text-center py-4 bg-slate-900/90 border-t border-white/5 z-40 backdrop-blur">
+        <p class="text-[10px] text-gray-400">
+            © 2026 1º Batalhão de Bombeiro Militar - Baseado no QO [cite: 4, 7]
+        </p>
     </footer>
 
-    <script>
-        const CONFIG = {
-            repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2026,
-            months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
-            poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
-        };
-
-        const STYLES = {
-            "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-yellow-400", bg: "rgba(255, 215, 0, 0.8)" },
-            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-brown-600", bg: "rgba(139, 69, 19, 0.8)" },
-            "BUSCA E RESGATE": { c: "#F97316", i: "🛟", cl: "text-orange-500", bg: "rgba(249, 115, 22, 0.8)" },
-            "CORTE DE ÁRVORE": { c: "#4ADE80", i: "🌳", cl: "text-green-400", bg: "rgba(74, 222, 128, 0.8)" },
-            "AÇÕES PREVENTIVAS": { c: "#87CEEB", i: "🛡️", cl: "text-sky-400", bg: "rgba(135, 206, 235, 0.8)" },
-            "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO": { c: "#60A5FA", i: "📋", cl: "text-blue-400", bg: "rgba(96, 165, 250, 0.8)" },
-            "PRÉ-HOSPITALAR": { c: "#EF4444", i: "🚑", cl: "text-red-500", bg: "rgba(239, 68, 68, 0.8)" },
-            "PRODUTOS PERIGOSOS": { c: "#FFFFFF", i: "☢️", cl: "text-white", bg: "rgba(255, 255, 255, 0.8)" },
-            "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-slate-400", bg: "rgba(100, 116, 139, 0.8)" },
-            "TROTE": { c: "#A78BFA", i: "🎭", cl: "text-purple-400", bg: "rgba(167, 139, 250, 0.8)" }
-        };
-
-        const PELOTAO_SIMPLIFICADO = {
-            "BBS (POA) - MERGULHO": "BBS / MERGULHO",
-            "BBS (POA) - CANIL": "BBS / CANIL",
-            "BBS (POA) - AQUÁTICA": "BBS / AQUÁTICA",
-            "BBS (POA) - TERRESTRE": "BBS / TERRESTRE",
-            "BBS / 1ª 2º CANIL": "BBS / CANIL",
-            "BBS / 2ª 1º AQUÁTICA": "BBS / AQUÁTICA",
-            "8º BBM / 1ª 1º 1º GR CANOAS": "8º BBM CANOAS",
-            "AODC / DOA / AEREO": "AODC / AÉREO",
-            "AODC": "AODC / AÉREO",
-            "COBOM": "COBOM",
-            "BBS": "BBS / TERRESTRE"
-        };
-
-        const GREEN_GRADIENTS = [
-            '#065f46', '#047857', '#059669', '#10b981', 
-            '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'
-        ];
-
-        let curYear = 2026;
-        let instances = {};
-
-        const isMobile = () => window.innerWidth < 768;
-        const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024;
-
-        const getChartConfig = () => {
-            if (isMobile()) {
-                return {
-                    barThickness: 16,
-                    categoryPercentage: 0.8,
-                    fontSize: 10,
-                    tickPadding: 5,
-                    datalabelsSize: 9,
-                    subBarThickness: 7,
-                    subSpacing: 0.6,
-                    subItemHeight: 22
-                };
-            } else if (isTablet()) {
-                return {
-                    barThickness: 18,
-                    categoryPercentage: 0.8,
-                    fontSize: 11,
-                    tickPadding: 8,
-                    datalabelsSize: 10,
-                    subBarThickness: 9,
-                    subSpacing: 0.65,
-                    subItemHeight: 26
-                };
-            } else {
-                return {
-                    barThickness: 20,
-                    categoryPercentage: 0.8,
-                    fontSize: 12,
-                    tickPadding: 10,
-                    datalabelsSize: 11,
-                    subBarThickness: 11,
-                    subSpacing: 0.7,
-                    subItemHeight: 30
-                };
-            }
-        };
-
-        const Core = {
-            db: [],
-            
-            init: () => {
-                Chart.defaults.font.family = "'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace";
-                Chart.defaults.font.size = getChartConfig().fontSize;
-                Chart.register(ChartDataLabels);
-                
-                const container = document.getElementById('monthContainer');
-                CONFIG.months.forEach((m, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'month-btn bg-slate-800 text-gray-300 font-bold w-full';
-                    btn.innerText = m;
-                    btn.id = `btn_${i}`;
-                    btn.onclick = () => Core.loadMonth(m, btn);
-                    container.appendChild(btn);
-                });
-
-                document.getElementById('yearSelect').addEventListener('change', (e) => {
-                    Core.setYear(parseInt(e.target.value));
-                });
-                
-                document.getElementById('btnAnual').onclick = Core.loadAnnual;
-                
-                ['fNat','fSub','fBai','fPel'].forEach(id => {
-                    document.getElementById(id).addEventListener('change', Core.applyFilters);
-                });
-
-                window.addEventListener('resize', Core.handleResize);
-
-                Core.setYear(2026);
-            },
-
-            handleResize: () => {
-                Chart.defaults.font.size = getChartConfig().fontSize;
-                
-                Object.keys(instances).forEach(id => {
-                    if (instances[id]) {
-                        instances[id].destroy();
-                        delete instances[id];
-                    }
-                });
-                
-                if (Core.db.length > 0) {
-                    Core.drawCharts(Core.db);
-                }
-            },
-
-            setYear: (y) => {
-                curYear = y;
-                document.getElementById('lblAnual').innerText = y;
-                document.getElementById('yearSelect').value = y;
-                
-                const now = new Date();
-                const limit = (y === now.getFullYear()) ? now.getMonth() : 12;
-
-                CONFIG.months.forEach((_, i) => {
-                    const btn = document.getElementById(`btn_${i}`);
-                    if (i < limit) {
-                        btn.disabled = false;
-                        btn.classList.remove('opacity-30', 'cursor-not-allowed');
-                    } else {
-                        btn.disabled = true;
-                        btn.classList.add('opacity-30', 'cursor-not-allowed');
-                    }
-                    btn.classList.remove('active');
-                });
-                
-                document.getElementById('btnAnual').classList.remove('active');
-                document.getElementById('dashboard').classList.add('hidden');
-            },
-
-            toggleLoad: (show) => {
-                document.getElementById('loader').classList.toggle('hidden', !show);
-                document.getElementById('dashboard').classList.toggle('hidden', show);
-            },
-
-            resetBtns: () => {
-                document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById('btnAnual').classList.remove('active');
-            },
-
-            loadMonth: async (m, btn) => {
-                if(btn.disabled) return;
-                
-                Core.resetBtns();
-                btn.classList.add('active');
-                Core.toggleLoad(true);
-
-                try {
-                    const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
-                    if(!req.ok) throw new Error("Arquivo não encontrado");
-                    
-                    const txt = await req.text();
-                    Core.processData(txt, `${m}/${curYear}`);
-                } catch(e) {
-                    Core.toggleLoad(false);
-                    btn.classList.remove('active');
-                    alert(`Dados para ${m}/${curYear} não encontrados.`);
-                }
-            },
-
-            loadAnnual: async () => {
-                Core.resetBtns();
-                document.getElementById('btnAnual').classList.add('active');
-                Core.toggleLoad(true);
-
-                try {
-                    const req = await fetch(`${CONFIG.repo}/dados/ANUAL_${curYear}.csv?t=${Date.now()}`);
-                    if(req.ok) {
-                        const txt = await req.text();
-                        Core.processData(txt, `ANUAL/${curYear}`);
-                        return;
-                    }
-                } catch(e) {}
-
-                const now = new Date();
-                const limit = (curYear === now.getFullYear()) ? now.getMonth() : 12;
-                const validMonths = CONFIG.months.slice(0, limit);
-                
-                let allData = [];
-                let loadedCount = 0;
-
-                for (const m of validMonths) {
-                    try {
-                        const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
-                        if(req.ok) {
-                            const txt = await req.text();
-                            const data = await new Promise((resolve) => {
-                                Papa.parse(txt, {
-                                    header: true,
-                                    skipEmptyLines: true,
-                                    complete: (res) => resolve(res.data)
-                                });
-                            });
-                            allData = allData.concat(data);
-                            loadedCount++;
-                        }
-                    } catch(e) {}
-                }
-
-                if(loadedCount > 0) {
-                    Core.db = Core.normalize(allData);
-                    Core.initFilters();
-                    Core.render(Core.db);
-                    Core.toggleLoad(false);
-                } else {
-                    Core.toggleLoad(false);
-                    document.getElementById('btnAnual').classList.remove('active');
-                    alert("Nenhum dado encontrado para o ano selecionado.");
-                }
-            },
-
-            processData: (csv, source) => {
-                Papa.parse(csv, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (res) => {
-                        Core.db = Core.normalize(res.data);
-                        Core.initFilters();
-                        Core.render(Core.db);
-                        Core.toggleLoad(false);
-                    },
-                    error: (err) => {
-                        console.error('Erro ao parsear CSV:', err);
-                        Core.toggleLoad(false);
-                        alert('Erro ao processar dados.');
-                    }
-                });
-            },
-
-            normalize: (raw) => {
-                if(!raw || !raw.length) return [];
-                
-                const firstRow = raw[0];
-                const keys = Object.keys(firstRow);
-                
-                const findKey = (patterns) => {
-                    const lowerKeys = keys.map(k => k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-                    for (const pattern of patterns) {
-                        const idx = lowerKeys.findIndex(k => k.includes(pattern));
-                        if (idx !== -1) return keys[idx];
-                    }
-                    return null;
-                };
-
-                const colNatureza = findKey(['nat', 'emerg', 'tipo', 'ocorrencia']);
-                const colPelotao = findKey(['obm', 'guarni', 'pel', 'pelotao']);
-                const colSubgrupo = findKey(['sub', 'detalhe', 'subgrupo']);
-                const colData = findKey(['data', 'date']);
-                const colBairro = findKey(['bairro', 'local']);
-                const colViatura = findKey(['viatura', 'prefixo', 'vtr']);
-                const colLat = findKey(['lat', 'latitude']);
-                const colLon = findKey(['lon', 'long', 'longitude']);
-                
-                let colBA = null;
-                
-                // Procura pela coluna "Nº Oc." ou números de 6 dígitos
-                for (const key of keys) {
-                    if (key.toLowerCase().includes('nº oc') || key.toLowerCase().includes('numero oc') || 
-                        key.toLowerCase().includes('num oc') || key.toLowerCase().includes('n oc')) {
-                        colBA = key;
-                        break;
-                    }
-                }
-                
-                if (!colBA) {
-                    for (const key of keys) {
-                        const value = firstRow[key];
-                        if (value && value.toString().match(/^\d{6}$/)) {
-                            colBA = key;
-                            break;
-                        }
-                    }
-                }
-                
-                if (!colBA) {
-                    colBA = findKey(['ba', 'numero', 'num', 'relatorio', 'protocolo', 'ocorrencia']);
-                }
-
-                return raw.map((r, i) => {
-                    if(!r[colNatureza]) return null;
-                    
-                    let natureza = (r[colNatureza] || "").toUpperCase().trim();
-                    let pelotao = (r[colPelotao] || "").toUpperCase().trim();
-                    const viatura = (r[colViatura] || "").toUpperCase();
-                    const numeroBA = colBA ? (r[colBA] || '') : '';
-                    
-                    // Normalizar natureza
-                    if(natureza.includes("INCÊNDIO")) natureza = "INCÊNDIO";
-                    else if(natureza.includes("INSETO")) natureza = "MANEJO DE INSETOS";
-                    else if(natureza.includes("SALVAMENTO") || natureza.includes("BUSCA") || natureza.includes("RESGATE")) 
-                        natureza = "BUSCA E RESGATE";
-                    else if(natureza.includes("APH") || natureza.includes("PRÉ-HOSPITALAR")) natureza = "PRÉ-HOSPITALAR";
-                    else if(natureza.includes("VISTORIA")) natureza = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-                    else if(natureza.includes("CORTE") && natureza.includes("ÁRVORE")) natureza = "CORTE DE ÁRVORE";
-                    else if(natureza.includes("PREVENTIVA")) natureza = "AÇÕES PREVENTIVAS";
-                    else if(natureza.includes("PRODUTO") && natureza.includes("PERIGOSO")) natureza = "PRODUTOS PERIGOSOS";
-                    else if(natureza.includes("TROTE")) natureza = "TROTE";
-                    
-                    // Corrigir PASSO D'AREIA
-                    if (pelotao.includes("PASSO") || pelotao.includes("PASSO D'AREIA") || pelotao.includes("2ª 2º")) {
-                        pelotao = "PASSO D'AREIA";
-                    } else if (viatura.includes("AR") || pelotao.includes("RESGATE") || pelotao.includes("GBS")) {
-                        pelotao = "AUTO RESGATE";
-                    } else {
-                        CONFIG.poa.forEach(p => {
-                            if (pelotao.includes(p.replace("'", "").toUpperCase())) {
-                                pelotao = p;
-                            }
-                        });
-                    }
-
-                    // --- FILTRO: cidades que devem ser omitidas do gráfico (viram OUTROS) ---
-                    const cidadesExcluir = ["CACHOEIRINHA", "CANOAS", "CAXIAS DO SUL", "CAXIAS"];
-                    if (cidadesExcluir.some(cidade => pelotao.includes(cidade))) {
-                        pelotao = "OUTROS";
-                    }
-                    // -----------------------------------------------------------------------
-                    
-                    // Simplificar pelotões especiais
-                    if (PELOTAO_SIMPLIFICADO[pelotao]) {
-                        pelotao = PELOTAO_SIMPLIFICADO[pelotao];
-                    } else if (!CONFIG.poa.includes(pelotao) && pelotao) {
-                        for (const [key, value] of Object.entries(PELOTAO_SIMPLIFICADO)) {
-                            if (pelotao.includes(key.replace(" (POA)", ""))) {
-                                pelotao = value;
-                                break;
-                            }
-                        }
-                        
-                        pelotao = pelotao.replace("1º BBM / ", "")
-                                        .replace("CIA / ", "")
-                                        .replace("PEL / ", "")
-                                        .replace("PEL.", "")
-                                        .replace("PELOTÃO", "")
-                                        .replace("2ª 2º ", "")
-                                        .replace("1ª 1º ", "")
-                                        .replace("1º GR ", "")
-                                        .trim();
-                        if (pelotao.length <= 2) pelotao = "OUTROS";
-                    }
-                    
-                    if (pelotao.includes("AQUÁTICO")) {
-                        pelotao = pelotao.replace("AQUÁTICO", "AQUÁTICA");
-                    }
-                    
-                    let mapUrl = null;
-                    if (r[colLat] && r[colLon]) {
-                        const lat = r[colLat].replace(',', '.').trim();
-                        const lon = r[colLon].replace(',', '.').trim();
-                        if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
-                            mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-                        }
-                    }
-
-                    return {
-                        id: i + 1,
-                        date: r[colData] || '--/--/----',
-                        nat: natureza,
-                        sub: (r[colSubgrupo] || '').toUpperCase().trim(),
-                        pel: pelotao || "OUTROS",
-                        bairro: (r[colBairro] || '--').toUpperCase().trim(),
-                        map: mapUrl,
-                        ba: numeroBA
-                    };
-                }).filter(x => x !== null);
-            },
-
-            initFilters: () => {
-                const sets = {
-                    nat: new Set(),
-                    sub: new Set(),
-                    bai: new Set(),
-                    pel: new Set()
-                };
-                
-                Core.db.forEach(d => {
-                    sets.nat.add(d.nat);
-                    if(d.sub && d.sub !== '') sets.sub.add(d.sub);
-                    if(d.bairro && d.bairro !== '--') sets.bai.add(d.bairro);
-                    sets.pel.add(d.pel);
-                });
-
-                const populateFilter = (id, values, placeholder) => {
-                    const select = document.getElementById(id);
-                    select.innerHTML = `<option value="">${placeholder}</option>`;
-                    Array.from(values)
-                        .sort()
-                        .forEach(value => {
-                            const option = document.createElement('option');
-                            option.value = value;
-                            option.textContent = value;
-                            select.appendChild(option);
-                        });
-                };
-
-                populateFilter('fNat', sets.nat, 'Todas as Naturezas');
-                populateFilter('fSub', sets.sub, 'Todos os Subgrupos');
-                populateFilter('fBai', sets.bai, 'Todos os Bairros');
-                populateFilter('fPel', sets.pel, 'Todos os Pelotões');
-            },
-
-            applyFilters: () => {
-                const filters = {
-                    nat: document.getElementById('fNat').value,
-                    sub: document.getElementById('fSub').value,
-                    bai: document.getElementById('fBai').value,
-                    pel: document.getElementById('fPel').value
-                };
-
-                const filtered = Core.db.filter(item => {
-                    return (!filters.nat || item.nat === filters.nat) &&
-                           (!filters.sub || item.sub === filters.sub) &&
-                           (!filters.bai || item.bairro === filters.bai) &&
-                           (!filters.pel || item.pel === filters.pel);
-                });
-
-                Core.render(filtered);
-            },
-
-            resetFilters: () => {
-                document.querySelectorAll('#fNat, #fSub, #fBai, #fPel').forEach(select => {
-                    select.value = '';
-                });
-                Core.render(Core.db);
-            },
-
-            render: (data) => {
-                document.getElementById('totalVal').textContent = data.length.toLocaleString('pt-BR');
-                document.getElementById('rowsVal').textContent = data.length.toLocaleString('pt-BR');
-
-                const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = '';
-
-                const displayData = data.slice(0, 100);
-                
-                displayData.forEach(item => {
-                    const style = STYLES[item.nat] || { i: "📄", cl: "text-slate-400" };
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-white/5 border-b border-white/5';
-                    row.innerHTML = `
-                        <td class="p-2 sm:p-3 text-center text-slate-500 font-mono">${item.id}</td>
-                        <td class="p-2 sm:p-3 whitespace-nowrap">${item.date}</td>
-                        <td class="p-2 sm:p-3 font-bold ${style.cl}">
-                            <span class="mr-2">${style.i}</span>${item.nat}
-                        </td>
-                        <td class="p-2 sm:p-3 text-blue-200/70 text-xs truncate max-w-[150px]" title="${item.sub}">
-                            ${item.sub || '-'}
-                        </td>
-                        <td class="p-2 sm:p-3 truncate max-w-[120px]" title="${item.bairro}">
-                            ${item.bairro}
-                        </td>
-                        <td class="p-2 sm:p-3 text-emerald-400 font-bold truncate max-w-[120px]" title="${item.pel}">
-                            ${item.pel}
-                        </td>
-                        <td class="p-2 sm:p-3 text-center">
-                            ${item.map ? 
-                                `<a href="${item.map}" target="_blank" class="text-blue-400 hover:text-white transition-colors" title="Abrir no Google Maps">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </a>` : 
-                                '<span class="text-slate-600">-</span>'
-                            }
-                        </td>
-                        <td class="p-2 sm:p-3 text-center text-slate-400 font-mono">
-                            ${item.ba || '<span class="text-slate-600">-</span>'}
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                Core.drawCharts(data);
-            },
-
-            drawCharts: (data) => {
-                const aggregations = {
-                    pel: {},
-                    nat: {},
-                    sub: {}
-                };
-
-                data.forEach(item => {
-                    aggregations.pel[item.pel] = (aggregations.pel[item.pel] || 0) + 1;
-                    aggregations.nat[item.nat] = (aggregations.nat[item.nat] || 0) + 1;
-                    if (item.sub && item.sub !== '') {
-                        const key = `${item.nat} - ${item.sub}`;
-                        aggregations.sub[key] = (aggregations.sub[key] || 0) + 1;
-                    }
-                });
-
-                const sortObject = (obj) => 
-                    Object.entries(obj).sort((a, b) => b[1] - a[1]);
-
-                Core.createChart('chartPel', sortObject(aggregations.pel), 'pel');
-                Core.createChart('chartNat', sortObject(aggregations.nat), 'nat');
-                Core.createChart('chartSub', sortObject(aggregations.sub), 'sub');
-            },
-
-            createChart: (canvasId, data, type) => {
-                if (instances[canvasId]) {
-                    instances[canvasId].destroy();
-                }
-
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                const config = getChartConfig();
-                
-                let labels = data.map(item => {
-                    if (type === 'sub') {
-                        const maxLength = isMobile() ? 40 : isTablet() ? 50 : 60;
-                        let label = item[0].split(' - ')[1] || item[0];
-                        if (label.length > maxLength) {
-                            label = label.substring(0, maxLength) + '...';
-                        }
-                        return label;
-                    }
-                    return item[0];
-                });
-                
-                const values = data.map(item => item[1]);
-                const total = values.reduce((a, b) => a + b, 0);
-
-                let backgroundColors;
-                let tickColors;
-                let barThickness;
-                let categoryPercentage;
-                let barPercentage;
-
-                if (type === 'pel') {
-                    const isPoaPelotao = (label) => {
-                        return CONFIG.poa.includes(label) || label === "PASSO D'AREIA";
-                    };
-                    
-                    const isBBS = (label) => {
-                        return label.includes("BBS") || label.includes("AODC") || label.includes("COBOM") || label.includes("8º BBM");
-                    };
-                    
-                    const poaItems = data.filter(item => isPoaPelotao(item[0]));
-                    const sortedPoa = [...poaItems].sort((a, b) => b[1] - a[1]);
-                    const poaRanking = {};
-                    sortedPoa.forEach((item, index) => {
-                        poaRanking[item[0]] = index;
-                    });
-                    const totalPoa = sortedPoa.length;
-                    
-                    backgroundColors = labels.map(label => {
-                        if (poaRanking.hasOwnProperty(label)) {
-                            const rank = poaRanking[label];
-                            const gradientIndex = Math.min(
-                                Math.floor((rank / Math.max(1, totalPoa - 1)) * (GREEN_GRADIENTS.length - 1)),
-                                GREEN_GRADIENTS.length - 1
-                            );
-                            return GREEN_GRADIENTS[gradientIndex];
-                        }
-                        return '#64748B';
-                    });
-                    
-                    tickColors = labels.map(label => {
-                        if (isPoaPelotao(label)) return '#10B981';
-                        if (isBBS(label)) return '#94a3b8';
-                        return '#94a3b8';
-                    });
-                    
-                    barThickness = config.barThickness;
-                    categoryPercentage = config.categoryPercentage;
-                    barPercentage = 0.7; // mais espaçamento entre barras
-                    
-                } else if (type === 'nat') {
-                    const newLabels = data.map(item => {
-                        const style = STYLES[item[0]] || { i: "⚠️" };
-                        return `${item[0]} ${style.i}`;
-                    });
-                    labels = newLabels;
-                    
-                    backgroundColors = data.map(item => {
-                        const style = STYLES[item[0]] || { c: '#64748B' };
-                        return style.c;
-                    });
-                    
-                    tickColors = data.map(item => {
-                        const style = STYLES[item[0]] || { cl: '#94a3b8' };
-                        const colorClass = style.cl.replace('text-', '');
-                        const colorMap = {
-                            'yellow-400': '#FBBF24',
-                            'brown-600': '#8B4513',
-                            'orange-500': '#F97316',
-                            'green-400': '#34D399',
-                            'sky-400': '#38BDF8',
-                            'blue-400': '#60A5FA',
-                            'red-500': '#EF4444',
-                            'white': '#FFFFFF',
-                            'purple-400': '#A78BFA',
-                            'slate-400': '#94A3B8'
-                        };
-                        return colorMap[colorClass] || '#94A3B8';
-                    });
-                    
-                    barThickness = config.barThickness;
-                    categoryPercentage = config.categoryPercentage;
-                    barPercentage = 0.8;
-                    
-                } else if (type === 'sub') {
-                    backgroundColors = data.map(item => {
-                        const nat = item[0].split(' - ')[0];
-                        const style = STYLES[nat] || { bg: 'rgba(100, 116, 139, 0.8)' };
-                        return style.bg;
-                    });
-                    
-                    tickColors = data.map(item => {
-                        const nat = item[0].split(' - ')[0];
-                        const style = STYLES[nat] || { cl: '#94a3b8', i: "⚠️" };
-                        const colorClass = style.cl.replace('text-', '');
-                        const colorMap = {
-                            'yellow-400': '#FBBF24',
-                            'brown-600': '#8B4513',
-                            'orange-500': '#F97316',
-                            'green-400': '#34D399',
-                            'sky-400': '#38BDF8',
-                            'blue-400': '#60A5FA',
-                            'red-500': '#EF4444',
-                            'white': '#FFFFFF',
-                            'purple-400': '#A78BFA',
-                            'slate-400': '#94A3B8'
-                        };
-                        return colorMap[colorClass] || '#94A3B8';
-                    });
-                    
-                    labels = data.map((item) => {
-                        const nat = item[0].split(' - ')[0];
-                        const sub = item[0].split(' - ')[1] || '';
-                        const style = STYLES[nat] || { i: "⚠️" };
-                        const maxLength = isMobile() ? 35 : isTablet() ? 45 : 55;
-                        let displaySub = sub;
-                        if (displaySub.length > maxLength) {
-                            displaySub = displaySub.substring(0, maxLength) + '...';
-                        }
-                        return `${displaySub} ${style.i}`;
-                    });
-                    
-                    const container = document.getElementById('subChartContainer');
-                    const minHeight = isMobile() ? 380 : isTablet() ? 420 : 480;
-                    const itemHeight = config.subItemHeight;
-                    const calculatedHeight = Math.max(minHeight, data.length * itemHeight);
-                    container.style.height = `${calculatedHeight}px`;
-                    
-                    barThickness = config.subBarThickness;
-                    categoryPercentage = config.subSpacing;
-                    barPercentage = 0.6;
-                } else {
-                    backgroundColors = '#60A5FA';
-                    tickColors = Array(labels.length).fill('#94a3b8');
-                    barThickness = config.barThickness;
-                    categoryPercentage = config.categoryPercentage;
-                    barPercentage = 0.8;
-                }
-
-                instances[canvasId] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: backgroundColors,
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            borderRadius: 2,
-                            barThickness: barThickness,
-                            categoryPercentage: categoryPercentage,
-                            barPercentage: barPercentage
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        layout: {
-                            padding: {
-                                right: 50
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                                borderColor: 'rgba(255, 255, 255, 0.1)',
-                                borderWidth: 1,
-                                titleColor: '#e2e8f0',
-                                bodyColor: '#cbd5e1',
-                                padding: 12,
-                                displayColors: false,
-                                callbacks: {
-                                    label: (context) => {
-                                        const value = context.raw;
-                                        const percentage = ((value / total) * 100).toFixed(1);
-                                        return `${value.toLocaleString('pt-BR')} ocorrências (${percentage}%)`;
-                                    },
-                                    title: (context) => {
-                                        if (type === 'sub') {
-                                            return data[context[0].dataIndex][0];
-                                        }
-                                        return context[0].label;
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                color: '#ffffff',
-                                anchor: 'end',
-                                align: 'end',
-                                font: {
-                                    family: "'ui-monospace', monospace",
-                                    weight: 'bold',
-                                    size: type === 'sub' ? (isMobile() ? 10 : isTablet() ? 11 : 12) : config.datalabelsSize
-                                },
-                                formatter: (value) => value.toLocaleString('pt-BR'),
-                                display: (context) => {
-                                    return context.dataset.data[context.dataIndex] > 0;
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                display: false,
-                                grid: { 
-                                    color: 'rgba(255, 255, 255, 0.05)',
-                                    drawBorder: false
-                                }
-                            },
-                            y: {
-                                grid: { display: false },
-                                ticks: {
-                                    color: (context) => {
-                                        if (type === 'pel') {
-                                            return tickColors[context.index];
-                                        } else if (type === 'nat') {
-                                            return tickColors[context.index];
-                                        } else if (type === 'sub') {
-                                            return tickColors[context.index];
-                                        }
-                                        return '#94a3b8';
-                                    },
-                                    font: {
-                                        size: type === 'sub' ? (isMobile() ? 11 : isTablet() ? 12 : 13) : config.fontSize,
-                                        family: "'ui-monospace', monospace",
-                                        weight: type === 'sub' ? 'bold' : 'normal'
-                                    },
-                                    padding: type === 'sub' ? 6 : config.tickPadding,
-                                }
-                            }
-                        },
-                        interaction: {
-                            mode: 'nearest',
-                            intersect: true,
-                            axis: 'y'
-                        },
-                        hover: {
-                            mode: 'nearest',
-                            intersect: true
-                        },
-                        animation: {
-                            duration: 500,
-                            easing: 'easeOutQuart'
-                        }
-                    }
-                });
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', Core.init);
-    </script>
 </body>
 </html>
