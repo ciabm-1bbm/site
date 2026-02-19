@@ -84,7 +84,7 @@
         .tooltip-box {
             visibility: hidden; opacity: 0; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
             background: #000; border: 1px solid #FF8C00; padding: 10px; border-radius: 6px;
-            width: max-content; min-width: 250px; z-index: 100; transition: 0.2s; pointer-events: none;
+            width: max-content; min-width: 280px; z-index: 100; transition: 0.2s; pointer-events: none;
             box-shadow: 0 10px 40px black; margin-top: 10px;
         }
         .group:hover .tooltip-box { visibility: visible; opacity: 1; }
@@ -100,7 +100,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Finalizando visual...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Separando funções...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -204,6 +204,32 @@
             "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
 
+        // LISTA FIXA DE FUNÇÕES (Do maior para o menor para evitar erro de replace parcial)
+        const FUNCOES_FIXAS = [
+            "COMANDANTE DE GUARNIÇÃO",
+            "AUXILIAR DE LINHA DIREITA",
+            "AUXILIAR DE LINHA ESQUERDA",
+            "COV / OPERADOR / CONDUTOR",
+            "COMANDANTE DE SOCORRO",
+            "CHEFE DE LINHA DIREITA",
+            "CHEFE DE LINHA ESQUERDA",
+            "OFICIAL SUPERVISOR",
+            "MOTORISTA DE DIA",
+            "OPERADOR COBOM",
+            "CONDUTOR NAVAL",
+            "OFICIAL DE SV",
+            "OPERADOR CCOB",
+            "RESGATISTA 1",
+            "RESGATISTA 2",
+            "SOCORRISTA 1",
+            "SOCORRISTA 2",
+            "CINOTÉCNICO",
+            "MERGULHADOR",
+            "SOCORRISTA",
+            "RESGATISTA",
+            "MOTORISTA"
+        ];
+
         function getDataOperacional() {
             const agora = new Date();
             if (agora.getHours() < 8) {
@@ -218,37 +244,9 @@
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        // LIMPEZA E PADRONIZAÇÃO
-        function normalizarFuncao(funcRaw) {
-            if(!funcRaw) return "";
-            let f = funcRaw.toUpperCase();
-
-            f = f.replace(/\bND\b/g, '')           
-                 .replace(/\d+º\s*\d+/g, '')       
-                 .replace(/\b\d+\b/g, '')          
-                 .replace(/[-]/g, ' ')             
-                 .replace(/\s+/g, ' ')             
-                 .trim();
-
-            if(f.length < 2) return ""; 
-
-            if(f.includes("CONDUTOR") || f.includes("MOTORISTA")) return "COV";
-            if(f.includes("CMT") || f.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
-            if(f.includes("LINHA") && f.includes("CHEFE")) return "LINHA (CHEFE)";
-            if(f.includes("LINHA") && f.includes("AUXILIAR")) return "LINHA (AUXILIAR)";
-            if(f.includes("OPERADOR") || f.includes("COBOM")) return "OPERADOR COBOM";
-            if(f.includes("MERGULHADOR")) return "MERGULHADOR";
-            if(f.includes("NAVAL")) return "CONDUTOR NAVAL";
-            if(f.includes("CINO") || f.includes("CANIL")) return "CINOTÉCNICO";
-            if(f.includes("MOTORISTA") && f.includes("DIA")) return "MOTORISTA DE DIA";
-            if(f.includes("OFICIAL") && f.includes("SERVIÇO")) return "OFICIAL DE SERVIÇO";
-
-            return f; 
-        }
-
+        // --- CALCULADORA DE TURNO ---
         function calcularTurno(raw) {
             if(!raw) return "";
-
             try {
                 const horasMatch = raw.match(/(\d{2}:\d{2})/g);
                 if (!horasMatch || horasMatch.length === 0) return "";
@@ -258,11 +256,8 @@
                 const amanha = new Date(dataOp);
                 amanha.setDate(amanha.getDate() + 1);
 
-                let hInicio = "08:00";
-                let hFim = "08:00";
-                let dInicio = hoje;
-                let dFim = amanha; 
-                let carga = "24h";
+                let hInicio = "08:00"; let hFim = "08:00";
+                let dInicio = hoje; let dFim = amanha; let carga = "24h";
 
                 if (horasMatch.length === 1) {
                     const horaUnica = horasMatch[0];
@@ -303,7 +298,6 @@
                         <span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>
                     </div>
                 `;
-
             } catch(e) { console.error(e); return ""; }
         }
 
@@ -312,10 +306,13 @@
             return match ? match[1] : null; 
         }
 
-        function limparNome(nomeCompleto) {
-            return nomeCompleto.replace(/\d{7}\s+/, '').trim();
+        function limparNomeBasico(nomeCompleto) {
+            return nomeCompleto.replace(/\d{7}\s+/, '').replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/\b\d+\b/g, '').trim();
         }
 
+        // =========================================================
+        // PROCESSAMENTO COM SEPARAÇÃO DE FUNÇÃO INTELIGENTE
+        // =========================================================
         function processarDados(dados) {
             const estrutura = {};
             const mapOficiais = new Map();
@@ -326,13 +323,38 @@
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
-                let nomeCompleto = (d.nome || "").trim().toUpperCase();
+                let nomeBruto = (d.nome || "").trim().toUpperCase();
+                let funcBruta = (d.func || "").trim().toUpperCase();
                 
-                let idMilitar = extrairID(nomeCompleto);
-                let idUnico = idMilitar ? idMilitar : nomeCompleto;
-                let nomeExibicao = limparNome(nomeCompleto);
+                // 1. LIMPEZA PRELIMINAR (Remove lixo comum)
+                funcBruta = funcBruta.replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/[0-9]/g, '').replace(/[-]/g, '').trim();
+
+                // 2. EXTRAÇÃO DE FUNÇÃO FIXA (Se a função estiver grudada no nome ou na variavel func)
+                let funcaoFinal = "";
                 
-                let func = normalizarFuncao(d.func || "");
+                // Verifica na string de Função primeiro
+                for (const cargo of FUNCOES_FIXAS) {
+                    if (funcBruta.includes(cargo)) {
+                        funcaoFinal = cargo;
+                        break;
+                    }
+                }
+
+                // Se não achou na função, procura se está grudado no NOME (Erro comum)
+                if (funcaoFinal === "") {
+                    for (const cargo of FUNCOES_FIXAS) {
+                        if (nomeBruto.includes(cargo)) {
+                            funcaoFinal = cargo;
+                            // Remove a função do nome para não duplicar
+                            nomeBruto = nomeBruto.replace(cargo, "").trim();
+                            break;
+                        }
+                    }
+                }
+
+                let idMilitar = extrairID(nomeBruto);
+                let idUnico = idMilitar ? idMilitar : nomeBruto;
+                let nomeExibicao = limparNomeBasico(nomeBruto);
                 let horaHTML = calcularTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
@@ -358,19 +380,18 @@
                     estrutura[obmKey].push(viaturaObj);
                 }
                 
-                if(nomeCompleto !== "ND" && !nomeCompleto.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: func, n: nomeExibicao, id: idUnico, h: horaHTML });
+                if(nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
+                    viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, h: horaHTML });
 
-                    // SALVAMOS O OBJETO {n, f} PARA O TOOLTIP
-                    const dadosMilitar = { n: nomeExibicao, f: func };
+                    const dadosMilitar = { n: nomeExibicao, f: funcaoFinal };
 
-                    if (nomeCompleto.includes("SD ") || nomeCompleto.includes("SOLDADO ")) {
+                    if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) {
                         mapPracas.set(idUnico, dadosMilitar);
                     }
-                    else if(nomeCompleto.includes("SGT")) {
+                    else if(nomeBruto.includes("SGT")) {
                         mapSargentos.set(idUnico, dadosMilitar);
                     }
-                    else if(nomeCompleto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
+                    else if(nomeBruto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
                         mapOficiais.set(idUnico, dadosMilitar);
                     }
                     else {
@@ -397,12 +418,11 @@
             const combArr = Array.from(statsViaturas.combate);
             const apoioArr = Array.from(statsViaturas.apoio);
 
-            // FUNÇÃO DE RENDERIZAR LISTA DO TOOLTIP (AJUSTE 1)
             const fillList = (idL, arr) => {
                 const html = arr.map(item => `
                     <li class="whitespace-nowrap mb-1">
                         <span class="text-bombeiros-orange font-bold">• ${item.n}</span>
-                        <span class="text-white"> - ${item.f}</span>
+                        ${item.f ? `<span class="text-white"> - ${item.f}</span>` : ''}
                     </li>
                 `).join('');
                 document.getElementById(idL).innerHTML = html;
@@ -465,11 +485,11 @@
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
-                            if(r.includes("COMANDANTE DE GUARNIÇÃO")) return 1;
-                            if(r.includes("COV")) return 2;
+                            if(r.includes("COMANDANTE")) return 1;
+                            if(r.includes("CONDUTOR") || r.includes("COV")) return 2;
                             return 3;
                         }
-                        return getScore(a.f) - getScore(b.f);
+                        return getScore(a.f || "") - getScore(b.f || "");
                     });
 
                     const listaVtrs = grupo.nomesVtrs.join(' / ');
@@ -485,12 +505,10 @@
                                         <div class="text-moss-green font-black text-xl leading-none drop-shadow-md text-center">
                                             ${m.n}
                                         </div>
-                                        
                                         ${m.f ? `
                                         <div class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-1 text-center w-full block">
                                             ${m.f}
                                         </div>` : ''}
-                                        
                                         <div class="w-full flex justify-center">
                                             ${m.h}
                                         </div>
