@@ -100,7 +100,7 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Calculando turnos...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Limpando dados...</p>
     </div>
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
@@ -168,15 +168,15 @@
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-abt">0</span>
+                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box"><ul id="list-abt" class="text-xs text-left text-gray-300"></ul></div>
+                            <div class="tooltip-box"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                         <div class="w-px h-10 bg-white/10"></div>
                         <div class="group relative text-center cursor-help">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-ar">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">RESGATE (AR / AEM)</span>
-                            <div class="tooltip-box"><ul id="list-ar" class="text-xs text-left text-gray-300"></ul></div>
+                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
+                            <div class="tooltip-box"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
                     </div>
                 </div>
@@ -204,10 +204,6 @@
             "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
         ];
 
-        // --------------------------------------------------------
-        // FUNÇÃO DATA OPERACIONAL (O CORAÇÃO DA LÓGICA)
-        // Se for antes das 08:00, considera que ainda é "Ontem"
-        // --------------------------------------------------------
         function getDataOperacional() {
             const agora = new Date();
             if (agora.getHours() < 8) {
@@ -216,108 +212,97 @@
             return agora;
         }
 
-        // Formata data: 10Fev
         function formatarDataCurta(data) {
             const dia = String(data.getDate()).padStart(2, '0');
             const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
             return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
         }
 
-        // --------------------------------------------------------
-        // NOVA CALCULADORA DE TURNOS (V23 - ZERO DATA SUJA)
-        // --------------------------------------------------------
+        // --- TRADUTOR E LIMPEZA DE FUNÇÕES (AGORA MAIS FORTE) ---
+        function normalizarFuncao(funcRaw) {
+            if(!funcRaw) return "";
+            let f = funcRaw.toUpperCase();
+
+            // 1. LIMPEZA PROFUNDA (Remove sujeira como "1º 24", "ND", números soltos)
+            f = f.replace(/\bND\b/g, '')           // Remove ND exato
+                 .replace(/\d+º\s*\d+/g, '')       // Remove "1º 24", "2º 12"
+                 .replace(/\b\d+\b/g, '')          // Remove números soltos "12", "24"
+                 .replace(/[-]/g, ' ')             // Remove traços
+                 .replace(/\s+/g, ' ')             // Remove espaços duplos
+                 .trim();
+
+            if(f.length < 2) return ""; // Se sobrou quase nada, retorna vazio
+
+            // 2. Padronização de Termos
+            if(f.includes("CONDUTOR") || f.includes("MOTORISTA")) return "COV";
+            if(f.includes("CMT") || f.includes("COMANDANTE")) return "COMANDANTE DE GUARNIÇÃO";
+            if(f.includes("LINHA") && f.includes("CHEFE")) return "LINHA (CHEFE)";
+            if(f.includes("LINHA") && f.includes("AUXILIAR")) return "LINHA (AUXILIAR)";
+            if(f.includes("OPERADOR") || f.includes("COBOM")) return "OPERADOR COBOM";
+            if(f.includes("MERGULHADOR")) return "MERGULHADOR";
+            if(f.includes("NAVAL")) return "CONDUTOR NAVAL";
+            if(f.includes("CINO") || f.includes("CANIL")) return "CINOTÉCNICO";
+            if(f.includes("MOTORISTA") && f.includes("DIA")) return "MOTORISTA DE DIA";
+            if(f.includes("OFICIAL") && f.includes("SERVIÇO")) return "OFICIAL DE SERVIÇO";
+
+            return f; 
+        }
+
         function calcularTurno(raw) {
             if(!raw) return "";
 
             try {
-                // 1. Extrair APENAS as horas (ignorando datas do Excel)
                 const horasMatch = raw.match(/(\d{2}:\d{2})/g);
-                
-                // Se não tem hora, retorna vazio
                 if (!horasMatch || horasMatch.length === 0) return "";
 
-                // 2. Definir Datas Base (Hoje e Amanhã)
                 const dataOp = getDataOperacional();
                 const hoje = new Date(dataOp);
                 const amanha = new Date(dataOp);
                 amanha.setDate(amanha.getDate() + 1);
 
-                // 3. Variáveis de Saída
                 let hInicio = "08:00";
                 let hFim = "08:00";
                 let dInicio = hoje;
-                let dFim = amanha; // Padrão 24h termina amanhã
+                let dFim = amanha; 
                 let carga = "24h";
 
-                // --- CENÁRIO A: Único Horário (ex: "20:00" ou "08:00") ---
                 if (horasMatch.length === 1) {
                     const horaUnica = horasMatch[0];
-                    
                     if (horaUnica === "20:00") {
-                        // CASO BOTTINI: Sai às 20h. Logo, entrou às 08h de HOJE.
-                        hInicio = "08:00";
-                        hFim = "20:00";
-                        dFim = hoje; // Termina hoje
-                        carga = "12h";
-                    } 
-                    else {
-                        // CASO PADRÃO: Sai às 08h. Logo, entrou às 08h de hoje e sai amanhã.
-                        hInicio = "08:00";
-                        hFim = "08:00";
-                        dFim = amanha;
-                        carga = "24h";
+                        hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
+                    } else {
+                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
                     }
                 }
-                
-                // --- CENÁRIO B: Dois Horários (ex: "08:00 20:00" ou "20:00 08:00") ---
                 else if (horasMatch.length >= 2) {
                     hInicio = horasMatch[0];
-                    hFim = horasMatch[1]; // Pega o último horário registrado
-
+                    hFim = horasMatch[1]; 
                     if (hInicio === hFim) {
-                        // 24h Padrão
-                        dFim = amanha;
-                        carga = "24h";
-                    }
-                    else if (hInicio === "08:00" && hFim === "20:00") {
-                        // 12h Diurno
-                        dFim = hoje;
-                        carga = "12h";
-                    }
-                    else if (hInicio === "20:00" && hFim === "08:00") {
-                        // 12h Noturno
-                        dFim = amanha;
-                        carga = "12h";
-                    }
-                    else {
-                        // Genérico (Calcula se virou o dia)
+                        dFim = amanha; carga = "24h";
+                    } else if (hInicio === "08:00" && hFim === "20:00") {
+                        dFim = hoje; carga = "12h";
+                    } else if (hInicio === "20:00" && hFim === "08:00") {
+                        dFim = amanha; carga = "12h";
+                    } else {
                         const h1 = parseInt(hInicio.split(':')[0]);
                         const h2 = parseInt(hFim.split(':')[0]);
-                        if (h2 < h1) dFim = amanha;
-                        else dFim = hoje;
-                        
-                        let diff = h2 - h1;
-                        if(diff < 0) diff += 24;
+                        if (h2 < h1) dFim = amanha; else dFim = hoje;
+                        let diff = h2 - h1; if(diff < 0) diff += 24;
                         carga = diff > 12 ? "24h" : "12h";
                     }
                 }
 
-                // 4. Montar Strings Finais
                 const strDataIni = formatarDataCurta(dInicio);
                 const strDataFim = formatarDataCurta(dFim);
 
-                // 5. Retornar HTML Formatado e Colorido
                 return `
-                    <div class="mt-1 leading-snug">
+                    <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
                         <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
-                        <span class="text-gray-500 text-[10px]">- das</span> 
+                        <span class="text-gray-500 text-[10px]">|</span> 
                         <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
-                        <span class="text-gray-500 text-[10px]">de</span> 
-                        <span class="text-gray-400 font-bold text-[10px]">${strDataIni}</span> 
-                        <span class="text-gray-500 text-[10px]">às</span> 
+                        <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
                         <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
-                        <span class="text-gray-500 text-[10px]">de</span> 
-                        <span class="text-gray-400 font-bold text-[10px]">${strDataFim}</span>
+                        <span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>
                     </div>
                 `;
 
@@ -338,7 +323,7 @@
             const mapOficiais = new Map();
             const mapSargentos = new Map();
             const mapPracas = new Map();
-            const statsViaturas = { abt: new Set(), ar: new Set() };
+            const statsViaturas = { combate: new Set(), apoio: new Set() };
 
             dados.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
@@ -348,9 +333,9 @@
                 let idMilitar = extrairID(nomeCompleto);
                 let idUnico = idMilitar ? idMilitar : nomeCompleto;
                 let nomeExibicao = limparNome(nomeCompleto);
-                let func = (d.func || "").trim();
                 
-                // CHAMA A NOVA FUNÇÃO LIMPA
+                // Lógica de limpeza reforçada aqui
+                let func = normalizarFuncao(d.func || "");
                 let horaHTML = calcularTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
@@ -393,8 +378,12 @@
                     }
                 }
 
-                if(vtr.includes("ABT")) statsViaturas.abt.add(vtr);
-                if(vtr.includes("AR") || vtr.includes("AEM")) statsViaturas.ar.add(vtr);
+                if(vtr.includes("ABT")) {
+                    statsViaturas.combate.add(vtr);
+                }
+                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
+                    statsViaturas.apoio.add(vtr);
+                }
             });
 
             atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
@@ -405,8 +394,8 @@
             const capArr = Array.from(mapOficiais.values());
             const sgtArr = Array.from(mapSargentos.values());
             const sdArr = Array.from(mapPracas.values());
-            const abtArr = Array.from(statsViaturas.abt);
-            const arArr = Array.from(statsViaturas.ar);
+            const combArr = Array.from(statsViaturas.combate);
+            const apoioArr = Array.from(statsViaturas.apoio);
 
             const fill = (idC, idL, arr) => {
                 document.getElementById(idC).innerText = arr.length;
@@ -417,11 +406,12 @@
             fill('count-sgt', 'list-sgt', sgtArr);
             fill('count-sd', 'list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
-            document.getElementById('count-abt').innerText = abtArr.length;
-            document.getElementById('count-ar').innerText = arArr.length;
             
-            document.getElementById('list-abt').innerHTML = abtArr.map(x => `<li>• ${x}</li>`).join('');
-            document.getElementById('list-ar').innerHTML = arArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('count-combate').innerText = combArr.length;
+            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
+
+            document.getElementById('count-apoio').innerText = apoioArr.length;
+            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li>• ${x}</li>`).join('');
         }
 
         function renderizarCards(estrutura) {
@@ -450,7 +440,6 @@
                 const card = document.createElement('div');
                 card.className = "card-monitor break-inside-avoid mb-5"; 
 
-                // NOME DO PELOTÃO GIGANTE (text-3xl) e LARANJA
                 let content = `
                     <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
                         <h2 class="vertical-text text-white font-black text-2xl md:text-3xl tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
@@ -464,8 +453,8 @@
                     grupo.guarnicao.sort((a,b) => {
                         const getScore = (role) => {
                             let r = role.toUpperCase();
-                            if(r.includes("CMT") || r.includes("COMANDANTE")) return 1;
-                            if(r.includes("CONDUTOR") || r.includes("MOTORISTA")) return 2;
+                            if(r.includes("COMANDANTE DE GUARNIÇÃO")) return 1;
+                            if(r.includes("COV")) return 2;
                             return 3;
                         }
                         return getScore(a.f) - getScore(b.f);
@@ -478,15 +467,20 @@
                             <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
                                 ${listaVtrs}
                             </span>
-                            <div class="w-full flex flex-col gap-2">
+                            <div class="w-full flex flex-col gap-3">
                                 ${grupo.guarnicao.map(m => `
-                                    <div class="text-center group">
-                                        <div class="text-moss-green font-bold text-lg leading-tight drop-shadow-md">
+                                    <div class="flex flex-col items-center w-full mb-1">
+                                        <div class="text-moss-green font-black text-xl leading-none drop-shadow-md text-center">
                                             ${m.n}
                                         </div>
-                                        <div class="text-[10px] uppercase tracking-wide">
-                                            <span class="font-bold text-gray-400">${m.f}</span>
-                                            <div>${m.h}</div>
+                                        
+                                        ${m.f ? `
+                                        <div class="text-gray-400 text-[9px] font-bold uppercase tracking-wider mt-1 text-center w-full block">
+                                            ${m.f}
+                                        </div>` : ''}
+                                        
+                                        <div class="w-full flex justify-center">
+                                            ${m.h}
                                         </div>
                                     </div>
                                 `).join('')}
