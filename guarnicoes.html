@@ -81,22 +81,44 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        /* --- ESTILOS CORRIGIDOS PARA O TOOLTIP RESPONSIVO --- */
+        /* --- ESTILOS BASE DO TOOLTIP --- */
         .tooltip-box {
             visibility: hidden; opacity: 0; position: absolute; top: 100%;
             background: rgba(15, 23, 42, 0.98); border: 1px solid #FF8C00; padding: 12px; border-radius: 8px;
-            width: max-content; max-width: 85vw; /* Evita vazar da tela no celular */
-            z-index: 100; transition: 0.2s; pointer-events: none;
+            width: max-content; min-width: 280px; z-index: 100; transition: 0.2s; pointer-events: none;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9); margin-top: 10px;
         }
         
-        /* Acionamento via Hover e Touch (Active) */
-        .group:hover .tooltip-box, .group:active .tooltip-box { visibility: visible; opacity: 1; }
+        /* Acionamento (Hover no PC, Focus/Active no Celular) */
+        .group:hover .tooltip-box, .group:focus .tooltip-box, .group:focus-within .tooltip-box { 
+            visibility: visible; opacity: 1; 
+        }
 
-        /* Classes de Alinhamento Inteligente para não cortar na borda */
-        .tt-left { left: 0; transform: none; }
-        .tt-center { left: 50%; transform: translateX(-50%); }
-        .tt-right { right: 0; left: auto; transform: none; }
+        /* --- ALINHAMENTO PARA PC (Telas grandes) --- */
+        @media (min-width: 768px) {
+            .tt-left { left: 0; transform: none; }
+            .tt-center { left: 50%; transform: translateX(-50%); }
+            .tt-right { right: 0; left: auto; transform: none; }
+        }
+
+        /* --- ALINHAMENTO PARA CELULAR (Pop-up Centralizado) --- */
+        @media (max-width: 767px) {
+            .tooltip-box {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                right: auto !important;
+                transform: translate(-50%, -50%) !important;
+                width: 90vw !important; /* Quase a largura toda da tela */
+                max-width: 400px;
+                max-height: 80vh; /* Máximo de altura */
+                overflow-y: auto; /* Cria barra de rolagem se for muito longo */
+                margin-top: 0;
+                border-width: 2px;
+                box-shadow: 0 0 50px rgba(0,0,0,0.9);
+                z-index: 999999 !important;
+            }
+        }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
@@ -149,19 +171,19 @@
                     </h3>
                     <div class="flex justify-around items-center">
                         
-                        <div class="group relative text-center cursor-pointer md:cursor-help">
+                        <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
                             <div class="tooltip-box tt-left"><ul id="list-cap" class="text-left"></ul></div>
                         </div>
 
-                        <div class="group relative text-center cursor-pointer md:cursor-help">
+                        <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
                             <div class="tooltip-box tt-center"><ul id="list-sgt" class="text-left"></ul></div>
                         </div>
 
-                        <div class="group relative text-center cursor-pointer md:cursor-help">
+                        <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
                             <div class="tooltip-box tt-right"><ul id="list-sd" class="text-left"></ul></div>
@@ -180,21 +202,17 @@
                         <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
                     </h3>
                     <div class="flex justify-around items-center">
-                        
-                        <div class="group relative text-center cursor-pointer md:cursor-help">
+                        <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
                             <div class="tooltip-box tt-left"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
-
                         <div class="w-px h-10 bg-white/10"></div>
-                        
-                        <div class="group relative text-center cursor-pointer md:cursor-help">
+                        <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
                             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
                             <div class="tooltip-box tt-right"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -212,11 +230,10 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
 
         const ORDEM_QUARTEIS = [
-            "OFICIAL DE DIA", "ESTADO MAIOR", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
+            "OFICIAL DE DIA","ESTADO MAIOR", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
             "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
             "PARTENON", "TERRESTRE", "CANIL", "AQUÁTICA", "MERGULHO", "CCOB",
         ];
@@ -381,7 +398,8 @@
                 else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
                 else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
                 else if(obmRaw.includes("CCOB")) obmKey = "CCOB";
-                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+                else if(obmRaw.includes("OFICIAL")) obmKey = "OFICIAL DE DIA";
+
                 if(!estrutura[obmKey]) estrutura[obmKey] = [];
                 
                 let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
@@ -428,7 +446,6 @@
             const combArr = Array.from(statsViaturas.combate);
             const apoioArr = Array.from(statsViaturas.apoio);
 
-            // FUNÇÃO ATUALIZADA DO TOOLTIP (Laranja no Nome - Branco na Função, Responsivo)
             const fillList = (idL, arr) => {
                 const html = arr.map(item => `
                     <li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left whitespace-normal break-words border-b border-white/5 pb-1 last:border-0">
