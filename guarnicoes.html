@@ -201,7 +201,7 @@
         const ORDEM_QUARTEIS = [
             "OFICIAL DE DIA", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
             "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
-            "PARTENON", "CANIL", "AQUÁTICA", "MERGULHO"
+            "PARTENON", "TERRESTRE", "CANIL", "AQUÁTICA", "MERGULHO" 
         ];
 
         // LISTA FIXA DE FUNÇÕES (Do maior para o menor para evitar erro de replace parcial)
@@ -369,6 +369,7 @@
                 else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
                 else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
                 else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
+                else if(obmRaw.includes("TERRESTRE")) obmKey = "TERRESTRE";
                 else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
                 else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
                 else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
@@ -556,4 +557,5 @@
     </script>
 </body>
 </html>
+
 
