@@ -10,7 +10,7 @@ import time
 URL = "https://e193.cbm.rs.gov.br/"
 USER = "2822130"
 PASS = "E193@Gus"
-URL_PONTE = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"
+URL_PONTE = "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec"
 
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
