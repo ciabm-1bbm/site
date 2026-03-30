@@ -89,19 +89,16 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.9); margin-top: 10px;
         }
         
-        /* Acionamento (Hover no PC, Focus/Active no Celular) */
         .group:hover .tooltip-box, .group:focus .tooltip-box, .group:focus-within .tooltip-box { 
             visibility: visible; opacity: 1; 
         }
 
-        /* --- ALINHAMENTO PARA PC (Telas grandes) --- */
         @media (min-width: 768px) {
             .tt-left { left: 0; transform: none; }
             .tt-center { left: 50%; transform: translateX(-50%); }
             .tt-right { right: 0; left: auto; transform: none; }
         }
 
-        /* --- ALINHAMENTO PARA CELULAR (Pop-up Centralizado) --- */
         @media (max-width: 767px) {
             .tooltip-box {
                 position: fixed !important;
@@ -109,10 +106,10 @@
                 left: 50% !important;
                 right: auto !important;
                 transform: translate(-50%, -50%) !important;
-                width: 90vw !important; /* Quase a largura toda da tela */
+                width: 90vw !important;
                 max-width: 400px;
-                max-height: 80vh; /* Máximo de altura */
-                overflow-y: auto; /* Cria barra de rolagem se for muito longo */
+                max-height: 80vh;
+                overflow-y: auto;
                 margin-top: 0;
                 border-width: 2px;
                 box-shadow: 0 0 50px rgba(0,0,0,0.9);
@@ -264,73 +261,74 @@
             "MOTORISTA"
         ];
 
-        function getDataOperacional() {
-            const agora = new Date();
-            if (agora.getHours() < 8) {
-                agora.setDate(agora.getDate() - 1);
-            }
-            return agora;
-        }
-
-        function formatarDataCurta(data) {
-            const dia = String(data.getDate()).padStart(2, '0');
-            const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-            return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
-        }
-
+        // === FUNÇÃO CORRIGIDA PARA TURNOS ===
         function calcularTurno(raw) {
-            if(!raw) return "";
+            if (!raw) return "";
             try {
-                const horasMatch = raw.match(/(\d{2}:\d{2})/g);
-                if (!horasMatch || horasMatch.length === 0) return "";
-
-                const dataOp = getDataOperacional();
-                const hoje = new Date(dataOp);
-                const amanha = new Date(dataOp);
-                amanha.setDate(amanha.getDate() + 1);
-
-                let hInicio = "08:00"; let hFim = "08:00";
-                let dInicio = hoje; let dFim = amanha; let carga = "24h";
-
-                if (horasMatch.length === 1) {
-                    const horaUnica = horasMatch[0];
-                    if (horaUnica === "20:00") {
-                        hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
+                const partes = raw.trim().split(/\s+/);
+                if (partes.length === 1) {
+                    const hInicio = partes[0];
+                    if (hInicio === "20:00") {
+                        return `
+                            <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
+                                <span class="text-bombeiros-orange font-bold text-xs">12h</span>
+                                <span class="text-gray-500 text-[10px]">|</span>
+                                <span class="text-sky-blue font-bold text-xs">20:00</span>
+                                <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
+                                <span class="text-sky-blue font-bold text-xs">08:00</span>
+                            </div>
+                        `;
+                    } else if (hInicio === "08:00") {
+                        return `
+                            <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
+                                <span class="text-bombeiros-orange font-bold text-xs">24h</span>
+                                <span class="text-gray-500 text-[10px]">|</span>
+                                <span class="text-sky-blue font-bold text-xs">08:00</span>
+                                <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
+                                <span class="text-sky-blue font-bold text-xs">08:00</span>
+                                <span class="text-gray-500 text-[9px] ml-0.5">(+1)</span>
+                            </div>
+                        `;
                     } else {
-                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
+                        // turno de 6h ou outro horário único
+                        return `
+                            <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
+                                <span class="text-bombeiros-orange font-bold text-xs">?</span>
+                                <span class="text-gray-500 text-[10px]">|</span>
+                                <span class="text-sky-blue font-bold text-xs">${hInicio}</span>
+                                <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
+                                <span class="text-sky-blue font-bold text-xs">${hInicio}</span>
+                            </div>
+                        `;
                     }
-                }
-                else if (horasMatch.length >= 2) {
-                    hInicio = horasMatch[0];
-                    hFim = horasMatch[1]; 
-                    if (hInicio === hFim) {
-                        dFim = amanha; carga = "24h";
-                    } else if (hInicio === "08:00" && hFim === "20:00") {
-                        dFim = hoje; carga = "12h";
-                    } else if (hInicio === "20:00" && hFim === "08:00") {
-                        dFim = amanha; carga = "12h";
-                    } else {
-                        const h1 = parseInt(hInicio.split(':')[0]);
-                        const h2 = parseInt(hFim.split(':')[0]);
-                        if (h2 < h1) dFim = amanha; else dFim = hoje;
-                        let diff = h2 - h1; if(diff < 0) diff += 24;
-                        carga = diff > 12 ? "24h" : "12h";
+                } else if (partes.length >= 2) {
+                    let hInicio = partes[0];
+                    let hFim = partes[1];
+                    let carga = "";
+                    if (hInicio === "08:00" && hFim === "20:00") carga = "12h";
+                    else if (hInicio === "20:00" && hFim === "08:00") carga = "12h";
+                    else {
+                        const [h1, m1] = hInicio.split(':').map(Number);
+                        const [h2, m2] = hFim.split(':').map(Number);
+                        let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+                        if (diff < 0) diff += 24 * 60;
+                        const diffHoras = diff / 60;
+                        if (Math.abs(diffHoras - 12) < 0.1) carga = "12h";
+                        else if (Math.abs(diffHoras - 6) < 0.1) carga = "6h";
+                        else carga = "24h";
                     }
+                    return `
+                        <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
+                            <span class="text-bombeiros-orange font-bold text-xs">${carga}</span>
+                            <span class="text-gray-500 text-[10px]">|</span>
+                            <span class="text-sky-blue font-bold text-xs">${hInicio}</span>
+                            <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
+                            <span class="text-sky-blue font-bold text-xs">${hFim}</span>
+                            ${carga === "24h" ? `<span class="text-gray-500 text-[9px] ml-0.5">(+1)</span>` : ''}
+                        </div>
+                    `;
                 }
-
-                const strDataIni = formatarDataCurta(dInicio);
-                const strDataFim = formatarDataCurta(dFim);
-
-                return `
-                    <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                        <span class="text-bombeiros-orange font-bold text-xs">${carga}</span> 
-                        <span class="text-gray-500 text-[10px]">|</span> 
-                        <span class="text-sky-blue font-bold text-xs">${hInicio}</span> 
-                        <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                        <span class="text-sky-blue font-bold text-xs">${hFim}</span> 
-                        <span class="text-gray-500 text-[9px] ml-0.5">(${strDataFim})</span>
-                    </div>
-                `;
+                return "";
             } catch(e) { console.error(e); return ""; }
         }
 
@@ -343,14 +341,37 @@
             return nomeCompleto.replace(/\d{7}\s+/, '').replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/\b\d+\b/g, '').trim();
         }
 
-        function processarDados(dados) {
+        // Função principal alterada para receber timestamp e atualizar cabeçalho
+        function processarDados(dadosRecebidos) {
+            // Se os dados vierem com timestamp, atualiza o cabeçalho
+            if (dadosRecebidos.timestamp_extracao) {
+                const dataObj = new Date(dadosRecebidos.timestamp_extracao);
+                const dataFormatada = dataObj.toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' }).toUpperCase();
+                const horaFormatada = dataObj.toLocaleTimeString('pt-BR');
+                document.getElementById('data-topo').innerHTML = dataFormatada;
+                document.getElementById('hora-topo').innerHTML = horaFormatada;
+            } else {
+                // Fallback: data/hora atual
+                const agora = new Date();
+                document.getElementById('data-topo').innerHTML = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+                document.getElementById('hora-topo').innerHTML = agora.toLocaleTimeString('pt-BR');
+            }
+
+            // Se os dados vierem como array diretamente (formato antigo) ou dentro de um campo "dados"
+            let dadosArray = dadosRecebidos;
+            if (dadosRecebidos.dados && Array.isArray(dadosRecebidos.dados)) {
+                dadosArray = dadosRecebidos.dados;
+            } else if (!Array.isArray(dadosRecebidos)) {
+                dadosArray = [];
+            }
+
             const estrutura = {};
             const mapOficiais = new Map();
             const mapSargentos = new Map();
             const mapPracas = new Map();
             const statsViaturas = { combate: new Set(), apoio: new Set() };
 
-            dados.forEach(d => {
+            dadosArray.forEach(d => {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
                 let nomeBruto = (d.nome || "").trim().toUpperCase();
@@ -359,14 +380,12 @@
                 funcBruta = funcBruta.replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/[0-9]/g, '').replace(/[-]/g, '').trim();
 
                 let funcaoFinal = "";
-                
                 for (const cargo of FUNCOES_FIXAS) {
                     if (funcBruta.includes(cargo)) {
                         funcaoFinal = cargo;
                         break;
                     }
                 }
-
                 if (funcaoFinal === "") {
                     for (const cargo of FUNCOES_FIXAS) {
                         if (nomeBruto.includes(cargo)) {
@@ -553,33 +572,24 @@
             });
         }
 
-        function atualizarRelogio() {
-            const dataOp = getDataOperacional();
-            const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
-            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
-        }
-
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
-
-        async function iniciarSistema() {
+        // Função que busca os dados e chama processarDados
+        async function carregarDados() {
             try {
                 const req = await fetch(URL_DADOS);
                 const dados = await req.json();
-                if(dados.erro) throw new Error("Dados inválidos");
+                // Supondo que o Google Apps Script retorne { dados: [...], timestamp_extracao: "..." }
                 processarDados(dados);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('app').classList.remove('hidden');
             } catch(e) { 
                 console.error(e); 
                 document.getElementById('msg-loading').innerText = "Reconectando...";
-                setTimeout(iniciarSistema, 5000); 
+                setTimeout(carregarDados, 5000); 
             }
         }
 
-        iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
+        carregarDados();
+        setInterval(carregarDados, 60000); // atualiza a cada 1 minuto
     </script>
 </body>
 </html>
