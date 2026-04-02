@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>ESTATÍSTICAS - 1º BBM</title>
+    <title>ESTATÍSTICAS DE OCORRÊNCIAS - 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -359,7 +359,12 @@
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
             year: 2026,
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
-            poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"]
+            poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"],
+            // Regras de disponibilidade de meses por ano (mês inicial, 0-indexado)
+            monthAvailability: {
+                2023: 7  // a partir de agosto (índice 7)
+                // outros anos começam do mês 0 (janeiro) por padrão
+            }
         };
 
         const STYLES = {
@@ -458,6 +463,25 @@
             }
         }
 
+        // ========== OBTÉM O LIMITE DE MESES DISPONÍVEIS PARA O ANO ==========
+        function getAvailableMonthsLimit(year) {
+            const now = new Date();
+            let limit = (year === now.getFullYear()) ? now.getMonth() + 1 : 12;
+            // Se o ano tiver uma regra especial de início (ex: 2023 a partir de agosto)
+            if (CONFIG.monthAvailability[year] !== undefined) {
+                const startMonth = CONFIG.monthAvailability[year];
+                // Se o ano atual for o ano corrente e o mês atual for menor que o início, não tem nenhum mês disponível
+                if (year === now.getFullYear() && (now.getMonth() + 1) <= startMonth) {
+                    return 0;
+                }
+                // O limite máximo é o mínimo entre o limite normal e o final do ano (12)
+                // Mas a lógica de exibição dos botões: só mostrar meses a partir do startMonth
+                // Vamos retornar o startMonth como offset, mas a função setYear tratará de habilitar apenas a partir desse mês.
+                return startMonth; // retorna o índice do primeiro mês disponível (0-indexado, mas usaremos como mês inicial)
+            }
+            return 0; // 0 significa nenhum offset (começa em janeiro)
+        }
+
         const Core = {
             db: [],
             
@@ -512,11 +536,23 @@
                 document.getElementById('yearSelect').value = y;
                 
                 const now = new Date();
-                const limit = (y === now.getFullYear()) ? now.getMonth() : 12;
+                // Limite padrão: até o mês atual se for o ano corrente, senão 12
+                let maxMonth = (y === now.getFullYear()) ? now.getMonth() + 1 : 12;
+                // Mês de início para este ano (0-indexado)
+                let startMonth = CONFIG.monthAvailability[y] !== undefined ? CONFIG.monthAvailability[y] : 0;
+                
+                // Se o ano corrente e o mês atual for antes do mês de início, não há meses disponíveis
+                if (y === now.getFullYear() && (now.getMonth() + 1) <= startMonth) {
+                    maxMonth = 0;
+                }
 
                 CONFIG.months.forEach((_, i) => {
                     const btn = document.getElementById(`btn_${i}`);
-                    if (i < limit) {
+                    // Habilita apenas se o mês atual (i+1) estiver dentro do intervalo [startMonth+1, maxMonth]
+                    const monthNumber = i + 1;
+                    const isAvailable = (monthNumber > startMonth) && (monthNumber <= maxMonth);
+                    
+                    if (isAvailable) {
                         btn.disabled = false;
                         btn.classList.remove('opacity-30', 'cursor-not-allowed');
                     } else {
@@ -578,8 +614,17 @@
                 } catch(e) {}
 
                 const now = new Date();
-                const limit = (curYear === now.getFullYear()) ? now.getMonth() : 12;
-                const validMonths = CONFIG.months.slice(0, limit);
+                let maxMonth = (curYear === now.getFullYear()) ? now.getMonth() + 1 : 12;
+                let startMonth = CONFIG.monthAvailability[curYear] !== undefined ? CONFIG.monthAvailability[curYear] : 0;
+                
+                if (curYear === now.getFullYear() && (now.getMonth() + 1) <= startMonth) {
+                    maxMonth = 0;
+                }
+                
+                const validMonths = [];
+                for (let i = startMonth; i < maxMonth; i++) {
+                    validMonths.push(CONFIG.months[i]);
+                }
                 
                 let allData = [];
                 let loadedCount = 0;
