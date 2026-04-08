@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>🎖️ Ranking de Ingressos - Batalhão</title>
+    <title>🎖️ Distribuição Ingressos - 1º BBM</title>
     <meta name="description" content="Controle de cortesias com ranking por mérito">
     <style>
         * {
@@ -217,18 +217,18 @@
 <body>
 <div class="container">
     <div class="status-bar">
-        <h1>🎫 INGRESSOS <span>10/JOGO</span></h1>
+        <h1>🎫 INGRESSOS PARA OS JOGOS DA DUPLA GRE-NAL <span>Total: 10 por jogo</span></h1>
         <span id="statusSalvo" style="font-size:0.75rem; background:#1e2433; padding:4px 10px; border-radius:20px;">💾 SALVO</span>
     </div>
-    <div class="sub">⚽ Internacional x Grêmio • Ranking por Mérito</div>
+    <div class="sub">⚽ Jogos do Grêmio e Internacional • Ranking de Contemplados:</div>
 
     <!-- CARD: CONFIGURAR JOGO -->
     <div class="controle-jogo">
-        <div style="margin-bottom: 12px; font-weight:bold; color:#c49a2b;">📅 CONFIGURAR JOGO</div>
+        <div style="margin-bottom: 12px; font-weight:bold; color:#c49a2b;">📅 INSERIR DADO DO JOGO:</div>
         <div class="form-row">
             <select id="timeJogoSelect">
-                <option value="INTER">INTER 🇦🇹</option>
-                <option value="GREMIO">GRÊMIO 🇧🇼</option>
+                <option value="INTER">INTER</option>
+                <option value="GREMIO">GRÊMIO</option>
             </select>
             <input type="date" id="dataJogoInput" style="flex:1;">
         </div>
@@ -291,7 +291,7 @@
         </table>
 
         <!-- SUPLENTES -->
-        <div class="secao-titulo" style="margin-top:0;">🔄 SUPLENTES (ORDEM DE MÉRITO)</div>
+        <div class="secao-titulo" style="margin-top:0;">🔄 SUPLENTES (ORDEM DE CONTEMPLAÇÃO)</div>
         <table class="tabela-planilha" id="tabelaSuplentes">
             <thead>
                 <tr>
@@ -317,7 +317,7 @@
 
     <!-- CARD: HISTÓRICO -->
     <div class="planilha-card" style="padding: 16px;">
-        <div style="font-weight:bold; margin-bottom:8px; color:#c49a2b;">📊 HISTÓRICO DE JOGOS (ANO)</div>
+        <div style="font-weight:bold; margin-bottom:8px; color:#c49a2b;">📊 HISTÓRICO DE JOGOS JÁ REALIZADOS (ANO:2026)</div>
         <div id="historicoJogos" style="max-height:200px; overflow-y:auto; font-size:0.85rem;">
             Nenhum jogo finalizado ainda.
         </div>
@@ -350,6 +350,7 @@
         { grad: "1º Sgt", nome: "LAMADRIL" },
         { grad: "1º Sgt", nome: "FLÁVIO" },
         { grad: "1º Sgt", nome: "DELAVECHIA" },
+        { grad: "1º Sgt", nome: "CHAVES" },
         { grad: "1º Sgt", nome: "ARAGÃO" },
         { grad: "1º Sgt", nome: "GOMES" },
         { grad: "1º Sgt", nome: "LINCOLN" },
@@ -453,7 +454,7 @@
         { grad: "Sd", nome: "ROGER" },
         { grad: "Sd", nome: "MAURÍCIO" },
         { grad: "Sd", nome: "DETONI" },
-        { grad: "Sd", nome: "A. BARBOSA" },
+        { grad: "Sd", nome: "ADRIANO BARBOSA" },
         { grad: "Sd", nome: "COSME" },
         { grad: "Sd", nome: "DANILO" },
         { grad: "Sd", nome: "CRISTIANO" },
@@ -467,7 +468,7 @@
         { grad: "Sd", nome: "DREYER" },
         { grad: "Sd", nome: "THIAGO RIBEIRO" },
         { grad: "Sd", nome: "MONTEIRO" },
-        { grad: "Sd", nome: "J. BARBOSA" },
+        { grad: "Sd", nome: "JEFERSON BARBOSA" },
         { grad: "Sd", nome: "ISMAEL" },
         { grad: "Sd", nome: "EIDER" },
         { grad: "Sd", nome: "GAUTIER" },
