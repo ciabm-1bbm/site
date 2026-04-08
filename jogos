@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🎖️ Ranking de Ingressos - Batalhão</title>
+    <meta name="description" content="Controle de cortesias com ranking por mérito">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #1a1e2b;
+            padding: 12px 10px 30px;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        h1 span {
+            background: #c49a2b;
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            border-radius: 30px;
+            color: #000;
+            font-weight: bold;
+        }
+        .sub {
+            text-align: center;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            color: #a0a8c0;
+        }
+
+        /* CARD - PLANILHA */
+        .planilha-card {
+            background: #232838;
+            border-radius: 16px;
+            padding: 0;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border: 1px solid #363e54;
+            overflow: hidden;
+        }
+        .planilha-header {
+            background: #2a3145;
+            padding: 12px 16px;
+            border-bottom: 2px solid #c49a2b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .planilha-header h2 {
+            font-size: 1.1rem;
+            color: #c49a2b;
+        }
+        .contador-ingressos {
+            background: #1a1e2b;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .contador-cheio {
+            color: #ff6b6b;
+        }
+        .contador-ok {
+            color: #6bcf6b;
+        }
+
+        /* TABELA ESTILO PLANILHA */
+        .tabela-planilha {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tabela-planilha th {
+            background: #1e2433;
+            padding: 10px 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #a0a8c0;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 1px solid #3f485e;
+        }
+        .tabela-planilha td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #2f3547;
+            font-size: 0.9rem;
+        }
+        .tabela-planilha tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* BADGES */
+        .time-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+        .inter { background: #d32f2f; color: white; }
+        .gremio { background: #1565c0; color: white; }
+
+        .merito-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.7rem;
+            text-align: center;
+            min-width: 50px;
+        }
+        .merito-verde { background: #1b4d1b; color: #a5d6a5; }
+        .merito-amarelo { background: #5a3e0e; color: #ffd966; }
+        .merito-vermelho { background: #4a1a1a; color: #ffb3b3; }
+
+        .ranking-posicao {
+            font-weight: bold;
+            color: #c49a2b;
+            margin-right: 5px;
+        }
+
+        /* CONTROLES */
+        .controle-jogo {
+            background: #232838;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 18px;
+            border: 1px solid #363e54;
+        }
+        .form-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        select, input, button {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: #1a1e2b;
+            color: white;
+            font-size: 0.95rem;
+            border: 1px solid #3f485e;
+            outline: none;
+            font-family: inherit;
+        }
+        select {
+            flex: 1;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23c49a2b" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+        }
+        button {
+            background: #c49a2b;
+            color: #0f1219;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            background: #2f3547;
+            color: #ddd;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .footer {
+            font-size: 0.75rem;
+            text-align: center;
+            opacity: 0.6;
+            margin-top: 20px;
+        }
+
+        .secao-titulo {
+            background: #2a3145;
+            padding: 8px 16px;
+            font-weight: bold;
+            color: #c49a2b;
+            border-bottom: 1px solid #3f485e;
+        }
+        .suplente-item {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="status-bar">
+        <h1>🎫 INGRESSOS <span>10/JOGO</span></h1>
+        <span id="statusSalvo" style="font-size:0.75rem; background:#1e2433; padding:4px 10px; border-radius:20px;">💾 SALVO</span>
+    </div>
+    <div class="sub">⚽ Internacional x Grêmio • Ranking por Mérito</div>
+
+    <!-- CARD: CONFIGURAR JOGO -->
+    <div class="controle-jogo">
+        <div style="margin-bottom: 12px; font-weight:bold; color:#c49a2b;">📅 CONFIGURAR JOGO</div>
+        <div class="form-row">
+            <select id="timeJogoSelect">
+                <option value="INTER">INTER 🇦🇹</option>
+                <option value="GREMIO">GRÊMIO 🇧🇼</option>
+            </select>
+            <input type="date" id="dataJogoInput" style="flex:1;">
+        </div>
+        <button onclick="definirJogoAtual()" style="width:100%;">✅ DEFINIR JOGO E GERAR RANKING</button>
+        <div id="jogoAtualInfo" style="margin-top:12px; padding:10px; background:#1a1e2b; border-radius:10px; font-size:0.9rem;">
+            ⚽ Nenhum jogo definido
+        </div>
+    </div>
+
+    <!-- CARD: INTERESSADOS E RANKING -->
+    <div class="planilha-card" id="cardRanking" style="display:none;">
+        <div class="planilha-header">
+            <h2>📋 INTERESSADOS</h2>
+            <div class="contador-ingressos" id="contadorIngressos">0 / 10</div>
+        </div>
+        
+        <!-- LISTA DE INTERESSADOS (ADICIONAR) -->
+        <div style="padding: 16px; border-bottom: 1px solid #363e54;">
+            <div class="form-row">
+                <select id="interessadoGrad" onchange="atualizarInteressadoNomes()">
+                    <option value="">-- Grad --</option>
+                    <option value="Ten Cel">Ten Cel</option>
+                    <option value="Cap">Cap</option>
+                    <option value="1º Ten">1º Ten</option>
+                    <option value="1º Sgt">1º Sgt</option>
+                    <option value="2º Sgt">2º Sgt</option>
+                    <option value="3º Sgt">3º Sgt</option>
+                    <option value="Sd">Sd</option>
+                    <option value="SD BMT">SD BMT</option>
+                </select>
+                <select id="interessadoNome">
+                    <option value="">-- Nome --</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <select id="interessadoQtd" style="flex:1;">
+                    <option value="1">1 ingresso</option>
+                    <option value="2">2 ingressos</option>
+                </select>
+                <button onclick="adicionarInteressado()" style="flex:1;">➕ ADICIONAR</button>
+            </div>
+        </div>
+
+        <!-- RANKING (TITULARES) -->
+        <div class="secao-titulo">🏆 TITULARES (10 INGRESSOS)</div>
+        <table class="tabela-planilha" id="tabelaTitulares">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Militar</th>
+                    <th>Grad</th>
+                    <th>Jogos</th>
+                    <th>Qtd</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="corpoTitulares">
+                <tr><td colspan="6" style="text-align:center; padding:20px;">Adicione interessados para gerar o ranking</td></tr>
+            </tbody>
+        </table>
+
+        <!-- SUPLENTES -->
+        <div class="secao-titulo" style="margin-top:0;">🔄 SUPLENTES (ORDEM DE MÉRITO)</div>
+        <table class="tabela-planilha" id="tabelaSuplentes">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Militar</th>
+                    <th>Grad</th>
+                    <th>Jogos</th>
+                    <th>Qtd</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="corpoSuplentes">
+                <tr><td colspan="6" style="text-align:center; padding:10px;">Nenhum suplente</td></tr>
+            </tbody>
+        </table>
+
+        <!-- AÇÕES -->
+        <div style="padding: 16px; border-top: 1px solid #363e54; display: flex; gap: 8px;">
+            <button onclick="promoverSuplente()" class="btn-secondary" style="flex:1;">⬆️ PROMOVER SUPLENTE</button>
+            <button onclick="finalizarJogo()" style="flex:1;">🏁 FINALIZAR JOGO</button>
+        </div>
+    </div>
+
+    <!-- CARD: HISTÓRICO -->
+    <div class="planilha-card" style="padding: 16px;">
+        <div style="font-weight:bold; margin-bottom:8px; color:#c49a2b;">📊 HISTÓRICO DE JOGOS (ANO)</div>
+        <div id="historicoJogos" style="max-height:200px; overflow-y:auto; font-size:0.85rem;">
+            Nenhum jogo finalizado ainda.
+        </div>
+    </div>
+    
+    <div class="footer">
+        Total Efetivo: 148 militares | Mérito acumulado no ano
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // BANCO DE DADOS - EFETIVO COMPLETO (148 MILITARES)
+    // ============================================================
+    const efetivoBase = [
+        { grad: "Ten Cel", nome: "GUSTAVO" },
+        { grad: "Cap", nome: "BONA" },
+        { grad: "Cap", nome: "LUCAS" },
+        { grad: "1º Ten", nome: "TERRA" },
+        { grad: "1º Ten", nome: "PRADE" },
+        { grad: "1º Ten", nome: "DILMAR" },
+        { grad: "1º Ten", nome: "DONATO" },
+        { grad: "1º Ten", nome: "CÂNDIDO" },
+        { grad: "1º Ten", nome: "SITENESKI" },
+        { grad: "1º Ten", nome: "PATRÍCIO" },
+        { grad: "1º Ten", nome: "FREITAS" },
+        { grad: "1º Ten", nome: "POSENATO" },
+        { grad: "1º Ten", nome: "SOARES" },
+        { grad: "1º Sgt", nome: "JÚLIA" },
+        { grad: "1º Sgt", nome: "LAMADRIL" },
+        { grad: "1º Sgt", nome: "FLÁVIO" },
+        { grad: "1º Sgt", nome: "DELAVECHIA" },
+        { grad: "1º Sgt", nome: "ARAGÃO" },
+        { grad: "1º Sgt", nome: "GOMES" },
+        { grad: "1º Sgt", nome: "LINCOLN" },
+        { grad: "1º Sgt", nome: "ALBUQUERQUE" },
+        { grad: "1º Sgt", nome: "RONALDO" },
+        { grad: "1º Sgt", nome: "ASSIS" },
+        { grad: "1º Sgt", nome: "JULIANO" },
+        { grad: "1º Sgt", nome: "LUCIANO" },
+        { grad: "1º Sgt", nome: "AIRTON" },
+        { grad: "1º Sgt", nome: "MATHEUS" },
+        { grad: "1º Sgt", nome: "FERNANDO" },
+        { grad: "1º Sgt", nome: "ARIAS" },
+        { grad: "2º Sgt", nome: "VASCONCELOS" },
+        { grad: "2º Sgt", nome: "BECKER" },
+        { grad: "2º Sgt", nome: "DA COSTA" },
+        { grad: "2º Sgt", nome: "MAURÍCIO" },
+        { grad: "2º Sgt", nome: "THAÍS" },
+        { grad: "2º Sgt", nome: "KANOFRE" },
+        { grad: "2º Sgt", nome: "GUIMARÃES" },
+        { grad: "2º Sgt", nome: "MARQUARDT" },
+        { grad: "2º Sgt", nome: "MALET" },
+        { grad: "2º Sgt", nome: "DOMINGUES" },
+        { grad: "2º Sgt", nome: "TOMIELLO" },
+        { grad: "2º Sgt", nome: "CHRISTMANN" },
+        { grad: "2º Sgt", nome: "CARGNELUTTI" },
+        { grad: "2º Sgt", nome: "JUNIOR" },
+        { grad: "2º Sgt", nome: "PANAZZOLO" },
+        { grad: "2º Sgt", nome: "COAN" },
+        { grad: "2º Sgt", nome: "PESSOTA" },
+        { grad: "2º Sgt", nome: "CHIEZA" },
+        { grad: "2º Sgt", nome: "MENDES" },
+        { grad: "2º Sgt", nome: "PRADIER" },
+        { grad: "2º Sgt", nome: "SAUL" },
+        { grad: "2º Sgt", nome: "CASTRO" },
+        { grad: "2º Sgt", nome: "FARIAS" },
+        { grad: "2º Sgt", nome: "FABRÍCIO" },
+        { grad: "2º Sgt", nome: "LEANDRO" },
+        { grad: "2º Sgt", nome: "BOTEGA" },
+        { grad: "2º Sgt", nome: "SCHNEIDER" },
+        { grad: "2º Sgt", nome: "BARREIRO" },
+        { grad: "2º Sgt", nome: "MENDONÇA" },
+        { grad: "3º Sgt", nome: "RAMOS" },
+        { grad: "Sd", nome: "MEDEIROS" },
+        { grad: "Sd", nome: "BRUNO SILVA" },
+        { grad: "Sd", nome: "HERMENEGILDO" },
+        { grad: "Sd", nome: "MUNDEL" },
+        { grad: "Sd", nome: "WESTPHALEN" },
+        { grad: "Sd", nome: "GARIBALDI" },
+        { grad: "Sd", nome: "NATHAN" },
+        { grad: "Sd", nome: "SCHULTZ" },
+        { grad: "Sd", nome: "BRUNA" },
+        { grad: "Sd", nome: "ESEQUIEL" },
+        { grad: "Sd", nome: "BARRETO" },
+        { grad: "Sd", nome: "VANDERLAN" },
+        { grad: "Sd", nome: "VICENTE" },
+        { grad: "Sd", nome: "ROGAN" },
+        { grad: "Sd", nome: "FONTANA" },
+        { grad: "Sd", nome: "MATHEUS SANTOS" },
+        { grad: "Sd", nome: "ESPINOSA" },
+        { grad: "Sd", nome: "DARIU" },
+        { grad: "Sd", nome: "DEIVID" },
+        { grad: "Sd", nome: "VILELA" },
+        { grad: "Sd", nome: "BITENCOURT" },
+        { grad: "Sd", nome: "BOTTINI" },
+        { grad: "Sd", nome: "VINÍCIUS" },
+        { grad: "Sd", nome: "LAGO" },
+        { grad: "Sd", nome: "ALISSON" },
+        { grad: "Sd", nome: "JULIAN" },
+        { grad: "Sd", nome: "ALESSANDRO" },
+        { grad: "Sd", nome: "IBALDO" },
+        { grad: "Sd", nome: "PIRES" },
+        { grad: "Sd", nome: "ASSUNÇÃO" },
+        { grad: "Sd", nome: "TEIXEIRA" },
+        { grad: "Sd", nome: "THIAGO COELHO" },
+        { grad: "Sd", nome: "ZEMPER" },
+        { grad: "Sd", nome: "CASSIANO" },
+        { grad: "Sd", nome: "GONÇALVES" },
+        { grad: "Sd", nome: "HIDALGO" },
+        { grad: "Sd", nome: "JORDAN" },
+        { grad: "Sd", nome: "DORNELES" },
+        { grad: "Sd", nome: "VILLAR" },
+        { grad: "Sd", nome: "ROSEANE" },
+        { grad: "Sd", nome: "ARAUJO" },
+        { grad: "Sd", nome: "WILLIAN SANTOS" },
+        { grad: "Sd", nome: "BRUM" },
+        { grad: "Sd", nome: "DIEIQUE" },
+        { grad: "Sd", nome: "RAUBACH" },
+        { grad: "Sd", nome: "PORCELIS" },
+        { grad: "Sd", nome: "BAIGORRA" },
+        { grad: "Sd", nome: "CECCON" },
+        { grad: "Sd", nome: "BERGHAHN" },
+        { grad: "Sd", nome: "FINGER" },
+        { grad: "Sd", nome: "FÁBIO" },
+        { grad: "Sd", nome: "DAYKER" },
+        { grad: "Sd", nome: "ESTIVALETE" },
+        { grad: "Sd", nome: "THIAGO" },
+        { grad: "Sd", nome: "CATELAN" },
+        { grad: "Sd", nome: "FERREIRA" },
+        { grad: "Sd", nome: "MARTINEZ" },
+        { grad: "Sd", nome: "RAUBUSTT" },
+        { grad: "Sd", nome: "ROGER" },
+        { grad: "Sd", nome: "MAURÍCIO" },
+        { grad: "Sd", nome: "DETONI" },
+        { grad: "Sd", nome: "A. BARBOSA" },
+        { grad: "Sd", nome: "COSME" },
+        { grad: "Sd", nome: "DANILO" },
+        { grad: "Sd", nome: "CRISTIANO" },
+        { grad: "Sd", nome: "DA SILVA" },
+        { grad: "Sd", nome: "ACÁCIO" },
+        { grad: "Sd", nome: "FRANCIS" },
+        { grad: "Sd", nome: "CAMPOS" },
+        { grad: "Sd", nome: "KINGESKI" },
+        { grad: "Sd", nome: "PEDRO" },
+        { grad: "Sd", nome: "THALIN" },
+        { grad: "Sd", nome: "DREYER" },
+        { grad: "Sd", nome: "THIAGO RIBEIRO" },
+        { grad: "Sd", nome: "MONTEIRO" },
+        { grad: "Sd", nome: "J. BARBOSA" },
+        { grad: "Sd", nome: "ISMAEL" },
+        { grad: "Sd", nome: "EIDER" },
+        { grad: "Sd", nome: "GAUTIER" },
+        { grad: "Sd", nome: "FERRANDIN" },
+        { grad: "Sd", nome: "JUSSIE" },
+        { grad: "Sd", nome: "PATRICK" },
+        { grad: "Sd", nome: "BELOMO" },
+        { grad: "Sd", nome: "BRUNO EDUARDO" },
+        { grad: "Sd", nome: "JONATHAN" },
+        { grad: "Sd", nome: "VARGAS" },
+        { grad: "Sd", nome: "BERNARDES" },
+        { grad: "SD BMT", nome: "DOTTA" },
+        { grad: "SD BMT", nome: "CORREA" },
+        { grad: "SD BMT", nome: "PAULINO" },
+        { grad: "SD BMT", nome: "SPERLING" },
+        { grad: "SD BMT", nome: "CARDOSO" },
+        { grad: "SD BMT", nome: "MAIA" },
+        { grad: "SD BMT", nome: "PETER" },
+        { grad: "SD BMT", nome: "PINTO" },
+        { grad: "SD BMT", nome: "VOLZ" },
+        { grad: "SD BMT", nome: "FOLLETO" },
+        { grad: "SD BMT", nome: "W. BOTTINI" },
+        { grad: "SD BMT", nome: "RENAN" },
+        { grad: "SD BMT", nome: "ZANETTI" }
+    ];
+
+    // ============================================================
+    // ESTADO DO SISTEMA
+    // ============================================================
+    let efetivo = [];
+    let jogoAtual = null;
+    let interessados = []; // Lista de interessados com qtd solicitada
+    let historicoJogos = [];
+
+    // ============================================================
+    // LOCALSTORAGE
+    // ============================================================
+    function carregarDados() {
+        const dados = localStorage.getItem('batalhaoIngressos_v3');
+        if (dados) {
+            try {
+                const parsed = JSON.parse(dados);
+                efetivo = parsed.efetivo || efetivoBase.map(m => ({ ...m, historico: [] }));
+                historicoJogos = parsed.historicoJogos || [];
+            } catch(e) {
+                inicializarNovo();
+            }
+        } else {
+            inicializarNovo();
+        }
+    }
+
+    function inicializarNovo() {
+        efetivo = efetivoBase.map(m => ({ ...m, historico: [] }));
+        historicoJogos = [];
+        salvarDados();
+    }
+
+    function salvarDados() {
+        localStorage.setItem('batalhaoIngressos_v3', JSON.stringify({ efetivo, historicoJogos }));
+        document.getElementById('statusSalvo').textContent = '💾 SALVO';
+    }
+
+    // ============================================================
+    // FUNÇÕES DE MÉRITO E RANKING
+    // ============================================================
+    function getTotalIngressosMilitar(militar) {
+        return militar.historico.reduce((s, h) => s + h.qtd, 0);
+    }
+
+    function getMeritoClasse(total) {
+        if (total <= 1) return 'merito-verde';
+        if (total <= 3) return 'merito-amarelo';
+        return 'merito-vermelho';
+    }
+
+    function getMeritoTexto(total) {
+        if (total <= 1) return '🟢 ALTA';
+        if (total <= 3) return '🟡 MÉDIA';
+        return '🔴 BAIXA';
+    }
+
+    // Ordena interessados por mérito (menos ingressos primeiro)
+    function ordenarPorMerito(lista) {
+        return lista.sort((a, b) => {
+            const totalA = getTotalIngressosMilitar(a.militar);
+            const totalB = getTotalIngressosMilitar(b.militar);
+            if (totalA !== totalB) return totalA - totalB;
+            // Desempate: ordem alfabética
+            return a.militar.nome.localeCompare(b.militar.nome);
+        });
+    }
+
+    // ============================================================
+    // FUNÇÕES DA INTERFACE
+    // ============================================================
+    function definirJogoAtual() {
+        const time = document.getElementById('timeJogoSelect').value;
+        const data = document.getElementById('dataJogoInput').value;
+        if (!data) {
+            alert('Selecione a data do jogo!');
+            return;
+        }
+        jogoAtual = { time, data };
+        interessados = [];
+        
+        const timeNome = time === 'INTER' ? 'INTER 🇦🇹' : 'GRÊMIO 🇧🇼';
+        document.getElementById('jogoAtualInfo').innerHTML = `
+            ⚽ <strong>${timeNome}</strong> • ${formatarData(data)}
+        `;
+        document.getElementById('cardRanking').style.display = 'block';
+        atualizarTabelas();
+        salvarDados();
+    }
+
+    function atualizarInteressadoNomes() {
+        const grad = document.getElementById('interessadoGrad').value;
+        const selectNome = document.getElementById('interessadoNome');
+        selectNome.innerHTML = '<option value="">-- Nome --</option>';
+        if (!grad) return;
+        
+        const filtrados = efetivo.filter(m => m.grad === grad);
+        filtrados.sort((a,b) => a.nome.localeCompare(b.nome));
+        filtrados.forEach(m => {
+            const option = document.createElement('option');
+            option.value = m.nome;
+            option.textContent = m.nome;
+            selectNome.appendChild(option);
+        });
+    }
+
+    function adicionarInteressado() {
+        if (!jogoAtual) {
+            alert('Defina o jogo primeiro!');
+            return;
+        }
+        
+        const grad = document.getElementById('interessadoGrad').value;
+        const nome = document.getElementById('interessadoNome').value;
+        const qtd = parseInt(document.getElementById('interessadoQtd').value);
+        
+        if (!grad || !nome) {
+            alert('Selecione graduação e nome!');
+            return;
+        }
+        
+        const militar = efetivo.find(m => m.nome === nome && m.grad === grad);
+        if (!militar) return;
+        
+        // Verifica se já está na lista de interessados
+        const existente = interessados.find(i => i.militar.nome === nome && i.militar.grad === grad);
+        if (existente) {
+            alert('Este militar já está na lista de interessados!');
+            return;
+        }
+        
+        interessados.push({ militar: { ...militar }, qtdSolicitada: qtd });
+        atualizarTabelas();
+        salvarDados();
+        
+        // Limpa seleção
+        document.getElementById('interessadoGrad').value = '';
+        document.getElementById('interessadoNome').innerHTML = '<option value="">-- Nome --</option>';
+        document.getElementById('interessadoQtd').value = '1';
+    }
+
+    function removerInteressado(index, isSuplente = false) {
+        interessados.splice(index, 1);
+        atualizarTabelas();
+        salvarDados();
+    }
+
+    function promoverSuplente() {
+        // Encontra o primeiro suplente e move para o final dos titulares (se houver vaga)
+        const ordenados = ordenarPorMerito([...interessados]);
+        const titulares = [];
+        const suplentes = [];
+        let ingressosDistribuidos = 0;
+        
+        ordenados.forEach(item => {
+            if (ingressosDistribuidos + item.qtdSolicitada <= 10) {
+                titulares.push(item);
+                ingressosDistribuidos += item.qtdSolicitada;
+            } else {
+                suplentes.push(item);
+            }
+        });
+        
+        if (suplentes.length === 0) {
+            alert('Não há suplentes para promover!');
+            return;
+        }
+        
+        // Pega o primeiro suplente e tenta encaixar
+        const suplente = suplentes[0];
+        if (ingressosDistribuidos + suplente.qtdSolicitada <= 10) {
+            // Já está na ordem correta, só atualizar
+            atualizarTabelas();
+            alert(`✅ ${suplente.militar.nome} já pode ser titular! (${ingressosDistribuidos + suplente.qtdSolicitada}/10 ingressos)`);
+        } else {
+            alert(`⚠️ Não há ingressos suficientes para promover ${suplente.militar.nome}. Disponíveis: ${10 - ingressosDistribuidos}`);
+        }
+    }
+
+    function atualizarTabelas() {
+        if (!jogoAtual) return;
+        
+        const ordenados = ordenarPorMerito([...interessados]);
+        const titulares = [];
+        const suplentes = [];
+        let ingressosDistribuidos = 0;
+        
+        ordenados.forEach(item => {
+            if (ingressosDistribuidos + item.qtdSolicitada <= 10) {
+                titulares.push(item);
+                ingressosDistribuidos += item.qtdSolicitada;
+            } else {
+                suplentes.push(item);
+            }
+        });
+        
+        // Atualiza contador
+        const contador = document.getElementById('contadorIngressos');
+        contador.textContent = `${ingressosDistribuidos} / 10`;
+        contador.className = `contador-ingressos ${ingressosDistribuidos >= 10 ? 'contador-cheio' : 'contador-ok'}`;
+        
+        // Atualiza tabela de titulares
+        const tbodyTitulares = document.getElementById('corpoTitulares');
+        if (titulares.length === 0) {
+            tbodyTitulares.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Adicione interessados para gerar o ranking</td></tr>';
+        } else {
+            let html = '';
+            titulares.forEach((item, idx) => {
+                const total = getTotalIngressosMilitar(item.militar);
+                const meritoClasse = getMeritoClasse(total);
+                const indexOriginal = interessados.findIndex(i => i.militar.nome === item.militar.nome && i.militar.grad === item.militar.grad);
+                html += `<tr>
+                    <td><span class="ranking-posicao">${idx + 1}º</span></td>
+                    <td>${item.militar.nome}</td>
+                    <td>${item.militar.grad}</td>
+                    <td><span class="merito-badge ${meritoClasse}">${total} jogos</span></td>
+                    <td><strong>${item.qtdSolicitada}</strong></td>
+                    <td><button onclick="removerInteressado(${indexOriginal})" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:4px 8px;">✕</button></td>
+                </tr>`;
+            });
+            tbodyTitulares.innerHTML = html;
+        }
+        
+        // Atualiza tabela de suplentes
+        const tbodySuplentes = document.getElementById('corpoSuplentes');
+        if (suplentes.length === 0) {
+            tbodySuplentes.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">Nenhum suplente</td></tr>';
+        } else {
+            let html = '';
+            suplentes.forEach((item, idx) => {
+                const total = getTotalIngressosMilitar(item.militar);
+                const meritoClasse = getMeritoClasse(total);
+                const indexOriginal = interessados.findIndex(i => i.militar.nome === item.militar.nome && i.militar.grad === item.militar.grad);
+                html += `<tr class="suplente-item">
+                    <td><span class="ranking-posicao">${idx + 1}º</span></td>
+                    <td>${item.militar.nome}</td>
+                    <td>${item.militar.grad}</td>
+                    <td><span class="merito-badge ${meritoClasse}">${total} jogos</span></td>
+                    <td><strong>${item.qtdSolicitada}</strong></td>
+                    <td><button onclick="removerInteressado(${indexOriginal})" style="background:none; border:none; color:#ff6b6b; cursor:pointer; padding:4px 8px;">✕</button></td>
+                </tr>`;
+            });
+            tbodySuplentes.innerHTML = html;
+        }
+    }
+
+    function finalizarJogo() {
+        if (!jogoAtual) {
+            alert('Nenhum jogo definido!');
+            return;
+        }
+        
+        // Determina quem realmente recebeu (titulares)
+        const ordenados = ordenarPorMerito([...interessados]);
+        const titulares = [];
+        let ingressosDistribuidos = 0;
+        
+        ordenados.forEach(item => {
+            if (ingressosDistribuidos + item.qtdSolicitada <= 10) {
+                titulares.push(item);
+                ingressosDistribuidos += item.qtdSolicitada;
+            }
+        });
+        
+        if (titulares.length === 0) {
+            alert('Nenhum titular definido!');
+            return;
+        }
+        
+        // Registra no histórico de cada militar
+        titulares.forEach(item => {
+            const militarEfetivo = efetivo.find(m => m.nome === item.militar.nome && m.grad === item.militar.grad);
+            if (militarEfetivo) {
+                militarEfetivo.historico.push({
+                    time: jogoAtual.time,
+                    data: jogoAtual.data,
+                    qtd: item.qtdSolicitada
+                });
+            }
+        });
+        
+        // Adiciona ao histórico de jogos
+        historicoJogos.push({
+            time: jogoAtual.time,
+            data: jogoAtual.data,
+            titulares: titulares.map(t => ({ nome: t.militar.nome, grad: t.militar.grad, qtd: t.qtdSolicitada }))
+        });
+        
+        // Limpa jogo atual
+        jogoAtual = null;
+        interessados = [];
+        
+        document.getElementById('cardRanking').style.display = 'none';
+        document.getElementById('jogoAtualInfo').innerHTML = '⚽ Nenhum jogo definido';
+        atualizarHistoricoJogos();
+        salvarDados();
+        
+        alert(`✅ Jogo finalizado! ${titulares.length} militares contemplados.`);
+    }
+
+    function atualizarHistoricoJogos() {
+        const container = document.getElementById('historicoJogos');
+        if (historicoJogos.length === 0) {
+            container.innerHTML = 'Nenhum jogo finalizado ainda.';
+            return;
+        }
+        
+        let html = '';
+        historicoJogos.slice(-5).reverse().forEach(jogo => {
+            const timeClass = jogo.time === 'INTER' ? 'inter' : 'gremio';
+            const total = jogo.titulares.reduce((s, t) => s + t.qtd, 0);
+            html += `<div style="background:#1a1e2b; padding:10px; border-radius:10px; margin-bottom:8px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span class="time-badge ${timeClass}">${jogo.time}</span>
+                    <span>📅 ${formatarData(jogo.data)}</span>
+                    <span>🎟️ ${total} ing.</span>
+                </div>
+                <div style="margin-top:5px; font-size:0.8rem; color:#a0a8c0;">
+                    ${jogo.titulares.map(t => t.nome).join(' • ')}
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function formatarData(dataStr) {
+        const partes = dataStr.split('-');
+        if (partes.length !== 3) return dataStr;
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+    window.onload = function() {
+        carregarDados();
+        
+        const hoje = new Date();
+        hoje.setDate(hoje.getDate() + 5);
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2,'0');
+        const dia = String(hoje.getDate()).padStart(2,'0');
+        document.getElementById('dataJogoInput').value = `${ano}-${mes}-${dia}`;
+        
+        atualizarHistoricoJogos();
+    };
+</script>
+</body>
+</html>
