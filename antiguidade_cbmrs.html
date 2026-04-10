@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     
-    <!-- Mammoth.js para extrair texto de .docx -->
+    <!-- Mammoth.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <style>
@@ -25,11 +25,7 @@
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
         }
-        .table-container {
-            max-height: 580px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        .table-container { max-height: 580px; overflow-y: auto; }
         @media (max-width: 640px) { .table-container { max-height: 450px; } }
         .filter-input {
             background: rgba(30, 41, 59, 0.9);
@@ -38,7 +34,6 @@
             padding: 0.6rem 1rem;
             border-radius: 1rem;
             font-size: 0.9rem;
-            transition: all 0.2s;
         }
         .filter-input:focus { border-color: #10b981; outline: none; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
         .suggestions-dropdown {
@@ -47,15 +42,10 @@
             border-radius: 0.75rem;
             max-height: 200px;
             overflow-y: auto;
-            box-shadow: 0 10px 25px -5px #00000080;
             z-index: 50;
         }
-        .suggestion-item { padding: 0.5rem 1rem; cursor: pointer; border-bottom: 1px solid #2d3a4e; }
+        .suggestion-item { padding: 0.5rem 1rem; cursor: pointer; }
         .suggestion-item:hover { background: #2d3a4e; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 8px; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         .loader {
             border: 4px solid rgba(255,255,255,0.1);
             border-left-color: #10b981;
@@ -65,137 +55,139 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        #debugPanel { background: #0f172a; border: 1px solid #334155; border-radius: 1rem; padding: 1rem; max-height: 200px; overflow: auto; }
     </style>
-    
-    <link rel="icon" type="image/png" href="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/favicon.png">
 </head>
 <body class="bg-[#0b1120] text-gray-100 min-h-screen flex flex-col font-sans antialiased">
 
     <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow space-y-5">
         
         <header class="glass p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12 sm:h-16 opacity-90 w-auto">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12 sm:h-16 opacity-90">
             <div class="text-center">
-                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight">
+                <h1 class="text-2xl sm:text-3xl font-black text-white">
                     <i class="fas fa-ranking-star text-yellow-400 mr-2"></i>ANTIGUIDADE
                 </h1>
-                <div class="flex items-center justify-center gap-2 text-emerald-400 font-mono text-sm sm:text-base font-bold">
+                <div class="flex items-center justify-center gap-2 text-emerald-400 font-mono text-sm font-bold">
                     <i class="fas fa-shield-halved"></i>
-                    <span>1º, 2º, 3º SARGENTOS & SOLDADOS · CBMRS</span>
+                    <span>DE PRAÇAS DO CBMRS</span>
                 </div>
-                <div class="text-xs text-slate-400 mt-1 tracking-widest">REF. BAM 002/SAMP/2026 · CARREGADO DO GITHUB</div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-12 sm:h-16 opacity-90 w-auto hidden md:block">
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-12 sm:h-16 hidden md:block">
         </header>
 
-        <!-- Tela de carregamento -->
+        <!-- Área de DEBUG (oculta por padrão, mas pode ser ativada) -->
+        <details class="glass p-4 text-xs font-mono">
+            <summary class="cursor-pointer text-slate-400 hover:text-white">🔧 Painel de Debug (clique para expandir)</summary>
+            <div class="mt-3">
+                <button id="btnRecarregar" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm mr-2"><i class="fas fa-sync-alt mr-1"></i>Recarregar dados</button>
+                <button id="btnMostrarTexto" class="bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm"><i class="fas fa-file-alt mr-1"></i>Exibir texto extraído</button>
+                <pre id="debugContent" class="mt-3 text-slate-300 whitespace-pre-wrap hidden"></pre>
+                <p id="debugStatus" class="text-emerald-400"></p>
+            </div>
+        </details>
+
+        <!-- Loader -->
         <div id="loadingOverlay" class="glass p-8 flex flex-col items-center justify-center space-y-4">
             <div class="loader"></div>
-            <p class="text-emerald-400 font-mono text-lg font-bold">CARREGANDO BOLETIM DO GITHUB...</p>
-            <p class="text-slate-400 text-sm" id="loadingStatus">Conectando ao arquivo .docx</p>
+            <p class="text-emerald-400 font-mono text-lg font-bold">CARREGANDO BOLETIM...</p>
+            <p class="text-slate-400 text-sm" id="loadingStatus">Conectando...</p>
         </div>
 
-        <!-- Dashboard (oculto até carregar) -->
+        <!-- Dashboard -->
         <div id="mainDashboard" class="hidden space-y-5">
-            
+            <!-- cards e gráfico -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                <div class="glass p-5 flex flex-col justify-center lg:col-span-1">
-                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center">
-                        <i class="fas fa-users text-emerald-400 mr-2"></i>EFETIVO TOTAL
-                    </h3>
+                <div class="glass p-5 lg:col-span-1">
+                    <h3 class="text-sm font-bold text-slate-300 mb-4"><i class="fas fa-users text-emerald-400 mr-2"></i>EFETIVO TOTAL</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-slate-800/60 p-3 rounded-2xl border-l-4 border-yellow-500">
                             <span class="text-xs text-slate-400">1º SGT</span>
-                            <div class="text-3xl font-black text-white" id="total1Sgt">0</div>
+                            <div class="text-3xl font-black" id="total1Sgt">0</div>
                         </div>
                         <div class="bg-slate-800/60 p-3 rounded-2xl border-l-4 border-orange-400">
                             <span class="text-xs text-slate-400">2º SGT</span>
-                            <div class="text-3xl font-black text-white" id="total2Sgt">0</div>
+                            <div class="text-3xl font-black" id="total2Sgt">0</div>
                         </div>
                         <div class="bg-slate-800/60 p-3 rounded-2xl border-l-4 border-sky-400">
                             <span class="text-xs text-slate-400">3º SGT</span>
-                            <div class="text-3xl font-black text-white" id="total3Sgt">0</div>
+                            <div class="text-3xl font-black" id="total3Sgt">0</div>
                         </div>
                         <div class="bg-slate-800/60 p-3 rounded-2xl border-l-4 border-emerald-400">
                             <span class="text-xs text-slate-400">SOLDADOS</span>
-                            <div class="text-3xl font-black text-white" id="totalSd">0</div>
+                            <div class="text-3xl font-black" id="totalSd">0</div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="glass p-4 lg:col-span-2 flex flex-col">
-                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center">
-                        <i class="fas fa-chart-bar text-emerald-400 mr-2"></i>DISTRIBUIÇÃO POR GRADUAÇÃO
-                    </h3>
+                <div class="glass p-4 lg:col-span-2">
+                    <h3 class="text-sm font-bold text-slate-300 mb-2"><i class="fas fa-chart-bar text-emerald-400 mr-2"></i>DISTRIBUIÇÃO</h3>
                     <div class="relative w-full h-56 sm:h-64">
                         <canvas id="chartGraduacao"></canvas>
                     </div>
                 </div>
             </div>
 
+            <!-- Comparador -->
             <div class="glass p-5">
-                <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <i class="fas fa-balance-scale text-2xl text-yellow-400"></i>
-                    <h3 class="text-lg font-black uppercase tracking-wide">COMPARAR MILITARES</h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <h3 class="text-lg font-black mb-4"><i class="fas fa-balance-scale text-yellow-400 mr-2"></i>COMPARAR MILITARES</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="relative">
-                        <label class="block text-xs font-bold text-slate-400 mb-1"><i class="fas fa-user mr-1"></i>MILITAR A</label>
-                        <input type="text" id="compareA" placeholder="Nome ou ID funcional..." class="w-full filter-input" autocomplete="off">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">MILITAR A</label>
+                        <input type="text" id="compareA" placeholder="Nome ou ID" class="w-full filter-input" autocomplete="off">
                         <div id="suggestionsA" class="suggestions-dropdown absolute w-full hidden"></div>
                     </div>
                     <div class="relative">
-                        <label class="block text-xs font-bold text-slate-400 mb-1"><i class="fas fa-user mr-1"></i>MILITAR B</label>
-                        <input type="text" id="compareB" placeholder="Nome ou ID funcional..." class="w-full filter-input" autocomplete="off">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">MILITAR B</label>
+                        <input type="text" id="compareB" placeholder="Nome ou ID" class="w-full filter-input" autocomplete="off">
                         <div id="suggestionsB" class="suggestions-dropdown absolute w-full hidden"></div>
                     </div>
                 </div>
                 <div class="flex justify-center mt-5">
-                    <button id="btnComparar" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg transition flex items-center gap-2 text-lg">
-                        <i class="fas fa-arrow-right-arrow-left"></i> COMPARAR ANTIGUIDADE
+                    <button id="btnComparar" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg">
+                        <i class="fas fa-arrow-right-arrow-left mr-2"></i>COMPARAR
                     </button>
                 </div>
-                <div id="resultadoComparacao" class="mt-5 p-4 bg-slate-800/50 rounded-2xl text-center font-mono text-base hidden border border-white/10"></div>
+                <div id="resultadoComparacao" class="mt-5 p-4 bg-slate-800/50 rounded-2xl text-center hidden"></div>
             </div>
 
+            <!-- Filtros -->
             <div class="glass p-4">
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap gap-3">
                     <div class="flex items-center gap-2 bg-slate-800/70 px-4 py-2 rounded-full">
                         <i class="fas fa-filter text-emerald-400"></i>
-                        <span class="text-sm font-bold uppercase tracking-wider">FILTROS</span>
+                        <span class="text-sm font-bold">FILTROS</span>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-grow">
-                        <input type="text" id="fAnt" placeholder="Antiguidade (ex: 12)" class="filter-input text-sm">
-                        <input type="text" id="fNome" placeholder="Nome ou parte" class="filter-input text-sm">
-                        <input type="text" id="fId" placeholder="ID funcional" class="filter-input text-sm">
+                        <input type="text" id="fAnt" placeholder="Antiguidade" class="filter-input text-sm">
+                        <input type="text" id="fNome" placeholder="Nome" class="filter-input text-sm">
+                        <input type="text" id="fId" placeholder="ID Funcional" class="filter-input text-sm">
                         <select id="fGrad" class="filter-input text-sm">
-                            <option value="">Todas graduações</option>
-                            <option value="1º Sargento">1º Sargento</option>
-                            <option value="2º Sargento">2º Sargento</option>
-                            <option value="3º Sargento">3º Sargento</option>
-                            <option value="Soldado">Soldado</option>
+                            <option value="">Todas</option>
+                            <option value="1º Sargento">1º SGT</option>
+                            <option value="2º Sargento">2º SGT</option>
+                            <option value="3º Sargento">3º SGT</option>
+                            <option value="Soldado">SOLDADO</option>
                         </select>
                     </div>
-                    <button id="btnLimparFiltros" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-full text-sm font-bold transition">
+                    <button id="btnLimparFiltros" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-full text-sm">
                         <i class="fas fa-times mr-1"></i>LIMPAR
                     </button>
                 </div>
             </div>
 
-            <div class="glass overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-white/5 bg-slate-900/60 flex justify-between items-center">
-                    <span class="font-black text-white uppercase tracking-wider text-sm">
-                        <i class="fas fa-list mr-2 text-emerald-400"></i>RELAÇÃO COMPLETA
-                    </span>
+            <!-- Tabela -->
+            <div class="glass overflow-hidden">
+                <div class="p-4 border-b border-white/5 bg-slate-900/60 flex justify-between">
+                    <span class="font-black text-white uppercase"><i class="fas fa-list mr-2 text-emerald-400"></i>RELAÇÃO COMPLETA</span>
                     <span class="text-xs bg-emerald-900/50 px-3 py-1 rounded-full text-emerald-300 font-mono">
                         <span id="totalExibido">0</span> praças
                     </span>
                 </div>
                 <div class="table-container">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                        <thead class="bg-slate-900 text-slate-300 font-bold sticky top-0 uppercase font-mono text-[0.7rem] tracking-wider">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-900 text-slate-300 sticky top-0 uppercase font-mono text-[0.7rem]">
                             <tr>
-                                <th class="p-3 text-center"># ANT.</th>
+                                <th class="p-3"># ANT.</th>
                                 <th class="p-3">NOME COMPLETO</th>
                                 <th class="p-3">ID FUNC</th>
                                 <th class="p-3">GRADUAÇÃO</th>
@@ -209,21 +201,18 @@
         </div>
     </main>
 
-    <footer class="text-center py-5 text-slate-500 text-[0.65rem] uppercase tracking-[.2em] bg-[#0b1120]/80 font-mono">
-        © CBMRS · SAMP · ANTIGUIDADE DE PRAÇAS 2026 | DADOS VIA GITHUB
+    <footer class="text-center py-5 text-slate-500 text-[0.65rem] uppercase tracking-[.2em] bg-[#0b1120]/80">
+        © CBMRS · SAMP · ANTIGUIDADE DE PRAÇAS 2026
     </footer>
 
     <script>
         (function(){
             "use strict";
 
-            // ---------- CONFIGURAÇÃO ----------
             const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
-            
-            // Caminho para o arquivo .docx no GitHub (ajuste conforme sua estrutura)
             const ARQUIVO_DOCX = './dados/BAM-002-SAMP.docx';
             
-            // Elementos da UI
+            // Elementos
             const loadingEl = document.getElementById('loadingOverlay');
             const loadingStatus = document.getElementById('loadingStatus');
             const dashboardEl = document.getElementById('mainDashboard');
@@ -244,29 +233,38 @@
             const suggestionsB = document.getElementById('suggestionsB');
             const btnComparar = document.getElementById('btnComparar');
             const resultadoComp = document.getElementById('resultadoComparacao');
+            const debugContent = document.getElementById('debugContent');
+            const debugStatus = document.getElementById('debugStatus');
 
             let dadosBrutos = [];
             let dadosFiltrados = [];
             let chartInstance = null;
+            let ultimoTextoExtraido = '';
 
-            // ---------- PARSER (mantido igual) ----------
+            // ---------- PARSER ROBUSTO ----------
             function parseTextoBoletim(texto) {
                 const militares = [];
-                const lines = texto.split('\n').map(l => l.trim()).filter(l => l.length > 5);
+                const lines = texto.split('\n');
                 let section = null;
-                const rowRegex = /^\|\s*(\d+)\s*\|(?:\s*(?:>\s*)?(?:Ag\s+)?)?\|\s*>\s*([A-ZÀ-Ú\s\.]+?)\s*\|\s*(\d{7})\s*\|\s*>\s*(\d{2}\/\d{2}\/\d{2,4})/i;
+                
+                // Regex mais flexível: aceita espaços extras, "Ag", ">", barras verticais opcionais no início
+                const regexRankNomeIdData = /(\d{1,4})\s*\|?\s*(?:Ag\s+)?\|?\s*>\s*([A-ZÀ-Ú\s\.]+?)\s*\|\s*(\d{7})\s*\|\s*>\s*(\d{2}\/\d{2}\/\d{2,4})/i;
                 
                 for (let line of lines) {
-                    if (line.includes('1º SARGENTOS')) { section = '1sgt'; continue; }
-                    if (line.includes('2º SARGENTOS')) { section = '2sgt'; continue; }
-                    if (line.includes('3º SARGENTOS')) { section = '3sgt'; continue; }
-                    if (line.includes('RELAÇÃO DOS SOLDADOS')) { section = 'sd'; continue; }
+                    const trimmed = line.trim();
+                    
+                    // Identificar seção
+                    if (trimmed.includes('1º SARGENTOS')) { section = '1sgt'; continue; }
+                    if (trimmed.includes('2º SARGENTOS')) { section = '2sgt'; continue; }
+                    if (trimmed.includes('3º SARGENTOS')) { section = '3sgt'; continue; }
+                    if (trimmed.includes('RELAÇÃO DOS SOLDADOS')) { section = 'sd'; continue; }
+                    
                     if (!section) continue;
                     
-                    const match = line.match(rowRegex);
+                    const match = trimmed.match(regexRankNomeIdData);
                     if (match) {
                         const rank = parseInt(match[1]);
-                        let nome = match[2].trim().replace(/\s+/g, ' ').replace(/>/g,'');
+                        let nome = match[2].trim().replace(/\s+/g, ' ').replace(/>/g, '');
                         const idFunc = match[3];
                         let dataRaw = match[4];
                         
@@ -287,27 +285,35 @@
                         militares.push({ rank, nome, idFunc, graduacao, data: dataFormatada });
                     }
                 }
+                
+                console.log(`Parser encontrou ${militares.length} militares.`);
                 return militares;
             }
 
-            // ---------- CARREGAR ARQUIVO .DOCX DO GITHUB ----------
+            // ---------- CARREGAR DADOS ----------
             async function carregarDados() {
                 try {
                     loadingStatus.textContent = 'Baixando arquivo .docx...';
                     const response = await fetch(ARQUIVO_DOCX);
-                    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     
                     const arrayBuffer = await response.arrayBuffer();
-                    loadingStatus.textContent = 'Extraindo texto do documento...';
+                    loadingStatus.textContent = 'Extraindo texto com Mammoth...';
                     
                     const result = await mammoth.extractRawText({ arrayBuffer });
                     const textoExtraido = result.value;
+                    ultimoTextoExtraido = textoExtraido;
                     
-                    loadingStatus.textContent = 'Processando lista de militares...';
+                    debugStatus.innerHTML = `✅ Texto extraído: ${textoExtraido.length} caracteres.`;
+                    
+                    loadingStatus.textContent = 'Processando lista...';
                     dadosBrutos = parseTextoBoletim(textoExtraido);
                     
                     if (dadosBrutos.length === 0) {
-                        throw new Error('Nenhum militar encontrado. Verifique o formato do arquivo.');
+                        // Tenta um fallback mostrando uma amostra do texto
+                        debugContent.textContent = textoExtraido.substring(0, 2000) + '...';
+                        debugContent.classList.remove('hidden');
+                        throw new Error('Nenhum militar encontrado. Verifique o formato no painel de debug.');
                     }
                     
                     // Ordenar
@@ -320,7 +326,6 @@
                     
                     dadosFiltrados = [...dadosBrutos];
                     
-                    // Inicializar interface
                     atualizarContadores();
                     desenharGrafico();
                     renderizarTabela();
@@ -331,9 +336,11 @@
                 } catch (erro) {
                     console.error(erro);
                     loadingStatus.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Erro: ${erro.message}</span>`;
-                    loadingStatus.classList.add('text-red-400');
-                    // Fallback mínimo para não travar
-                    dadosBrutos = gerarFallback();
+                    // Fallback mínimo
+                    dadosBrutos = [
+                        { rank:1, nome:"AUREO ROGERIO GAUTERIO DA VEIGA", idFunc:"2274175", graduacao:"1º Sargento", data:"ABR/2004" },
+                        { rank:2, nome:"NILSON ROCHA REMELING", idFunc:"2281163", graduacao:"1º Sargento", data:"DEZ/2006" },
+                    ];
                     dadosFiltrados = [...dadosBrutos];
                     atualizarContadores();
                     desenharGrafico();
@@ -350,7 +357,7 @@
                 ];
             }
 
-            // ---------- FUNÇÕES DE UI ----------
+            // ---------- UI ----------
             function atualizarContadores() {
                 const counts = {'1º Sargento':0,'2º Sargento':0,'3º Sargento':0,'Soldado':0};
                 dadosBrutos.forEach(m => counts[m.graduacao]++);
@@ -375,7 +382,7 @@
                             backgroundColor: ['#eab308','#f97316','#0ea5e9','#10b981'], borderRadius: 6 }] },
                     options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                         plugins: { legend: {display:false}, datalabels: { anchor:'end', align:'right', color:'#fff', font:{weight:'bold',size:13}, formatter:v=>v } },
-                        scales: { x: { grid:{color:'#334155'}, ticks:{color:'#cbd5e1'} }, y: { grid:{display:false}, ticks:{color:'#f1f5f9',font:{size:14}} } }
+                        scales: { x: { grid:{color:'#334155'}, ticks:{color:'#cbd5e1'} }, y: { grid:{display:false}, ticks:{color:'#f1f5f9'} } }
                     }, plugins: [ChartDataLabels]
                 });
             }
@@ -401,8 +408,8 @@
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-white/5 border-b border-slate-700/40';
                     let gradClass = m.graduacao.includes('1º')?'text-yellow-400':m.graduacao.includes('2º')?'text-orange-400':m.graduacao.includes('3º')?'text-sky-400':'text-emerald-400';
-                    tr.innerHTML = `<td class="p-3 text-center font-bold text-slate-300">${m.rank}</td>
-                        <td class="p-3 font-semibold">${m.nome}</td><td class="p-3 font-mono tracking-wider text-blue-300">${m.idFunc}</td>
+                    tr.innerHTML = `<td class="p-3 text-center">${m.rank}</td>
+                        <td class="p-3 font-semibold">${m.nome}</td><td class="p-3 text-blue-300">${m.idFunc}</td>
                         <td class="p-3 ${gradClass} font-bold">${m.graduacao}</td><td class="p-3 text-slate-400">${m.data}</td>`;
                     tableBody.appendChild(tr);
                 });
@@ -416,7 +423,6 @@
                 renderizarTabela();
             }
 
-            // Autocomplete
             function setupAutocomplete(inputEl, suggestionsEl, targetInput) {
                 inputEl.addEventListener('input', function() {
                     const val = this.value.trim().toUpperCase();
@@ -427,11 +433,9 @@
                     matches.forEach(m => {
                         const div = document.createElement('div');
                         div.className = 'suggestion-item';
-                        div.innerHTML = `<span class="font-bold">${m.nome}</span> <span class="text-xs text-slate-400 ml-2">${m.idFunc} · ${m.graduacao}</span>`;
+                        div.innerHTML = `<span class="font-bold">${m.nome}</span> <span class="text-xs text-slate-400 ml-2">${m.idFunc}</span>`;
                         div.addEventListener('click', () => {
                             targetInput.value = `${m.nome} (${m.idFunc})`;
-                            targetInput.dataset.idFunc = m.idFunc;
-                            targetInput.dataset.nome = m.nome;
                             suggestionsEl.classList.add('hidden');
                         });
                         suggestionsEl.appendChild(div);
@@ -451,35 +455,38 @@
                 };
                 const mA = buscar(valA), mB = buscar(valB);
                 if (!mA || !mB) {
-                    resultadoComp.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Um ou ambos não encontrados.</span>`;
+                    resultadoComp.innerHTML = `<span class="text-red-400">Militares não encontrados.</span>`;
                     resultadoComp.classList.remove('hidden');
                     return;
                 }
                 const idxA = dadosBrutos.indexOf(mA), idxB = dadosBrutos.indexOf(mB);
                 const maisAntigo = idxA < idxB ? mA : mB;
-                const maisModerno = idxA < idxB ? mB : mA;
                 resultadoComp.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div class="text-right"><span class="text-slate-400">${mA.nome}</span><br><span class="text-xs">${mA.graduacao} · #${mA.rank}</span></div>
-                        <div class="text-left"><span class="text-slate-400">${mB.nome}</span><br><span class="text-xs">${mB.graduacao} · #${mB.rank}</span></div>
-                    </div>
-                    <div class="mt-4 text-xl font-black text-emerald-400"><i class="fas fa-crown mr-2"></i> MAIS ANTIGO: ${maisAntigo.nome} <span class="text-sm font-normal ml-2">(${maisAntigo.graduacao} #${maisAntigo.rank})</span></div>
-                    <div class="text-slate-400 text-sm mt-1">${maisModerno.nome} é o mais moderno.</div>`;
+                    <div class="text-xl font-black text-emerald-400"><i class="fas fa-crown mr-2"></i> MAIS ANTIGO: ${maisAntigo.nome} (${maisAntigo.graduacao} #${maisAntigo.rank})</div>
+                `;
                 resultadoComp.classList.remove('hidden');
             }
 
-            // Event listeners
+            // Eventos
             fAnt.addEventListener('input', filtrarDados);
             fNome.addEventListener('input', filtrarDados);
             fId.addEventListener('input', filtrarDados);
             fGrad.addEventListener('change', filtrarDados);
             btnLimpar.addEventListener('click', resetFiltros);
             btnComparar.addEventListener('click', compararMilitares);
-            
             setupAutocomplete(compareA, suggestionsA, compareA);
             setupAutocomplete(compareB, suggestionsB, compareB);
+            
+            document.getElementById('btnRecarregar').addEventListener('click', () => {
+                location.reload();
+            });
+            
+            document.getElementById('btnMostrarTexto').addEventListener('click', () => {
+                debugContent.textContent = ultimoTextoExtraido || 'Nenhum texto extraído ainda.';
+                debugContent.classList.remove('hidden');
+            });
 
-            // Iniciar carregamento
+            // Iniciar
             carregarDados();
         })();
     </script>
