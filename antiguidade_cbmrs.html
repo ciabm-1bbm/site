@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>ANTIGUIDADE · PRAÇAS CBMRS (GitHub)</title>
+    <title>ANTIGUIDADE · PRAÇAS CBMRS</title>
     
     <!-- Tailwind + Font Awesome -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,9 +12,6 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    
-    <!-- Mammoth.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <style>
         .glass {
@@ -55,7 +52,6 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #debugPanel { background: #0f172a; border: 1px solid #334155; border-radius: 1rem; padding: 1rem; max-height: 200px; overflow: auto; }
     </style>
 </head>
 <body class="bg-[#0b1120] text-gray-100 min-h-screen flex flex-col font-sans antialiased">
@@ -76,27 +72,16 @@
             <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-12 sm:h-16 hidden md:block">
         </header>
 
-        <!-- Área de DEBUG (oculta por padrão, mas pode ser ativada) -->
-        <details class="glass p-4 text-xs font-mono">
-            <summary class="cursor-pointer text-slate-400 hover:text-white">🔧 Painel de Debug (clique para expandir)</summary>
-            <div class="mt-3">
-                <button id="btnRecarregar" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm mr-2"><i class="fas fa-sync-alt mr-1"></i>Recarregar dados</button>
-                <button id="btnMostrarTexto" class="bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm"><i class="fas fa-file-alt mr-1"></i>Exibir texto extraído</button>
-                <pre id="debugContent" class="mt-3 text-slate-300 whitespace-pre-wrap hidden"></pre>
-                <p id="debugStatus" class="text-emerald-400"></p>
-            </div>
-        </details>
-
         <!-- Loader -->
         <div id="loadingOverlay" class="glass p-8 flex flex-col items-center justify-center space-y-4">
             <div class="loader"></div>
-            <p class="text-emerald-400 font-mono text-lg font-bold">CARREGANDO BOLETIM...</p>
-            <p class="text-slate-400 text-sm" id="loadingStatus">Conectando...</p>
+            <p class="text-emerald-400 font-mono text-lg font-bold">CARREGANDO EFETIVO...</p>
+            <p class="text-slate-400 text-sm" id="loadingStatus">Conectando ao CSV...</p>
         </div>
 
         <!-- Dashboard -->
         <div id="mainDashboard" class="hidden space-y-5">
-            <!-- cards e gráfico -->
+            <!-- Cards e gráfico -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div class="glass p-5 lg:col-span-1">
                     <h3 class="text-sm font-bold text-slate-300 mb-4"><i class="fas fa-users text-emerald-400 mr-2"></i>EFETIVO TOTAL</h3>
@@ -209,10 +194,10 @@
         (function(){
             "use strict";
 
-            const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
-            const ARQUIVO_DOCX = './dados/BAM-002-SAMP.docx';
+            // Caminho do CSV no GitHub
+            const CSV_URL = './dados/efetivo.csv';
             
-            // Elementos
+            // Elementos DOM
             const loadingEl = document.getElementById('loadingOverlay');
             const loadingStatus = document.getElementById('loadingStatus');
             const dashboardEl = document.getElementById('mainDashboard');
@@ -233,91 +218,66 @@
             const suggestionsB = document.getElementById('suggestionsB');
             const btnComparar = document.getElementById('btnComparar');
             const resultadoComp = document.getElementById('resultadoComparacao');
-            const debugContent = document.getElementById('debugContent');
-            const debugStatus = document.getElementById('debugStatus');
 
             let dadosBrutos = [];
             let dadosFiltrados = [];
             let chartInstance = null;
-            let ultimoTextoExtraido = '';
 
-            // ---------- PARSER ROBUSTO ----------
-            function parseTextoBoletim(texto) {
+            // ---------- PARSE CSV (separador ;) ----------
+            function parseCSV(texto) {
+                const linhas = texto.split('\n').filter(l => l.trim() !== '');
+                if (linhas.length === 0) return [];
+                
+                // Remove cabeçalho
+                const dados = linhas.slice(1);
                 const militares = [];
-                const lines = texto.split('\n');
-                let section = null;
                 
-                // Regex mais flexível: aceita espaços extras, "Ag", ">", barras verticais opcionais no início
-                const regexRankNomeIdData = /(\d{1,4})\s*\|?\s*(?:Ag\s+)?\|?\s*>\s*([A-ZÀ-Ú\s\.]+?)\s*\|\s*(\d{7})\s*\|\s*>\s*(\d{2}\/\d{2}\/\d{2,4})/i;
-                
-                for (let line of lines) {
-                    const trimmed = line.trim();
+                for (let linha of dados) {
+                    // Ignora linhas vazias ou muito curtas
+                    if (linha.trim() === '') continue;
                     
-                    // Identificar seção
-                    if (trimmed.includes('1º SARGENTOS')) { section = '1sgt'; continue; }
-                    if (trimmed.includes('2º SARGENTOS')) { section = '2sgt'; continue; }
-                    if (trimmed.includes('3º SARGENTOS')) { section = '3sgt'; continue; }
-                    if (trimmed.includes('RELAÇÃO DOS SOLDADOS')) { section = 'sd'; continue; }
+                    // Quebra por ; (considera que nomes podem ter espaços, mas sem ;)
+                    const partes = linha.split(';');
+                    if (partes.length < 5) continue;
                     
-                    if (!section) continue;
+                    const rank = parseInt(partes[0].trim(), 10);
+                    const nome = partes[1].trim();
+                    const idFunc = partes[2].trim();
+                    const graduacao = partes[3].trim();
+                    const data = partes[4].trim();
                     
-                    const match = trimmed.match(regexRankNomeIdData);
-                    if (match) {
-                        const rank = parseInt(match[1]);
-                        let nome = match[2].trim().replace(/\s+/g, ' ').replace(/>/g, '');
-                        const idFunc = match[3];
-                        let dataRaw = match[4];
-                        
-                        let dataFormatada = dataRaw;
-                        const partes = dataRaw.split('/');
-                        if (partes.length === 3) {
-                            let mes = parseInt(partes[1]) - 1;
-                            let ano = partes[2].length === 2 ? '20'+partes[2] : partes[2];
-                            if (!isNaN(mes) && mes >=0 && mes<12) dataFormatada = `${MESES[mes]}/${ano}`;
-                        }
-                        
-                        let graduacao = '';
-                        if (section === '1sgt') graduacao = '1º Sargento';
-                        else if (section === '2sgt') graduacao = '2º Sargento';
-                        else if (section === '3sgt') graduacao = '3º Sargento';
-                        else if (section === 'sd') graduacao = 'Soldado';
-                        
-                        militares.push({ rank, nome, idFunc, graduacao, data: dataFormatada });
-                    }
+                    if (isNaN(rank)) continue;
+                    
+                    militares.push({
+                        rank: rank,
+                        nome: nome,
+                        idFunc: idFunc,
+                        graduacao: graduacao,
+                        data: data
+                    });
                 }
                 
-                console.log(`Parser encontrou ${militares.length} militares.`);
                 return militares;
             }
 
-            // ---------- CARREGAR DADOS ----------
+            // ---------- CARREGAR CSV ----------
             async function carregarDados() {
                 try {
-                    loadingStatus.textContent = 'Baixando arquivo .docx...';
-                    const response = await fetch(ARQUIVO_DOCX);
+                    loadingStatus.textContent = 'Baixando CSV do GitHub...';
+                    const response = await fetch(CSV_URL);
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     
-                    const arrayBuffer = await response.arrayBuffer();
-                    loadingStatus.textContent = 'Extraindo texto com Mammoth...';
+                    const texto = await response.text();
+                    loadingStatus.textContent = 'Processando dados...';
                     
-                    const result = await mammoth.extractRawText({ arrayBuffer });
-                    const textoExtraido = result.value;
-                    ultimoTextoExtraido = textoExtraido;
-                    
-                    debugStatus.innerHTML = `✅ Texto extraído: ${textoExtraido.length} caracteres.`;
-                    
-                    loadingStatus.textContent = 'Processando lista...';
-                    dadosBrutos = parseTextoBoletim(textoExtraido);
+                    dadosBrutos = parseCSV(texto);
                     
                     if (dadosBrutos.length === 0) {
-                        // Tenta um fallback mostrando uma amostra do texto
-                        debugContent.textContent = textoExtraido.substring(0, 2000) + '...';
-                        debugContent.classList.remove('hidden');
-                        throw new Error('Nenhum militar encontrado. Verifique o formato no painel de debug.');
+                        throw new Error('Nenhum militar encontrado no CSV.');
                     }
                     
-                    // Ordenar
-                    const ordemGrad = {'1º Sargento':1,'2º Sargento':2,'3º Sargento':3,'Soldado':4};
+                    // Ordenação hierárquica (1º SGT, 2º SGT, 3º SGT, SD) e por rank
+                    const ordemGrad = {'1º Sargento':1, '2º Sargento':2, '3º Sargento':3, 'Soldado':4};
                     dadosBrutos.sort((a,b) => {
                         if (ordemGrad[a.graduacao] !== ordemGrad[b.graduacao]) 
                             return ordemGrad[a.graduacao] - ordemGrad[b.graduacao];
@@ -350,16 +310,9 @@
                 }
             }
 
-            function gerarFallback() {
-                return [
-                    { rank:1, nome:"AUREO ROGERIO GAUTERIO DA VEIGA", idFunc:"2274175", graduacao:"1º Sargento", data:"ABR/2004" },
-                    { rank:2, nome:"NILSON ROCHA REMELING", idFunc:"2281163", graduacao:"1º Sargento", data:"DEZ/2006" },
-                ];
-            }
-
             // ---------- UI ----------
             function atualizarContadores() {
-                const counts = {'1º Sargento':0,'2º Sargento':0,'3º Sargento':0,'Soldado':0};
+                const counts = {'1º Sargento':0, '2º Sargento':0, '3º Sargento':0, 'Soldado':0};
                 dadosBrutos.forEach(m => counts[m.graduacao]++);
                 total1SgtEl.textContent = counts['1º Sargento'];
                 total2SgtEl.textContent = counts['2º Sargento'];
@@ -477,16 +430,7 @@
             setupAutocomplete(compareA, suggestionsA, compareA);
             setupAutocomplete(compareB, suggestionsB, compareB);
             
-            document.getElementById('btnRecarregar').addEventListener('click', () => {
-                location.reload();
-            });
-            
-            document.getElementById('btnMostrarTexto').addEventListener('click', () => {
-                debugContent.textContent = ultimoTextoExtraido || 'Nenhum texto extraído ainda.';
-                debugContent.classList.remove('hidden');
-            });
-
-            // Iniciar
+            // Iniciar carregamento
             carregarDados();
         })();
     </script>
