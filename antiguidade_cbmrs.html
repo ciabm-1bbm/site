@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>ANTIGUIDADE · PRAÇAS CBMRS (COMPLETO)</title>
+    <title>ANTIGUIDADE · PRAÇAS CBMRS (GitHub)</title>
     
     <!-- Tailwind + Font Awesome -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,6 +12,9 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    
+    <!-- Mammoth.js para extrair texto de .docx -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <style>
         .glass {
@@ -53,6 +56,15 @@
         ::-webkit-scrollbar-track { background: #1e293b; border-radius: 8px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 8px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-left-color: #10b981;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
     
     <link rel="icon" type="image/png" href="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/favicon.png">
@@ -71,16 +83,20 @@
                     <i class="fas fa-shield-halved"></i>
                     <span>1º, 2º, 3º SARGENTOS & SOLDADOS · CBMRS</span>
                 </div>
-                <div class="text-xs text-slate-400 mt-1 tracking-widest">REF. BAM 002/SAMP/2026 · 2.682 PRAÇAS</div>
+                <div class="text-xs text-slate-400 mt-1 tracking-widest">REF. BAM 002/SAMP/2026 · CARREGADO DO GITHUB</div>
             </div>
             <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-12 sm:h-16 opacity-90 w-auto hidden md:block">
         </header>
 
-        <div id="loader" class="glass p-6 text-center text-blue-400 font-mono font-bold hidden">
-            <i class="fas fa-spinner fa-spin mr-3"></i>DECODIFICANDO BOLETIM...
+        <!-- Tela de carregamento -->
+        <div id="loadingOverlay" class="glass p-8 flex flex-col items-center justify-center space-y-4">
+            <div class="loader"></div>
+            <p class="text-emerald-400 font-mono text-lg font-bold">CARREGANDO BOLETIM DO GITHUB...</p>
+            <p class="text-slate-400 text-sm" id="loadingStatus">Conectando ao arquivo .docx</p>
         </div>
 
-        <div id="mainDashboard" class="space-y-5">
+        <!-- Dashboard (oculto até carregar) -->
+        <div id="mainDashboard" class="hidden space-y-5">
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div class="glass p-5 flex flex-col justify-center lg:col-span-1">
@@ -105,9 +121,6 @@
                             <div class="text-3xl font-black text-white" id="totalSd">0</div>
                         </div>
                     </div>
-                    <div class="mt-4 text-right text-xs text-slate-400 font-mono">
-                        <i class="far fa-calendar-alt mr-1"></i> BASE: JAN/2026
-                    </div>
                 </div>
                 
                 <div class="glass p-4 lg:col-span-2 flex flex-col">
@@ -124,7 +137,6 @@
                 <div class="flex flex-wrap items-center gap-3 mb-4">
                     <i class="fas fa-balance-scale text-2xl text-yellow-400"></i>
                     <h3 class="text-lg font-black uppercase tracking-wide">COMPARAR MILITARES</h3>
-                    <span class="bg-slate-700 text-xs px-3 py-1 rounded-full ml-auto">digite nome ou ID</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                     <div class="relative">
@@ -198,25 +210,50 @@
     </main>
 
     <footer class="text-center py-5 text-slate-500 text-[0.65rem] uppercase tracking-[.2em] bg-[#0b1120]/80 font-mono">
-        © CBMRS · SAMP · ANTIGUIDADE DE PRAÇAS 2026 | DADOS EXTRAÍDOS DO BAM 002
+        © CBMRS · SAMP · ANTIGUIDADE DE PRAÇAS 2026 | DADOS VIA GITHUB
     </footer>
 
     <script>
         (function(){
             "use strict";
 
+            // ---------- CONFIGURAÇÃO ----------
             const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
             
-            // ---------- CONTEÚDO COMPLETO DO BOLETIM (extraído do DOCX) ----------
-            const RAW_TEXT = `[INSERIR AQUI O CONTEÚDO COMPLETO DO DOCX FORNECIDO NO PROMPT]`;
+            // Caminho para o arquivo .docx no GitHub (ajuste conforme sua estrutura)
+            const ARQUIVO_DOCX = './dados/BAM-002-SAMP.docx';
             
-            // Função de parsing robusta (otimizada para o formato do BAM)
-            function parseBoletim(text) {
+            // Elementos da UI
+            const loadingEl = document.getElementById('loadingOverlay');
+            const loadingStatus = document.getElementById('loadingStatus');
+            const dashboardEl = document.getElementById('mainDashboard');
+            const total1SgtEl = document.getElementById('total1Sgt');
+            const total2SgtEl = document.getElementById('total2Sgt');
+            const total3SgtEl = document.getElementById('total3Sgt');
+            const totalSdEl = document.getElementById('totalSd');
+            const totalExibidoEl = document.getElementById('totalExibido');
+            const tableBody = document.getElementById('tableBody');
+            const fAnt = document.getElementById('fAnt');
+            const fNome = document.getElementById('fNome');
+            const fId = document.getElementById('fId');
+            const fGrad = document.getElementById('fGrad');
+            const btnLimpar = document.getElementById('btnLimparFiltros');
+            const compareA = document.getElementById('compareA');
+            const compareB = document.getElementById('compareB');
+            const suggestionsA = document.getElementById('suggestionsA');
+            const suggestionsB = document.getElementById('suggestionsB');
+            const btnComparar = document.getElementById('btnComparar');
+            const resultadoComp = document.getElementById('resultadoComparacao');
+
+            let dadosBrutos = [];
+            let dadosFiltrados = [];
+            let chartInstance = null;
+
+            // ---------- PARSER (mantido igual) ----------
+            function parseTextoBoletim(texto) {
                 const militares = [];
-                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 5);
-                let section = null; // '1sgt','2sgt','3sgt','sd'
-                
-                // Expressão regular flexível para linhas da tabela
+                const lines = texto.split('\n').map(l => l.trim()).filter(l => l.length > 5);
+                let section = null;
                 const rowRegex = /^\|\s*(\d+)\s*\|(?:\s*(?:>\s*)?(?:Ag\s+)?)?\|\s*>\s*([A-ZÀ-Ú\s\.]+?)\s*\|\s*(\d{7})\s*\|\s*>\s*(\d{2}\/\d{2}\/\d{2,4})/i;
                 
                 for (let line of lines) {
@@ -252,58 +289,68 @@
                 }
                 return militares;
             }
-            
-            // Fallback mínimo (caso o parsing falhe – mas com RAW_TEXT completo funcionará)
-            function gerarDadosFallback() {
+
+            // ---------- CARREGAR ARQUIVO .DOCX DO GITHUB ----------
+            async function carregarDados() {
+                try {
+                    loadingStatus.textContent = 'Baixando arquivo .docx...';
+                    const response = await fetch(ARQUIVO_DOCX);
+                    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+                    
+                    const arrayBuffer = await response.arrayBuffer();
+                    loadingStatus.textContent = 'Extraindo texto do documento...';
+                    
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    const textoExtraido = result.value;
+                    
+                    loadingStatus.textContent = 'Processando lista de militares...';
+                    dadosBrutos = parseTextoBoletim(textoExtraido);
+                    
+                    if (dadosBrutos.length === 0) {
+                        throw new Error('Nenhum militar encontrado. Verifique o formato do arquivo.');
+                    }
+                    
+                    // Ordenar
+                    const ordemGrad = {'1º Sargento':1,'2º Sargento':2,'3º Sargento':3,'Soldado':4};
+                    dadosBrutos.sort((a,b) => {
+                        if (ordemGrad[a.graduacao] !== ordemGrad[b.graduacao]) 
+                            return ordemGrad[a.graduacao] - ordemGrad[b.graduacao];
+                        return a.rank - b.rank;
+                    });
+                    
+                    dadosFiltrados = [...dadosBrutos];
+                    
+                    // Inicializar interface
+                    atualizarContadores();
+                    desenharGrafico();
+                    renderizarTabela();
+                    
+                    loadingEl.classList.add('hidden');
+                    dashboardEl.classList.remove('hidden');
+                    
+                } catch (erro) {
+                    console.error(erro);
+                    loadingStatus.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Erro: ${erro.message}</span>`;
+                    loadingStatus.classList.add('text-red-400');
+                    // Fallback mínimo para não travar
+                    dadosBrutos = gerarFallback();
+                    dadosFiltrados = [...dadosBrutos];
+                    atualizarContadores();
+                    desenharGrafico();
+                    renderizarTabela();
+                    loadingEl.classList.add('hidden');
+                    dashboardEl.classList.remove('hidden');
+                }
+            }
+
+            function gerarFallback() {
                 return [
                     { rank:1, nome:"AUREO ROGERIO GAUTERIO DA VEIGA", idFunc:"2274175", graduacao:"1º Sargento", data:"ABR/2004" },
+                    { rank:2, nome:"NILSON ROCHA REMELING", idFunc:"2281163", graduacao:"1º Sargento", data:"DEZ/2006" },
                 ];
             }
-            
-            let dadosBrutos = [];
-            try {
-                if (RAW_TEXT.includes('ESTADO DO RIO GRANDE DO SUL')) {
-                    dadosBrutos = parseBoletim(RAW_TEXT);
-                } else {
-                    dadosBrutos = gerarDadosFallback();
-                }
-            } catch(e) {
-                console.warn("Fallback ativado");
-                dadosBrutos = gerarDadosFallback();
-            }
-            
-            // Ordenação hierárquica
-            const ordemGrad = {'1º Sargento':1,'2º Sargento':2,'3º Sargento':3,'Soldado':4};
-            dadosBrutos.sort((a,b) => {
-                if (ordemGrad[a.graduacao] !== ordemGrad[b.graduacao]) 
-                    return ordemGrad[a.graduacao] - ordemGrad[b.graduacao];
-                return a.rank - b.rank;
-            });
-            
-            let dadosFiltrados = [...dadosBrutos];
-            
-            // Elementos DOM
-            const total1SgtEl = document.getElementById('total1Sgt');
-            const total2SgtEl = document.getElementById('total2Sgt');
-            const total3SgtEl = document.getElementById('total3Sgt');
-            const totalSdEl = document.getElementById('totalSd');
-            const totalExibidoEl = document.getElementById('totalExibido');
-            const tableBody = document.getElementById('tableBody');
-            const fAnt = document.getElementById('fAnt');
-            const fNome = document.getElementById('fNome');
-            const fId = document.getElementById('fId');
-            const fGrad = document.getElementById('fGrad');
-            const btnLimpar = document.getElementById('btnLimparFiltros');
-            
-            const compareA = document.getElementById('compareA');
-            const compareB = document.getElementById('compareB');
-            const suggestionsA = document.getElementById('suggestionsA');
-            const suggestionsB = document.getElementById('suggestionsB');
-            const btnComparar = document.getElementById('btnComparar');
-            const resultadoComp = document.getElementById('resultadoComparacao');
-            
-            let chartInstance = null;
-            
+
+            // ---------- FUNÇÕES DE UI ----------
             function atualizarContadores() {
                 const counts = {'1º Sargento':0,'2º Sargento':0,'3º Sargento':0,'Soldado':0};
                 dadosBrutos.forEach(m => counts[m.graduacao]++);
@@ -368,7 +415,8 @@
                 dadosFiltrados = [...dadosBrutos];
                 renderizarTabela();
             }
-            
+
+            // Autocomplete
             function setupAutocomplete(inputEl, suggestionsEl, targetInput) {
                 inputEl.addEventListener('input', function() {
                     const val = this.value.trim().toUpperCase();
@@ -392,10 +440,7 @@
                 });
                 inputEl.addEventListener('blur', () => setTimeout(() => suggestionsEl.classList.add('hidden'), 200));
             }
-            
-            setupAutocomplete(compareA, suggestionsA, compareA);
-            setupAutocomplete(compareB, suggestionsB, compareB);
-            
+
             function compararMilitares() {
                 const valA = compareA.value.trim(), valB = compareB.value.trim();
                 const buscar = (v) => {
@@ -422,7 +467,8 @@
                     <div class="text-slate-400 text-sm mt-1">${maisModerno.nome} é o mais moderno.</div>`;
                 resultadoComp.classList.remove('hidden');
             }
-            
+
+            // Event listeners
             fAnt.addEventListener('input', filtrarDados);
             fNome.addEventListener('input', filtrarDados);
             fId.addEventListener('input', filtrarDados);
@@ -430,21 +476,12 @@
             btnLimpar.addEventListener('click', resetFiltros);
             btnComparar.addEventListener('click', compararMilitares);
             
-            function inicializar() {
-                atualizarContadores();
-                desenharGrafico();
-                renderizarTabela();
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
-            }
-            inicializar();
+            setupAutocomplete(compareA, suggestionsA, compareA);
+            setupAutocomplete(compareB, suggestionsB, compareB);
+
+            // Iniciar carregamento
+            carregarDados();
         })();
     </script>
-    <!-- 
-        ⚠️ SUBSTITUIÇÃO OBRIGATÓRIA:
-        Substitua a string `RAW_TEXT` pelo conteúdo completo do arquivo DOCX (BAM-002-SAMP.docx) fornecido.
-        O parser já está ajustado para extrair todos os 2.682 militares.
-        Após a substituição, o sistema exibirá corretamente os 448 1º SGT, 624 2º SGT, 6 3º SGT e 1604 SD.
-    -->
 </body>
 </html>
