@@ -52,10 +52,10 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        /* Verde oliva fraco para os cards */
-        .card-olive {
-            background-color: #8FBC8F; /* DarkSeaGreen */
-            border-left: 4px solid #2E5A2E !important;
+        /* Cards laranja */
+        .card-orange {
+            background-color: #FFB347; /* laranja pastel */
+            border-left: 4px solid #C44600 !important;
         }
     </style>
 </head>
@@ -64,7 +64,7 @@
     <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow space-y-5">
         
         <header class="glass p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12 sm:h-16 opacity-90">
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 sm:h-20 opacity-90 w-auto">
             <div class="text-center">
                 <h1 class="text-2xl sm:text-3xl font-black text-white">
                     <i class="fas fa-users text-emerald-400 mr-2"></i>PLATAFORMA ANTIGUIDADE DE PRAÇAS DO CBMRS
@@ -74,7 +74,7 @@
                     <span>conforme Boletim de Avaliação e Mérito nº 002/2026</span>
                 </div>
             </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-12 sm:h-16 hidden md:block">
+            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 sm:h-20 hidden md:block w-auto">
         </header>
 
         <!-- Loader -->
@@ -91,25 +91,25 @@
                 <!-- Cards de efetivo -->
                 <div class="glass p-5 lg:col-span-1">
                     <h3 class="text-sm font-bold text-slate-300 mb-4"><i class="fas fa-users text-emerald-400 mr-2"></i>EFETIVO TOTAL</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800">1º SGT</span>
+                    <div class="grid grid-cols-2 gap-3 text-center">
+                        <div class="card-orange p-3 rounded-2xl">
+                            <span class="text-xs text-gray-800 font-semibold">1º SGT</span>
                             <div class="text-3xl font-black text-gray-900" id="total1Sgt">0</div>
                         </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800">2º SGT</span>
+                        <div class="card-orange p-3 rounded-2xl">
+                            <span class="text-xs text-gray-800 font-semibold">2º SGT</span>
                             <div class="text-3xl font-black text-gray-900" id="total2Sgt">0</div>
                         </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800">3º SGT</span>
+                        <div class="card-orange p-3 rounded-2xl">
+                            <span class="text-xs text-gray-800 font-semibold">3º SGT</span>
                             <div class="text-3xl font-black text-gray-900" id="total3Sgt">0</div>
                         </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800">SOLDADOS</span>
+                        <div class="card-orange p-3 rounded-2xl">
+                            <span class="text-xs text-gray-800 font-semibold">SOLDADOS</span>
                             <div class="text-3xl font-black text-gray-900" id="totalSd">0</div>
                         </div>
                         <!-- Total geral -->
-                        <div class="col-span-2 mt-2 bg-slate-800/40 p-3 rounded-2xl border border-emerald-500/30">
+                        <div class="col-span-2 mt-2 bg-slate-800/40 p-3 rounded-2xl border border-emerald-500/30 text-center">
                             <span class="text-xs text-emerald-300 uppercase tracking-wider">Total de Praças</span>
                             <div class="text-4xl font-black text-white" id="totalGeral">0</div>
                         </div>
@@ -295,11 +295,11 @@
             function atualizarContadores() {
                 const counts = {'1º Sargento':0, '2º Sargento':0, '3º Sargento':0, 'Soldado':0};
                 dadosBrutos.forEach(m => counts[m.graduacao]++);
-                total1SgtEl.textContent = counts['1º Sargento'];
-                total2SgtEl.textContent = counts['2º Sargento'];
-                total3SgtEl.textContent = counts['3º Sargento'];
-                totalSdEl.textContent = counts['Soldado'];
-                totalGeralEl.textContent = dadosBrutos.length;
+                total1SgtEl.textContent = counts['1º Sargento'].toLocaleString('pt-BR');
+                total2SgtEl.textContent = counts['2º Sargento'].toLocaleString('pt-BR');
+                total3SgtEl.textContent = counts['3º Sargento'].toLocaleString('pt-BR');
+                totalSdEl.textContent = counts['Soldado'].toLocaleString('pt-BR');
+                totalGeralEl.textContent = dadosBrutos.length.toLocaleString('pt-BR');
             }
             
             function desenharGrafico() {
@@ -326,15 +326,18 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { labels: { color: '#cbd5e1', font: {size: 13} } },
+                            legend: { 
+                                labels: { color: '#000000', font: {size: 13, weight: 'bold'} } 
+                            },
                             datalabels: {
-                                color: '#fff',
-                                font: { weight: 'bold', size: 14 },
+                                color: '#FFFFFF',
+                                font: { weight: 'bold', size: 13 },
                                 formatter: (value, ctx) => {
                                     const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
                                     const percent = ((value / total)*100).toFixed(1);
-                                    return `${value} (${percent}%)`;
-                                }
+                                    return `${value.toLocaleString('pt-BR')}\n(${percent}%)`;
+                                },
+                                textAlign: 'center'
                             }
                         }
                     },
@@ -368,7 +371,7 @@
                         <td class="p-3 ${gradClass} font-bold">${m.graduacao}</td><td class="p-3 text-slate-400">${m.data}</td>`;
                     tableBody.appendChild(tr);
                 });
-                totalExibidoEl.textContent = dadosFiltrados.length;
+                totalExibidoEl.textContent = dadosFiltrados.length.toLocaleString('pt-BR');
             }
             
             function resetFiltros() {
