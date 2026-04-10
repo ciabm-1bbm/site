@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>PLATAFORMA ANTIGUIDADE DE PRAÇAS NO CBMRS</title>
+    <title>PLATAFORMA ANTIGUIDADE · PRAÇAS CBMRS</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,9 +52,9 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .card-orange {
-            background-color: #FFB347;
-            border-left: 4px solid #C44600 !important;
+        .card-olive {
+            background-color: #8FBC8F;
+            border-left: 4px solid #2E5A2E !important;
         }
         .chart-container-3d {
             filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.4));
@@ -90,25 +90,29 @@
                 <div class="glass p-5 lg:col-span-1">
                     <h3 class="text-sm font-bold text-slate-300 mb-4"><i class="fas fa-users text-emerald-400 mr-2"></i>EFETIVO TOTAL</h3>
                     <div class="grid grid-cols-2 gap-3 text-center">
-                        <div class="card-orange p-3 rounded-2xl">
+                        <div class="card-olive p-3 rounded-2xl">
                             <span class="text-xs text-gray-800 font-semibold">1º SGT</span>
                             <div class="text-3xl font-black text-gray-900" id="total1Sgt">0</div>
                         </div>
-                        <div class="card-orange p-3 rounded-2xl">
+                        <div class="card-olive p-3 rounded-2xl">
                             <span class="text-xs text-gray-800 font-semibold">2º SGT</span>
                             <div class="text-3xl font-black text-gray-900" id="total2Sgt">0</div>
                         </div>
-                        <div class="card-orange p-3 rounded-2xl">
+                        <div class="card-olive p-3 rounded-2xl">
                             <span class="text-xs text-gray-800 font-semibold">3º SGT</span>
                             <div class="text-3xl font-black text-gray-900" id="total3Sgt">0</div>
                         </div>
-                        <div class="card-orange p-3 rounded-2xl">
+                        <div class="card-olive p-3 rounded-2xl">
                             <span class="text-xs text-gray-800 font-semibold">SOLDADOS</span>
                             <div class="text-3xl font-black text-gray-900" id="totalSd">0</div>
                         </div>
-                        <div class="col-span-2 mt-2 bg-slate-800/40 p-3 rounded-2xl border border-emerald-500/30 text-center">
-                            <span class="text-xs text-emerald-300 uppercase tracking-wider">Total de Praças</span>
-                            <div class="text-4xl font-black text-white" id="totalGeral">0</div>
+                        <div class="card-olive p-3 rounded-2xl">
+                            <span class="text-xs text-gray-800 font-semibold">SD BMT</span>
+                            <div class="text-3xl font-black text-gray-900" id="totalSdTemp">0</div>
+                        </div>
+                        <div class="card-olive p-3 rounded-2xl">
+                            <span class="text-xs text-gray-800 font-semibold">TOTAL</span>
+                            <div class="text-3xl font-black text-gray-900" id="totalGeral">0</div>
                         </div>
                     </div>
                 </div>
@@ -159,6 +163,7 @@
                             <option value="2º Sargento">2º SGT</option>
                             <option value="3º Sargento">3º SGT</option>
                             <option value="Soldado">SOLDADO</option>
+                            <option value="Soldado Temporário">SD BMT</option>
                         </select>
                     </div>
                     <button id="btnLimparFiltros" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-full text-sm">
@@ -193,7 +198,7 @@
     </main>
 
     <footer class="text-center py-5 text-slate-500 text-[0.65rem] uppercase tracking-[.2em] bg-[#0b1120]/80">
-        © CIA - 1º BBM · 2026 · Plataforma Desenvolvida por Gustavo Medeiros.
+             © CIA - 1º BBM · 2026 · Plataforma Desenvolvida por Gustavo Medeiros.
     </footer>
 
     <script>
@@ -209,6 +214,7 @@
             const total2SgtEl = document.getElementById('total2Sgt');
             const total3SgtEl = document.getElementById('total3Sgt');
             const totalSdEl = document.getElementById('totalSd');
+            const totalSdTempEl = document.getElementById('totalSdTemp');
             const totalGeralEl = document.getElementById('totalGeral');
             const totalExibidoEl = document.getElementById('totalExibido');
             const tableBody = document.getElementById('tableBody');
@@ -237,12 +243,11 @@
                     if (linha.trim() === '') continue;
                     const partes = linha.split(';');
                     if (partes.length < 5) continue;
-                    const rank = parseInt(partes[0].trim(), 10);
+                    let rank = partes[0].trim();
                     const nome = partes[1].trim();
                     const idFunc = partes[2].trim();
                     const graduacao = partes[3].trim();
                     const data = partes[4].trim();
-                    if (isNaN(rank)) continue;
                     militares.push({ rank, nome, idFunc, graduacao, data });
                 }
                 return militares;
@@ -257,11 +262,19 @@
                     dadosBrutos = parseCSV(texto);
                     if (dadosBrutos.length === 0) throw new Error('Nenhum militar encontrado.');
                     
-                    const ordemGrad = {'1º Sargento':1, '2º Sargento':2, '3º Sargento':3, 'Soldado':4};
+                    const ordemGrad = {
+                        '1º Sargento':1, '2º Sargento':2, '3º Sargento':3, 
+                        'Soldado':4, 'Soldado Temporário':5
+                    };
                     dadosBrutos.sort((a,b) => {
-                        if (ordemGrad[a.graduacao] !== ordemGrad[b.graduacao]) 
-                            return ordemGrad[a.graduacao] - ordemGrad[b.graduacao];
-                        return a.rank - b.rank;
+                        const ga = ordemGrad[a.graduacao] || 99;
+                        const gb = ordemGrad[b.graduacao] || 99;
+                        if (ga !== gb) return ga - gb;
+                        const ra = parseInt(a.rank);
+                        const rb = parseInt(b.rank);
+                        if (!isNaN(ra) && !isNaN(rb)) return ra - rb;
+                        if (isNaN(ra) && isNaN(rb)) return a.rank.localeCompare(b.rank);
+                        return isNaN(ra) ? 1 : -1;
                     });
                     
                     dadosFiltrados = [...dadosBrutos];
@@ -273,9 +286,7 @@
                 } catch (erro) {
                     console.error(erro);
                     loadingStatus.innerHTML = `<span class="text-red-400">Erro: ${erro.message}</span>`;
-                    dadosBrutos = [
-                        { rank:1, nome:"AUREO ROGERIO GAUTERIO DA VEIGA", idFunc:"2274175", graduacao:"1º Sargento", data:"ABR/2004" },
-                    ];
+                    dadosBrutos = [{ rank:1, nome:"AUREO ROGERIO GAUTERIO DA VEIGA", idFunc:"2274175", graduacao:"1º Sargento", data:"ABR/2004" }];
                     dadosFiltrados = [...dadosBrutos];
                     atualizarContadores();
                     desenharGrafico();
@@ -286,34 +297,48 @@
             }
 
             function atualizarContadores() {
-                const counts = {'1º Sargento':0, '2º Sargento':0, '3º Sargento':0, 'Soldado':0};
-                dadosBrutos.forEach(m => counts[m.graduacao]++);
-                total1SgtEl.textContent = counts['1º Sargento'].toLocaleString('pt-BR');
-                total2SgtEl.textContent = counts['2º Sargento'].toLocaleString('pt-BR');
-                total3SgtEl.textContent = counts['3º Sargento'].toLocaleString('pt-BR');
-                totalSdEl.textContent = counts['Soldado'].toLocaleString('pt-BR');
+                const counts = {};
+                dadosBrutos.forEach(m => counts[m.graduacao] = (counts[m.graduacao] || 0) + 1);
+                total1SgtEl.textContent = (counts['1º Sargento'] || 0).toLocaleString('pt-BR');
+                total2SgtEl.textContent = (counts['2º Sargento'] || 0).toLocaleString('pt-BR');
+                total3SgtEl.textContent = (counts['3º Sargento'] || 0).toLocaleString('pt-BR');
+                totalSdEl.textContent = (counts['Soldado'] || 0).toLocaleString('pt-BR');
+                totalSdTempEl.textContent = (counts['Soldado Temporário'] || 0).toLocaleString('pt-BR');
                 totalGeralEl.textContent = dadosBrutos.length.toLocaleString('pt-BR');
             }
             
             function desenharGrafico() {
                 const ctx = document.getElementById('chartGraduacao').getContext('2d');
                 if (chartInstance) chartInstance.destroy();
+                
                 const counts = {
-                    '1º Sargento': dadosBrutos.filter(m=>m.graduacao==='1º Sargento').length,
-                    '2º Sargento': dadosBrutos.filter(m=>m.graduacao==='2º Sargento').length,
-                    '3º Sargento': dadosBrutos.filter(m=>m.graduacao==='3º Sargento').length,
-                    'Soldado': dadosBrutos.filter(m=>m.graduacao==='Soldado').length,
+                    '1º Sargento': 0,
+                    '2º Sargento': 0,
+                    '3º Sargento': 0,
+                    'Soldado': 0,
+                    'Soldado Temporário': 0
                 };
-                const data = [counts['1º Sargento'], counts['2º Sargento'], counts['3º Sargento'], counts['Soldado']];
+                dadosBrutos.forEach(m => counts[m.graduacao]++);
+                
+                const data = [
+                    counts['1º Sargento'],
+                    counts['2º Sargento'],
+                    counts['3º Sargento'],
+                    counts['Soldado'],
+                    counts['Soldado Temporário']
+                ];
+                const labels = ['1º SGT', '2º SGT', '3º SGT', 'SOLDADOS', 'SD BMT'];
+                const cores = ['#eab308', '#f97316', '#0ea5e9', '#10b981', '#f59e0b'];
+                
                 chartInstance = new Chart(ctx, {
                     type: 'pie',
                     data: {
-                        labels: ['1º SGT', '2º SGT', '3º SGT', 'SOLDADOS'],
+                        labels: labels,
                         datasets: [{
                             data: data,
-                            backgroundColor: ['#eab308', '#f97316', '#0ea5e9', '#10b981'],
+                            backgroundColor: cores,
                             borderWidth: 2,
-                            borderColor: '#ffffff'
+                            borderColor: '#000000'
                         }]
                     },
                     options: {
@@ -340,16 +365,18 @@
             }
             
             function filtrarDados() {
-                const ant = fAnt.value.trim();
+                const ant = fAnt.value.trim().toUpperCase();
                 const nome = fNome.value.trim().toUpperCase();
                 const id = fId.value.trim();
                 const grad = fGrad.value;
-                dadosFiltrados = dadosBrutos.filter(m => 
-                    (!ant || m.rank.toString() === ant) &&
-                    (!nome || m.nome.toUpperCase().includes(nome)) &&
-                    (!id || m.idFunc.includes(id)) &&
-                    (!grad || m.graduacao === grad)
-                );
+                
+                dadosFiltrados = dadosBrutos.filter(m => {
+                    if (ant && m.rank.toString().toUpperCase() !== ant) return false;
+                    if (nome && !m.nome.toUpperCase().includes(nome)) return false;
+                    if (id && !m.idFunc.includes(id)) return false;
+                    if (grad && m.graduacao !== grad) return false;
+                    return true;
+                });
                 renderizarTabela();
             }
             
@@ -359,10 +386,17 @@
                 display.forEach(m => {
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-white/5 border-b border-slate-700/40';
-                    let gradClass = m.graduacao.includes('1º')?'text-yellow-400':m.graduacao.includes('2º')?'text-orange-400':m.graduacao.includes('3º')?'text-sky-400':'text-emerald-400';
+                    let gradClass = 'text-emerald-400';
+                    if (m.graduacao.includes('1º')) gradClass = 'text-yellow-400';
+                    else if (m.graduacao.includes('2º')) gradClass = 'text-orange-400';
+                    else if (m.graduacao.includes('3º')) gradClass = 'text-sky-400';
+                    else if (m.graduacao.includes('Temporário')) gradClass = 'text-amber-400';
+                    
                     tr.innerHTML = `<td class="p-3 text-center">${m.rank}</td>
-                        <td class="p-3 font-semibold">${m.nome}</td><td class="p-3 text-blue-300">${m.idFunc}</td>
-                        <td class="p-3 ${gradClass} font-bold">${m.graduacao}</td><td class="p-3 text-slate-400">${m.data}</td>`;
+                        <td class="p-3 font-semibold">${m.nome}</td>
+                        <td class="p-3 text-blue-300">${m.idFunc}</td>
+                        <td class="p-3 ${gradClass} font-bold">${m.graduacao}</td>
+                        <td class="p-3 text-slate-400">${m.data}</td>`;
                     tableBody.appendChild(tr);
                 });
                 totalExibidoEl.textContent = dadosFiltrados.length.toLocaleString('pt-BR');
@@ -433,3 +467,4 @@
     </script>
 </body>
 </html>
+  
