@@ -72,40 +72,40 @@
             z-index: 50;
         }
 
-        /* Título vertical dentro do card */
+        /* Título vertical dentro do card - FONTE MAIOR */
         .vertical-text {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
             text-align: center;
             white-space: nowrap;
             font-weight: 900;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
+            font-size: 1.3rem; /* aumentado */
+            letter-spacing: 3px;
             padding: 16px 4px;
-            width: 48px;
+            width: 56px; /* um pouco mais largo */
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 0.5rem 0 0 0.5rem;
         }
 
-        /* Cores das bordas laterais dos cards (já definido por grupo) */
+        /* Cores das bordas laterais dos cards */
         .card-vermelho { border-left: 6px solid #B91C1C; }
         .card-amarelo { border-left: 6px solid #D97706; }
         .card-verde { border-left: 6px solid #4B5563; }
         .card-laranja { border-left: 6px solid #FF8C00; }
 
-        /* Cabeçalho de grupo (acima dos cards) */
+        /* Cabeçalho de grupo (acima dos cards) - FONTE MAIOR */
         .grupo-header {
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(8px);
             border-radius: 0.75rem;
             margin-bottom: 1rem;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
             text-align: center;
-            font-weight: 800;
-            font-size: 1.25rem;
-            letter-spacing: 2px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
@@ -139,9 +139,9 @@
         #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
 
         /* Estilos internos do card (militares) */
-        .militar-nome { color: #9BE36D; font-weight: 800; font-size: 0.9rem; text-align: center; }
+        .militar-nome { color: #9BE36D; font-weight: 800; font-size: 0.95rem; text-align: center; }
         .militar-funcao { color: #ccc; font-size: 0.7rem; text-align: center; margin-top: 2px; }
-        .turno-box { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 2px 8px; display: inline-flex; gap: 6px; font-size: 0.65rem; margin-top: 4px; }
+        .turno-box { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 2px 8px; display: inline-flex; gap: 6px; font-size: 0.7rem; margin-top: 4px; }
     </style>
 </head>
 <body class="hero-background">
@@ -268,7 +268,7 @@
                 if (partes.length === 1) {
                     const h = partes[0];
                     if (h === "20:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">12h</span> <span class="text-sky-blue">20:00→08:00</span></div>`;
-                    if (h === "08:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">24h</span> <span class="text-sky-blue">08:00→08:00 (+1)</span></div>`;
+                    if (h === "08:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">24h</span> <span class="text-sky-blue">08:00→08:00</span></div>`;
                     return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">?</span> <span class="text-sky-blue">${h}</span></div>`;
                 } else if (partes.length >= 2) {
                     let inicio = partes[0], fim = partes[1];
@@ -276,7 +276,7 @@
                     if (inicio === "08:00" && fim === "20:00") carga = "12h";
                     else if (inicio === "20:00" && fim === "08:00") carga = "12h";
                     else carga = "24h";
-                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">${carga}</span> <span class="text-sky-blue">${inicio}→${fim}</span>${carga==="24h"? '<span class="text-gray-500 text-[10px]">(+1)</span>' : ''}</div>`;
+                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">${carga}</span> <span class="text-sky-blue">${inicio}→${fim}</span></div>`;
                 }
                 return "";
             } catch(e) { return ""; }
@@ -422,14 +422,13 @@
                 }
                 container.appendChild(gridDiv);
 
-                // Inicializar Sortable para este grid (permite reorganizar dentro do grupo)
+                // Inicializar Sortable para este grid
                 if (typeof Sortable !== 'undefined') {
                     new Sortable(gridDiv, {
                         animation: 150,
                         ghostClass: 'opacity-30 bg-orange-500/10 border-dashed border-orange-400',
                         chosenClass: 'shadow-2xl scale-[1.01]',
                         onEnd: function() {
-                            // Salvar ordem? Opcional, mas mantemos localStorage para ordem global simples
                             const todasOrdens = [];
                             document.querySelectorAll('#grupos-container .grid').forEach(grid => {
                                 Array.from(grid.children).forEach(card => {
