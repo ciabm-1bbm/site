@@ -2,10 +2,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Guarnição Operacional - 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -16,7 +17,10 @@
                         'fire-red': '#DC2626',
                         'moss-green': '#9BE36D',
                         'total-green': '#4ade80',
-                        'sky-blue': '#38bdf8' 
+                        'sky-blue': '#38bdf8',
+                        'vermelho-fosco': '#B91C1C',
+                        'amarelo-queimado': '#D97706',
+                        'verde-oliva': '#4B5563',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -46,6 +50,7 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
 
+        /* Card base */
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
@@ -53,11 +58,12 @@
             border-radius: 0.5rem;
             transition: all 0.3s ease;
             break-inside: avoid;
-            page-break-inside: avoid;
             display: flex; 
             overflow: hidden;
-            min-height: 140px; 
+            min-height: 140px;
+            cursor: grab;
         }
+        .card-monitor:active { cursor: grabbing; }
         .card-monitor:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
@@ -66,12 +72,47 @@
             z-index: 50;
         }
 
+        /* Título vertical dentro do card */
         .vertical-text {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
             text-align: center;
             white-space: nowrap;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            padding: 16px 4px;
+            width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem 0 0 0.5rem;
         }
+
+        /* Cores das bordas laterais dos cards (já definido por grupo) */
+        .card-vermelho { border-left: 6px solid #B91C1C; }
+        .card-amarelo { border-left: 6px solid #D97706; }
+        .card-verde { border-left: 6px solid #4B5563; }
+        .card-laranja { border-left: 6px solid #FF8C00; }
+
+        /* Cabeçalho de grupo (acima dos cards) */
+        .grupo-header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .grupo-header-vermelho { background: linear-gradient(135deg, #7F1D1D, #991B1B); border-left: 6px solid #B91C1C; }
+        .grupo-header-amarelo { background: linear-gradient(135deg, #92400E, #B45309); border-left: 6px solid #D97706; }
+        .grupo-header-verde { background: linear-gradient(135deg, #1F2937, #374151); border-left: 6px solid #4B5563; }
+        .grupo-header-laranja { background: linear-gradient(135deg, #9A3412, #C2410C); border-left: 6px solid #FF8C00; }
 
         .stats-container {
             background: rgba(15, 23, 42, 0.8);
@@ -81,46 +122,26 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        /* --- ESTILOS BASE DO TOOLTIP --- */
         .tooltip-box {
             visibility: hidden; opacity: 0; position: absolute; top: 100%;
             background: rgba(15, 23, 42, 0.98); border: 1px solid #FF8C00; padding: 12px; border-radius: 8px;
             width: max-content; min-width: 280px; z-index: 100; transition: 0.2s; pointer-events: none;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9); margin-top: 10px;
         }
-        
-        .group:hover .tooltip-box, .group:focus .tooltip-box, .group:focus-within .tooltip-box { 
-            visibility: visible; opacity: 1; 
-        }
-
-        @media (min-width: 768px) {
-            .tt-left { left: 0; transform: none; }
-            .tt-center { left: 50%; transform: translateX(-50%); }
-            .tt-right { right: 0; left: auto; transform: none; }
-        }
-
+        .group:hover .tooltip-box, .group:focus .tooltip-box { visibility: visible; opacity: 1; }
         @media (max-width: 767px) {
-            .tooltip-box {
-                position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                right: auto !important;
-                transform: translate(-50%, -50%) !important;
-                width: 90vw !important;
-                max-width: 400px;
-                max-height: 80vh;
-                overflow-y: auto;
-                margin-top: 0;
-                border-width: 2px;
-                box-shadow: 0 0 50px rgba(0,0,0,0.9);
-                z-index: 999999 !important;
-            }
+            .tooltip-box { position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 90vw !important; max-width: 400px; max-height: 80vh; overflow-y: auto; }
         }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
 
         #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+
+        /* Estilos internos do card (militares) */
+        .militar-nome { color: #9BE36D; font-weight: 800; font-size: 0.9rem; text-align: center; }
+        .militar-funcao { color: #ccc; font-size: 0.7rem; text-align: center; margin-top: 2px; }
+        .turno-box { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 2px 8px; display: inline-flex; gap: 6px; font-size: 0.65rem; margin-top: 4px; }
     </style>
 </head>
 <body class="hero-background">
@@ -137,7 +158,6 @@
             <div class="flex-shrink-0">
                 <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
             </div>
-
             <div class="text-center flex-grow">
                 <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
                     Guarnição Operacional
@@ -145,47 +165,40 @@
                 <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
                     EM PORTO ALEGRE
                 </h2>
-                
                 <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
                     <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
                     <span>|</span>
                     <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
                 </div>
             </div>
-
             <div class="flex-shrink-0">
                 <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
             </div>
         </header>
 
         <main class="w-full max-w-7xl mx-auto flex-grow">
-            
+            <!-- Stats (Efetivo e Viaturas) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-                
                 <div class="stats-container border-l-4 border-bombeiros-orange">
                     <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
                         <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA DO DIA)
                     </h3>
                     <div class="flex justify-around items-center">
-                        
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
                             <div class="tooltip-box tt-left"><ul id="list-cap" class="text-left"></ul></div>
                         </div>
-
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
                             <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
                             <div class="tooltip-box tt-center"><ul id="list-sgt" class="text-left"></ul></div>
                         </div>
-
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
                             <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
                             <div class="tooltip-box tt-right"><ul id="list-sd" class="text-left"></ul></div>
                         </div>
-
                         <div class="w-px h-10 bg-white/10 mx-2"></div>
                         <div class="group relative text-center">
                             <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
@@ -214,8 +227,8 @@
                 </div>
             </div>
 
-            <div id="grid-cards" class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-5 pb-10 space-y-5"></div>
-
+            <!-- Área onde serão inseridos os grupos com cabeçalhos e cards -->
+            <div id="grupos-container" class="space-y-8"></div>
         </main>
 
         <footer class="mt-auto py-6 text-center border-t border-white/5">
@@ -227,166 +240,87 @@
     </div>
 
     <script>
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec"; 
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec";
 
-        const ORDEM_QUARTEIS = [
-            "OFICIAL DE DIA","ESTADO MAIOR", "COBOM", "AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", 
-            "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", 
-            "PARTENON", "TERRESTRE", "CANIL", "AQUÁTICA", "MERGULHO", "CCOB",
+        // Definição dos grupos com cores e ordem
+        const GRUPOS = [
+            { nome: "COORDENAÇÃO", corClasse: "vermelho", corHex: "#B91C1C", headerClass: "grupo-header-vermelho", cardClass: "card-vermelho", pelotoes: ["OFICIAL DE DIA", "COBOM", "CCOB"] },
+            { nome: "1ª CIA", corClasse: "amarelo", corHex: "#D97706", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "TERESÓPOLIS", "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO"] },
+            { nome: "2ª CIA", corClasse: "verde", corHex: "#4B5563", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["FLORESTA", "PASSO D'AREIA", "PARTENON"] },
+            { nome: "BBS", corClasse: "laranja", corHex: "#FF8C00", headerClass: "grupo-header-laranja", cardClass: "card-laranja", pelotoes: ["TERRESTRE", "AQUÁTICA", "MERGULHO", "CANIL"] }
         ];
 
+        const ORDEM_QUARTEIS = GRUPOS.flatMap(g => g.pelotoes);
         const FUNCOES_FIXAS = [
-            "COMANDANTE DE GUARNIÇÃO",
-            "AUXILIAR DE LINHA DIREITA",
-            "AUXILIAR DE LINHA ESQUERDA",
-            "COV / OPERADOR / CONDUTOR",
-            "COMANDANTE DE SOCORRO",
-            "CHEFE DE LINHA DIREITA",
-            "CHEFE DE LINHA ESQUERDA",
-            "OFICIAL SUPERVISOR",
-            "MOTORISTA DE DIA",
-            "OPERADOR COBOM",
-            "CONDUTOR NAVAL",
-            "AUXILIAR DE CONDUTOR NAVAL",
-            "OFICIAL DE SV",
-            "OPERADOR CCOB",
-            "RESGATISTA 1",
-            "RESGATISTA 2",
-            "SOCORRISTA 1",
-            "SOCORRISTA 2",
-            "CINOTÉCNICO",
-            "MERGULHADOR",
-            "SOCORRISTA",
-            "RESGATISTA",
-            "MOTORISTA"
+            "COMANDANTE DE GUARNIÇÃO", "AUXILIAR DE LINHA DIREITA", "AUXILIAR DE LINHA ESQUERDA",
+            "COV / OPERADOR / CONDUTOR", "COMANDANTE DE SOCORRO", "CHEFE DE LINHA DIREITA",
+            "CHEFE DE LINHA ESQUERDA", "OFICIAL SUPERVISOR", "MOTORISTA DE DIA", "OPERADOR COBOM",
+            "CONDUTOR NAVAL", "AUXILIAR DE CONDUTOR NAVAL", "OFICIAL DE SV", "OPERADOR CCOB",
+            "RESGATISTA 1", "RESGATISTA 2", "SOCORRISTA 1", "SOCORRISTA 2", "CINOTÉCNICO",
+            "MERGULHADOR", "SOCORRISTA", "RESGATISTA", "MOTORISTA"
         ];
 
-        // === FUNÇÃO CORRIGIDA PARA TURNOS ===
+        // Funções auxiliares (turno, limpeza, etc)
         function calcularTurno(raw) {
             if (!raw) return "";
             try {
                 const partes = raw.trim().split(/\s+/);
                 if (partes.length === 1) {
-                    const hInicio = partes[0];
-                    if (hInicio === "20:00") {
-                        return `
-                            <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                                <span class="text-bombeiros-orange font-bold text-xs">12h</span>
-                                <span class="text-gray-500 text-[10px]">|</span>
-                                <span class="text-sky-blue font-bold text-xs">20:00</span>
-                                <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                                <span class="text-sky-blue font-bold text-xs">08:00</span>
-                            </div>
-                        `;
-                    } else if (hInicio === "08:00") {
-                        return `
-                            <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                                <span class="text-bombeiros-orange font-bold text-xs">24h</span>
-                                <span class="text-gray-500 text-[10px]">|</span>
-                                <span class="text-sky-blue font-bold text-xs">08:00</span>
-                                <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                                <span class="text-sky-blue font-bold text-xs">08:00</span>
-                                <span class="text-gray-500 text-[9px] ml-0.5">(+1)</span>
-                            </div>
-                        `;
-                    } else {
-                        // turno de 6h ou outro horário único
-                        return `
-                            <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                                <span class="text-bombeiros-orange font-bold text-xs">?</span>
-                                <span class="text-gray-500 text-[10px]">|</span>
-                                <span class="text-sky-blue font-bold text-xs">${hInicio}</span>
-                                <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                                <span class="text-sky-blue font-bold text-xs">${hInicio}</span>
-                            </div>
-                        `;
-                    }
+                    const h = partes[0];
+                    if (h === "20:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">12h</span> <span class="text-sky-blue">20:00→08:00</span></div>`;
+                    if (h === "08:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">24h</span> <span class="text-sky-blue">08:00→08:00 (+1)</span></div>`;
+                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">?</span> <span class="text-sky-blue">${h}</span></div>`;
                 } else if (partes.length >= 2) {
-                    let hInicio = partes[0];
-                    let hFim = partes[1];
+                    let inicio = partes[0], fim = partes[1];
                     let carga = "";
-                    if (hInicio === "08:00" && hFim === "20:00") carga = "12h";
-                    else if (hInicio === "20:00" && hFim === "08:00") carga = "12h";
-                    else {
-                        const [h1, m1] = hInicio.split(':').map(Number);
-                        const [h2, m2] = hFim.split(':').map(Number);
-                        let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-                        if (diff < 0) diff += 24 * 60;
-                        const diffHoras = diff / 60;
-                        if (Math.abs(diffHoras - 12) < 0.1) carga = "12h";
-                        else if (Math.abs(diffHoras - 6) < 0.1) carga = "6h";
-                        else carga = "24h";
-                    }
-                    return `
-                        <div class="mt-1 leading-snug flex items-center justify-center gap-1.5 bg-black/20 rounded px-2 py-1">
-                            <span class="text-bombeiros-orange font-bold text-xs">${carga}</span>
-                            <span class="text-gray-500 text-[10px]">|</span>
-                            <span class="text-sky-blue font-bold text-xs">${hInicio}</span>
-                            <i class="fas fa-arrow-right text-gray-600 text-[8px]"></i>
-                            <span class="text-sky-blue font-bold text-xs">${hFim}</span>
-                            ${carga === "24h" ? `<span class="text-gray-500 text-[9px] ml-0.5">(+1)</span>` : ''}
-                        </div>
-                    `;
+                    if (inicio === "08:00" && fim === "20:00") carga = "12h";
+                    else if (inicio === "20:00" && fim === "08:00") carga = "12h";
+                    else carga = "24h";
+                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">${carga}</span> <span class="text-sky-blue">${inicio}→${fim}</span>${carga==="24h"? '<span class="text-gray-500 text-[10px]">(+1)</span>' : ''}</div>`;
                 }
                 return "";
-            } catch(e) { console.error(e); return ""; }
+            } catch(e) { return ""; }
         }
 
-        function extrairID(nomeCompleto) {
-            const match = nomeCompleto.match(/(\d{7})/);
-            return match ? match[1] : null; 
-        }
+        function extrairID(nome) { let m=nome.match(/(\d{7})/); return m?m[1]:null; }
+        function limparNomeBasico(nome) { return nome.replace(/\d{7}\s+/,'').replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/\b\d+\b/g,'').trim(); }
 
-        function limparNomeBasico(nomeCompleto) {
-            return nomeCompleto.replace(/\d{7}\s+/, '').replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/\b\d+\b/g, '').trim();
-        }
-
-        // Função principal alterada para receber timestamp e atualizar cabeçalho
         function processarDados(dadosRecebidos) {
-            // Se os dados vierem com timestamp, atualiza o cabeçalho
-            if (dadosRecebidos.timestamp_extracao) {
-                const dataObj = new Date(dadosRecebidos.timestamp_extracao);
-                const dataFormatada = dataObj.toLocaleString('pt-BR', { dateStyle: 'full', timeStyle: 'short' }).toUpperCase();
-                const horaFormatada = dataObj.toLocaleTimeString('pt-BR');
-                document.getElementById('data-topo').innerHTML = dataFormatada;
-                document.getElementById('hora-topo').innerHTML = horaFormatada;
+            console.log("📦 Dados recebidos:", dadosRecebidos);
+            let dadosArray = Array.isArray(dadosRecebidos) ? dadosRecebidos : (dadosRecebidos.dados || []);
+            if (!dadosArray.length) {
+                document.getElementById('msg-loading').innerText = "Nenhum dado disponível.";
+                return;
+            }
+
+            // Atualizar timestamp
+            const timestamp = dadosRecebidos.timestamp_extracao || new Date().toISOString();
+            const dataObj = new Date(timestamp);
+            if (!isNaN(dataObj.getTime())) {
+                document.getElementById('data-topo').innerHTML = dataObj.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+                document.getElementById('hora-topo').innerHTML = dataObj.toLocaleTimeString('pt-BR');
             } else {
-                // Fallback: data/hora atual
                 const agora = new Date();
-                document.getElementById('data-topo').innerHTML = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+                document.getElementById('data-topo').innerHTML = agora.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
                 document.getElementById('hora-topo').innerHTML = agora.toLocaleTimeString('pt-BR');
             }
 
-            // Se os dados vierem como array diretamente (formato antigo) ou dentro de um campo "dados"
-            let dadosArray = dadosRecebidos;
-            if (dadosRecebidos.dados && Array.isArray(dadosRecebidos.dados)) {
-                dadosArray = dadosRecebidos.dados;
-            } else if (!Array.isArray(dadosRecebidos)) {
-                dadosArray = [];
-            }
-
+            // Processar estrutura de pelotões
             const estrutura = {};
-            const mapOficiais = new Map();
-            const mapSargentos = new Map();
-            const mapPracas = new Map();
+            const mapOficiais = new Map(), mapSargentos = new Map(), mapPracas = new Map();
             const statsViaturas = { combate: new Set(), apoio: new Set() };
 
-            dadosArray.forEach(d => {
+            for (const d of dadosArray) {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
                 let nomeBruto = (d.nome || "").trim().toUpperCase();
                 let funcBruta = (d.func || "").trim().toUpperCase();
-                
-                funcBruta = funcBruta.replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/[0-9]/g, '').replace(/[-]/g, '').trim();
-
+                funcBruta = funcBruta.replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/[0-9]/g,'').replace(/[-]/g,'').trim();
                 let funcaoFinal = "";
                 for (const cargo of FUNCOES_FIXAS) {
-                    if (funcBruta.includes(cargo)) {
-                        funcaoFinal = cargo;
-                        break;
-                    }
+                    if (funcBruta.includes(cargo)) { funcaoFinal = cargo; break; }
                 }
-                if (funcaoFinal === "") {
+                if (!funcaoFinal) {
                     for (const cargo of FUNCOES_FIXAS) {
                         if (nomeBruto.includes(cargo)) {
                             funcaoFinal = cargo;
@@ -395,201 +329,191 @@
                         }
                     }
                 }
-
                 let idMilitar = extrairID(nomeBruto);
-                let idUnico = idMilitar ? idMilitar : nomeBruto;
+                let idUnico = idMilitar || nomeBruto;
                 let nomeExibicao = limparNomeBasico(nomeBruto);
                 let horaHTML = calcularTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
-                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
-                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
-                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
-                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
-                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
-                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
-                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
-                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
-                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
-                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
-                else if(obmRaw.includes("TERRESTRE")) obmKey = "TERRESTRE";
-                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
-                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
-                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
-                else if(obmRaw.includes("CCOB")) obmKey = "CCOB";
-                else if(obmRaw.includes("OFICIAL")) obmKey = "OFICIAL DE DIA";
+                for (let grupo of GRUPOS) {
+                    if (grupo.pelotoes.includes(obmRaw)) { obmKey = obmRaw; break; }
+                }
+                if (obmKey === "OUTROS") {
+                    if (obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+                    else if (obmRaw.includes("COBOM")) obmKey = "COBOM";
+                    else if (obmRaw.includes("CCOB")) obmKey = "CCOB";
+                    else if (obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+                    else if (obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+                    else if (obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+                    else if (obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+                    else if (obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+                    else if (obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+                    else if (obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+                    else if (obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+                    else if (obmRaw.includes("TERRESTRE")) obmKey = "TERRESTRE";
+                    else if (obmRaw.includes("CANIL")) obmKey = "CANIL";
+                    else if (obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+                    else if (obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
+                }
 
-                if(!estrutura[obmKey]) estrutura[obmKey] = [];
-                
+                if (!estrutura[obmKey]) estrutura[obmKey] = [];
                 let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
-                if(!viaturaObj) {
+                if (!viaturaObj) {
                     viaturaObj = { nome: vtr, guarnicao: [] };
                     estrutura[obmKey].push(viaturaObj);
                 }
-                
-                if(nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
+                if (nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, h: horaHTML });
-
                     const dadosMilitar = { n: nomeExibicao, f: funcaoFinal };
-
-                    if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) {
-                        mapPracas.set(idUnico, dadosMilitar);
-                    }
-                    else if(nomeBruto.includes("SGT")) {
-                        mapSargentos.set(idUnico, dadosMilitar);
-                    }
-                    else if(nomeBruto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
-                        mapOficiais.set(idUnico, dadosMilitar);
-                    }
-                    else {
-                        mapPracas.set(idUnico, dadosMilitar);
-                    }
+                    if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) mapPracas.set(idUnico, dadosMilitar);
+                    else if (nomeBruto.includes("SGT")) mapSargentos.set(idUnico, dadosMilitar);
+                    else if (nomeBruto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) mapOficiais.set(idUnico, dadosMilitar);
+                    else mapPracas.set(idUnico, dadosMilitar);
                 }
-
-                if(vtr.includes("ABT")) {
-                    statsViaturas.combate.add(vtr);
-                }
-                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
-                    statsViaturas.apoio.add(vtr);
-                }
-            });
+                if (vtr.includes("ABT")) statsViaturas.combate.add(vtr);
+                else if (vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) statsViaturas.apoio.add(vtr);
+            }
 
             atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
-            renderizarCards(estrutura);
+            renderizarCardsPorGrupo(estrutura);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
         }
 
-        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
-            const capArr = Array.from(mapOficiais.values());
-            const sgtArr = Array.from(mapSargentos.values());
-            const sdArr = Array.from(mapPracas.values());
-            const combArr = Array.from(statsViaturas.combate);
-            const apoioArr = Array.from(statsViaturas.apoio);
-
+        function atualizarStats(oficiais, sgt, pracas, viaturas) {
+            const capArr = Array.from(oficiais.values()), sgtArr = Array.from(sgt.values()), sdArr = Array.from(pracas.values());
             const fillList = (idL, arr) => {
-                const html = arr.map(item => `
-                    <li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left whitespace-normal break-words border-b border-white/5 pb-1 last:border-0">
-                        <span class="text-bombeiros-orange font-bold text-xs uppercase">• ${item.n}</span>
-                        ${item.f ? `<span class="text-white opacity-90 uppercase"> - ${item.f}</span>` : ''}
-                    </li>
-                `).join('');
-                document.getElementById(idL).innerHTML = html;
+                document.getElementById(idL).innerHTML = arr.map(item => `<li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left break-words border-b border-white/5 pb-1 last:border-0"><span class="text-bombeiros-orange font-bold text-xs uppercase">• ${item.n}</span>${item.f ? `<span class="text-white opacity-90 uppercase"> - ${item.f}</span>` : ''}</li>`).join('');
             };
-
-            document.getElementById('count-cap').innerText = capArr.length;
-            fillList('list-cap', capArr);
-
-            document.getElementById('count-sgt').innerText = sgtArr.length;
-            fillList('list-sgt', sgtArr);
-
-            document.getElementById('count-sd').innerText = sdArr.length;
-            fillList('list-sd', sdArr);
-
+            document.getElementById('count-cap').innerText = capArr.length; fillList('list-cap', capArr);
+            document.getElementById('count-sgt').innerText = sgtArr.length; fillList('list-sgt', sgtArr);
+            document.getElementById('count-sd').innerText = sdArr.length; fillList('list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
-            
-            document.getElementById('count-combate').innerText = combArr.length;
-            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
-
-            document.getElementById('count-apoio').innerText = apoioArr.length;
-            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('count-combate').innerText = viaturas.combate.size;
+            document.getElementById('list-combate').innerHTML = Array.from(viaturas.combate).map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('count-apoio').innerText = viaturas.apoio.size;
+            document.getElementById('list-apoio').innerHTML = Array.from(viaturas.apoio).map(x => `<li>• ${x}</li>`).join('');
         }
 
-        function renderizarCards(estrutura) {
-            const grid = document.getElementById('grid-cards');
-            grid.innerHTML = "";
+        function renderizarCardsPorGrupo(estrutura) {
+            const container = document.getElementById('grupos-container');
+            container.innerHTML = '';
 
-            const keysOrdenadas = [
-                ...ORDEM_QUARTEIS.filter(k => estrutura[k]), 
-                ...Object.keys(estrutura).filter(k => !ORDEM_QUARTEIS.includes(k))
-            ];
+            for (const grupo of GRUPOS) {
+                // Filtra os pelotões que existem na estrutura
+                const pelotoesExistentes = grupo.pelotoes.filter(p => estrutura[p] && estrutura[p].length > 0);
+                if (pelotoesExistentes.length === 0) continue;
 
-            keysOrdenadas.forEach(obmName => {
-                const viaturasRaw = estrutura[obmName];
-                const gruposUnicos = [];
-                
-                viaturasRaw.forEach(vtr => {
-                    const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
-                    const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
-                    if(grupoExistente && assinatura.length > 0) {
-                        grupoExistente.nomesVtrs.push(vtr.nome);
-                    } else {
-                        gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
-                    }
-                });
+                // Cria cabeçalho do grupo
+                const headerDiv = document.createElement('div');
+                headerDiv.className = `grupo-header ${grupo.headerClass}`;
+                headerDiv.innerHTML = `<h3 class="text-white text-center font-black tracking-wider">${grupo.nome}</h3>`;
+                container.appendChild(headerDiv);
 
-                const card = document.createElement('div');
-                card.className = "card-monitor break-inside-avoid mb-5"; 
+                // Grid para os cards deste grupo
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-8';
+                gridDiv.setAttribute('data-grupo', grupo.nome);
 
-                let content = `
-                    <div class="bg-bombeiros-orange w-16 md:w-20 flex items-center justify-center py-4 flex-shrink-0">
-                        <h2 class="vertical-text text-white font-black text-2xl md:text-3xl tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
-                            ${obmName}
-                        </h2>
-                    </div>
-                    <div class="flex-grow p-3 flex flex-col gap-4">
-                `;
+                for (const pelotao of pelotoesExistentes) {
+                    const viaturasRaw = estrutura[pelotao];
+                    const card = criarCardPelotao(pelotao, viaturasRaw, grupo.cardClass);
+                    gridDiv.appendChild(card);
+                }
+                container.appendChild(gridDiv);
 
-                gruposUnicos.forEach(grupo => {
-                    grupo.guarnicao.sort((a,b) => {
-                        const getScore = (role) => {
-                            let r = role.toUpperCase();
-                            if(r.includes("COMANDANTE")) return 1;
-                            if(r.includes("CONDUTOR") || r.includes("COV")) return 2;
-                            return 3;
+                // Inicializar Sortable para este grid (permite reorganizar dentro do grupo)
+                if (typeof Sortable !== 'undefined') {
+                    new Sortable(gridDiv, {
+                        animation: 150,
+                        ghostClass: 'opacity-30 bg-orange-500/10 border-dashed border-orange-400',
+                        chosenClass: 'shadow-2xl scale-[1.01]',
+                        onEnd: function() {
+                            // Salvar ordem? Opcional, mas mantemos localStorage para ordem global simples
+                            const todasOrdens = [];
+                            document.querySelectorAll('#grupos-container .grid').forEach(grid => {
+                                Array.from(grid.children).forEach(card => {
+                                    const nomePel = card.getAttribute('data-pelotao');
+                                    if (nomePel) todasOrdens.push(nomePel);
+                                });
+                            });
+                            localStorage.setItem('ordemQuarteis', JSON.stringify(todasOrdens));
                         }
-                        return getScore(a.f || "") - getScore(b.f || "");
                     });
-
-                    const listaVtrs = grupo.nomesVtrs.join(' / ');
-
-                    content += `
-                        <div class="w-full flex flex-col items-center">
-                            <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">
-                                ${listaVtrs}
-                            </span>
-                            <div class="w-full flex flex-col gap-3">
-                                ${grupo.guarnicao.map(m => `
-                                    <div class="flex flex-col items-center w-full mb-1">
-                                        <div class="text-moss-green font-black text-xl leading-none drop-shadow-md text-center">
-                                            ${m.n}
-                                        </div>
-                                        ${m.f ? `
-                                        <div class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-1 text-center w-full block">
-                                            ${m.f}
-                                        </div>` : ''}
-                                        <div class="w-full flex justify-center">
-                                            ${m.h}
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                content += `</div>`;
-                card.innerHTML = content;
-                grid.appendChild(card);
-            });
+                }
+            }
         }
 
-        // Função que busca os dados e chama processarDados
+        function criarCardPelotao(nomePelotao, viaturasRaw, classeCor) {
+            // Agrupa viaturas por guarnição (mesmo conjunto de IDs)
+            const gruposUnicos = [];
+            for (const vtr of viaturasRaw) {
+                const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
+                let grupo = gruposUnicos.find(g => g.assinatura === assinatura);
+                if (grupo) grupo.nomesVtrs.push(vtr.nome);
+                else gruposUnicos.push({ assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+            }
+
+            const card = document.createElement('div');
+            card.className = `card-monitor ${classeCor}`;
+            card.setAttribute('data-pelotao', nomePelotao);
+
+            // Título vertical (cor do fundo de acordo com a classe do grupo)
+            let corFundo = '';
+            if (classeCor === 'card-vermelho') corFundo = '#B91C1C';
+            else if (classeCor === 'card-amarelo') corFundo = '#D97706';
+            else if (classeCor === 'card-verde') corFundo = '#4B5563';
+            else corFundo = '#FF8C00';
+
+            let content = `<div class="vertical-text" style="background: ${corFundo};">${nomePelotao.substring(0, 14)}</div>`;
+            content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
+
+            for (const grupo of gruposUnicos) {
+                // Ordenar militares: Comandante primeiro, depois COV, depois outros
+                grupo.guarnicao.sort((a,b) => {
+                    const getScore = (r) => {
+                        let u = (r.f || "").toUpperCase();
+                        if (u.includes("COMANDANTE")) return 1;
+                        if (u.includes("COV") || u.includes("CONDUTOR")) return 2;
+                        return 3;
+                    };
+                    return getScore(a) - getScore(b);
+                });
+
+                const listaVtrs = grupo.nomesVtrs.join(' / ');
+                content += `<div class="w-full flex flex-col items-center bg-black/20 rounded-lg p-2">
+                                <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">${listaVtrs}</span>
+                                <div class="w-full flex flex-col gap-2">`;
+                for (const m of grupo.guarnicao) {
+                    content += `<div class="flex flex-col items-center w-full bg-white/5 rounded p-1">
+                                    <div class="militar-nome">${m.n}</div>
+                                    ${m.f ? `<div class="militar-funcao">${m.f}</div>` : ''}
+                                    <div class="w-full flex justify-center mt-1">${m.h}</div>
+                                </div>`;
+                }
+                content += `</div></div>`;
+            }
+            content += `</div>`;
+            card.innerHTML = content;
+            return card;
+        }
+
         async function carregarDados() {
             try {
+                document.getElementById('msg-loading').innerText = "Buscando dados...";
                 const req = await fetch(URL_DADOS);
                 const dados = await req.json();
-                // Supondo que o Google Apps Script retorne { dados: [...], timestamp_extracao: "..." }
+                console.log("✅ Dados brutos:", dados);
                 processarDados(dados);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-            } catch(e) { 
-                console.error(e); 
-                document.getElementById('msg-loading').innerText = "Reconectando...";
-                setTimeout(carregarDados, 5000); 
+            } catch(e) {
+                console.error("❌ Erro:", e);
+                document.getElementById('msg-loading').innerText = "Erro de conexão. Tentando novamente...";
+                setTimeout(carregarDados, 10000);
             }
         }
 
         carregarDados();
-        setInterval(carregarDados, 60000); // atualiza a cada 1 minuto
+        setInterval(carregarDados, 60000);
     </script>
 </body>
 </html>
