@@ -16,9 +16,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Bibliotecas para PDF -->
+    <!-- Bibliotecas para PDF e imagem -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- SheetJS para exportar XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         /* ========== ESTILOS GLOBAIS ========== */
@@ -36,29 +39,17 @@
         }
         
         @media (max-width: 640px) {
-            .chart-container {
-                height: 280px;
-                min-height: 280px;
-            }
-            .chart-container-lg {
-                min-height: 380px;
-            }
+            .chart-container { height: 280px; min-height: 280px; }
+            .chart-container-lg { min-height: 380px; }
         }
         
         @media (min-width: 641px) and (max-width: 1024px) {
-            .chart-container {
-                height: 350px;
-                min-height: 350px;
-            }
-            .chart-container-lg {
-                min-height: 420px;
-            }
+            .chart-container { height: 350px; min-height: 350px; }
+            .chart-container-lg { min-height: 420px; }
         }
         
         @media (min-width: 1025px) {
-            .chart-container-lg {
-                min-height: 480px;
-            }
+            .chart-container-lg { min-height: 480px; }
         }
         
         .glass {
@@ -76,9 +67,7 @@
         }
         
         @media (max-width: 768px) {
-            .table-container {
-                max-height: 400px;
-            }
+            .table-container { max-height: 400px; }
         }
         
         .month-btn {
@@ -103,17 +92,11 @@
         }
         
         @media (min-width: 768px) {
-            .month-btn {
-                min-height: 52px;
-                font-size: 0.75rem;
-            }
+            .month-btn { min-height: 52px; font-size: 0.75rem; }
         }
         
         @media (min-width: 1024px) {
-            .month-btn {
-                min-height: 56px;
-                font-size: 0.8rem;
-            }
+            .month-btn { min-height: 56px; font-size: 0.8rem; }
         }
         
         .year-select-btn {
@@ -191,24 +174,10 @@
             pointer-events: none;
         }
         
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(100, 116, 139, 0.7);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.9);
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.7); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.9); }
         
         .pelotao-gradient-0 { background-color: #065f46; }
         .pelotao-gradient-1 { background-color: #047857; }
@@ -220,19 +189,30 @@
         .pelotao-gradient-7 { background-color: #d1fae5; }
         
         /* Mapa */
-        .map-wrapper {
-            position: relative;
-            width: 100%;
-        }
+        .map-wrapper { position: relative; width: 100%; }
         .map-container {
             height: 500px;
             width: 100%;
             border-radius: 0.75rem;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            transition: all 0.3s ease, max-width 0.3s ease, height 0.3s ease;
+            margin-left: auto;
+            margin-right: auto;
         }
-        /* Estilo para fullscreen da página inteira (usando a API) */
+
+        /* Formato paisagem (padrão): retângulo largo */
+        .map-container.map-landscape {
+            height: 500px;
+            max-width: 100%;
+        }
+
+        /* Formato retrato: retângulo mais alto que largo, centralizado */
+        .map-container.map-portrait {
+            height: 720px;
+            max-width: 540px;
+        }
+
         .map-wrapper:fullscreen {
             width: 100vw;
             height: 100vh;
@@ -241,15 +221,29 @@
             align-items: center;
             justify-content: center;
         }
-        .map-wrapper:fullscreen .map-container {
-            height: 90vh;
-            width: 95vw;
+        /* Tela cheia paisagem */
+        .map-wrapper:fullscreen .map-container.map-landscape {
+            height: 92vh;
+            width: 96vw;
+            max-width: 96vw;
             border-radius: 1rem;
         }
+        /* Tela cheia retrato: usa altura cheia, largura proporcional */
+        .map-wrapper:fullscreen .map-container.map-portrait {
+            height: 92vh;
+            width: auto;
+            max-width: calc(92vh * 0.75);
+            border-radius: 1rem;
+        }
+        /* Fallback para o caso de nenhuma classe estar aplicada ainda */
+        .map-wrapper:fullscreen .map-container {
+            height: 92vh;
+            border-radius: 1rem;
+        }
+
         @media (max-width: 768px) {
-            .map-container {
-                height: 400px;
-            }
+            .map-container.map-landscape { height: 400px; }
+            .map-container.map-portrait { height: 600px; max-width: 100%; }
         }
         
         .custom-popup .leaflet-popup-content-wrapper {
@@ -259,12 +253,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             font-family: 'ui-monospace', monospace;
         }
-        .custom-popup .leaflet-popup-tip {
-            background: rgba(30, 41, 59, 0.95);
-        }
-        .leaflet-container {
-            background: #1e293b;
-        }
+        .custom-popup .leaflet-popup-tip { background: rgba(30, 41, 59, 0.95); }
+        .leaflet-container { background: #1e293b; }
         
         /* Botões do mapa */
         .map-action-btn {
@@ -274,24 +264,79 @@
             padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.2s;
             backdrop-filter: blur(4px);
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            font-family: 'ui-monospace', monospace;
+            white-space: nowrap;
         }
-        .map-action-btn:hover {
+        .map-action-btn:hover:not(:disabled) {
             background: #10b981;
             border-color: #10b981;
         }
-        .map-buttons {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
+        .map-action-btn:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        /* Seletor de orientação */
+        .orientation-select {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 28px 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: 'ui-monospace', monospace;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M4 6l4 4 4-4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+        }
+        .orientation-select:hover {
+            border-color: #10b981;
+        }
+        .orientation-select:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+        }
+
+        .map-toolbar {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .export-xlsx-btn {
+            background: linear-gradient(135deg, #059669, #10b981);
+            border: 1px solid #34d399;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .export-xlsx-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        .export-xlsx-btn:disabled {
+            opacity: 0.6;
+            cursor: wait;
         }
     </style>
     
@@ -383,14 +428,14 @@
             </div>
 
             <div class="glass overflow-hidden flex flex-col">
-                <div class="p-3 sm:p-4 border-b border-white/5 bg-slate-900/50 text-xs flex justify-between items-center text-gray-400">
+                <div class="p-3 sm:p-4 border-b border-white/5 bg-slate-900/50 text-xs flex justify-between items-center text-gray-400 flex-wrap gap-2">
                     <span class="font-bold text-white uppercase">
                         <i class="fas fa-list mr-2"></i> REGISTRO DE DADOS
                     </span>
                     <span><span id="rowsVal" class="text-white font-bold">0</span> registros</span>
                 </div>
                 
-                <div class="p-2 bg-slate-800/50 flex gap-1.5 sm:gap-2 overflow-x-auto">
+                <div class="p-2 bg-slate-800/50 flex gap-1.5 sm:gap-2 overflow-x-auto items-center">
                     <select id="fNat" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
                         <option value="">Natureza</option>
                     </select>
@@ -406,6 +451,9 @@
                     <button onclick="Core.resetFilters()" 
                             class="bg-red-600 hover:bg-red-700 text-white px-2 sm:px-3 py-1 rounded text-xs font-bold transition-colors whitespace-nowrap">
                         LIMPAR
+                    </button>
+                    <button id="btnExportXlsx" onclick="Core.exportToXLSX()" class="export-xlsx-btn" title="Baixar planilha Excel com os dados filtrados">
+                        <i class="fas fa-file-excel"></i> EXPORTAR XLSX
                     </button>
                 </div>
 
@@ -434,20 +482,30 @@
                     <h3 class="text-xs sm:text-sm font-bold text-white border-l-4 border-purple-400 pl-2 sm:pl-3 uppercase">
                         <i class="fas fa-map-marked-alt mr-2"></i> MAPA DAS OCORRÊNCIAS (Google Maps)
                     </h3>
-                    <div class="flex gap-2">
+                    <div class="map-toolbar">
+                        <select id="orientationSelect" class="orientation-select" title="Formato do mapa para visualização (paisagem = largo, retrato = alto)">
+                            <option value="landscape">📐 Paisagem</option>
+                            <option value="portrait">📄 Retrato</option>
+                        </select>
                         <button id="fullscreenMapBtn" class="map-action-btn" title="Expandir para tela cheia">
                             <i class="fas fa-expand"></i> Tela Cheia
                         </button>
-                        <button id="exportPdfBtn" class="map-action-btn" title="Exportar mapa em PDF">
-                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        <button id="printMapBtn" class="map-action-btn" title="Imprimir mapa (respeita o zoom atual)">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                        <button id="exportPdfBtn" class="map-action-btn" title="Baixar mapa em PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button id="exportPngBtn" class="map-action-btn" title="Baixar mapa como imagem PNG">
+                            <i class="fas fa-image"></i> Imagem
                         </button>
                     </div>
                 </div>
                 <div class="map-wrapper" id="mapWrapper">
-                    <div id="map" class="map-container"></div>
+                    <div id="map" class="map-container map-landscape"></div>
                 </div>
                 <p class="text-xs text-gray-400 mt-2 text-center">
-                    Ícones por tipo de ocorrência | Cores dos marcadores por pelotão (mesma cor da fonte) | Clique no marcador para detalhes
+                    Ícones por tipo de ocorrência | Clique no marcador para ver os detalhes
                 </p>
             </div>
         </div>
@@ -456,7 +514,7 @@
     </main>
 
     <footer class="text-center py-4 sm:py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
-        © 2026 CIABM / 1º BBM - Desenvolvido por Gustavo Medeiros | versão 7.0
+        © 1º BBM / CIABM 2026 - Desenvolvido por Gustavo Medeiros | v8.0
     </footer>
 
     <script>
@@ -466,9 +524,7 @@
             year: 2026,
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"],
-            monthAvailability: {
-                2023: 7
-            }
+            monthAvailability: { 2023: 7 }
         };
 
         const STYLES = {
@@ -498,7 +554,6 @@
             "BBS": "BBS / TERRESTRE"
         };
 
-        // Cores dos pelotões para os marcadores (mesmas cores da fonte)
         const PELOTAO_CORES = {
             "AÇORIANOS": "#065f46",
             "ASSUNÇÃO": "#047857",
@@ -533,6 +588,7 @@
         let curYear = 2026;
         let instances = {};
         let currentPeriod = { type: 'month', monthName: null };
+        let currentFilteredData = []; // guarda a lista filtrada atual (usada na exportação)
         
         let map = null;
         let markersLayer = null;
@@ -544,38 +600,11 @@
 
         const getChartConfig = () => {
             if (isMobile()) {
-                return {
-                    barThickness: 16,
-                    categoryPercentage: 0.8,
-                    fontSize: 10,
-                    tickPadding: 5,
-                    datalabelsSize: 9,
-                    subBarThickness: 7,
-                    subSpacing: 0.6,
-                    subItemHeight: 22
-                };
+                return { barThickness: 16, categoryPercentage: 0.8, fontSize: 10, tickPadding: 5, datalabelsSize: 9, subBarThickness: 7, subSpacing: 0.6, subItemHeight: 22 };
             } else if (isTablet()) {
-                return {
-                    barThickness: 18,
-                    categoryPercentage: 0.8,
-                    fontSize: 11,
-                    tickPadding: 8,
-                    datalabelsSize: 10,
-                    subBarThickness: 9,
-                    subSpacing: 0.65,
-                    subItemHeight: 26
-                };
+                return { barThickness: 18, categoryPercentage: 0.8, fontSize: 11, tickPadding: 8, datalabelsSize: 10, subBarThickness: 9, subSpacing: 0.65, subItemHeight: 26 };
             } else {
-                return {
-                    barThickness: 20,
-                    categoryPercentage: 0.8,
-                    fontSize: 12,
-                    tickPadding: 10,
-                    datalabelsSize: 11,
-                    subBarThickness: 11,
-                    subSpacing: 0.7,
-                    subItemHeight: 30
-                };
+                return { barThickness: 20, categoryPercentage: 0.8, fontSize: 12, tickPadding: 10, datalabelsSize: 11, subBarThickness: 11, subSpacing: 0.7, subItemHeight: 30 };
             }
         };
 
@@ -594,6 +623,75 @@
                 const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
                 return isLeap ? 366 : 365;
             }
+        }
+
+        // Remove acentos e caracteres inválidos para nome de arquivo
+        function sanitizeForFilename(str) {
+            return String(str || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9]+/g, '_')
+                .replace(/^_|_$/g, '')
+                .toUpperCase();
+        }
+
+        // Gera nome do arquivo a partir dos filtros ativos + período
+        function generateFilename(extension) {
+            const filters = {
+                nat: document.getElementById('fNat').value,
+                sub: document.getElementById('fSub').value,
+                bai: document.getElementById('fBai').value,
+                pel: document.getElementById('fPel').value
+            };
+            const parts = [];
+            if (filters.nat) parts.push(sanitizeForFilename(filters.nat));
+            if (filters.sub) parts.push(sanitizeForFilename(filters.sub));
+            if (filters.bai) parts.push(sanitizeForFilename(filters.bai));
+            if (filters.pel) parts.push(sanitizeForFilename(filters.pel));
+            const periodLabel = currentPeriod.type === 'month' && currentPeriod.monthName
+                ? currentPeriod.monthName
+                : 'ANUAL';
+            parts.push(periodLabel);
+            parts.push(String(curYear));
+            if (parts.length <= 2) parts.unshift('OCORRENCIAS');
+            else parts.unshift('1BBM');
+            // Limita o tamanho de cada parte para evitar nomes muito longos
+            const limited = parts.map(p => p.length > 30 ? p.substring(0, 30) : p);
+            return `${limited.join('_')}.${extension}`;
+        }
+
+        // Retorna um texto legível dos filtros ativos (para cabeçalhos de PDF / resumo)
+        function getActiveFiltersSummary() {
+            const filters = {
+                nat: document.getElementById('fNat').value,
+                sub: document.getElementById('fSub').value,
+                bai: document.getElementById('fBai').value,
+                pel: document.getElementById('fPel').value
+            };
+            const active = [];
+            if (filters.nat) active.push(`Natureza: ${filters.nat}`);
+            if (filters.sub) active.push(`Subgrupo: ${filters.sub}`);
+            if (filters.bai) active.push(`Bairro: ${filters.bai}`);
+            if (filters.pel) active.push(`Pelotão: ${filters.pel}`);
+            return active;
+        }
+
+        function getPeriodLabel() {
+            if (currentPeriod.type === 'month' && currentPeriod.monthName) {
+                return `${currentPeriod.monthName}/${curYear}`;
+            }
+            return `ANUAL ${curYear}`;
+        }
+
+        // Retorna a orientação atual do mapa na tela (landscape ou portrait).
+        // Usado pelo PDF/impressão/imagem para enquadrar corretamente o que
+        // está sendo capturado. Fonte única da verdade: a classe CSS aplicada
+        // no container do mapa + fallback para as dimensões reais.
+        function getMapOrientation() {
+            const mapEl = document.getElementById('map');
+            if (mapEl.classList.contains('map-portrait')) return 'portrait';
+            if (mapEl.classList.contains('map-landscape')) return 'landscape';
+            const r = mapEl.getBoundingClientRect();
+            return r.width >= r.height ? 'landscape' : 'portrait';
         }
 
         // ========== FUNÇÕES DO MAPA ==========
@@ -627,28 +725,27 @@
         function getMarkerIcon(natureza, pelotao) {
             const style = STYLES[natureza] || { i: "⚠️" };
             const emoji = style.i;
-            const bgColor = getPelotaoColor(pelotao);
+
+            // Todos os marcadores: apenas o emoji, sem círculo colorido atrás.
+            // Fica mais limpo no mapa e muito melhor para impressão.
             const iconHtml = `
                 <div style="
-                    background-color: ${bgColor};
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
+                    width: 34px;
+                    height: 34px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 18px;
-                    border: 2px solid white;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-                ">
-                    ${emoji}
-                </div>
+                    font-size: 26px;
+                    line-height: 1;
+                    text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.6);
+                    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.45));
+                ">${emoji}</div>
             `;
             return L.divIcon({
                 html: iconHtml,
-                iconSize: [32, 32],
+                iconSize: [34, 34],
                 className: 'custom-marker',
-                popupAnchor: [0, -16]
+                popupAnchor: [0, -17]
             });
         }
 
@@ -709,43 +806,266 @@
             }
         }
 
+        // ========== CAPTURA DO MAPA COMO IMAGEM ==========
+        // Função auxiliar: aguarda todos os tiles visíveis carregarem
+        function waitForTilesToLoad() {
+            return new Promise((resolve) => {
+                if (!map) return resolve();
+                const tiles = document.querySelectorAll('#map img.leaflet-tile');
+                let pending = 0;
+                tiles.forEach(t => {
+                    if (!t.complete || t.naturalWidth === 0) pending++;
+                });
+                if (pending === 0) return setTimeout(resolve, 200);
+                let remaining = pending;
+                const onDone = () => {
+                    remaining--;
+                    if (remaining <= 0) setTimeout(resolve, 200);
+                };
+                tiles.forEach(t => {
+                    if (!t.complete || t.naturalWidth === 0) {
+                        t.addEventListener('load', onDone, { once: true });
+                        t.addEventListener('error', onDone, { once: true });
+                    }
+                });
+                // fallback: resolve depois de 3s mesmo se alguns tiles falharem
+                setTimeout(resolve, 3000);
+            });
+        }
+
+        async function captureMapCanvas() {
+            const mapContainer = document.getElementById('map');
+            await waitForTilesToLoad();
+            return await html2canvas(mapContainer, {
+                scale: 2,
+                backgroundColor: '#1e293b',
+                logging: false,
+                useCORS: true,
+                allowTaint: true
+            });
+        }
+
+        // ========== IMPRIMIR MAPA ==========
+        async function printMap() {
+            const btn = document.getElementById('printMapBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+            btn.disabled = true;
+
+            // Segue o formato atual do mapa para enquadrar bem no papel
+            const orientation = getMapOrientation();
+
+            try {
+                const canvas = await captureMapCanvas();
+                const imgData = canvas.toDataURL('image/png');
+                const periodTxt = getPeriodLabel();
+                const filters = getActiveFiltersSummary();
+                const filtersHtml = filters.length
+                    ? `<p class="filters"><strong>Filtros:</strong> ${filters.join(' &nbsp;|&nbsp; ')}</p>`
+                    : '<p class="filters"><em>Sem filtros aplicados</em></p>';
+                const totalRegistros = currentFilteredData.length;
+
+                const printWin = window.open('', '_blank', 'width=1000,height=700');
+                if (!printWin) {
+                    alert('O navegador bloqueou a janela de impressão. Permita pop-ups deste site.');
+                    return;
+                }
+
+                printWin.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="pt-BR">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Mapa de Ocorrências - 1º BBM</title>
+                        <style>
+                            @page { size: A4 ${orientation}; margin: 10mm; }
+                            * { box-sizing: border-box; }
+                            html, body { margin: 0; padding: 0; }
+                            body {
+                                font-family: Arial, Helvetica, sans-serif;
+                                background: white;
+                                color: #111;
+                                padding: 8mm;
+                            }
+                            .header {
+                                text-align: center;
+                                border-bottom: 2px solid #065f46;
+                                padding-bottom: 6px;
+                                margin-bottom: 8px;
+                            }
+                            .header h1 {
+                                margin: 0;
+                                font-size: 16px;
+                                color: #065f46;
+                            }
+                            .header p {
+                                margin: 3px 0 0;
+                                font-size: 11px;
+                                color: #444;
+                            }
+                            .filters {
+                                margin: 4px 0 0;
+                                font-size: 10px;
+                                color: #444;
+                            }
+                            .map-img {
+                                display: block;
+                                width: 100%;
+                                height: auto;
+                                max-height: ${orientation === 'portrait' ? '230mm' : '150mm'};
+                                object-fit: contain;
+                                margin: 0 auto;
+                            }
+                            .footer {
+                                text-align: center;
+                                font-size: 9px;
+                                color: #666;
+                                margin-top: 6px;
+                            }
+                            @media print {
+                                .no-print { display: none !important; }
+                            }
+                            .no-print {
+                                text-align: center;
+                                margin: 10px 0;
+                            }
+                            .no-print button {
+                                background: #065f46; color: white; border: 0;
+                                padding: 8px 18px; border-radius: 6px; cursor: pointer;
+                                font-weight: bold; margin: 0 4px;
+                            }
+                            .no-print button:hover { background: #10b981; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>🚒 Mapa de Ocorrências &mdash; 1º BBM Porto Alegre</h1>
+                            <p><strong>Período:</strong> ${periodTxt} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Total:</strong> ${totalRegistros} registros</p>
+                            ${filtersHtml}
+                        </div>
+                        <img src="${imgData}" class="map-img" alt="Mapa de Ocorrências" />
+                        <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
+                        <div class="no-print">
+                            <button onclick="window.print()">🖨️ Imprimir novamente</button>
+                            <button onclick="window.close()">Fechar</button>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                setTimeout(function() { window.print(); }, 400);
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWin.document.close();
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao preparar impressão do mapa.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
         // ========== EXPORTAR PDF ==========
         async function exportMapAsPDF() {
-            const mapContainer = document.getElementById('map');
-            if (!mapContainer) return;
-            
-            // Mostrar indicador de carregamento
             const btn = document.getElementById('exportPdfBtn');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando PDF...';
             btn.disabled = true;
-            
+
+            // Papel segue o formato atual do mapa (paisagem/retrato),
+            // para que a imagem capturada ocupe bem a página
+            const orientation = getMapOrientation();
+
             try {
-                // Aguardar renderização completa
-                await new Promise(resolve => setTimeout(resolve, 300));
-                // Capturar o elemento do mapa
-                const canvas = await html2canvas(mapContainer, {
-                    scale: 2, // maior qualidade
-                    backgroundColor: '#1e293b',
-                    logging: false,
-                    useCORS: true
-                });
+                const canvas = await captureMapCanvas();
                 const imgData = canvas.toDataURL('image/png');
-                
+
                 const { jsPDF } = window.jspdf;
-                // Definir orientação landscape (paisagem) para melhor aproveitamento
                 const pdf = new jsPDF({
-                    orientation: 'landscape',
+                    orientation: orientation,
                     unit: 'mm',
                     format: 'a4'
                 });
-                const imgWidth = 280; // mm (A4 landscape tem 297mm largura)
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                pdf.save(`mapa_ocorrencias_${currentPeriod.type === 'month' ? currentPeriod.monthName : 'anual'}_${curYear}.pdf`);
+
+                const pageW = orientation === 'landscape' ? 297 : 210;
+                const pageH = orientation === 'landscape' ? 210 : 297;
+                const margin = 10;
+
+                // Cabeçalho
+                pdf.setFontSize(14);
+                pdf.setTextColor(6, 95, 70);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('Mapa de Ocorrências - 1º BBM Porto Alegre', pageW / 2, margin + 5, { align: 'center' });
+
+                pdf.setFontSize(10);
+                pdf.setTextColor(60);
+                pdf.setFont(undefined, 'normal');
+                const periodTxt = getPeriodLabel();
+                const total = currentFilteredData.length;
+                pdf.text(`Período: ${periodTxt}    |    Total: ${total} registros`, pageW / 2, margin + 11, { align: 'center' });
+
+                const filters = getActiveFiltersSummary();
+                let topOffset = margin + 17;
+                if (filters.length) {
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(90);
+                    const filterLine = `Filtros: ${filters.join('  |  ')}`;
+                    const lines = pdf.splitTextToSize(filterLine, pageW - 2 * margin);
+                    pdf.text(lines, pageW / 2, topOffset, { align: 'center' });
+                    topOffset += lines.length * 4;
+                }
+                topOffset += 2;
+
+                // Calcula área disponível para a imagem
+                const availW = pageW - 2 * margin;
+                const availH = pageH - topOffset - margin - 6;
+                const imgRatio = canvas.width / canvas.height;
+                let drawW = availW;
+                let drawH = drawW / imgRatio;
+                if (drawH > availH) {
+                    drawH = availH;
+                    drawW = drawH * imgRatio;
+                }
+                const offsetX = (pageW - drawW) / 2;
+
+                pdf.addImage(imgData, 'PNG', offsetX, topOffset, drawW, drawH);
+
+                // Rodapé
+                pdf.setFontSize(8);
+                pdf.setTextColor(130);
+                pdf.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, pageW / 2, pageH - 5, { align: 'center' });
+
+                pdf.save(generateFilename('pdf'));
             } catch (error) {
                 console.error('Erro ao gerar PDF:', error);
                 alert('Erro ao gerar PDF. Tente novamente.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // ========== EXPORTAR IMAGEM PNG ==========
+        async function exportMapAsImage() {
+            const btn = document.getElementById('exportPngBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+            btn.disabled = true;
+
+            try {
+                const canvas = await captureMapCanvas();
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = generateFilename('png');
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao gerar imagem do mapa.');
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -777,7 +1097,48 @@
                 document.getElementById('btnAnual').onclick = Core.loadAnnual;
                 document.getElementById('fullscreenMapBtn').onclick = toggleFullscreen;
                 document.getElementById('exportPdfBtn').onclick = exportMapAsPDF;
-                
+                document.getElementById('printMapBtn').onclick = printMap;
+                document.getElementById('exportPngBtn').onclick = exportMapAsImage;
+
+                // Seletor de orientação: altera o FORMATO do mapa em tempo real
+                // (paisagem = mais largo, retrato = mais alto). O PDF/impressão/imagem
+                // seguem automaticamente o formato atual do mapa.
+                document.getElementById('orientationSelect').addEventListener('change', (e) => {
+                    const mapEl = document.getElementById('map');
+                    if (e.target.value === 'portrait') {
+                        mapEl.classList.remove('map-landscape');
+                        mapEl.classList.add('map-portrait');
+                    } else {
+                        mapEl.classList.remove('map-portrait');
+                        mapEl.classList.add('map-landscape');
+                    }
+                    if (map) {
+                        // Espera a transição CSS terminar antes de re-renderizar
+                        setTimeout(() => {
+                            map.invalidateSize();
+                            if (currentMarkers.length > 0) {
+                                const group = L.featureGroup(currentMarkers);
+                                map.fitBounds(group.getBounds().pad(0.1));
+                            }
+                        }, 350);
+                    }
+                });
+
+                // Atalho Ctrl+P / Cmd+P quando o mapa está em tela cheia:
+                // intercepta a impressão padrão do navegador e chama nossa função
+                // de impressão (apenas o mapa via popup).
+                document.addEventListener('keydown', (e) => {
+                    const key = (e.key || '').toLowerCase();
+                    if ((e.ctrlKey || e.metaKey) && key === 'p') {
+                        const wrapper = document.getElementById('mapWrapper');
+                        if (document.fullscreenElement === wrapper) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            printMap();
+                        }
+                    }
+                }, true); // fase de captura, para pegar antes do navegador
+
                 ['fNat','fSub','fBai','fPel'].forEach(id => {
                     document.getElementById(id).addEventListener('change', Core.applyFilters);
                 });
@@ -807,7 +1168,7 @@
                         delete instances[id];
                     }
                 });
-                if (Core.db.length) Core.drawCharts(Core.db);
+                if (Core.db.length) Core.drawCharts(currentFilteredData.length ? currentFilteredData : Core.db);
                 if (map) {
                     setTimeout(() => map.invalidateSize(), 100);
                     if (currentMarkers.length) {
@@ -1060,7 +1421,105 @@
                 Core.render(Core.db);
             },
 
+            // ========== EXPORTAR XLSX ==========
+            exportToXLSX: () => {
+                const data = currentFilteredData;
+                if (!data || data.length === 0) {
+                    alert('Não há dados para exportar. Carregue um mês ou o relatório anual primeiro.');
+                    return;
+                }
+
+                const btn = document.getElementById('btnExportXlsx');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GERANDO...';
+                btn.disabled = true;
+
+                try {
+                    // Monta linhas de dados
+                    const rows = data.map(item => ({
+                        '#': item.id,
+                        'Data': item.date || '',
+                        'Natureza': item.nat || '',
+                        'Subgrupo': item.sub || '',
+                        'Bairro': item.bairro || '',
+                        'Pelotão': item.pel || '',
+                        'Nº BA': item.ba || '',
+                        'Latitude': item.latitude != null ? item.latitude : '',
+                        'Longitude': item.longitude != null ? item.longitude : '',
+                        'Link Maps': item.map || ''
+                    }));
+
+                    // Cria a planilha de dados
+                    const wsData = XLSX.utils.json_to_sheet(rows);
+                    wsData['!cols'] = [
+                        { wch: 6 },   // #
+                        { wch: 12 },  // Data
+                        { wch: 30 },  // Natureza
+                        { wch: 40 },  // Subgrupo
+                        { wch: 22 },  // Bairro
+                        { wch: 22 },  // Pelotão
+                        { wch: 12 },  // Nº BA
+                        { wch: 12 },  // Latitude
+                        { wch: 12 },  // Longitude
+                        { wch: 50 }   // Link
+                    ];
+
+                    // Cria planilha de resumo
+                    const filters = getActiveFiltersSummary();
+                    const periodTxt = getPeriodLabel();
+                    const resumoRows = [
+                        ['RELATÓRIO DE OCORRÊNCIAS - 1º BBM PORTO ALEGRE'],
+                        [],
+                        ['Período', periodTxt],
+                        ['Total de registros', data.length],
+                        ['Gerado em', new Date().toLocaleString('pt-BR')],
+                        [],
+                        ['FILTROS APLICADOS']
+                    ];
+                    if (filters.length) {
+                        filters.forEach(f => {
+                            const [label, value] = f.split(':').map(s => s.trim());
+                            resumoRows.push([label, value]);
+                        });
+                    } else {
+                        resumoRows.push(['(Sem filtros)', '']);
+                    }
+
+                    // Agregações simples
+                    resumoRows.push([]);
+                    resumoRows.push(['TOTAIS POR NATUREZA']);
+                    const byNat = {};
+                    data.forEach(d => { byNat[d.nat] = (byNat[d.nat] || 0) + 1; });
+                    Object.entries(byNat).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => resumoRows.push([k, v]));
+
+                    resumoRows.push([]);
+                    resumoRows.push(['TOTAIS POR PELOTÃO']);
+                    const byPel = {};
+                    data.forEach(d => { byPel[d.pel] = (byPel[d.pel] || 0) + 1; });
+                    Object.entries(byPel).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => resumoRows.push([k, v]));
+
+                    const wsResumo = XLSX.utils.aoa_to_sheet(resumoRows);
+                    wsResumo['!cols'] = [{ wch: 35 }, { wch: 30 }];
+
+                    // Monta o workbook
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+                    XLSX.utils.book_append_sheet(wb, wsData, 'Ocorrências');
+
+                    // Download
+                    const filename = generateFilename('xlsx');
+                    XLSX.writeFile(wb, filename);
+                } catch (err) {
+                    console.error('Erro ao gerar XLSX:', err);
+                    alert('Erro ao gerar planilha Excel. Tente novamente.');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            },
+
             render: (data) => {
+                currentFilteredData = data; // salva a lista filtrada
                 document.getElementById('totalVal').textContent = data.length.toLocaleString('pt-BR');
                 document.getElementById('rowsVal').textContent = data.length.toLocaleString('pt-BR');
                 const tbody = document.getElementById('tableBody');
