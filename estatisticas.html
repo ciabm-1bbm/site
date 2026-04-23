@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>ESTATÍSTICAS DE OCORRÊNCIAS - 1º BBM</title>
+    <title>ESTATÍSTICAS - 1º BBM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,9 +11,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-
+    
+    <!-- Leaflet CSS e JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <style>
-        /* ========== ESTILOS GLOBAIS - VERSÃO STATS_BBM_v4_FINAL ========== */
+        /* Estilos existentes mantidos... */
         .chart-container {
             position: relative;
             width: 100%;
@@ -210,6 +214,70 @@
         .pelotao-gradient-5 { background-color: #6ee7b7; }
         .pelotao-gradient-6 { background-color: #a7f3d0; }
         .pelotao-gradient-7 { background-color: #d1fae5; }
+        
+        /* Estilo para o mapa */
+        .map-container {
+            height: 500px;
+            width: 100%;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .map-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            border-radius: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .map-container {
+                height: 400px;
+            }
+        }
+        
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: rgba(30, 41, 59, 0.95);
+            color: #e2e8f0;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-family: 'ui-monospace', monospace;
+        }
+        .custom-popup .leaflet-popup-tip {
+            background: rgba(30, 41, 59, 0.95);
+        }
+        .leaflet-container {
+            background: #1e293b;
+        }
+        
+        /* Botão de tela cheia */
+        .fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .fullscreen-btn:hover {
+            background: #10b981;
+            border-color: #10b981;
+        }
+        .map-wrapper {
+            position: relative;
+        }
     </style>
     
     <link rel="icon" type="image/x-icon" href="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true">
@@ -344,26 +412,42 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Mapa interativo com Google Maps e botão fullscreen -->
+            <div class="glass p-3 sm:p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs sm:text-sm font-bold text-white border-l-4 border-purple-400 pl-2 sm:pl-3 uppercase">
+                        <i class="fas fa-map-marked-alt mr-2"></i> MAPA DAS OCORRÊNCIAS (Google Maps)
+                    </h3>
+                    <button id="fullscreenMapBtn" class="fullscreen-btn" title="Abrir mapa em tela cheia">
+                        <i class="fas fa-expand"></i> Tela Cheia
+                    </button>
+                </div>
+                <div class="map-wrapper">
+                    <div id="map" class="map-container"></div>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 text-center">
+                    Ícones por tipo de ocorrência | Cores dos marcadores por pelotão (mesma cor da fonte) | Clique no marcador para detalhes
+                </p>
+            </div>
         </div>
         
         <div class="h-4 sm:h-6"></div>
     </main>
 
     <footer class="text-center py-4 sm:py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
-        © 1º BBM - Gustavo Medeiros | v4_FINAL
+        © 1º BBM - Gustavo Medeiros | v6_FINAL_MAPA_CORES_PELOTAO
     </footer>
 
     <script>
-        // ========== CONFIGURAÇÕES GLOBAIS - STATS_BBM_v4_FINAL ==========
+        // ========== CONFIGURAÇÕES GLOBAIS ==========
         const CONFIG = {
             repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
             year: 2026,
             months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
             poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"],
-            // Regras de disponibilidade de meses por ano (mês inicial, 0-indexado)
             monthAvailability: {
-                2023: 7  // a partir de agosto (índice 7)
-                // outros anos começam do mês 0 (janeiro) por padrão
+                2023: 7
             }
         };
 
@@ -394,6 +478,37 @@
             "BBS": "BBS / TERRESTRE"
         };
 
+        // Cores dos pelotões para os marcadores (mesmas cores da fonte na tabela)
+        const PELOTAO_CORES = {
+            // Pelotões POA - tons de verde
+            "AÇORIANOS": "#065f46",
+            "ASSUNÇÃO": "#047857",
+            "TERESÓPOLIS": "#059669",
+            "RESTINGA": "#10b981",
+            "BELÉM NOVO": "#34d399",
+            "FLORESTA": "#6ee7b7",
+            "PASSO D'AREIA": "#10b981",
+            "PARTENON": "#10b981",
+            "AUTO RESGATE": "#10b981",
+            // BBS e outros - tons de cinza
+            "BBS / MERGULHO": "#6B7280",
+            "BBS / CANIL": "#6B7280",
+            "BBS / AQUÁTICA": "#6B7280",
+            "BBS / TERRESTRE": "#6B7280",
+            "8º BBM CANOAS": "#6B7280",
+            "AODC / AÉREO": "#6B7280",
+            "COBOM": "#6B7280",
+            "OUTROS": "#64748B"
+        };
+
+        // Função para obter cor do pelotão (com fallback)
+        function getPelotaoColor(pelotao) {
+            if (PELOTAO_CORES[pelotao]) return PELOTAO_CORES[pelotao];
+            // Se for pelotão de POA não mapeado explicitamente, usar verde padrão
+            if (CONFIG.poa.includes(pelotao)) return "#10b981";
+            return "#64748B";
+        }
+
         const GREEN_GRADIENTS = [
             '#065f46', '#047857', '#059669', '#10b981', 
             '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'
@@ -401,7 +516,13 @@
 
         let curYear = 2026;
         let instances = {};
-        let currentPeriod = { type: 'month', monthName: null }; // 'month' ou 'annual'
+        let currentPeriod = { type: 'month', monthName: null };
+        
+        // Variáveis para o mapa
+        let map = null;
+        let markersLayer = null;
+        let currentMarkers = [];
+        let mapInitialized = false;
 
         const isMobile = () => window.innerWidth < 768;
         const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024;
@@ -443,45 +564,161 @@
             }
         };
 
-        // ========== FUNÇÃO AUXILIAR PARA DIAS NO PERÍODO ==========
+        // ========== FUNÇÕES AUXILIARES ==========
         function getDaysInPeriod(year, monthName = null) {
             if (monthName) {
                 const monthIndex = CONFIG.months.indexOf(monthName);
-                if (monthIndex === -1) return 30; // fallback
-                // Verifica ano bissexto para fevereiro
-                if (monthIndex === 1) { // FEV
+                if (monthIndex === -1) return 30;
+                if (monthIndex === 1) {
                     const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
                     return isLeap ? 29 : 28;
                 }
-                // Meses com 31 dias
                 if ([0, 2, 4, 6, 7, 9, 11].includes(monthIndex)) return 31;
                 return 30;
             } else {
-                // Ano inteiro: 365 ou 366
                 const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
                 return isLeap ? 366 : 365;
             }
         }
 
-        // ========== OBTÉM O LIMITE DE MESES DISPONÍVEIS PARA O ANO ==========
         function getAvailableMonthsLimit(year) {
             const now = new Date();
             let limit = (year === now.getFullYear()) ? now.getMonth() + 1 : 12;
-            // Se o ano tiver uma regra especial de início (ex: 2023 a partir de agosto)
             if (CONFIG.monthAvailability[year] !== undefined) {
                 const startMonth = CONFIG.monthAvailability[year];
-                // Se o ano atual for o ano corrente e o mês atual for menor que o início, não tem nenhum mês disponível
                 if (year === now.getFullYear() && (now.getMonth() + 1) <= startMonth) {
                     return 0;
                 }
-                // O limite máximo é o mínimo entre o limite normal e o final do ano (12)
-                // Mas a lógica de exibição dos botões: só mostrar meses a partir do startMonth
-                // Vamos retornar o startMonth como offset, mas a função setYear tratará de habilitar apenas a partir desse mês.
-                return startMonth; // retorna o índice do primeiro mês disponível (0-indexado, mas usaremos como mês inicial)
+                return startMonth;
             }
-            return 0; // 0 significa nenhum offset (começa em janeiro)
+            return 0;
         }
 
+        // ========== FUNÇÕES DO MAPA ==========
+        function initMap() {
+            if (mapInitialized) return;
+            const center = [-30.0346, -51.2177];
+            map = L.map('map').setView(center, 12);
+            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
+                maxZoom: 20,
+                minZoom: 10
+            }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map);
+            mapInitialized = true;
+            
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 100);
+        }
+        
+        function resizeMap() {
+            if (map) {
+                setTimeout(() => {
+                    map.invalidateSize();
+                    if (currentMarkers.length > 0) {
+                        const group = L.featureGroup(currentMarkers);
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                }, 200);
+            }
+        }
+
+        // Gera ícone personalizado com emoji e cor de fundo baseada no pelotão (mesma cor da fonte)
+        function getMarkerIcon(natureza, pelotao) {
+            const style = STYLES[natureza] || { i: "⚠️" };
+            const emoji = style.i;
+            const bgColor = getPelotaoColor(pelotao);
+            
+            const iconHtml = `
+                <div style="
+                    background-color: ${bgColor};
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 18px;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                ">
+                    ${emoji}
+                </div>
+            `;
+            return L.divIcon({
+                html: iconHtml,
+                iconSize: [32, 32],
+                className: 'custom-marker',
+                popupAnchor: [0, -16]
+            });
+        }
+
+        // Atualiza os marcadores no mapa com base nos dados
+        function updateMapMarkers(data) {
+            if (!map || !markersLayer) return;
+            markersLayer.clearLayers();
+            currentMarkers = [];
+            
+            const occurrencesWithCoords = data.filter(item => item.latitude && item.longitude && !isNaN(item.latitude) && !isNaN(item.longitude));
+            
+            occurrencesWithCoords.forEach(occ => {
+                const icon = getMarkerIcon(occ.nat, occ.pel);
+                const marker = L.marker([occ.latitude, occ.longitude], { icon: icon });
+                const popupContent = `
+                    <div style="font-family: monospace; font-size: 12px; min-width: 200px;">
+                        <strong>${occ.nat} ${STYLES[occ.nat]?.i || ''}</strong><br>
+                        <strong>Data:</strong> ${occ.date}<br>
+                        <strong>Pelotão:</strong> ${occ.pel}<br>
+                        <strong>Bairro:</strong> ${occ.bairro}<br>
+                        <strong>Subgrupo:</strong> ${occ.sub || '-'}<br>
+                        <strong>Nº BA:</strong> ${occ.ba || '-'}<br>
+                        <a href="https://www.google.com/maps?q=${occ.latitude},${occ.longitude}" target="_blank" style="color: #3B82F6;">Abrir no Google Maps</a>
+                    </div>
+                `;
+                marker.bindPopup(popupContent, { className: 'custom-popup' });
+                marker.addTo(markersLayer);
+                currentMarkers.push(marker);
+            });
+            
+            if (currentMarkers.length > 0) {
+                const group = L.featureGroup(currentMarkers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            } else {
+                map.setView([-30.0346, -51.2177], 12);
+            }
+        }
+
+        // Função para tela cheia
+        function toggleFullscreen() {
+            const mapContainer = document.getElementById('map');
+            const mapWrapper = mapContainer.closest('.map-wrapper');
+            if (!document.fullscreenElement) {
+                mapWrapper.requestFullscreen().catch(err => {
+                    console.error(`Erro ao entrar em tela cheia: ${err.message}`);
+                });
+                // Ajustar o mapa após entrar em fullscreen
+                setTimeout(() => {
+                    if (map) map.invalidateSize();
+                    if (currentMarkers.length > 0) {
+                        const group = L.featureGroup(currentMarkers);
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                }, 100);
+            } else {
+                document.exitFullscreen();
+                setTimeout(() => {
+                    if (map) map.invalidateSize();
+                    if (currentMarkers.length > 0) {
+                        const group = L.featureGroup(currentMarkers);
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                }, 100);
+            }
+        }
+
+        // ========== CORE ==========
         const Core = {
             db: [],
             
@@ -505,6 +742,7 @@
                 });
                 
                 document.getElementById('btnAnual').onclick = Core.loadAnnual;
+                document.getElementById('fullscreenMapBtn').onclick = toggleFullscreen;
                 
                 ['fNat','fSub','fBai','fPel'].forEach(id => {
                     document.getElementById(id).addEventListener('change', Core.applyFilters);
@@ -513,6 +751,23 @@
                 window.addEventListener('resize', Core.handleResize);
 
                 Core.setYear(2026);
+                
+                // Inicializa o mapa quando o dashboard for mostrado
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'class') {
+                            const dashboard = document.getElementById('dashboard');
+                            if (dashboard && !dashboard.classList.contains('hidden')) {
+                                if (!mapInitialized) {
+                                    initMap();
+                                } else {
+                                    resizeMap();
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(document.getElementById('dashboard'), { attributes: true });
             },
 
             handleResize: () => {
@@ -528,6 +783,13 @@
                 if (Core.db.length > 0) {
                     Core.drawCharts(Core.db);
                 }
+                if (map) {
+                    setTimeout(() => map.invalidateSize(), 100);
+                    if (currentMarkers.length > 0) {
+                        const group = L.featureGroup(currentMarkers);
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                }
             },
 
             setYear: (y) => {
@@ -536,19 +798,15 @@
                 document.getElementById('yearSelect').value = y;
                 
                 const now = new Date();
-                // Limite padrão: até o mês atual se for o ano corrente, senão 12
                 let maxMonth = (y === now.getFullYear()) ? now.getMonth() + 1 : 12;
-                // Mês de início para este ano (0-indexado)
                 let startMonth = CONFIG.monthAvailability[y] !== undefined ? CONFIG.monthAvailability[y] : 0;
                 
-                // Se o ano corrente e o mês atual for antes do mês de início, não há meses disponíveis
                 if (y === now.getFullYear() && (now.getMonth() + 1) <= startMonth) {
                     maxMonth = 0;
                 }
 
                 CONFIG.months.forEach((_, i) => {
                     const btn = document.getElementById(`btn_${i}`);
-                    // Habilita apenas se o mês atual (i+1) estiver dentro do intervalo [startMonth+1, maxMonth]
                     const monthNumber = i + 1;
                     const isAvailable = (monthNumber > startMonth) && (monthNumber <= maxMonth);
                     
@@ -594,7 +852,7 @@
                 } catch(e) {
                     Core.toggleLoad(false);
                     btn.classList.remove('active');
-                    alert(`Dados para o mês de ${m}/${curYear} ainda não foram compilados. Somente após o final do mês.`);
+                    alert(`Dados para ${m}/${curYear} não encontrados.`);
                 }
             },
 
@@ -702,8 +960,6 @@
                 const colLon = findKey(['lon', 'long', 'longitude']);
                 
                 let colBA = null;
-                
-                // Procura pela coluna "Nº Oc." ou números de 6 dígitos
                 for (const key of keys) {
                     if (key.toLowerCase().includes('nº oc') || key.toLowerCase().includes('numero oc') || 
                         key.toLowerCase().includes('num oc') || key.toLowerCase().includes('n oc')) {
@@ -759,14 +1015,13 @@
                         });
                     }
 
-                    // --- FILTRO: cidades que devem ser omitidas do gráfico (viram OUTROS) ---
+                    // Filtro cidades
                     const cidadesExcluir = ["CACHOEIRINHA", "CANOAS", "CAXIAS DO SUL", "CAXIAS"];
                     if (cidadesExcluir.some(cidade => pelotao.includes(cidade))) {
                         pelotao = "OUTROS";
                     }
-                    // -----------------------------------------------------------------------
                     
-                    // Simplificar pelotões especiais
+                    // Simplificar pelotões
                     if (PELOTAO_SIMPLIFICADO[pelotao]) {
                         pelotao = PELOTAO_SIMPLIFICADO[pelotao];
                     } else if (!CONFIG.poa.includes(pelotao) && pelotao) {
@@ -776,16 +1031,7 @@
                                 break;
                             }
                         }
-                        
-                        pelotao = pelotao.replace("1º BBM / ", "")
-                                        .replace("CIA / ", "")
-                                        .replace("PEL / ", "")
-                                        .replace("PEL.", "")
-                                        .replace("PELOTÃO", "")
-                                        .replace("2ª 2º ", "")
-                                        .replace("1ª 1º ", "")
-                                        .replace("1º GR ", "")
-                                        .trim();
+                        pelotao = pelotao.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").replace("PEL.", "").replace("PELOTÃO", "").replace("2ª 2º ", "").replace("1ª 1º ", "").replace("1º GR ", "").trim();
                         if (pelotao.length <= 2) pelotao = "OUTROS";
                     }
                     
@@ -793,13 +1039,20 @@
                         pelotao = pelotao.replace("AQUÁTICO", "AQUÁTICA");
                     }
                     
-                    let mapUrl = null;
+                    // Captura coordenadas
+                    let latitude = null, longitude = null;
                     if (r[colLat] && r[colLon]) {
                         const lat = r[colLat].replace(',', '.').trim();
                         const lon = r[colLon].replace(',', '.').trim();
                         if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
-                            mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                            latitude = parseFloat(lat);
+                            longitude = parseFloat(lon);
                         }
+                    }
+                    
+                    let mapUrl = null;
+                    if (latitude && longitude) {
+                        mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
                     }
 
                     return {
@@ -810,7 +1063,9 @@
                         pel: pelotao || "OUTROS",
                         bairro: (r[colBairro] || '--').toUpperCase().trim(),
                         map: mapUrl,
-                        ba: numeroBA
+                        ba: numeroBA,
+                        latitude: latitude,
+                        longitude: longitude
                     };
                 }).filter(x => x !== null);
             },
@@ -918,6 +1173,13 @@
                 });
 
                 Core.drawCharts(data);
+                if (mapInitialized) {
+                    updateMapMarkers(data);
+                } else {
+                    setTimeout(() => {
+                        if (mapInitialized) updateMapMarkers(data);
+                    }, 500);
+                }
             },
 
             drawCharts: (data) => {
@@ -939,8 +1201,7 @@
                 const sortObject = (obj) => 
                     Object.entries(obj).sort((a, b) => b[1] - a[1]);
 
-                // Calcula os dias do período atual para usar nos tooltips
-                let daysInPeriod = 30; // fallback
+                let daysInPeriod = 30;
                 if (currentPeriod.type === 'month' && currentPeriod.monthName) {
                     daysInPeriod = getDaysInPeriod(curYear, currentPeriod.monthName);
                 } else {
@@ -985,11 +1246,9 @@
                     const isPoaPelotao = (label) => {
                         return CONFIG.poa.includes(label) || label === "PASSO D'AREIA";
                     };
-                    
                     const isBBS = (label) => {
                         return label.includes("BBS") || label.includes("AODC") || label.includes("COBOM") || label.includes("8º BBM");
                     };
-                    
                     const poaItems = data.filter(item => isPoaPelotao(item[0]));
                     const sortedPoa = [...poaItems].sort((a, b) => b[1] - a[1]);
                     const poaRanking = {};
