@@ -500,14 +500,14 @@
         const PELOTAO_CORES = {
             "AÇORIANOS": "#065f46",
             "ASSUNÇÃO": "#047857",
-            "TERESÓPOLIS": "#059669",
+            "TERESÓPOLIS / AR": "#059669",
             "RESTINGA": "#10b981",
             "BELÉM NOVO": "#34d399",
             "FLORESTA": "#6ee7b7",
             "PASSO D'AREIA": "#10b981",
             "PARTENON": "#10b981",
             "AUTO RESGATE": "#10b981",
-            "TERESÓPOLIS": "#10b981",
+            "TERESÓPOLIS / AR": "#10b981",
             "BBS / MERGULHO": "#6B7280",
             "BBS / CANIL": "#6B7280",
             "BBS / AQUÁTICA": "#6B7280",
@@ -594,7 +594,7 @@
             if (!pelotaoOriginal) return "OUTROS";
             // Se for TERESÓPOLIS ou AUTO RESGATE e a data for a partir de abril/2026
             if ((pelotaoOriginal === "TERESÓPOLIS" || pelotaoOriginal === "AUTO RESGATE") && isApril2026OrLater(dataStr)) {
-                return "TERESÓPOLIS";
+                return "TERESÓPOLIS / AR";
             }
             return pelotaoOriginal;
         }
