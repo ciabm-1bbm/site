@@ -480,7 +480,7 @@
             "PRODUTOS PERIGOSOS": { c: "#FFFFFF", i: "☢️", cl: "text-white", bg: "rgba(255, 255, 255, 0.8)" },
             "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-slate-400", bg: "rgba(100, 116, 139, 0.8)" },
             "TROTE": { c: "#A78BFA", i: "🎭", cl: "text-purple-400", bg: "rgba(167, 139, 250, 0.8)" },
-            "TERESÓPOLIS": { c: "#10b981", i: "🚒", cl: "text-emerald-500", bg: "rgba(16, 185, 129, 0.8)" }
+            "TERESÓPOLIS / AR": { c: "#10b981", i: "🚒", cl: "text-emerald-500", bg: "rgba(16, 185, 129, 0.8)" }
         };
 
         const PELOTAO_SIMPLIFICADO = {
@@ -1456,7 +1456,7 @@
                 const total = values.reduce((a,b) => a+b, 0);
                 let bgColors, tickColors, barThickness, catPerc, barPerc;
                 if (type === 'pel') {
-                    const isPoa = (l) => CONFIG.poa.includes(l) || l === "PASSO D'AREIA" || l === "TERESÓPOLIS";
+                    const isPoa = (l) => CONFIG.poa.includes(l) || l === "PASSO D'AREIA" || l === "TERESÓPOLIS / AR";
                     const poaItems = data.filter(i => isPoa(i[0]));
                     const sortedPoa = [...poaItems].sort((a,b) => b[1]-a[1]);
                     const rank = {};
