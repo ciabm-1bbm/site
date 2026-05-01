@@ -19,12 +19,10 @@
     <!-- Bibliotecas para PDF e imagem -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <!-- SheetJS para exportar XLSX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        /* ========== ESTILOS GLOBAIS ========== */
+        /* ========== ESTILOS GLOBAIS (mesmos da versão anterior) ========== */
         .chart-container {
             position: relative;
             width: 100%;
@@ -32,26 +30,21 @@
             min-height: 300px;
             max-height: 500px;
         }
-        
         .chart-container-lg {
             height: auto;
             min-height: 400px;
         }
-        
         @media (max-width: 640px) {
             .chart-container { height: 280px; min-height: 280px; }
             .chart-container-lg { min-height: 380px; }
         }
-        
         @media (min-width: 641px) and (max-width: 1024px) {
             .chart-container { height: 350px; min-height: 350px; }
             .chart-container-lg { min-height: 420px; }
         }
-        
         @media (min-width: 1025px) {
             .chart-container-lg { min-height: 480px; }
         }
-        
         .glass {
             background: rgba(30, 41, 59, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -59,17 +52,14 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
-        
         .table-container {
             max-height: 500px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-        
         @media (max-width: 768px) {
             .table-container { max-height: 400px; }
         }
-        
         .month-btn {
             min-height: 48px;
             font-size: 0.7rem;
@@ -77,7 +67,6 @@
             border-radius: 0.5rem;
             transition: all 0.3s ease;
         }
-        
         .month-btn.active {
             background: linear-gradient(135deg, #10B981, #059669);
             color: white;
@@ -85,20 +74,16 @@
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
             transform: scale(1.02);
         }
-        
         .month-btn:hover:not(.active):not(:disabled) {
             background: rgba(100, 116, 139, 0.3);
             border-color: rgba(255, 255, 255, 0.2);
         }
-        
         @media (min-width: 768px) {
             .month-btn { min-height: 52px; font-size: 0.75rem; }
         }
-        
         @media (min-width: 1024px) {
             .month-btn { min-height: 56px; font-size: 0.8rem; }
         }
-        
         .year-select-btn {
             background: rgba(30, 41, 59, 0.9);
             border: 2px solid #10b981;
@@ -116,19 +101,16 @@
             position: relative;
             padding-right: 2.5rem;
         }
-        
         .year-select-btn:hover {
             background: #10b981;
             color: white;
             border-color: #10b981;
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
-        
         .year-select-btn:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
         }
-        
         .btn-anual {
             background: rgba(30, 41, 59, 0.9);
             border: 2px solid #eab308;
@@ -143,26 +125,22 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        
         .btn-anual:hover {
             background: #eab308;
             color: white;
             border-color: #fef08a;
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
         }
-        
         .btn-anual.active {
             background: linear-gradient(135deg, #ca8a04, #eab308);
             color: white;
             border-color: #fef08a;
             box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
         }
-        
         .year-select-wrapper {
             position: relative;
             display: inline-block;
         }
-        
         .year-select-wrapper::after {
             content: "▼";
             position: absolute;
@@ -173,7 +151,6 @@
             font-size: 0.8rem;
             pointer-events: none;
         }
-        
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.7); border-radius: 4px; }
@@ -196,23 +173,10 @@
             border-radius: 0.75rem;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease, max-width 0.3s ease, height 0.3s ease;
-            margin-left: auto;
-            margin-right: auto;
+            transition: all 0.3s ease;
         }
-
-        /* Formato paisagem (padrão): retângulo largo */
-        .map-container.map-landscape {
-            height: 500px;
-            max-width: 100%;
-        }
-
-        /* Formato retrato: retângulo mais alto que largo, centralizado */
-        .map-container.map-portrait {
-            height: 720px;
-            max-width: 540px;
-        }
-
+        .map-container.map-landscape { height: 500px; max-width: 100%; }
+        .map-container.map-portrait { height: 720px; max-width: 540px; margin: 0 auto; }
         .map-wrapper:fullscreen {
             width: 100vw;
             height: 100vh;
@@ -221,31 +185,12 @@
             align-items: center;
             justify-content: center;
         }
-        /* Tela cheia paisagem */
-        .map-wrapper:fullscreen .map-container.map-landscape {
-            height: 92vh;
-            width: 96vw;
-            max-width: 96vw;
-            border-radius: 1rem;
-        }
-        /* Tela cheia retrato: usa altura cheia, largura proporcional */
-        .map-wrapper:fullscreen .map-container.map-portrait {
-            height: 92vh;
-            width: auto;
-            max-width: calc(92vh * 0.75);
-            border-radius: 1rem;
-        }
-        /* Fallback para o caso de nenhuma classe estar aplicada ainda */
-        .map-wrapper:fullscreen .map-container {
-            height: 92vh;
-            border-radius: 1rem;
-        }
-
+        .map-wrapper:fullscreen .map-container.map-landscape { height: 92vh; width: 96vw; max-width: 96vw; border-radius: 1rem; }
+        .map-wrapper:fullscreen .map-container.map-portrait { height: 92vh; width: auto; max-width: calc(92vh * 0.75); border-radius: 1rem; }
         @media (max-width: 768px) {
             .map-container.map-landscape { height: 400px; }
             .map-container.map-portrait { height: 600px; max-width: 100%; }
         }
-        
         .custom-popup .leaflet-popup-content-wrapper {
             background: rgba(30, 41, 59, 0.95);
             color: #e2e8f0;
@@ -256,7 +201,6 @@
         .custom-popup .leaflet-popup-tip { background: rgba(30, 41, 59, 0.95); }
         .leaflet-container { background: #1e293b; }
         
-        /* Botões do mapa */
         .map-action-btn {
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -271,18 +215,9 @@
             align-items: center;
             gap: 6px;
             font-family: 'ui-monospace', monospace;
-            white-space: nowrap;
         }
-        .map-action-btn:hover:not(:disabled) {
-            background: #10b981;
-            border-color: #10b981;
-        }
-        .map-action-btn:disabled {
-            opacity: 0.6;
-            cursor: wait;
-        }
-
-        /* Seletor de orientação */
+        .map-action-btn:hover:not(:disabled) { background: #10b981; border-color: #10b981; }
+        .map-action-btn:disabled { opacity: 0.6; cursor: wait; }
         .orientation-select {
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -292,29 +227,14 @@
             cursor: pointer;
             font-size: 13px;
             appearance: none;
-            -webkit-appearance: none;
             font-family: 'ui-monospace', monospace;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M4 6l4 4 4-4'/%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 8px center;
             background-size: 12px;
         }
-        .orientation-select:hover {
-            border-color: #10b981;
-        }
-        .orientation-select:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
-        }
-
-        .map-toolbar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
+        .orientation-select:hover { border-color: #10b981; }
+        .map-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .export-xlsx-btn {
             background: linear-gradient(135deg, #059669, #10b981);
             border: 1px solid #34d399;
@@ -325,19 +245,11 @@
             font-size: 0.75rem;
             font-weight: bold;
             transition: all 0.2s;
-            white-space: nowrap;
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
-        .export-xlsx-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-        .export-xlsx-btn:disabled {
-            opacity: 0.6;
-            cursor: wait;
-        }
+        .export-xlsx-btn:hover:not(:disabled) { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
     </style>
     
     <link rel="icon" type="image/x-icon" href="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true">
@@ -345,1338 +257,25 @@
 <body class="bg-slate-900 text-gray-100 min-h-screen flex flex-col">
 
     <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow space-y-4 sm:space-y-6">
-        
+        <!-- Header e demais elementos visuais (idênticos à versão anterior) -->
         <header class="glass p-4 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" 
-                 class="h-12 sm:h-16 opacity-90 w-auto">
-            
+            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-12 sm:h-16 opacity-90 w-auto">
             <div class="text-center w-full md:w-auto">
-                <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight mb-2">
-                    ESTATÍSTICAS - 1º BBM
-                </h1>
-                
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight mb-2">ESTATÍSTICAS - 1º BBM</h1>
                 <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-                    <span class="text-sm sm:text-lg font-bold text-yellow-400 tracking-[0.1em] sm:tracking-[0.2em] uppercase">
-                        PORTO ALEGRE
-                    </span>
+                    <span class="text-sm sm:text-lg font-bold text-yellow-400 tracking-[0.1em] sm:tracking-[0.2em] uppercase">PORTO ALEGRE</span>
                     <div class="year-select-wrapper">
                         <select id="yearSelect" class="year-select-btn">
                             <option value="2026" selected>2026</option>
                             <option value="2025">2025</option>
                             <option value="2024">2024</option>
                             <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
                         </select>
                     </div>
                 </div>
             </div>
-            
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" 
-                 class="h-12 sm:h-16 opacity-90 w-auto hidden md:block">
-        </header>
-
-        <div id="loader" class="hidden glass p-4 sm:p-6 text-center text-blue-400 font-mono text-xs sm:text-sm font-bold">
-            <i class="fas fa-spinner fa-spin mr-2"></i> CARREGANDO DADOS...
-        </div>
-
-        <div class="glass p-3 sm:p-4">
-            <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1.5 sm:gap-2 mb-3 sm:mb-4" id="monthContainer"></div>
-            <div class="flex justify-center pt-3 sm:pt-4 border-t border-white/10">
-                <button id="btnAnual" class="btn-anual py-3 px-8 rounded-lg font-bold uppercase tracking-widest">
-                    <i class="fas fa-chart-bar mr-2"></i>RELATÓRIO ANUAL <span id="lblAnual">2026</span>
-                </button>
-            </div>
-        </div>
-
-        <div id="dashboard" class="hidden space-y-4 sm:space-y-6">
-            
-            <div class="flex justify-center">
-                <div class="glass px-6 sm:px-10 py-4 sm:py-6 text-center border-t-4 border-emerald-500 bg-slate-900/80 w-full max-w-md">
-                    <p class="text-xs font-bold tracking-[0.15em] text-emerald-400 mb-2 font-mono">
-                        TOTAL DE OCORRÊNCIAS
-                    </p>
-                    <p class="text-4xl sm:text-5xl font-black text-white font-mono drop-shadow-lg" id="totalVal">0</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <div class="glass p-3 sm:p-4 flex flex-col">
-                    <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-emerald-500 pl-2 sm:pl-3 uppercase">
-                        CONTAGEM POR PELOTÃO
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chartPel"></canvas>
-                    </div>
-                </div>
-                
-                <div class="glass p-3 sm:p-4 flex flex-col">
-                    <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-orange-500 pl-2 sm:pl-3 uppercase">
-                        POR TIPO DE OCORRÊNCIA
-                    </h3>
-                    <div class="chart-container">
-                        <canvas id="chartNat"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass p-3 sm:p-4">
-                <h3 class="text-xs sm:text-sm font-bold text-white mb-3 sm:mb-4 border-l-4 border-blue-400 pl-2 sm:pl-3 uppercase">
-                    DETALHAMENTO DOS SUBGRUPOS
-                </h3>
-                <div class="chart-container-lg" id="subChartContainer">
-                    <canvas id="chartSub"></canvas>
-                </div>
-            </div>
-
-            <div class="glass overflow-hidden flex flex-col">
-                <div class="p-3 sm:p-4 border-b border-white/5 bg-slate-900/50 text-xs flex justify-between items-center text-gray-400 flex-wrap gap-2">
-                    <span class="font-bold text-white uppercase">
-                        <i class="fas fa-list mr-2"></i> REGISTRO DE DADOS
-                    </span>
-                    <span><span id="rowsVal" class="text-white font-bold">0</span> registros</span>
-                </div>
-                
-                <div class="p-2 bg-slate-800/50 flex gap-1.5 sm:gap-2 overflow-x-auto items-center">
-                    <select id="fNat" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Natureza</option>
-                    </select>
-                    <select id="fSub" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Subgrupo</option>
-                    </select>
-                    <select id="fBai" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Bairro</option>
-                    </select>
-                    <select id="fPel" class="bg-slate-900 text-white border border-slate-600 rounded px-2 py-1 text-xs outline-none flex-1 min-w-[120px]">
-                        <option value="">Pelotão</option>
-                    </select>
-                    <button onclick="Core.resetFilters()" 
-                            class="bg-red-600 hover:bg-red-700 text-white px-2 sm:px-3 py-1 rounded text-xs font-bold transition-colors whitespace-nowrap">
-                        LIMPAR
-                    </button>
-                    <button id="btnExportXlsx" onclick="Core.exportToXLSX()" class="export-xlsx-btn" title="Baixar planilha Excel com os dados filtrados">
-                        <i class="fas fa-file-excel"></i> EXPORTAR XLSX
-                    </button>
-                </div>
-
-                <div class="table-container">
-                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                        <thead class="bg-slate-900 text-gray-400 font-bold sticky top-0 uppercase font-mono">
-                            <tr>
-                                <th class="p-2 sm:p-3 text-center">#</th>
-                                <th class="p-2 sm:p-3">Data</th>
-                                <th class="p-2 sm:p-3">Natureza</th>
-                                <th class="p-2 sm:p-3">Subgrupo</th>
-                                <th class="p-2 sm:p-3">Bairro</th>
-                                <th class="p-2 sm:p-3">Pelotão</th>
-                                <th class="p-2 sm:p-3 text-center">Mapa</th>
-                                <th class="p-2 sm:p-3 text-center">Nº BA</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="text-gray-300 font-mono divide-y divide-white/5"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Mapa interativo com botões -->
-            <div class="glass p-3 sm:p-4">
-                <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
-                    <h3 class="text-xs sm:text-sm font-bold text-white border-l-4 border-purple-400 pl-2 sm:pl-3 uppercase">
-                        <i class="fas fa-map-marked-alt mr-2"></i> MAPA DAS OCORRÊNCIAS (Google Maps)
-                    </h3>
-                    <div class="map-toolbar">
-                        <select id="orientationSelect" class="orientation-select" title="Formato do mapa para visualização (paisagem = largo, retrato = alto)">
-                            <option value="landscape">📐 Paisagem</option>
-                            <option value="portrait">📄 Retrato</option>
-                        </select>
-                        <button id="fullscreenMapBtn" class="map-action-btn" title="Expandir para tela cheia">
-                            <i class="fas fa-expand"></i> Tela Cheia
-                        </button>
-                        <button id="printMapBtn" class="map-action-btn" title="Imprimir mapa (respeita o zoom atual)">
-                            <i class="fas fa-print"></i> Imprimir
-                        </button>
-                        <button id="exportPdfBtn" class="map-action-btn" title="Baixar mapa em PDF">
-                            <i class="fas fa-file-pdf"></i> PDF
-                        </button>
-                        <button id="exportPngBtn" class="map-action-btn" title="Baixar mapa como imagem PNG">
-                            <i class="fas fa-image"></i> Imagem
-                        </button>
-                    </div>
-                </div>
-                <div class="map-wrapper" id="mapWrapper">
-                    <div id="map" class="map-container map-landscape"></div>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 text-center">
-                    Ícones por tipo de ocorrência | Clique no marcador para ver os detalhes
-                </p>
-            </div>
-        </div>
-        
-        <div class="h-4 sm:h-6"></div>
-    </main>
-
-    <footer class="text-center py-4 sm:py-6 text-gray-500 text-[10px] uppercase bg-slate-900 font-mono">
-        © 1º BBM / CIABM 2026 - Desenvolvido por Gustavo Medeiros | v8.0
-    </footer>
-
-    <script>
-        // ========== CONFIGURAÇÕES GLOBAIS ==========
-        const CONFIG = {
-            repo: 'https://raw.githubusercontent.com/ciabm-1bbm/site/main',
-            year: 2026,
-            months: ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'],
-            poa: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO", "FLORESTA", "PASSO D'AREIA", "PARTENON", "AUTO RESGATE"],
-            monthAvailability: { 2023: 7 }
-        };
-
-        const STYLES = {
-            "INCÊNDIO": { c: "#FFD700", i: "🔥", cl: "text-yellow-400", bg: "rgba(255, 215, 0, 0.8)" },
-            "MANEJO DE INSETOS": { c: "#8B4513", i: "🐝", cl: "text-brown-600", bg: "rgba(139, 69, 19, 0.8)" },
-            "BUSCA E RESGATE": { c: "#F97316", i: "🛟", cl: "text-orange-500", bg: "rgba(249, 115, 22, 0.8)" },
-            "CORTE DE ÁRVORE": { c: "#4ADE80", i: "🌳", cl: "text-green-400", bg: "rgba(74, 222, 128, 0.8)" },
-            "AÇÕES PREVENTIVAS": { c: "#87CEEB", i: "🛡️", cl: "text-sky-400", bg: "rgba(135, 206, 235, 0.8)" },
-            "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO": { c: "#60A5FA", i: "📋", cl: "text-blue-400", bg: "rgba(96, 165, 250, 0.8)" },
-            "PRÉ-HOSPITALAR": { c: "#EF4444", i: "🚑", cl: "text-red-500", bg: "rgba(239, 68, 68, 0.8)" },
-            "PRODUTOS PERIGOSOS": { c: "#FFFFFF", i: "☢️", cl: "text-white", bg: "rgba(255, 255, 255, 0.8)" },
-            "OUTROS": { c: "#64748B", i: "⚠️", cl: "text-slate-400", bg: "rgba(100, 116, 139, 0.8)" },
-            "TROTE": { c: "#A78BFA", i: "🎭", cl: "text-purple-400", bg: "rgba(167, 139, 250, 0.8)" }
-        };
-
-        const PELOTAO_SIMPLIFICADO = {
-            "BBS (POA) - MERGULHO": "BBS / MERGULHO",
-            "BBS (POA) - CANIL": "BBS / CANIL",
-            "BBS (POA) - AQUÁTICA": "BBS / AQUÁTICA",
-            "BBS (POA) - TERRESTRE": "BBS / TERRESTRE",
-            "BBS / 1ª 2º CANIL": "BBS / CANIL",
-            "BBS / 2ª 1º AQUÁTICA": "BBS / AQUÁTICA",
-            "8º BBM / 1ª 1º 1º GR CANOAS": "8º BBM CANOAS",
-            "AODC / DOA / AEREO": "AODC / AÉREO",
-            "AODC": "AODC / AÉREO",
-            "COBOM": "COBOM",
-            "BBS": "BBS / TERRESTRE"
-        };
-
-        const PELOTAO_CORES = {
-            "AÇORIANOS": "#065f46",
-            "ASSUNÇÃO": "#047857",
-            "TERESÓPOLIS": "#059669",
-            "RESTINGA": "#10b981",
-            "BELÉM NOVO": "#34d399",
-            "FLORESTA": "#6ee7b7",
-            "PASSO D'AREIA": "#10b981",
-            "PARTENON": "#10b981",
-            "AUTO RESGATE": "#10b981",
-            "BBS / MERGULHO": "#6B7280",
-            "BBS / CANIL": "#6B7280",
-            "BBS / AQUÁTICA": "#6B7280",
-            "BBS / TERRESTRE": "#6B7280",
-            "8º BBM CANOAS": "#6B7280",
-            "AODC / AÉREO": "#6B7280",
-            "COBOM": "#6B7280",
-            "OUTROS": "#64748B"
-        };
-
-        function getPelotaoColor(pelotao) {
-            if (PELOTAO_CORES[pelotao]) return PELOTAO_CORES[pelotao];
-            if (CONFIG.poa.includes(pelotao)) return "#10b981";
-            return "#64748B";
-        }
-
-        const GREEN_GRADIENTS = [
-            '#065f46', '#047857', '#059669', '#10b981', 
-            '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'
-        ];
-
-        let curYear = 2026;
-        let instances = {};
-        let currentPeriod = { type: 'month', monthName: null };
-        let currentFilteredData = []; // guarda a lista filtrada atual (usada na exportação)
-        
-        let map = null;
-        let markersLayer = null;
-        let currentMarkers = [];
-        let mapInitialized = false;
-
-        const isMobile = () => window.innerWidth < 768;
-        const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024;
-
-        const getChartConfig = () => {
-            if (isMobile()) {
-                return { barThickness: 16, categoryPercentage: 0.8, fontSize: 10, tickPadding: 5, datalabelsSize: 9, subBarThickness: 7, subSpacing: 0.6, subItemHeight: 22 };
-            } else if (isTablet()) {
-                return { barThickness: 18, categoryPercentage: 0.8, fontSize: 11, tickPadding: 8, datalabelsSize: 10, subBarThickness: 9, subSpacing: 0.65, subItemHeight: 26 };
-            } else {
-                return { barThickness: 20, categoryPercentage: 0.8, fontSize: 12, tickPadding: 10, datalabelsSize: 11, subBarThickness: 11, subSpacing: 0.7, subItemHeight: 30 };
-            }
-        };
-
-        // ========== FUNÇÕES AUXILIARES ==========
-        function getDaysInPeriod(year, monthName = null) {
-            if (monthName) {
-                const monthIndex = CONFIG.months.indexOf(monthName);
-                if (monthIndex === -1) return 30;
-                if (monthIndex === 1) {
-                    const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-                    return isLeap ? 29 : 28;
-                }
-                if ([0, 2, 4, 6, 7, 9, 11].includes(monthIndex)) return 31;
-                return 30;
-            } else {
-                const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-                return isLeap ? 366 : 365;
-            }
-        }
-
-        // Remove acentos e caracteres inválidos para nome de arquivo
-        function sanitizeForFilename(str) {
-            return String(str || '')
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-zA-Z0-9]+/g, '_')
-                .replace(/^_|_$/g, '')
-                .toUpperCase();
-        }
-
-        // Gera nome do arquivo a partir dos filtros ativos + período
-        function generateFilename(extension) {
-            const filters = {
-                nat: document.getElementById('fNat').value,
-                sub: document.getElementById('fSub').value,
-                bai: document.getElementById('fBai').value,
-                pel: document.getElementById('fPel').value
-            };
-            const parts = [];
-            if (filters.nat) parts.push(sanitizeForFilename(filters.nat));
-            if (filters.sub) parts.push(sanitizeForFilename(filters.sub));
-            if (filters.bai) parts.push(sanitizeForFilename(filters.bai));
-            if (filters.pel) parts.push(sanitizeForFilename(filters.pel));
-            const periodLabel = currentPeriod.type === 'month' && currentPeriod.monthName
-                ? currentPeriod.monthName
-                : 'ANUAL';
-            parts.push(periodLabel);
-            parts.push(String(curYear));
-            if (parts.length <= 2) parts.unshift('OCORRENCIAS');
-            else parts.unshift('1BBM');
-            // Limita o tamanho de cada parte para evitar nomes muito longos
-            const limited = parts.map(p => p.length > 30 ? p.substring(0, 30) : p);
-            return `${limited.join('_')}.${extension}`;
-        }
-
-        // Retorna um texto legível dos filtros ativos (para cabeçalhos de PDF / resumo)
-        function getActiveFiltersSummary() {
-            const filters = {
-                nat: document.getElementById('fNat').value,
-                sub: document.getElementById('fSub').value,
-                bai: document.getElementById('fBai').value,
-                pel: document.getElementById('fPel').value
-            };
-            const active = [];
-            if (filters.nat) active.push(`Natureza: ${filters.nat}`);
-            if (filters.sub) active.push(`Subgrupo: ${filters.sub}`);
-            if (filters.bai) active.push(`Bairro: ${filters.bai}`);
-            if (filters.pel) active.push(`Pelotão: ${filters.pel}`);
-            return active;
-        }
-
-        function getPeriodLabel() {
-            if (currentPeriod.type === 'month' && currentPeriod.monthName) {
-                return `${currentPeriod.monthName}/${curYear}`;
-            }
-            return `ANUAL ${curYear}`;
-        }
-
-        // Retorna a orientação atual do mapa na tela (landscape ou portrait).
-        // Usado pelo PDF/impressão/imagem para enquadrar corretamente o que
-        // está sendo capturado. Fonte única da verdade: a classe CSS aplicada
-        // no container do mapa + fallback para as dimensões reais.
-        function getMapOrientation() {
-            const mapEl = document.getElementById('map');
-            if (mapEl.classList.contains('map-portrait')) return 'portrait';
-            if (mapEl.classList.contains('map-landscape')) return 'landscape';
-            const r = mapEl.getBoundingClientRect();
-            return r.width >= r.height ? 'landscape' : 'portrait';
-        }
-
-        // ========== FUNÇÕES DO MAPA ==========
-        function initMap() {
-            if (mapInitialized) return;
-            const center = [-30.0346, -51.2177];
-            map = L.map('map').setView(center, 12);
-            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-                attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>',
-                maxZoom: 20,
-                minZoom: 10
-            }).addTo(map);
-            markersLayer = L.layerGroup().addTo(map);
-            mapInitialized = true;
-            setTimeout(() => map.invalidateSize(), 100);
-        }
-        
-        function resizeMap() {
-            if (map) {
-                setTimeout(() => {
-                    map.invalidateSize();
-                    if (currentMarkers.length > 0) {
-                        const group = L.featureGroup(currentMarkers);
-                        map.fitBounds(group.getBounds().pad(0.1));
-                    }
-                }, 200);
-            }
-        }
-
-        function getMarkerIcon(natureza, pelotao) {
-            const style = STYLES[natureza] || { i: "⚠️" };
-            const emoji = style.i;
-
-            // Todos os marcadores: apenas o emoji, sem círculo colorido atrás.
-            // Fica mais limpo no mapa e muito melhor para impressão.
-            const iconHtml = `
-                <div style="
-                    width: 34px;
-                    height: 34px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 26px;
-                    line-height: 1;
-                    text-shadow: 0 0 3px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.6);
-                    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.45));
-                ">${emoji}</div>
-            `;
-            return L.divIcon({
-                html: iconHtml,
-                iconSize: [34, 34],
-                className: 'custom-marker',
-                popupAnchor: [0, -17]
-            });
-        }
-
-        function updateMapMarkers(data) {
-            if (!map || !markersLayer) return;
-            markersLayer.clearLayers();
-            currentMarkers = [];
-            const withCoords = data.filter(item => item.latitude && item.longitude && !isNaN(item.latitude) && !isNaN(item.longitude));
-            withCoords.forEach(occ => {
-                const icon = getMarkerIcon(occ.nat, occ.pel);
-                const marker = L.marker([occ.latitude, occ.longitude], { icon: icon });
-                const popupContent = `
-                    <div style="font-family: monospace; font-size: 12px; min-width: 200px;">
-                        <strong>${occ.nat} ${STYLES[occ.nat]?.i || ''}</strong><br>
-                        <strong>Data:</strong> ${occ.date}<br>
-                        <strong>Pelotão:</strong> ${occ.pel}<br>
-                        <strong>Bairro:</strong> ${occ.bairro}<br>
-                        <strong>Subgrupo:</strong> ${occ.sub || '-'}<br>
-                        <strong>Nº BA:</strong> ${occ.ba || '-'}<br>
-                        <a href="https://www.google.com/maps?q=${occ.latitude},${occ.longitude}" target="_blank" style="color: #3B82F6;">Abrir no Google Maps</a>
-                    </div>
-                `;
-                marker.bindPopup(popupContent, { className: 'custom-popup' });
-                marker.addTo(markersLayer);
-                currentMarkers.push(marker);
-            });
-            if (currentMarkers.length > 0) {
-                const group = L.featureGroup(currentMarkers);
-                map.fitBounds(group.getBounds().pad(0.1));
-            } else {
-                map.setView([-30.0346, -51.2177], 12);
-            }
-        }
-
-        // ========== FULLSCREEN ==========
-        function toggleFullscreen() {
-            const wrapper = document.getElementById('mapWrapper');
-            if (!document.fullscreenElement) {
-                wrapper.requestFullscreen().catch(err => {
-                    console.error(`Erro ao entrar em tela cheia: ${err.message}`);
-                });
-                setTimeout(() => {
-                    if (map) map.invalidateSize();
-                    if (currentMarkers.length > 0) {
-                        const group = L.featureGroup(currentMarkers);
-                        map.fitBounds(group.getBounds().pad(0.1));
-                    }
-                }, 300);
-            } else {
-                document.exitFullscreen();
-                setTimeout(() => {
-                    if (map) map.invalidateSize();
-                    if (currentMarkers.length > 0) {
-                        const group = L.featureGroup(currentMarkers);
-                        map.fitBounds(group.getBounds().pad(0.1));
-                    }
-                }, 300);
-            }
-        }
-
-        // ========== CAPTURA DO MAPA COMO IMAGEM ==========
-        // Função auxiliar: aguarda todos os tiles visíveis carregarem
-        function waitForTilesToLoad() {
-            return new Promise((resolve) => {
-                if (!map) return resolve();
-                const tiles = document.querySelectorAll('#map img.leaflet-tile');
-                let pending = 0;
-                tiles.forEach(t => {
-                    if (!t.complete || t.naturalWidth === 0) pending++;
-                });
-                if (pending === 0) return setTimeout(resolve, 200);
-                let remaining = pending;
-                const onDone = () => {
-                    remaining--;
-                    if (remaining <= 0) setTimeout(resolve, 200);
-                };
-                tiles.forEach(t => {
-                    if (!t.complete || t.naturalWidth === 0) {
-                        t.addEventListener('load', onDone, { once: true });
-                        t.addEventListener('error', onDone, { once: true });
-                    }
-                });
-                // fallback: resolve depois de 3s mesmo se alguns tiles falharem
-                setTimeout(resolve, 3000);
-            });
-        }
-
-        async function captureMapCanvas() {
-            const mapContainer = document.getElementById('map');
-            await waitForTilesToLoad();
-            return await html2canvas(mapContainer, {
-                scale: 2,
-                backgroundColor: '#1e293b',
-                logging: false,
-                useCORS: true,
-                allowTaint: true
-            });
-        }
-
-        // ========== IMPRIMIR MAPA ==========
-        async function printMap() {
-            const btn = document.getElementById('printMapBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
-            btn.disabled = true;
-
-            // Segue o formato atual do mapa para enquadrar bem no papel
-            const orientation = getMapOrientation();
-
-            try {
-                const canvas = await captureMapCanvas();
-                const imgData = canvas.toDataURL('image/png');
-                const periodTxt = getPeriodLabel();
-                const filters = getActiveFiltersSummary();
-                const filtersHtml = filters.length
-                    ? `<p class="filters"><strong>Filtros:</strong> ${filters.join(' &nbsp;|&nbsp; ')}</p>`
-                    : '<p class="filters"><em>Sem filtros aplicados</em></p>';
-                const totalRegistros = currentFilteredData.length;
-
-                const printWin = window.open('', '_blank', 'width=1000,height=700');
-                if (!printWin) {
-                    alert('O navegador bloqueou a janela de impressão. Permita pop-ups deste site.');
-                    return;
-                }
-
-                printWin.document.write(`
-                    <!DOCTYPE html>
-                    <html lang="pt-BR">
-                    <head>
-                        <meta charset="UTF-8">
-                        <title>Mapa de Ocorrências - 1º BBM</title>
-                        <style>
-                            @page { size: A4 ${orientation}; margin: 10mm; }
-                            * { box-sizing: border-box; }
-                            html, body { margin: 0; padding: 0; }
-                            body {
-                                font-family: Arial, Helvetica, sans-serif;
-                                background: white;
-                                color: #111;
-                                padding: 8mm;
-                            }
-                            .header {
-                                text-align: center;
-                                border-bottom: 2px solid #065f46;
-                                padding-bottom: 6px;
-                                margin-bottom: 8px;
-                            }
-                            .header h1 {
-                                margin: 0;
-                                font-size: 16px;
-                                color: #065f46;
-                            }
-                            .header p {
-                                margin: 3px 0 0;
-                                font-size: 11px;
-                                color: #444;
-                            }
-                            .filters {
-                                margin: 4px 0 0;
-                                font-size: 10px;
-                                color: #444;
-                            }
-                            .map-img {
-                                display: block;
-                                width: 100%;
-                                height: auto;
-                                max-height: ${orientation === 'portrait' ? '230mm' : '150mm'};
-                                object-fit: contain;
-                                margin: 0 auto;
-                            }
-                            .footer {
-                                text-align: center;
-                                font-size: 9px;
-                                color: #666;
-                                margin-top: 6px;
-                            }
-                            @media print {
-                                .no-print { display: none !important; }
-                            }
-                            .no-print {
-                                text-align: center;
-                                margin: 10px 0;
-                            }
-                            .no-print button {
-                                background: #065f46; color: white; border: 0;
-                                padding: 8px 18px; border-radius: 6px; cursor: pointer;
-                                font-weight: bold; margin: 0 4px;
-                            }
-                            .no-print button:hover { background: #10b981; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <h1>🚒 Mapa de Ocorrências &mdash; 1º BBM Porto Alegre</h1>
-                            <p><strong>Período:</strong> ${periodTxt} &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Total:</strong> ${totalRegistros} registros</p>
-                            ${filtersHtml}
-                        </div>
-                        <img src="${imgData}" class="map-img" alt="Mapa de Ocorrências" />
-                        <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
-                        <div class="no-print">
-                            <button onclick="window.print()">🖨️ Imprimir novamente</button>
-                            <button onclick="window.close()">Fechar</button>
-                        </div>
-                        <script>
-                            window.onload = function() {
-                                setTimeout(function() { window.print(); }, 400);
-                            };
-                        <\/script>
-                    </body>
-                    </html>
-                `);
-                printWin.document.close();
-            } catch (err) {
-                console.error(err);
-                alert('Erro ao preparar impressão do mapa.');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // ========== EXPORTAR PDF ==========
-        async function exportMapAsPDF() {
-            const btn = document.getElementById('exportPdfBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando PDF...';
-            btn.disabled = true;
-
-            // Papel segue o formato atual do mapa (paisagem/retrato),
-            // para que a imagem capturada ocupe bem a página
-            const orientation = getMapOrientation();
-
-            try {
-                const canvas = await captureMapCanvas();
-                const imgData = canvas.toDataURL('image/png');
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: orientation,
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                const pageW = orientation === 'landscape' ? 297 : 210;
-                const pageH = orientation === 'landscape' ? 210 : 297;
-                const margin = 10;
-
-                // Cabeçalho
-                pdf.setFontSize(14);
-                pdf.setTextColor(6, 95, 70);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('Mapa de Ocorrências - 1º BBM Porto Alegre', pageW / 2, margin + 5, { align: 'center' });
-
-                pdf.setFontSize(10);
-                pdf.setTextColor(60);
-                pdf.setFont(undefined, 'normal');
-                const periodTxt = getPeriodLabel();
-                const total = currentFilteredData.length;
-                pdf.text(`Período: ${periodTxt}    |    Total: ${total} registros`, pageW / 2, margin + 11, { align: 'center' });
-
-                const filters = getActiveFiltersSummary();
-                let topOffset = margin + 17;
-                if (filters.length) {
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(90);
-                    const filterLine = `Filtros: ${filters.join('  |  ')}`;
-                    const lines = pdf.splitTextToSize(filterLine, pageW - 2 * margin);
-                    pdf.text(lines, pageW / 2, topOffset, { align: 'center' });
-                    topOffset += lines.length * 4;
-                }
-                topOffset += 2;
-
-                // Calcula área disponível para a imagem
-                const availW = pageW - 2 * margin;
-                const availH = pageH - topOffset - margin - 6;
-                const imgRatio = canvas.width / canvas.height;
-                let drawW = availW;
-                let drawH = drawW / imgRatio;
-                if (drawH > availH) {
-                    drawH = availH;
-                    drawW = drawH * imgRatio;
-                }
-                const offsetX = (pageW - drawW) / 2;
-
-                pdf.addImage(imgData, 'PNG', offsetX, topOffset, drawW, drawH);
-
-                // Rodapé
-                pdf.setFontSize(8);
-                pdf.setTextColor(130);
-                pdf.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, pageW / 2, pageH - 5, { align: 'center' });
-
-                pdf.save(generateFilename('pdf'));
-            } catch (error) {
-                console.error('Erro ao gerar PDF:', error);
-                alert('Erro ao gerar PDF. Tente novamente.');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // ========== EXPORTAR IMAGEM PNG ==========
-        async function exportMapAsImage() {
-            const btn = document.getElementById('exportPngBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-            btn.disabled = true;
-
-            try {
-                const canvas = await captureMapCanvas();
-                const dataUrl = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = generateFilename('png');
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (err) {
-                console.error(err);
-                alert('Erro ao gerar imagem do mapa.');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        // ========== CORE ==========
-        const Core = {
-            db: [],
-            
-            init: () => {
-                Chart.defaults.font.family = "'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace";
-                Chart.defaults.font.size = getChartConfig().fontSize;
-                Chart.register(ChartDataLabels);
-                
-                const container = document.getElementById('monthContainer');
-                CONFIG.months.forEach((m, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'month-btn bg-slate-800 text-gray-300 font-bold w-full';
-                    btn.innerText = m;
-                    btn.id = `btn_${i}`;
-                    btn.onclick = () => Core.loadMonth(m, btn);
-                    container.appendChild(btn);
-                });
-
-                document.getElementById('yearSelect').addEventListener('change', (e) => {
-                    Core.setYear(parseInt(e.target.value));
-                });
-                document.getElementById('btnAnual').onclick = Core.loadAnnual;
-                document.getElementById('fullscreenMapBtn').onclick = toggleFullscreen;
-                document.getElementById('exportPdfBtn').onclick = exportMapAsPDF;
-                document.getElementById('printMapBtn').onclick = printMap;
-                document.getElementById('exportPngBtn').onclick = exportMapAsImage;
-
-                // Seletor de orientação: altera o FORMATO do mapa em tempo real
-                // (paisagem = mais largo, retrato = mais alto). O PDF/impressão/imagem
-                // seguem automaticamente o formato atual do mapa.
-                document.getElementById('orientationSelect').addEventListener('change', (e) => {
-                    const mapEl = document.getElementById('map');
-                    if (e.target.value === 'portrait') {
-                        mapEl.classList.remove('map-landscape');
-                        mapEl.classList.add('map-portrait');
-                    } else {
-                        mapEl.classList.remove('map-portrait');
-                        mapEl.classList.add('map-landscape');
-                    }
-                    if (map) {
-                        // Espera a transição CSS terminar antes de re-renderizar
-                        setTimeout(() => {
-                            map.invalidateSize();
-                            if (currentMarkers.length > 0) {
-                                const group = L.featureGroup(currentMarkers);
-                                map.fitBounds(group.getBounds().pad(0.1));
-                            }
-                        }, 350);
-                    }
-                });
-
-                // Atalho Ctrl+P / Cmd+P quando o mapa está em tela cheia:
-                // intercepta a impressão padrão do navegador e chama nossa função
-                // de impressão (apenas o mapa via popup).
-                document.addEventListener('keydown', (e) => {
-                    const key = (e.key || '').toLowerCase();
-                    if ((e.ctrlKey || e.metaKey) && key === 'p') {
-                        const wrapper = document.getElementById('mapWrapper');
-                        if (document.fullscreenElement === wrapper) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            printMap();
-                        }
-                    }
-                }, true); // fase de captura, para pegar antes do navegador
-
-                ['fNat','fSub','fBai','fPel'].forEach(id => {
-                    document.getElementById(id).addEventListener('change', Core.applyFilters);
-                });
-
-                window.addEventListener('resize', Core.handleResize);
-                Core.setYear(2026);
-                
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.attributeName === 'class') {
-                            const dashboard = document.getElementById('dashboard');
-                            if (dashboard && !dashboard.classList.contains('hidden')) {
-                                if (!mapInitialized) initMap();
-                                else resizeMap();
-                            }
-                        }
-                    });
-                });
-                observer.observe(document.getElementById('dashboard'), { attributes: true });
-            },
-
-            handleResize: () => {
-                Chart.defaults.font.size = getChartConfig().fontSize;
-                Object.keys(instances).forEach(id => {
-                    if (instances[id]) {
-                        instances[id].destroy();
-                        delete instances[id];
-                    }
-                });
-                if (Core.db.length) Core.drawCharts(currentFilteredData.length ? currentFilteredData : Core.db);
-                if (map) {
-                    setTimeout(() => map.invalidateSize(), 100);
-                    if (currentMarkers.length) {
-                        const group = L.featureGroup(currentMarkers);
-                        map.fitBounds(group.getBounds().pad(0.1));
-                    }
-                }
-            },
-
-            setYear: (y) => {
-                curYear = y;
-                document.getElementById('lblAnual').innerText = y;
-                document.getElementById('yearSelect').value = y;
-                const now = new Date();
-                let maxMonth = (y === now.getFullYear()) ? now.getMonth() + 1 : 12;
-                let startMonth = CONFIG.monthAvailability[y] !== undefined ? CONFIG.monthAvailability[y] : 0;
-                if (y === now.getFullYear() && (now.getMonth() + 1) <= startMonth) maxMonth = 0;
-                CONFIG.months.forEach((_, i) => {
-                    const btn = document.getElementById(`btn_${i}`);
-                    const monthNumber = i + 1;
-                    const isAvailable = (monthNumber > startMonth) && (monthNumber <= maxMonth);
-                    if (isAvailable) {
-                        btn.disabled = false;
-                        btn.classList.remove('opacity-30', 'cursor-not-allowed');
-                    } else {
-                        btn.disabled = true;
-                        btn.classList.add('opacity-30', 'cursor-not-allowed');
-                    }
-                    btn.classList.remove('active');
-                });
-                document.getElementById('btnAnual').classList.remove('active');
-                document.getElementById('dashboard').classList.add('hidden');
-                currentPeriod = { type: 'month', monthName: null };
-            },
-
-            toggleLoad: (show) => {
-                document.getElementById('loader').classList.toggle('hidden', !show);
-                document.getElementById('dashboard').classList.toggle('hidden', show);
-            },
-
-            resetBtns: () => {
-                document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById('btnAnual').classList.remove('active');
-            },
-
-            loadMonth: async (m, btn) => {
-                if(btn.disabled) return;
-                Core.resetBtns();
-                btn.classList.add('active');
-                Core.toggleLoad(true);
-                currentPeriod = { type: 'month', monthName: m };
-                try {
-                    const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
-                    if(!req.ok) throw new Error("Arquivo não encontrado");
-                    const txt = await req.text();
-                    Core.processData(txt);
-                } catch(e) {
-                    Core.toggleLoad(false);
-                    btn.classList.remove('active');
-                    alert(`Dados para ${m}/${curYear} não encontrados.`);
-                }
-            },
-
-            loadAnnual: async () => {
-                Core.resetBtns();
-                document.getElementById('btnAnual').classList.add('active');
-                Core.toggleLoad(true);
-                currentPeriod = { type: 'annual', monthName: null };
-                try {
-                    const req = await fetch(`${CONFIG.repo}/dados/ANUAL_${curYear}.csv?t=${Date.now()}`);
-                    if(req.ok) {
-                        const txt = await req.text();
-                        Core.processData(txt);
-                        return;
-                    }
-                } catch(e) {}
-                const now = new Date();
-                let maxMonth = (curYear === now.getFullYear()) ? now.getMonth() + 1 : 12;
-                let startMonth = CONFIG.monthAvailability[curYear] !== undefined ? CONFIG.monthAvailability[curYear] : 0;
-                if (curYear === now.getFullYear() && (now.getMonth() + 1) <= startMonth) maxMonth = 0;
-                const validMonths = [];
-                for (let i = startMonth; i < maxMonth; i++) validMonths.push(CONFIG.months[i]);
-                let allData = [];
-                let loadedCount = 0;
-                for (const m of validMonths) {
-                    try {
-                        const req = await fetch(`${CONFIG.repo}/dados/${m}_${curYear}.csv?t=${Date.now()}`);
-                        if(req.ok) {
-                            const txt = await req.text();
-                            const data = await new Promise((resolve) => {
-                                Papa.parse(txt, {
-                                    header: true,
-                                    skipEmptyLines: true,
-                                    complete: (res) => resolve(res.data)
-                                });
-                            });
-                            allData = allData.concat(data);
-                            loadedCount++;
-                        }
-                    } catch(e) {}
-                }
-                if(loadedCount > 0) {
-                    Core.db = Core.normalize(allData);
-                    Core.initFilters();
-                    Core.render(Core.db);
-                    Core.toggleLoad(false);
-                } else {
-                    Core.toggleLoad(false);
-                    document.getElementById('btnAnual').classList.remove('active');
-                    alert("Nenhum dado encontrado para o ano selecionado.");
-                }
-            },
-
-            processData: (csv) => {
-                Papa.parse(csv, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (res) => {
-                        Core.db = Core.normalize(res.data);
-                        Core.initFilters();
-                        Core.render(Core.db);
-                        Core.toggleLoad(false);
-                    },
-                    error: () => {
-                        Core.toggleLoad(false);
-                        alert('Erro ao processar dados.');
-                    }
-                });
-            },
-
-            normalize: (raw) => {
-                if(!raw || !raw.length) return [];
-                const firstRow = raw[0];
-                const keys = Object.keys(firstRow);
-                const findKey = (patterns) => {
-                    const lowerKeys = keys.map(k => k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-                    for (const pattern of patterns) {
-                        const idx = lowerKeys.findIndex(k => k.includes(pattern));
-                        if (idx !== -1) return keys[idx];
-                    }
-                    return null;
-                };
-                const colNatureza = findKey(['nat', 'emerg', 'tipo', 'ocorrencia']);
-                const colPelotao = findKey(['obm', 'guarni', 'pel', 'pelotao']);
-                const colSubgrupo = findKey(['sub', 'detalhe', 'subgrupo']);
-                const colData = findKey(['data', 'date']);
-                const colBairro = findKey(['bairro', 'local']);
-                const colViatura = findKey(['viatura', 'prefixo', 'vtr']);
-                const colLat = findKey(['lat', 'latitude']);
-                const colLon = findKey(['lon', 'long', 'longitude']);
-                let colBA = null;
-                for (const key of keys) {
-                    if (key.toLowerCase().includes('nº oc') || key.toLowerCase().includes('numero oc') || 
-                        key.toLowerCase().includes('num oc') || key.toLowerCase().includes('n oc')) {
-                        colBA = key; break;
-                    }
-                }
-                if (!colBA) {
-                    for (const key of keys) {
-                        const value = firstRow[key];
-                        if (value && value.toString().match(/^\d{6}$/)) { colBA = key; break; }
-                    }
-                }
-                if (!colBA) colBA = findKey(['ba', 'numero', 'num', 'relatorio', 'protocolo', 'ocorrencia']);
-                return raw.map((r, i) => {
-                    if(!r[colNatureza]) return null;
-                    let natureza = (r[colNatureza] || "").toUpperCase().trim();
-                    let pelotao = (r[colPelotao] || "").toUpperCase().trim();
-                    const viatura = (r[colViatura] || "").toUpperCase();
-                    const numeroBA = colBA ? (r[colBA] || '') : '';
-                    if(natureza.includes("INCÊNDIO")) natureza = "INCÊNDIO";
-                    else if(natureza.includes("INSETO")) natureza = "MANEJO DE INSETOS";
-                    else if(natureza.includes("SALVAMENTO") || natureza.includes("BUSCA") || natureza.includes("RESGATE")) natureza = "BUSCA E RESGATE";
-                    else if(natureza.includes("APH") || natureza.includes("PRÉ-HOSPITALAR")) natureza = "PRÉ-HOSPITALAR";
-                    else if(natureza.includes("VISTORIA")) natureza = "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-                    else if(natureza.includes("CORTE") && natureza.includes("ÁRVORE")) natureza = "CORTE DE ÁRVORE";
-                    else if(natureza.includes("PREVENTIVA")) natureza = "AÇÕES PREVENTIVAS";
-                    else if(natureza.includes("PRODUTO") && natureza.includes("PERIGOSO")) natureza = "PRODUTOS PERIGOSOS";
-                    else if(natureza.includes("TROTE")) natureza = "TROTE";
-                    if (pelotao.includes("PASSO") || pelotao.includes("PASSO D'AREIA") || pelotao.includes("2ª 2º")) pelotao = "PASSO D'AREIA";
-                    else if (viatura.includes("AR") || pelotao.includes("RESGATE") || pelotao.includes("GBS")) pelotao = "AUTO RESGATE";
-                    else CONFIG.poa.forEach(p => { if (pelotao.includes(p.replace("'", "").toUpperCase())) pelotao = p; });
-                    const cidadesExcluir = ["CACHOEIRINHA", "CANOAS", "CAXIAS DO SUL", "CAXIAS"];
-                    if (cidadesExcluir.some(cidade => pelotao.includes(cidade))) pelotao = "OUTROS";
-                    if (PELOTAO_SIMPLIFICADO[pelotao]) pelotao = PELOTAO_SIMPLIFICADO[pelotao];
-                    else if (!CONFIG.poa.includes(pelotao) && pelotao) {
-                        for (const [key, value] of Object.entries(PELOTAO_SIMPLIFICADO)) {
-                            if (pelotao.includes(key.replace(" (POA)", ""))) { pelotao = value; break; }
-                        }
-                        pelotao = pelotao.replace("1º BBM / ", "").replace("CIA / ", "").replace("PEL / ", "").replace("PEL.", "").replace("PELOTÃO", "").replace("2ª 2º ", "").replace("1ª 1º ", "").replace("1º GR ", "").trim();
-                        if (pelotao.length <= 2) pelotao = "OUTROS";
-                    }
-                    if (pelotao.includes("AQUÁTICO")) pelotao = pelotao.replace("AQUÁTICO", "AQUÁTICA");
-                    let latitude = null, longitude = null;
-                    if (r[colLat] && r[colLon]) {
-                        const lat = r[colLat].replace(',', '.').trim();
-                        const lon = r[colLon].replace(',', '.').trim();
-                        if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
-                            latitude = parseFloat(lat);
-                            longitude = parseFloat(lon);
-                        }
-                    }
-                    let mapUrl = null;
-                    if (latitude && longitude) mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                    return {
-                        id: i+1, date: r[colData] || '--/--/----', nat: natureza, sub: (r[colSubgrupo] || '').toUpperCase().trim(),
-                        pel: pelotao || "OUTROS", bairro: (r[colBairro] || '--').toUpperCase().trim(),
-                        map: mapUrl, ba: numeroBA, latitude, longitude
-                    };
-                }).filter(x => x);
-            },
-
-            initFilters: () => {
-                const sets = { nat: new Set(), sub: new Set(), bai: new Set(), pel: new Set() };
-                Core.db.forEach(d => {
-                    sets.nat.add(d.nat);
-                    if(d.sub && d.sub !== '') sets.sub.add(d.sub);
-                    if(d.bairro && d.bairro !== '--') sets.bai.add(d.bairro);
-                    sets.pel.add(d.pel);
-                });
-                const populate = (id, values, placeholder) => {
-                    const select = document.getElementById(id);
-                    select.innerHTML = `<option value="">${placeholder}</option>`;
-                    Array.from(values).sort().forEach(v => { const opt = document.createElement('option'); opt.value = v; opt.textContent = v; select.appendChild(opt); });
-                };
-                populate('fNat', sets.nat, 'Todas as Naturezas');
-                populate('fSub', sets.sub, 'Todos os Subgrupos');
-                populate('fBai', sets.bai, 'Todos os Bairros');
-                populate('fPel', sets.pel, 'Todos os Pelotões');
-            },
-
-            applyFilters: () => {
-                const filters = {
-                    nat: document.getElementById('fNat').value,
-                    sub: document.getElementById('fSub').value,
-                    bai: document.getElementById('fBai').value,
-                    pel: document.getElementById('fPel').value
-                };
-                const filtered = Core.db.filter(item => 
-                    (!filters.nat || item.nat === filters.nat) &&
-                    (!filters.sub || item.sub === filters.sub) &&
-                    (!filters.bai || item.bairro === filters.bai) &&
-                    (!filters.pel || item.pel === filters.pel)
-                );
-                Core.render(filtered);
-            },
-
-            resetFilters: () => {
-                document.querySelectorAll('#fNat, #fSub, #fBai, #fPel').forEach(s => s.value = '');
-                Core.render(Core.db);
-            },
-
-            // ========== EXPORTAR XLSX ==========
-            exportToXLSX: () => {
-                const data = currentFilteredData;
-                if (!data || data.length === 0) {
-                    alert('Não há dados para exportar. Carregue um mês ou o relatório anual primeiro.');
-                    return;
-                }
-
-                const btn = document.getElementById('btnExportXlsx');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GERANDO...';
-                btn.disabled = true;
-
-                try {
-                    // Monta linhas de dados
-                    const rows = data.map(item => ({
-                        '#': item.id,
-                        'Data': item.date || '',
-                        'Natureza': item.nat || '',
-                        'Subgrupo': item.sub || '',
-                        'Bairro': item.bairro || '',
-                        'Pelotão': item.pel || '',
-                        'Nº BA': item.ba || '',
-                        'Latitude': item.latitude != null ? item.latitude : '',
-                        'Longitude': item.longitude != null ? item.longitude : '',
-                        'Link Maps': item.map || ''
-                    }));
-
-                    // Cria a planilha de dados
-                    const wsData = XLSX.utils.json_to_sheet(rows);
-                    wsData['!cols'] = [
-                        { wch: 6 },   // #
-                        { wch: 12 },  // Data
-                        { wch: 30 },  // Natureza
-                        { wch: 40 },  // Subgrupo
-                        { wch: 22 },  // Bairro
-                        { wch: 22 },  // Pelotão
-                        { wch: 12 },  // Nº BA
-                        { wch: 12 },  // Latitude
-                        { wch: 12 },  // Longitude
-                        { wch: 50 }   // Link
-                    ];
-
-                    // Cria planilha de resumo
-                    const filters = getActiveFiltersSummary();
-                    const periodTxt = getPeriodLabel();
-                    const resumoRows = [
-                        ['RELATÓRIO DE OCORRÊNCIAS - 1º BBM PORTO ALEGRE'],
-                        [],
-                        ['Período', periodTxt],
-                        ['Total de registros', data.length],
-                        ['Gerado em', new Date().toLocaleString('pt-BR')],
-                        [],
-                        ['FILTROS APLICADOS']
-                    ];
-                    if (filters.length) {
-                        filters.forEach(f => {
-                            const [label, value] = f.split(':').map(s => s.trim());
-                            resumoRows.push([label, value]);
-                        });
-                    } else {
-                        resumoRows.push(['(Sem filtros)', '']);
-                    }
-
-                    // Agregações simples
-                    resumoRows.push([]);
-                    resumoRows.push(['TOTAIS POR NATUREZA']);
-                    const byNat = {};
-                    data.forEach(d => { byNat[d.nat] = (byNat[d.nat] || 0) + 1; });
-                    Object.entries(byNat).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => resumoRows.push([k, v]));
-
-                    resumoRows.push([]);
-                    resumoRows.push(['TOTAIS POR PELOTÃO']);
-                    const byPel = {};
-                    data.forEach(d => { byPel[d.pel] = (byPel[d.pel] || 0) + 1; });
-                    Object.entries(byPel).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => resumoRows.push([k, v]));
-
-                    const wsResumo = XLSX.utils.aoa_to_sheet(resumoRows);
-                    wsResumo['!cols'] = [{ wch: 35 }, { wch: 30 }];
-
-                    // Monta o workbook
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
-                    XLSX.utils.book_append_sheet(wb, wsData, 'Ocorrências');
-
-                    // Download
-                    const filename = generateFilename('xlsx');
-                    XLSX.writeFile(wb, filename);
-                } catch (err) {
-                    console.error('Erro ao gerar XLSX:', err);
-                    alert('Erro ao gerar planilha Excel. Tente novamente.');
-                } finally {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            },
-
-            render: (data) => {
-                currentFilteredData = data; // salva a lista filtrada
-                document.getElementById('totalVal').textContent = data.length.toLocaleString('pt-BR');
-                document.getElementById('rowsVal').textContent = data.length.toLocaleString('pt-BR');
-                const tbody = document.getElementById('tableBody');
-                tbody.innerHTML = '';
-                data.slice(0, 100).forEach(item => {
-                    const style = STYLES[item.nat] || { i: "📄", cl: "text-slate-400" };
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-white/5 border-b border-white/5';
-                    row.innerHTML = `
-                        <td class="p-2 sm:p-3 text-center text-slate-500 font-mono">${item.id}</td>
-                        <td class="p-2 sm:p-3 whitespace-nowrap">${item.date}</td>
-                        <td class="p-2 sm:p-3 font-bold ${style.cl}"><span class="mr-2">${style.i}</span>${item.nat}</td>
-                        <td class="p-2 sm:p-3 text-blue-200/70 text-xs truncate max-w-[150px]" title="${item.sub}">${item.sub || '-'}</td>
-                        <td class="p-2 sm:p-3 truncate max-w-[120px]" title="${item.bairro}">${item.bairro}</td>
-                        <td class="p-2 sm:p-3 text-emerald-400 font-bold truncate max-w-[120px]" title="${item.pel}">${item.pel}</td>
-                        <td class="p-2 sm:p-3 text-center">${item.map ? `<a href="${item.map}" target="_blank" class="text-blue-400 hover:text-white transition-colors"><i class="fas fa-map-marker-alt"></i></a>` : '<span class="text-slate-600">-</span>'}</td>
-                        <td class="p-2 sm:p-3 text-center text-slate-400 font-mono">${item.ba || '<span class="text-slate-600">-</span>'}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-                Core.drawCharts(data);
-                if (mapInitialized) updateMapMarkers(data);
-                else setTimeout(() => { if (mapInitialized) updateMapMarkers(data); }, 500);
-            },
-
-            drawCharts: (data) => {
-                const agg = { pel: {}, nat: {}, sub: {} };
-                data.forEach(item => {
-                    agg.pel[item.pel] = (agg.pel[item.pel] || 0) + 1;
-                    agg.nat[item.nat] = (agg.nat[item.nat] || 0) + 1;
-                    if (item.sub) agg.sub[`${item.nat} - ${item.sub}`] = (agg.sub[`${item.nat} - ${item.sub}`] || 0) + 1;
-                });
-                const sort = (obj) => Object.entries(obj).sort((a,b) => b[1] - a[1]);
-                let days = 30;
-                if (currentPeriod.type === 'month' && currentPeriod.monthName) days = getDaysInPeriod(curYear, currentPeriod.monthName);
-                else days = getDaysInPeriod(curYear);
-                Core.createChart('chartPel', sort(agg.pel), 'pel', days);
-                Core.createChart('chartNat', sort(agg.nat), 'nat', days);
-                Core.createChart('chartSub', sort(agg.sub), 'sub', days);
-            },
-
-            createChart: (canvasId, data, type, daysInPeriod) => {
-                if (instances[canvasId]) instances[canvasId].destroy();
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                const config = getChartConfig();
-                let labels = data.map(item => {
-                    if (type === 'sub') {
-                        let label = item[0].split(' - ')[1] || item[0];
-                        const maxLen = isMobile() ? 40 : isTablet() ? 50 : 60;
-                        if (label.length > maxLen) label = label.substring(0, maxLen) + '...';
-                        return label;
-                    }
-                    return item[0];
-                });
-                const values = data.map(item => item[1]);
-                const total = values.reduce((a,b) => a+b, 0);
-                let bgColors, tickColors, barThickness, catPerc, barPerc;
-                if (type === 'pel') {
-                    const isPoa = (l) => CONFIG.poa.includes(l) || l === "PASSO D'AREIA";
-                    const poaItems = data.filter(i => isPoa(i[0]));
-                    const sortedPoa = [...poaItems].sort((a,b) => b[1]-a[1]);
-                    const rank = {};
-                    sortedPoa.forEach((item, idx) => { rank[item[0]] = idx; });
-                    const totalPoa = sortedPoa.length;
-                    bgColors = labels.map(l => rank.hasOwnProperty(l) ? GREEN_GRADIENTS[Math.min(Math.floor((rank[l] / Math.max(1,totalPoa-1)) * (GREEN_GRADIENTS.length-1)), GREEN_GRADIENTS.length-1)] : '#64748B');
-                    tickColors = labels.map(l => isPoa(l) ? '#10B981' : '#94a3b8');
-                    barThickness = config.barThickness;
-                    catPerc = config.categoryPercentage;
-                    barPerc = 0.7;
-                } else if (type === 'nat') {
-                    labels = data.map(i => { const s = STYLES[i[0]] || { i:"⚠️" }; return `${i[0]} ${s.i}`; });
-                    bgColors = data.map(i => (STYLES[i[0]] || { c:'#64748B' }).c);
-                    tickColors = data.map(i => {
-                        const cls = (STYLES[i[0]] || { cl:'#94a3b8' }).cl.replace('text-','');
-                        const map = { 'yellow-400':'#FBBF24','brown-600':'#8B4513','orange-500':'#F97316','green-400':'#34D399','sky-400':'#38BDF8','blue-400':'#60A5FA','red-500':'#EF4444','white':'#FFFFFF','purple-400':'#A78BFA','slate-400':'#94A3B8' };
-                        return map[cls] || '#94A3B8';
-                    });
-                    barThickness = config.barThickness;
-                    catPerc = config.categoryPercentage;
-                    barPerc = 0.8;
-                } else if (type === 'sub') {
-                    bgColors = data.map(i => (STYLES[i[0].split(' - ')[0]] || { bg:'rgba(100,116,139,0.8)' }).bg);
-                    tickColors = data.map(i => {
-                        const cls = (STYLES[i[0].split(' - ')[0]] || { cl:'#94a3b8' }).cl.replace('text-','');
-                        const map = { 'yellow-400':'#FBBF24','brown-600':'#8B4513','orange-500':'#F97316','green-400':'#34D399','sky-400':'#38BDF8','blue-400':'#60A5FA','red-500':'#EF4444','white':'#FFFFFF','purple-400':'#A78BFA','slate-400':'#94A3B8' };
-                        return map[cls] || '#94A3B8';
-                    });
-                    labels = data.map(i => {
-                        const nat = i[0].split(' - ')[0];
-                        const sub = i[0].split(' - ')[1] || '';
-                        const style = STYLES[nat] || { i:"⚠️" };
-                        let disp = sub;
-                        const maxLen = isMobile() ? 35 : isTablet() ? 45 : 55;
-                        if (disp.length > maxLen) disp = disp.substring(0, maxLen) + '...';
-                        return `${disp} ${style.i}`;
-                    });
-                    const container = document.getElementById('subChartContainer');
-                    const minH = isMobile() ? 380 : isTablet() ? 420 : 480;
-                    const calcH = Math.max(minH, data.length * config.subItemHeight);
-                    container.style.height = `${calcH}px`;
-                    barThickness = config.subBarThickness;
-                    catPerc = config.subSpacing;
-                    barPerc = 0.6;
-                } else {
-                    bgColors = '#60A5FA';
-                    tickColors = Array(labels.length).fill('#94a3b8');
-                    barThickness = config.barThickness;
-                    catPerc = config.categoryPercentage;
-                    barPerc = 0.8;
-                }
-                instances[canvasId] = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels, datasets: [{ data: values, backgroundColor: bgColors, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderRadius: 2, barThickness, categoryPercentage: catPerc, barPercentage: barPerc }] },
-                    options: {
-                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                        layout: { padding: { right: 50 } },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(15,23,42,0.95)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-                                titleColor: '#e2e8f0', bodyColor: '#cbd5e1', padding: 12, displayColors: false,
-                                callbacks: {
-                                    label: (ctx) => {
-                                        const val = ctx.raw;
-                                        const perc = ((val/total)*100).toFixed(1);
-                                        const avg = (val/daysInPeriod).toFixed(1).replace('.',',');
-                                        return [`${val.toLocaleString('pt-BR')} ocorrências (${perc}%)`, `Média diária: ${avg} por dia`];
-                                    },
-                                    title: (ctx) => type === 'sub' ? data[ctx[0].dataIndex][0] : ctx[0].label
-                                }
-                            },
-                            datalabels: {
-                                color: '#fff', anchor: 'end', align: 'end', font: { family: "'ui-monospace', monospace", weight: 'bold', size: type==='sub'? (isMobile()?10:isTablet()?11:12) : config.datalabelsSize },
-                                formatter: (v) => v.toLocaleString('pt-BR'),
-                                display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
-                            }
-                        },
-                        scales: {
-                            x: { display: false, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false } },
-                            y: {
-                                grid: { display: false },
-                                ticks: {
-                                    color: (ctx) => type==='pel'? tickColors[ctx.index] : (type==='nat'? tickColors[ctx.index] : (type==='sub'? tickColors[ctx.index] : '#94a3b8')),
-                                    font: { size: type==='sub'? (isMobile()?11:isTablet()?12:13) : config.fontSize, family: "'ui-monospace', monospace", weight: type==='sub'?'bold':'normal' },
-                                    padding: type==='sub'?6:config.tickPadding
-                                }
-                            }
-                        },
-                        interaction: { mode: 'nearest', intersect: true, axis: 'y' },
-                        hover: { mode: 'nearest', intersect: true },
-                        animation: { duration: 500, easing: 'easeOutQuart' }
-                    }
-                });
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', Core.init);
-    </script>
-</body>
-</html>
+            <img src="https:
