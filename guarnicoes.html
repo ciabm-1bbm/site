@@ -64,7 +64,7 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
             background: rgba(30, 41, 59, 0.98);
             border-color: rgba(255, 140, 0, 0.5);
-            z-index: 30; /* Reduzido para não passar por cima do cabeçalho */
+            z-index: 30; 
         }
 
         .vertical-text {
@@ -226,8 +226,8 @@
     <script>
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
 
-        // Definição das Companhias e Cores
-        const GRUPOS = [
+        // Definição das Companhias Oficiais e Cores
+        const GRUPOS_DEF = [
             {
                 nome: "COMANDO E CONTROLE",
                 obms: ["OFICIAL DE DIA", "ESTADO MAIOR", "COBOM", "CCOB"],
@@ -398,6 +398,7 @@
                 let nomeExibicao = limparNomeBasico(nomeBruto);
                 let horaHTML = calcularTurno(d.horario || ""); 
 
+                // Identifica o Pelotão exato. Se não for nenhum conhecido, mantém o nome bruto como "OUTROS"
                 let obmKey = "OUTROS";
                 if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
                 else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
@@ -415,6 +416,7 @@
                 else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
                 else if(obmRaw.includes("CCOB")) obmKey = "CCOB";
                 else if(obmRaw.includes("OFICIAL")) obmKey = "OFICIAL DE DIA";
+                else obmKey = obmRaw.substring(0, 20).trim(); // Fallback para pelotões não mapeados
 
                 if(!estrutura[obmKey]) estrutura[obmKey] = [];
                 
@@ -494,16 +496,39 @@
             const container = document.getElementById('grid-cards');
             container.innerHTML = "";
 
-            GRUPOS.forEach(grupo => {
-                // Filtra os OBMs do grupo que realmente tem dados ativos hoje
-                const obmsAtivos = grupo.obms.filter(obm => estrutura[obm] && estrutura[obm].length > 0);
-                
-                if (obmsAtivos.length === 0) return; // Se a CIA não tiver nada, pula
+            const gruposParaRenderizar = [];
+            const obmsAtribuidos = new Set();
 
+            // 1. Processa os grupos oficiais
+            GRUPOS_DEF.forEach(gDef => {
+                const obmsAtivos = gDef.obms.filter(obm => estrutura[obm] && estrutura[obm].length > 0);
+                if (obmsAtivos.length > 0) {
+                    gruposParaRenderizar.push({
+                        nome: gDef.nome,
+                        obms: obmsAtivos,
+                        corBarra: gDef.corBarra,
+                        corTitulo: gDef.corTitulo
+                    });
+                    obmsAtivos.forEach(o => obmsAtribuidos.add(o));
+                }
+            });
+
+            // 2. Rastreador Automático: Pega qualquer pelotão que não estava na lista e agrupa em "OUTROS"
+            const obmsRestantes = Object.keys(estrutura).filter(obm => !obmsAtribuidos.has(obm) && estrutura[obm].length > 0);
+            if (obmsRestantes.length > 0) {
+                gruposParaRenderizar.push({
+                    nome: "DEMAIS PELOTÕES",
+                    obms: obmsRestantes,
+                    corBarra: "bg-sky-blue", // Fica com a barra azul para destacar que é extra
+                    corTitulo: "text-sky-blue"
+                });
+            }
+
+            // 3. Renderiza os Grupos na Tela
+            gruposParaRenderizar.forEach(grupo => {
                 const section = document.createElement('div');
                 section.className = "w-full flex flex-col mb-4";
 
-                // Título da CIA com a cor customizada
                 let html = `
                     <h2 class="text-lg md:text-xl font-black ${grupo.corTitulo} border-b border-white/10 pb-1 mb-3 tracking-widest uppercase">
                         ${grupo.nome}
@@ -511,7 +536,7 @@
                     <div class="flex flex-col lg:flex-row gap-2 xl:gap-4 items-stretch w-full">
                 `;
 
-                obmsAtivos.forEach(obmName => {
+                grupo.obms.forEach(obmName => {
                     const viaturasRaw = estrutura[obmName];
                     const gruposUnicos = [];
                     
@@ -525,7 +550,6 @@
                         }
                     });
 
-                    // Renderização de cada Card de Pelotão
                     html += `
                         <div class="card-monitor flex-1 min-w-0">
                             <div class="${grupo.corBarra} w-10 md:w-12 flex items-center justify-center py-2 flex-shrink-0">
@@ -575,7 +599,7 @@
                     html += `</div></div>`;
                 });
 
-                html += `</div>`; // Fecha Flex Row
+                html += `</div>`;
                 section.innerHTML = html;
                 container.appendChild(section);
             });
