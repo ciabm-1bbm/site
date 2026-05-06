@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Guarnição Operacional - 1º BBM</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -15,9 +15,8 @@
                         'bombeiros-orange': '#FF8C00',
                         'bombeiros-yellow': '#FFD700',
                         'fire-red': '#DC2626',
-                        'moss-green': '#9BE36D',
                         'total-green': '#4ade80',
-                        'sky-blue': '#38bdf8' 
+                        'sky-blue': '#38bdf8',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -27,99 +26,239 @@
         }
     </script>
     
-    <!-- Ícones e Fonte -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        * {
+            box-sizing: border-box;
+        }
+        body { 
+            background-color: #0f172a; 
+            color: white; 
+            overflow-x: hidden; 
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
         
-        .hero-background { position: relative; min-height: 100vh; }
+        .hero-background { 
+            position: relative; 
+            height: 100vh;
+            background-color: #0f172a; 
+        }
         .hero-background::before { 
-            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+            content: ''; 
+            position: fixed; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            top: 0;
             background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
-            background-position: center; background-repeat: no-repeat; background-size: 500px;
-            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-size: 500px;
+            z-index: 0; 
+            opacity: 0.1; 
+            filter: grayscale(100%); 
+            pointer-events: none; 
         }
         .hero-background::after {
-            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
-            z-index: 1; pointer-events: none;
+            content: ''; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.5) 0%, rgba(15, 23, 42, 0.95) 100%);
+            z-index: 1; 
+            pointer-events: none;
         }
         
-        .content-wrapper { position: relative; z-index: 10; }
-
+        /* Layout fixo + rolagem */
+        .app-layout {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .fixed-top-area {
+            flex-shrink: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 30;
+            padding: 0.5rem 1rem 0 1rem;
+        }
+        
+        .scrollable-groups {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem 1rem;
+            scroll-behavior: smooth;
+        }
+        
+        /* Cards - layout flexível em grid para evitar scroll horizontal */
+        .cards-horizontal-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Mobile: mantém empilhado (já é automático pelo grid) */
+        @media (max-width: 767px) {
+            .cards-horizontal-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            display: flex; 
+            transition: all 0.2s ease;
+            display: flex;
             overflow: hidden;
-            min-height: 100px; 
+            min-height: 140px;
+            cursor: grab;
+            width: 100%;
         }
+        .card-monitor:active { cursor: grabbing; }
         .card-monitor:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
             background: rgba(30, 41, 59, 0.98);
             border-color: rgba(255, 140, 0, 0.5);
-            z-index: 30; 
+            z-index: 50;
         }
-
+        
+        /* Hover com cores mais claras na faixa vertical */
+        .card-verde:hover .vertical-text {
+            background: #6BBF4A !important;  /* Verde mais claro */
+        }
+        .card-amarelo:hover .vertical-text {
+            background: #FBBF24 !important;  /* Amarelo mais claro */
+        }
+        .card-laranja:hover .vertical-text {
+            background: #FFA559 !important;  /* Laranja mais claro */
+        }
+        .card-vermelho:hover .vertical-text {
+            background: #EF4444 !important;  /* Vermelho mais claro */
+        }
+        
+        /* Título vertical - tamanho reduzido e largura menor para caber todos na linha */
         .vertical-text {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
             text-align: center;
             white-space: nowrap;
-        }
-
-        .stats-container {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        /* --- TOOLTIP ESTILOS --- */
-        .tooltip-box {
-            visibility: hidden; opacity: 0; position: absolute; top: 100%;
-            background: rgba(15, 23, 42, 0.98); border: 1px solid #FF8C00; padding: 12px; border-radius: 8px;
-            width: max-content; min-width: 280px; z-index: 100; transition: 0.2s; pointer-events: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9); margin-top: 10px;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            padding: 12px 2px;
+            width: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem 0 0 0.5rem;
+            flex-shrink: 0;
+            transition: background 0.2s ease;
         }
         
-        .group:hover .tooltip-box, .group:focus .tooltip-box, .group:focus-within .tooltip-box, .group:active .tooltip-box { 
-            visibility: visible; opacity: 1; 
+        /* Cores laterais */
+        .card-vermelho { border-left: 6px solid #B91C1C; }
+        .card-amarelo { border-left: 6px solid #D97706; }
+        .card-verde { border-left: 6px solid #4B5563; }
+        .card-laranja { border-left: 6px solid #FF8C00; }
+        
+        /* Cabeçalhos de grupo */
+        .grupo-header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-
-        @media (min-width: 768px) {
-            .tt-left { left: 0; transform: none; }
-            .tt-center { left: 50%; transform: translateX(-50%); }
-            .tt-right { right: 0; left: auto; transform: none; }
+        .grupo-header-vermelho { background: linear-gradient(135deg, #7F1D1D, #991B1B); border-left: 6px solid #B91C1C; }
+        .grupo-header-amarelo { background: linear-gradient(135deg, #92400E, #B45309); border-left: 6px solid #D97706; }
+        .grupo-header-verde { background: linear-gradient(135deg, #1F2937, #374151); border-left: 6px solid #4B5563; }   /* 1ª CIA verde escuro */
+        .grupo-header-laranja { background: linear-gradient(135deg, #9A3412, #C2410C); border-left: 6px solid #FF8C00; }
+        
+        .stats-container {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
         }
-
+        
+        .tooltip-box {
+            visibility: hidden; 
+            opacity: 0; 
+            position: absolute; 
+            top: 100%;
+            background: rgba(15, 23, 42, 0.98); 
+            border: 1px solid #FF8C00; 
+            padding: 12px; 
+            border-radius: 8px;
+            width: max-content; 
+            min-width: 280px; 
+            z-index: 100; 
+            transition: 0.2s; 
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
+            margin-top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .group:hover .tooltip-box, 
+        .group:focus-within .tooltip-box { visibility: visible; opacity: 1; }
         @media (max-width: 767px) {
-            .tooltip-box {
-                position: fixed !important; top: 50% !important; left: 50% !important; right: auto !important; bottom: auto !important;
-                transform: translate(-50%, -50%) !important; width: 90vw !important; max-width: 400px !important;
-                max-height: 70vh !important; overflow-y: auto !important; margin-top: 0 !important;
-                border-width: 2px !important; box-shadow: 0 0 0 100vmax rgba(0,0,0,0.7), 0 0 30px rgba(0,0,0,0.9) !important; 
-                z-index: 999999 !important;
+            .tooltip-box { 
+                position: fixed !important; 
+                top: 50% !important; 
+                left: 50% !important; 
+                transform: translate(-50%, -50%) !important; 
+                width: 90vw !important; 
+                max-width: 400px; 
+                max-height: 80vh; 
+                overflow-y: auto; 
             }
-            .tooltip-box li {
-                font-size: 11px !important; line-height: 1.4 !important; white-space: normal !important; 
-                padding-bottom: 6px !important; margin-bottom: 6px !important; border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-            .tooltip-box li:last-child { border-bottom: none; margin-bottom: 0 !important; padding-bottom: 0 !important; }
-            .tooltip-box span { font-size: inherit !important; }
         }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
-
-        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 4px; }
+        
+        .militar-nome { color: #9BE36D; font-weight: 800; font-size: 0.85rem; text-align: center; word-break: break-word; }
+        .militar-funcao { color: #ccc; font-size: 0.65rem; text-align: center; margin-top: 2px; }
+        .turno-box { background: rgba(0,0,0,0.4); border-radius: 20px; padding: 2px 6px; display: inline-flex; gap: 4px; font-size: 0.65rem; margin-top: 4px; flex-wrap: wrap; justify-content: center; }
+        
+        #loading {
+            position: fixed; 
+            inset: 0; 
+            background: #0f172a; 
+            z-index: 9999; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
+        }
     </style>
 </head>
 <body class="hero-background">
@@ -127,80 +266,80 @@
     <div id="loading">
         <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
         <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
-        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Agrupando Pelotões...</p>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Separando funções...</p>
     </div>
 
-    <div class="content-wrapper flex flex-col min-h-screen hidden" id="app">
-        
-        <!-- ============================================== -->
-        <!-- CABEÇALHO CONGELADO (STICKY TOP) -->
-        <!-- ============================================== -->
-        <div class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 py-4 w-full">
-            <div class="max-w-7xl mx-auto">
-                <header class="w-full flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-                    <div class="flex-shrink-0 hidden md:block">
-                        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 drop-shadow-lg">
+    <div id="app" class="app-layout hidden">
+        <!-- ÁREA FIXA -->
+        <div class="fixed-top-area">
+            <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 gap-4 border-b border-white/10">
+                <div class="flex-shrink-0">
+                    <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-14 md:h-16 drop-shadow-lg">
+                </div>
+                <div class="text-center flex-grow">
+                    <h1 class="text-2xl md:text-4xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                        Guarnição Operacional
+                    </h1>
+                    <h2 class="text-base md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
+                        EM PORTO ALEGRE
+                    </h2>
+                    <div class="flex justify-center items-center gap-4 mt-2 text-xs font-mono text-gray-400 bg-black/30 px-4 py-1.5 rounded-full border border-white/5 inline-flex">
+                        <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
+                        <span>|</span>
+                        <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
                     </div>
+                </div>
+                <div class="flex-shrink-0">
+                    <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-14 md:h-16 drop-shadow-lg opacity-90">
+                </div>
+            </header>
 
-                    <div class="text-center flex-grow">
-                        <h1 class="text-2xl md:text-4xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
-                            Guarnição Operacional
-                        </h1>
-                        <h2 class="text-base md:text-lg font-bold text-bombeiros-orange mt-0.5 uppercase tracking-widest">
-                            EM PORTO ALEGRE
-                        </h2>
-                        <div class="flex justify-center items-center gap-3 mt-2 text-[10px] md:text-xs font-mono text-gray-400 bg-black/40 px-4 py-1.5 rounded-full border border-white/5 inline-flex">
-                            <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
-                            <span>|</span>
-                            <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
-                        </div>
-                    </div>
-
-                    <div class="flex-shrink-0 hidden md:block">
-                        <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 drop-shadow-lg opacity-90">
-                    </div>
-                </header>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- EFETIVO -->
+            <!-- Stats -->
+            <div class="w-full max-w-7xl mx-auto py-3 pb-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     <div class="stats-container border-l-4 border-bombeiros-orange">
-                        <div class="flex justify-around items-center">
+                        <h3 class="text-gray-400 font-bold uppercase text-xs mb-3 tracking-wider flex items-center gap-2">
+                            <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA DO DIA)
+                        </h3>
+                        <div class="flex justify-around items-center flex-wrap gap-2">
                             <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                                <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
-                                <span class="text-[9px] md:text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
-                                <div class="tooltip-box tt-left"><ul id="list-cap" class="text-left"></ul></div>
+                                <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                                <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                                <div class="tooltip-box"><ul id="list-cap" class="text-left text-xs"></ul></div>
                             </div>
                             <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                                <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
-                                <span class="text-[9px] md:text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
-                                <div class="tooltip-box tt-center"><ul id="list-sgt" class="text-left"></ul></div>
+                                <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                                <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                                <div class="tooltip-box"><ul id="list-sgt" class="text-left text-xs"></ul></div>
                             </div>
                             <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                                <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
-                                <span class="text-[9px] md:text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
-                                <div class="tooltip-box tt-right"><ul id="list-sd" class="text-left"></ul></div>
+                                <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                                <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                                <div class="tooltip-box"><ul id="list-sd" class="text-left text-xs"></ul></div>
                             </div>
-                            <div class="w-px h-8 bg-white/10 mx-2"></div>
+                            <div class="w-px h-8 bg-white/10 hidden sm:block"></div>
                             <div class="group relative text-center">
-                                <span class="block text-3xl md:text-4xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
-                                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
+                                <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- VIATURAS -->
                     <div class="stats-container border-l-4 border-fire-red">
+                        <h3 class="text-gray-400 font-bold uppercase text-xs mb-3 tracking-wider flex items-center gap-2">
+                            <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
+                        </h3>
                         <div class="flex justify-around items-center">
                             <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                                <span class="block text-3xl md:text-4xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
-                                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                                <div class="tooltip-box tt-left"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
+                                <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
+                                <div class="tooltip-box"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
                             </div>
-                            <div class="w-px h-8 bg-white/10"></div>
+                            <div class="w-px h-10 bg-white/10 mx-3"></div>
                             <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                                <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
-                                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
-                                <div class="tooltip-box tt-right"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
+                                <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
+                                <div class="tooltip-box"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
                             </div>
                         </div>
                     </div>
@@ -208,182 +347,98 @@
             </div>
         </div>
 
-        <!-- ============================================== -->
-        <!-- CONTEÚDO ROLÁVEL (CARDS DAS CIAS) -->
-        <!-- ============================================== -->
-        <main class="w-full max-w-7xl mx-auto flex-grow p-4">
-            <div id="grid-cards" class="flex flex-col gap-8 pb-10"></div>
-        </main>
-
-        <footer class="mt-auto py-6 text-center border-t border-white/5">
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
-                Sistema de Controle Operacional - 1º BBM - 2026
-            </p>
-            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
-        </footer>
+        <!-- ÁREA ROLÁVEL -->
+        <div class="scrollable-groups" id="scrollableContent">
+            <div class="w-full max-w-7xl mx-auto">
+                <div id="grupos-container" class="space-y-8"></div>
+            </div>
+            <footer class="max-w-7xl mx-auto py-5 text-center border-t border-white/5 mt-6">
+                <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                    Sistema de Controle Operacional - 1º BBM - 2026
+                </p>
+                <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
+            </footer>
+        </div>
     </div>
 
     <script>
-        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec";
 
-        // Definição das Companhias Oficiais e Cores
-        const GRUPOS_DEF = [
-            {
-                nome: "COMANDO E CONTROLE",
-                obms: ["OFICIAL DE DIA", "ESTADO MAIOR", "COBOM", "CCOB"],
-                corBarra: "bg-bombeiros-orange",
-                corTitulo: "text-bombeiros-orange"
-            },
-            {
-                nome: "1ª CIA",
-                obms: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO"],
-                corBarra: "bg-bombeiros-orange",
-                corTitulo: "text-bombeiros-orange"
-            },
-            {
-                nome: "2ª CIA",
-                obms: ["FLORESTA", "PASSO D'AREIA", "PARTENON"],
-                corBarra: "bg-total-green", // Verde
-                corTitulo: "text-total-green" // Verde
-            },
-            {
-                nome: "BBS",
-                obms: ["TERRESTRE", "CANIL", "AQUÁTICA", "MERGULHO"],
-                corBarra: "bg-gray-500", // Cinza
-                corTitulo: "text-gray-400" // Cinza
-            }
+        // Definição atualizada das cores: 1ª CIA verde, 2ª CIA amarelo, BBS laranja, COORD vermelho
+        const GRUPOS = [
+            { nome: "COORDENAÇÃO", corClasse: "vermelho", headerClass: "grupo-header-vermelho", cardClass: "card-vermelho", pelotoes: ["OFICIAL DE DIA", "COBOM", "CCOB"] },
+            { nome: "1ª CIA", corClasse: "verde", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["AÇORIANOS", "TERESÓPOLIS", "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO"] },
+            { nome: "2ª CIA", corClasse: "amarelo", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["FLORESTA", "PASSO D'AREIA", "PARTENON"] },
+            { nome: "BBS", corClasse: "laranja", headerClass: "grupo-header-laranja", cardClass: "card-laranja", pelotoes: ["TERRESTRE", "AQUÁTICA", "MERGULHO", "CANIL"] }
         ];
 
         const FUNCOES_FIXAS = [
-            "COMANDANTE DE GUARNIÇÃO",
-            "AUXILIAR DE LINHA DIREITA",
-            "AUXILIAR DE LINHA ESQUERDA",
-            "COV / OPERADOR / CONDUTOR",
-            "COMANDANTE DE SOCORRO",
-            "CHEFE DE LINHA DIREITA",
-            "CHEFE DE LINHA ESQUERDA",
-            "OFICIAL SUPERVISOR",
-            "MOTORISTA DE DIA",
-            "OPERADOR COBOM",
-            "CONDUTOR NAVAL",
-            "AUXILIAR DE CONDUTOR NAVAL",
-            "OFICIAL DE SV",
-            "OPERADOR CCOB",
-            "RESGATISTA 1",
-            "RESGATISTA 2",
-            "SOCORRISTA 1",
-            "SOCORRISTA 2",
-            "CINOTÉCNICO",
-            "MERGULHADOR",
-            "SOCORRISTA",
-            "RESGATISTA",
-            "MOTORISTA"
+            "COMANDANTE DE GUARNIÇÃO", "AUXILIAR DE LINHA DIREITA", "AUXILIAR DE LINHA ESQUERDA",
+            "COV / OPERADOR / CONDUTOR", "COMANDANTE DE SOCORRO", "CHEFE DE LINHA DIREITA",
+            "CHEFE DE LINHA ESQUERDA", "OFICIAL SUPERVISOR", "MOTORISTA DE DIA", "OPERADOR COBOM",
+            "CONDUTOR NAVAL", "AUXILIAR DE CONDUTOR NAVAL", "OFICIAL DE SV", "OPERADOR CCOB",
+            "RESGATISTA 1", "RESGATISTA 2", "SOCORRISTA 1", "SOCORRISTA 2", "CINOTÉCNICO",
+            "MERGULHADOR", "SOCORRISTA", "RESGATISTA", "MOTORISTA"
         ];
 
-        function getDataOperacional() {
-            const agora = new Date();
-            if (agora.getHours() < 8) {
-                agora.setDate(agora.getDate() - 1);
-            }
-            return agora;
-        }
-
-        function formatarDataCurta(data) {
-            const dia = String(data.getDate()).padStart(2, '0');
-            const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-            return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
-        }
-
         function calcularTurno(raw) {
-            if(!raw) return "";
+            if (!raw) return "";
             try {
-                const horasMatch = raw.match(/(\d{2}:\d{2})/g);
-                if (!horasMatch || horasMatch.length === 0) return "";
-
-                const dataOp = getDataOperacional();
-                const hoje = new Date(dataOp);
-                const amanha = new Date(dataOp);
-                amanha.setDate(amanha.getDate() + 1);
-
-                let hInicio = "08:00"; let hFim = "08:00";
-                let dInicio = hoje; let dFim = amanha; let carga = "24h";
-
-                if (horasMatch.length === 1) {
-                    const horaUnica = horasMatch[0];
-                    if (horaUnica === "20:00") {
-                        hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
-                    } else {
-                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
-                    }
+                const partes = raw.trim().split(/\s+/);
+                if (partes.length === 1) {
+                    const h = partes[0];
+                    if (h === "20:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">12h</span> <span class="text-sky-blue">20:00→08:00</span></div>`;
+                    if (h === "08:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">24h</span> <span class="text-sky-blue">08:00→08:00</span></div>`;
+                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">?</span> <span class="text-sky-blue">${h}</span></div>`;
+                } else if (partes.length >= 2) {
+                    let inicio = partes[0], fim = partes[1];
+                    let carga = "";
+                    if (inicio === "08:00" && fim === "20:00") carga = "12h";
+                    else if (inicio === "20:00" && fim === "08:00") carga = "12h";
+                    else carga = "24h";
+                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">${carga}</span> <span class="text-sky-blue">${inicio}→${fim}</span></div>`;
                 }
-                else if (horasMatch.length >= 2) {
-                    hInicio = horasMatch[0];
-                    hFim = horasMatch[1]; 
-                    if (hInicio === hFim) {
-                        dFim = amanha; carga = "24h";
-                    } else if (hInicio === "08:00" && hFim === "20:00") {
-                        dFim = hoje; carga = "12h";
-                    } else if (hInicio === "20:00" && hFim === "08:00") {
-                        dFim = amanha; carga = "12h";
-                    } else {
-                        const h1 = parseInt(hInicio.split(':')[0]);
-                        const h2 = parseInt(hFim.split(':')[0]);
-                        if (h2 < h1) dFim = amanha; else dFim = hoje;
-                        let diff = h2 - h1; if(diff < 0) diff += 24;
-                        carga = diff > 12 ? "24h" : "12h";
-                    }
-                }
-
-                const strDataIni = formatarDataCurta(dInicio);
-                const strDataFim = formatarDataCurta(dFim);
-
-                return `
-                    <div class="mt-0.5 leading-snug flex items-center justify-center gap-1 bg-black/30 rounded px-1.5 py-0.5 w-max mx-auto border border-white/5">
-                        <span class="text-bombeiros-orange font-bold text-[9px]">${carga}</span> 
-                        <span class="text-gray-500 text-[8px]">|</span> 
-                        <span class="text-sky-blue font-bold text-[9px]">${hInicio}</span> 
-                        <i class="fas fa-arrow-right text-gray-600 text-[6px]"></i>
-                        <span class="text-sky-blue font-bold text-[9px]">${hFim}</span> 
-                        <span class="text-gray-500 text-[8px] ml-0.5">(${strDataFim})</span>
-                    </div>
-                `;
-            } catch(e) { console.error(e); return ""; }
+                return "";
+            } catch(e) { return ""; }
         }
 
-        function extrairID(nomeCompleto) {
-            const match = nomeCompleto.match(/(\d{7})/);
-            return match ? match[1] : null; 
-        }
+        function extrairID(nome) { let m=nome.match(/(\d{7})/); return m?m[1]:null; }
+        function limparNomeBasico(nome) { return nome.replace(/\d{7}\s+/,'').replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/\b\d+\b/g,'').trim(); }
 
-        function limparNomeBasico(nomeCompleto) {
-            return nomeCompleto.replace(/\d{7}\s+/, '').replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/\b\d+\b/g, '').trim();
-        }
+        function processarDados(dadosRecebidos) {
+            console.log("📦 Dados carregados");
+            let dadosArray = Array.isArray(dadosRecebidos) ? dadosRecebidos : (dadosRecebidos.dados || []);
+            if (!dadosArray.length) {
+                document.getElementById('msg-loading').innerText = "Nenhum dado disponível.";
+                return;
+            }
 
-        function processarDados(dados) {
+            const timestamp = dadosRecebidos.timestamp_extracao || new Date().toISOString();
+            const dataObj = new Date(timestamp);
+            if (!isNaN(dataObj.getTime())) {
+                document.getElementById('data-topo').innerHTML = dataObj.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+                document.getElementById('hora-topo').innerHTML = dataObj.toLocaleTimeString('pt-BR');
+            } else {
+                const agora = new Date();
+                document.getElementById('data-topo').innerHTML = agora.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+                document.getElementById('hora-topo').innerHTML = agora.toLocaleTimeString('pt-BR');
+            }
+
             const estrutura = {};
-            const mapOficiais = new Map();
-            const mapSargentos = new Map();
-            const mapPracas = new Map();
+            const mapOficiais = new Map(), mapSargentos = new Map(), mapPracas = new Map();
             const statsViaturas = { combate: new Set(), apoio: new Set() };
 
-            dados.forEach(d => {
+            for (const d of dadosArray) {
                 let obmRaw = (d.obm || "").toUpperCase();
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
                 let nomeBruto = (d.nome || "").trim().toUpperCase();
                 let funcBruta = (d.func || "").trim().toUpperCase();
-                
-                funcBruta = funcBruta.replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/[0-9]/g, '').replace(/[-]/g, '').trim();
-
+                funcBruta = funcBruta.replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/[0-9]/g,'').replace(/[-]/g,'').trim();
                 let funcaoFinal = "";
-                
                 for (const cargo of FUNCOES_FIXAS) {
-                    if (funcBruta.includes(cargo)) {
-                        funcaoFinal = cargo;
-                        break;
-                    }
+                    if (funcBruta.includes(cargo)) { funcaoFinal = cargo; break; }
                 }
-
-                if (funcaoFinal === "") {
+                if (!funcaoFinal) {
                     for (const cargo of FUNCOES_FIXAS) {
                         if (nomeBruto.includes(cargo)) {
                             funcaoFinal = cargo;
@@ -392,246 +447,182 @@
                         }
                     }
                 }
-
                 let idMilitar = extrairID(nomeBruto);
-                let idUnico = idMilitar ? idMilitar : nomeBruto;
+                let idUnico = idMilitar || nomeBruto;
                 let nomeExibicao = limparNomeBasico(nomeBruto);
                 let horaHTML = calcularTurno(d.horario || ""); 
 
-                // Identifica o Pelotão exato. Se não for nenhum conhecido, mantém o nome bruto como "OUTROS"
                 let obmKey = "OUTROS";
-                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
-                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
-                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
-                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
-                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
-                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
-                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
-                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
-                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "ESTADO MAIOR";
-                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
-                else if(obmRaw.includes("TERRESTRE")) obmKey = "TERRESTRE";
-                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
-                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
-                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
-                else if(obmRaw.includes("CCOB")) obmKey = "CCOB";
-                else if(obmRaw.includes("OFICIAL")) obmKey = "OFICIAL DE DIA";
-                else obmKey = obmRaw.substring(0, 20).trim(); // Fallback para pelotões não mapeados
+                for (let grupo of GRUPOS) {
+                    if (grupo.pelotoes.includes(obmRaw)) { obmKey = obmRaw; break; }
+                }
+                if (obmKey === "OUTROS") {
+                    if (obmRaw.includes("ESTADO MAIOR")) obmKey = "OFICIAL DE DIA";
+                    else if (obmRaw.includes("COBOM")) obmKey = "COBOM";
+                    else if (obmRaw.includes("CCOB")) obmKey = "CCOB";
+                    else if (obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+                    else if (obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+                    else if (obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+                    else if (obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+                    else if (obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+                    else if (obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+                    else if (obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+                    else if (obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+                    else if (obmRaw.includes("TERRESTRE")) obmKey = "TERRESTRE";
+                    else if (obmRaw.includes("CANIL")) obmKey = "CANIL";
+                    else if (obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+                    else if (obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
+                }
 
-                if(!estrutura[obmKey]) estrutura[obmKey] = [];
-                
+                if (!estrutura[obmKey]) estrutura[obmKey] = [];
                 let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
-                if(!viaturaObj) {
+                if (!viaturaObj) {
                     viaturaObj = { nome: vtr, guarnicao: [] };
                     estrutura[obmKey].push(viaturaObj);
                 }
-                
-                if(nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
+                if (nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
                     viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, h: horaHTML });
-
                     const dadosMilitar = { n: nomeExibicao, f: funcaoFinal };
-
-                    if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) {
-                        mapPracas.set(idUnico, dadosMilitar);
-                    }
-                    else if(nomeBruto.includes("SGT")) {
-                        mapSargentos.set(idUnico, dadosMilitar);
-                    }
-                    else if(nomeBruto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
-                        mapOficiais.set(idUnico, dadosMilitar);
-                    }
-                    else {
-                        mapPracas.set(idUnico, dadosMilitar);
-                    }
+                    if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) mapPracas.set(idUnico, dadosMilitar);
+                    else if (nomeBruto.includes("SGT")) mapSargentos.set(idUnico, dadosMilitar);
+                    else if (nomeBruto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) mapOficiais.set(idUnico, dadosMilitar);
+                    else mapPracas.set(idUnico, dadosMilitar);
                 }
-
-                if(vtr.includes("ABT")) {
-                    statsViaturas.combate.add(vtr);
-                }
-                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
-                    statsViaturas.apoio.add(vtr);
-                }
-            });
+                if (vtr.includes("ABT")) statsViaturas.combate.add(vtr);
+                else if (vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) statsViaturas.apoio.add(vtr);
+            }
 
             atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
-            renderizarCards(estrutura);
+            renderizarCardsPorGrupo(estrutura);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
         }
 
-        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
-            const capArr = Array.from(mapOficiais.values());
-            const sgtArr = Array.from(mapSargentos.values());
-            const sdArr = Array.from(mapPracas.values());
-            const combArr = Array.from(statsViaturas.combate);
-            const apoioArr = Array.from(statsViaturas.apoio);
-
+        function atualizarStats(oficiais, sgt, pracas, viaturas) {
+            const capArr = Array.from(oficiais.values()), sgtArr = Array.from(sgt.values()), sdArr = Array.from(pracas.values());
             const fillList = (idL, arr) => {
-                const html = arr.map(item => `
-                    <li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left whitespace-normal break-words border-b border-white/5 pb-1 last:border-0">
-                        <span class="text-bombeiros-orange font-bold uppercase">• ${item.n}</span>
-                        ${item.f ? `<span class="text-white opacity-90 uppercase font-medium"> - ${item.f}</span>` : ''}
-                    </li>
-                `).join('');
-                document.getElementById(idL).innerHTML = html;
+                document.getElementById(idL).innerHTML = arr.map(item => `<li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left break-words border-b border-white/5 pb-1 last:border-0"><span class="text-bombeiros-orange font-bold text-xs uppercase">• ${item.n}</span>${item.f ? `<span class="text-white opacity-90 uppercase"> - ${item.f}</span>` : ''}</li>`).join('');
             };
-
-            document.getElementById('count-cap').innerText = capArr.length;
-            fillList('list-cap', capArr);
-
-            document.getElementById('count-sgt').innerText = sgtArr.length;
-            fillList('list-sgt', sgtArr);
-
-            document.getElementById('count-sd').innerText = sdArr.length;
-            fillList('list-sd', sdArr);
-
+            document.getElementById('count-cap').innerText = capArr.length; fillList('list-cap', capArr);
+            document.getElementById('count-sgt').innerText = sgtArr.length; fillList('list-sgt', sgtArr);
+            document.getElementById('count-sd').innerText = sdArr.length; fillList('list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
-            
-            document.getElementById('count-combate').innerText = combArr.length;
-            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
-
-            document.getElementById('count-apoio').innerText = apoioArr.length;
-            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('count-combate').innerText = viaturas.combate.size;
+            document.getElementById('list-combate').innerHTML = Array.from(viaturas.combate).map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('count-apoio').innerText = viaturas.apoio.size;
+            document.getElementById('list-apoio').innerHTML = Array.from(viaturas.apoio).map(x => `<li>• ${x}</li>`).join('');
         }
 
-        function renderizarCards(estrutura) {
-            const container = document.getElementById('grid-cards');
-            container.innerHTML = "";
+        function renderizarCardsPorGrupo(estrutura) {
+            const container = document.getElementById('grupos-container');
+            container.innerHTML = '';
 
-            const gruposParaRenderizar = [];
-            const obmsAtribuidos = new Set();
+            for (const grupo of GRUPOS) {
+                const pelotoesExistentes = grupo.pelotoes.filter(p => estrutura[p] && estrutura[p].length > 0);
+                if (pelotoesExistentes.length === 0) continue;
 
-            // 1. Processa os grupos oficiais
-            GRUPOS_DEF.forEach(gDef => {
-                const obmsAtivos = gDef.obms.filter(obm => estrutura[obm] && estrutura[obm].length > 0);
-                if (obmsAtivos.length > 0) {
-                    gruposParaRenderizar.push({
-                        nome: gDef.nome,
-                        obms: obmsAtivos,
-                        corBarra: gDef.corBarra,
-                        corTitulo: gDef.corTitulo
-                    });
-                    obmsAtivos.forEach(o => obmsAtribuidos.add(o));
+                const headerDiv = document.createElement('div');
+                headerDiv.className = `grupo-header ${grupo.headerClass}`;
+                headerDiv.innerHTML = `<h3 class="text-white text-center font-black tracking-wider">${grupo.nome}</h3>`;
+                container.appendChild(headerDiv);
+
+                const cardsWrapper = document.createElement('div');
+                cardsWrapper.className = 'cards-horizontal-container';
+                cardsWrapper.setAttribute('data-grupo', grupo.nome);
+
+                for (const pelotao of pelotoesExistentes) {
+                    const viaturasRaw = estrutura[pelotao];
+                    const card = criarCardPelotao(pelotao, viaturasRaw, grupo.cardClass);
+                    cardsWrapper.appendChild(card);
                 }
-            });
+                container.appendChild(cardsWrapper);
 
-            // 2. Rastreador Automático: Pega qualquer pelotão que não estava na lista e agrupa em "OUTROS"
-            const obmsRestantes = Object.keys(estrutura).filter(obm => !obmsAtribuidos.has(obm) && estrutura[obm].length > 0);
-            if (obmsRestantes.length > 0) {
-                gruposParaRenderizar.push({
-                    nome: "DEMAIS PELOTÕES",
-                    obms: obmsRestantes,
-                    corBarra: "bg-sky-blue", // Fica com a barra azul para destacar que é extra
-                    corTitulo: "text-sky-blue"
-                });
-            }
-
-            // 3. Renderiza os Grupos na Tela
-            gruposParaRenderizar.forEach(grupo => {
-                const section = document.createElement('div');
-                section.className = "w-full flex flex-col mb-4";
-
-                let html = `
-                    <h2 class="text-lg md:text-xl font-black ${grupo.corTitulo} border-b border-white/10 pb-1 mb-3 tracking-widest uppercase">
-                        ${grupo.nome}
-                    </h2>
-                    <div class="flex flex-col lg:flex-row gap-2 xl:gap-4 items-stretch w-full">
-                `;
-
-                grupo.obms.forEach(obmName => {
-                    const viaturasRaw = estrutura[obmName];
-                    const gruposUnicos = [];
-                    
-                    viaturasRaw.forEach(vtr => {
-                        const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
-                        const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
-                        if(grupoExistente && assinatura.length > 0) {
-                            grupoExistente.nomesVtrs.push(vtr.nome);
-                        } else {
-                            gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+                if (typeof Sortable !== 'undefined') {
+                    new Sortable(cardsWrapper, {
+                        animation: 200,
+                        ghostClass: 'opacity-30 bg-orange-500/10 border-dashed border-orange-400',
+                        chosenClass: 'shadow-2xl scale-[1.01]',
+                        onEnd: function() {
+                            const todasOrdens = [];
+                            document.querySelectorAll('#grupos-container .cards-horizontal-container').forEach(containerGroup => {
+                                Array.from(containerGroup.children).forEach(card => {
+                                    const nomePel = card.getAttribute('data-pelotao');
+                                    if (nomePel) todasOrdens.push(nomePel);
+                                });
+                            });
+                            localStorage.setItem('ordemQuarteis', JSON.stringify(todasOrdens));
                         }
                     });
-
-                    html += `
-                        <div class="card-monitor flex-1 min-w-0">
-                            <div class="${grupo.corBarra} w-10 md:w-12 flex items-center justify-center py-2 flex-shrink-0">
-                                <h2 class="vertical-text text-white font-black text-sm md:text-lg tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
-                                    ${obmName}
-                                </h2>
-                            </div>
-                            <div class="flex-grow p-2 flex flex-col gap-2 overflow-hidden bg-slate-800/50">
-                    `;
-
-                    gruposUnicos.forEach(grp => {
-                        grp.guarnicao.sort((a,b) => {
-                            const getScore = (role) => {
-                                let r = role.toUpperCase();
-                                if(r.includes("COMANDANTE")) return 1;
-                                if(r.includes("CONDUTOR") || r.includes("COV")) return 2;
-                                return 3;
-                            }
-                            return getScore(a.f || "") - getScore(b.f || "");
-                        });
-
-                        const listaVtrs = grp.nomesVtrs.join(' / ');
-
-                        html += `
-                            <div class="w-full flex flex-col items-center">
-                                <span class="text-bombeiros-yellow font-black text-[9px] tracking-widest uppercase border-b border-bombeiros-yellow/20 pb-0.5 mb-1.5 w-full text-center truncate">
-                                    ${listaVtrs}
-                                </span>
-                                <div class="w-full flex flex-col gap-2.5">
-                                    ${grp.guarnicao.map(m => `
-                                        <div class="flex flex-col items-center w-full">
-                                            <div class="text-moss-green font-black text-sm xl:text-base leading-none drop-shadow-md text-center w-full break-words">
-                                                ${m.n}
-                                            </div>
-                                            ${m.f ? `
-                                            <div class="text-gray-400 text-[8px] xl:text-[9px] font-bold uppercase tracking-wider mt-0.5 text-center w-full break-words">
-                                                ${m.f}
-                                            </div>` : ''}
-                                            ${m.h}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    html += `</div></div>`;
-                });
-
-                html += `</div>`;
-                section.innerHTML = html;
-                container.appendChild(section);
-            });
-        }
-
-        function atualizarRelogio() {
-            const dataOp = getDataOperacional();
-            const agora = new Date();
-            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
-            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
-        }
-
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
-
-        async function iniciarSistema() {
-            try {
-                const req = await fetch(URL_DADOS);
-                const dados = await req.json();
-                if(dados.erro) throw new Error("Dados inválidos");
-                processarDados(dados);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('app').classList.remove('hidden');
-            } catch(e) { 
-                console.error(e); 
-                document.getElementById('msg-loading').innerText = "Reconectando...";
-                setTimeout(iniciarSistema, 5000); 
+                }
             }
         }
 
-        iniciarSistema();
-        setInterval(iniciarSistema, 60000); 
+        function criarCardPelotao(nomePelotao, viaturasRaw, classeCor) {
+            const gruposUnicos = [];
+            for (const vtr of viaturasRaw) {
+                const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
+                let grupo = gruposUnicos.find(g => g.assinatura === assinatura);
+                if (grupo) grupo.nomesVtrs.push(vtr.nome);
+                else gruposUnicos.push({ assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+            }
+
+            const card = document.createElement('div');
+            card.className = `card-monitor ${classeCor}`;
+            card.setAttribute('data-pelotao', nomePelotao);
+
+            let corFundo = '';
+            if (classeCor === 'card-vermelho') corFundo = '#B91C1C';
+            else if (classeCor === 'card-amarelo') corFundo = '#D97706';
+            else if (classeCor === 'card-verde') corFundo = '#4B5563';
+            else corFundo = '#FF8C00';
+
+            let content = `<div class="vertical-text" style="background: ${corFundo};">${nomePelotao.substring(0, 18)}</div>`;
+            content += `<div class="flex-grow p-2 flex flex-col gap-2">`;
+
+            for (const grupo of gruposUnicos) {
+                grupo.guarnicao.sort((a,b) => {
+                    const getScore = (r) => {
+                        let u = (r.f || "").toUpperCase();
+                        if (u.includes("COMANDANTE")) return 1;
+                        if (u.includes("COV") || u.includes("CONDUTOR")) return 2;
+                        return 3;
+                    };
+                    return getScore(a) - getScore(b);
+                });
+
+                const listaVtrs = grupo.nomesVtrs.join(' / ');
+                content += `<div class="w-full flex flex-col items-center bg-black/20 rounded-lg p-1.5">
+                                <span class="text-bombeiros-yellow font-black text-[11px] tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">${listaVtrs}</span>
+                                <div class="w-full flex flex-col gap-1.5">`;
+                for (const m of grupo.guarnicao) {
+                    content += `<div class="flex flex-col items-center w-full bg-white/5 rounded p-1">
+                                    <div class="militar-nome">${m.n}</div>
+                                    ${m.f ? `<div class="militar-funcao">${m.f}</div>` : ''}
+                                    <div class="w-full flex justify-center mt-1">${m.h}</div>
+                                </div>`;
+                }
+                content += `</div></div>`;
+            }
+            content += `</div>`;
+            card.innerHTML = content;
+            return card;
+        }
+
+        async function carregarDados() {
+            try {
+                document.getElementById('msg-loading').innerText = "Buscando dados...";
+                const req = await fetch(URL_DADOS);
+                const dados = await req.json();
+                processarDados(dados);
+            } catch(e) {
+                console.error("❌ Erro:", e);
+                document.getElementById('msg-loading').innerText = "Erro de conexão. Tentando novamente...";
+                setTimeout(carregarDados, 10000);
+            }
+        }
+
+        carregarDados();
+        setInterval(carregarDados, 60000);
     </script>
 </body>
 </html>
