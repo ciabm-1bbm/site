@@ -2,691 +2,636 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>PLATAFORMA ANTIGUIDADE · PRAÇAS CBMRS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guarnição Operacional - 1º BBM</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bombeiros-orange': '#FF8C00',
+                        'bombeiros-yellow': '#FFD700',
+                        'fire-red': '#DC2626',
+                        'moss-green': '#9BE36D',
+                        'total-green': '#4ade80',
+                        'sky-blue': '#38bdf8' 
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <!-- Ícones e Fonte -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        .glass {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1.5rem;
+        body { background-color: #0f172a; color: white; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        
+        .hero-background { position: relative; min-height: 100vh; }
+        .hero-background::before { 
+            content: ''; position: fixed; left: 0; right: 0; bottom: 0; top: 0;
+            background-image: url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true'); 
+            background-position: center; background-repeat: no-repeat; background-size: 500px;
+            z-index: 0; opacity: 0.1; filter: grayscale(100%); pointer-events: none; 
+        }
+        .hero-background::after {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+            z-index: 1; pointer-events: none;
+        }
+        
+        .content-wrapper { position: relative; z-index: 10; }
+
+        .card-monitor {
+            background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex; 
+            overflow: hidden;
+            min-height: 100px; 
         }
-        .table-container { max-height: 580px; overflow-y: auto; }
-        @media (max-width: 640px) { .table-container { max-height: 450px; } }
-        .filter-input {
-            background: rgba(30, 41, 59, 0.9);
-            border: 1.5px solid #334155;
-            color: #f1f5f9;
-            padding: 0.6rem 1rem;
+        .card-monitor:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.98);
+            border-color: rgba(255, 140, 0, 0.5);
+            z-index: 30; 
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .stats-container {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 1rem;
-            font-size: 0.9rem;
-        }
-        .filter-input:focus { border-color: #10b981; outline: none; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
-        .suggestions-dropdown {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 0.75rem;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            top: 100%;
-            margin-top: 0.25rem;
-        }
-        .suggestion-item { padding: 0.5rem 1rem; cursor: pointer; }
-        .suggestion-item:hover { background: #2d3a4e; }
-        .loader {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-left-color: #10b981;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Cards de efetivo (verde-oliva) */
-        .card-grad {
-            background-color: #8FBC8F;
-            border-left: 5px solid #2E5A2E;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card-grad:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.4);
-        }
-        .card-total {
-            background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
-            border-left: 5px solid #facc15;
-            color: #ffffff;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card-total .label, .card-total .value { color: #ffffff !important; }
-        .card-total:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.4);
+            padding: 0.75rem 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        /* Linha destacada do mais antigo na comparação */
-        @keyframes goldPulse {
-            0%, 100% { box-shadow: inset 0 0 0 2px rgba(250, 204, 21, 0.6); }
-            50% { box-shadow: inset 0 0 0 2px rgba(250, 204, 21, 1); }
+        /* --- TOOLTIP ESTILOS --- */
+        .tooltip-box {
+            visibility: hidden; opacity: 0; position: absolute; top: 100%;
+            background: rgba(15, 23, 42, 0.98); border: 1px solid #FF8C00; padding: 12px; border-radius: 8px;
+            width: max-content; min-width: 280px; z-index: 100; transition: 0.2s; pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); margin-top: 10px;
         }
-        .row-winner {
-            background: linear-gradient(90deg, rgba(250, 204, 21, 0.18) 0%, rgba(250, 204, 21, 0.05) 100%) !important;
-            animation: goldPulse 2.2s ease-in-out infinite;
-        }
-        .row-compared {
-            background: rgba(16, 185, 129, 0.08) !important;
-        }
-        .trophy-icon {
-            display: inline-block;
-            animation: bounce 1.4s ease-in-out infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) rotate(-8deg); }
-            50% { transform: translateY(-4px) rotate(8deg); }
+        
+        .group:hover .tooltip-box, .group:focus .tooltip-box, .group:focus-within .tooltip-box, .group:active .tooltip-box { 
+            visibility: visible; opacity: 1; 
         }
 
-        .compare-banner {
-            background: linear-gradient(90deg, rgba(250, 204, 21, 0.18), rgba(16, 185, 129, 0.18));
-            border: 1px solid rgba(250, 204, 21, 0.4);
+        @media (min-width: 768px) {
+            .tt-left { left: 0; transform: none; }
+            .tt-center { left: 50%; transform: translateX(-50%); }
+            .tt-right { right: 0; left: auto; transform: none; }
         }
 
-        /* Section title */
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            font-weight: 900;
-            letter-spacing: 0.05em;
-            color: #e2e8f0;
-            text-transform: uppercase;
+        @media (max-width: 767px) {
+            .tooltip-box {
+                position: fixed !important; top: 50% !important; left: 50% !important; right: auto !important; bottom: auto !important;
+                transform: translate(-50%, -50%) !important; width: 90vw !important; max-width: 400px !important;
+                max-height: 70vh !important; overflow-y: auto !important; margin-top: 0 !important;
+                border-width: 2px !important; box-shadow: 0 0 0 100vmax rgba(0,0,0,0.7), 0 0 30px rgba(0,0,0,0.9) !important; 
+                z-index: 999999 !important;
+            }
+            .tooltip-box li {
+                font-size: 11px !important; line-height: 1.4 !important; white-space: normal !important; 
+                padding-bottom: 6px !important; margin-bottom: 6px !important; border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            .tooltip-box li:last-child { border-bottom: none; margin-bottom: 0 !important; padding-bottom: 0 !important; }
+            .tooltip-box span { font-size: inherit !important; }
         }
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(16,185,129,0.3), transparent);
-            margin-left: 0.75rem;
-        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #FF8C00; border-radius: 2px; }
+
+        #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
-<body class="bg-[#0b1120] text-gray-100 min-h-screen flex flex-col font-sans antialiased">
+<body class="hero-background">
 
-    <main class="container mx-auto px-3 sm:px-4 py-4 sm:py-6 flex-grow space-y-5">
+    <div id="loading">
+        <i class="fas fa-circle-notch fa-spin text-bombeiros-orange text-6xl mb-6"></i>
+        <h2 class="text-2xl font-black tracking-widest uppercase text-white">Carregando Escala</h2>
+        <p class="text-sm text-gray-500 mt-2 font-mono" id="msg-loading">Agrupando Pelotões...</p>
+    </div>
+
+    <div class="content-wrapper flex flex-col min-h-screen hidden" id="app">
         
-        <header class="glass p-5 sm:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 sm:h-20 opacity-90 w-auto">
-            <div class="text-center">
-                <h1 class="text-2xl sm:text-3xl font-black text-white">
-                    <i class="fas fa-users text-emerald-400 mr-2"></i>PLATAFORMA ANTIGUIDADE DE PRAÇAS DO CBMRS
-                </h1>
-                <div class="flex items-center justify-center gap-2 text-emerald-400 font-mono text-sm font-bold mt-1">
-                    <i class="fas fa-file-alt"></i>
-                    <span>conforme Boletim de Avaliação e Mérito nº 002/2026</span>
-                </div>
-            </div>
-            <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 sm:h-20 hidden md:block w-auto">
-        </header>
-
-        <div id="loadingOverlay" class="glass p-8 flex flex-col items-center justify-center space-y-4">
-            <div class="loader"></div>
-            <p class="text-emerald-400 font-mono text-lg font-bold">CARREGANDO EFETIVO...</p>
-            <p class="text-slate-400 text-sm" id="loadingStatus">Conectando ao CSV...</p>
-        </div>
-
-        <div id="mainDashboard" class="hidden space-y-5">
-
-            <!-- BLOCO 1: EFETIVO TOTAL -->
-            <div class="glass p-5">
-                <h3 class="section-title mb-4">
-                    <i class="fas fa-users text-emerald-400"></i>EFETIVO TOTAL POR GRADUAÇÃO
-                </h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                    <div class="card-grad p-4 rounded-2xl text-center">
-                        <div class="flex items-center justify-center gap-1.5 mb-1">
-                            <i class="fas fa-medal text-yellow-700 text-sm"></i>
-                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">1º SGT</span>
-                        </div>
-                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="total1Sgt">0</div>
+        <!-- ============================================== -->
+        <!-- CABEÇALHO CONGELADO (STICKY TOP) -->
+        <!-- ============================================== -->
+        <div class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 py-4 w-full">
+            <div class="max-w-7xl mx-auto">
+                <header class="w-full flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+                    <div class="flex-shrink-0 hidden md:block">
+                        <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 drop-shadow-lg">
                     </div>
-                    <div class="card-grad p-4 rounded-2xl text-center">
-                        <div class="flex items-center justify-center gap-1.5 mb-1">
-                            <i class="fas fa-medal text-orange-700 text-sm"></i>
-                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">2º SGT</span>
-                        </div>
-                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="total2Sgt">0</div>
-                    </div>
-                    <div class="card-grad p-4 rounded-2xl text-center">
-                        <div class="flex items-center justify-center gap-1.5 mb-1">
-                            <i class="fas fa-medal text-sky-700 text-sm"></i>
-                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">3º SGT</span>
-                        </div>
-                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="total3Sgt">0</div>
-                    </div>
-                    <div class="card-grad p-4 rounded-2xl text-center">
-                        <div class="flex items-center justify-center gap-1.5 mb-1">
-                            <i class="fas fa-shield-halved text-emerald-800 text-sm"></i>
-                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">SOLDADOS</span>
-                        </div>
-                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="totalSd">0</div>
-                    </div>
-                    <div class="card-grad p-4 rounded-2xl text-center">
-                        <div class="flex items-center justify-center gap-1.5 mb-1">
-                            <i class="fas fa-shield text-amber-700 text-sm"></i>
-                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">SD BMT</span>
-                        </div>
-                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="totalSdTemp">0</div>
-                    </div>
-                    <div class="card-total p-4 rounded-2xl text-center">
-                        <div class="flex items-center justify-center gap-1.5 mb-1">
-                            <i class="fas fa-star text-yellow-300 text-sm"></i>
-                            <span class="label text-[0.7rem] font-bold tracking-wide">TOTAL</span>
-                        </div>
-                        <div class="value text-3xl sm:text-4xl font-black leading-none" id="totalGeral">0</div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- BLOCO 2: GRÁFICO DE BARRAS VERTICAIS -->
-            <div class="glass p-5">
-                <h3 class="section-title mb-4">
-                    <i class="fas fa-chart-column text-emerald-400"></i>DISTRIBUIÇÃO DO EFETIVO POR GRADUAÇÃO
-                </h3>
-                <div class="relative w-full h-80 sm:h-96">
-                    <canvas id="chartGraduacao"></canvas>
-                </div>
-            </div>
-
-            <!-- BLOCO 3: FILTROS + COMPARAÇÃO -->
-            <div class="glass p-5 space-y-5">
-                <div>
-                    <h3 class="section-title mb-3">
-                        <i class="fas fa-filter text-emerald-400"></i>FILTROS DA LISTA
-                    </h3>
-                    <div class="flex flex-wrap gap-3 items-center">
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-grow">
-                            <input type="text" id="fAnt" placeholder="Antiguidade" class="filter-input text-sm">
-                            <input type="text" id="fNome" placeholder="Nome" class="filter-input text-sm">
-                            <input type="text" id="fId" placeholder="ID Funcional" class="filter-input text-sm">
-                            <select id="fGrad" class="filter-input text-sm">
-                                <option value="">Todas Graduações</option>
-                                <option value="1º Sargento">1º SGT</option>
-                                <option value="2º Sargento">2º SGT</option>
-                                <option value="3º Sargento">3º SGT</option>
-                                <option value="Soldado">SOLDADO</option>
-                                <option value="Soldado Temporário">SD BMT</option>
-                            </select>
-                        </div>
-                        <button id="btnLimparFiltros" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-full text-sm">
-                            <i class="fas fa-times mr-1"></i>LIMPAR
-                        </button>
-                    </div>
-                </div>
-
-                <div class="border-t border-white/10"></div>
-
-                <div>
-                    <h3 class="section-title mb-3">
-                        <i class="fas fa-balance-scale text-yellow-400"></i>VERIFICAR ANTIGUIDADE ENTRE DOIS MILITARES
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div class="relative">
-                            <label class="block text-[0.7rem] font-bold text-slate-400 mb-1">MILITAR A</label>
-                            <input type="text" id="compareA" placeholder="Digite o nome ou ID funcional" class="w-full filter-input" autocomplete="off">
-                            <div id="suggestionsA" class="suggestions-dropdown absolute w-full hidden"></div>
-                        </div>
-                        <div class="relative">
-                            <label class="block text-[0.7rem] font-bold text-slate-400 mb-1">MILITAR B</label>
-                            <input type="text" id="compareB" placeholder="Digite o nome ou ID funcional" class="w-full filter-input" autocomplete="off">
-                            <div id="suggestionsB" class="suggestions-dropdown absolute w-full hidden"></div>
+                    <div class="text-center flex-grow">
+                        <h1 class="text-2xl md:text-4xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                            Guarnição Operacional
+                        </h1>
+                        <h2 class="text-base md:text-lg font-bold text-bombeiros-orange mt-0.5 uppercase tracking-widest">
+                            EM PORTO ALEGRE
+                        </h2>
+                        <div class="flex justify-center items-center gap-3 mt-2 text-[10px] md:text-xs font-mono text-gray-400 bg-black/40 px-4 py-1.5 rounded-full border border-white/5 inline-flex">
+                            <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
+                            <span>|</span>
+                            <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
                         </div>
                     </div>
-                    <div class="flex flex-wrap justify-center gap-3 mt-4">
-                        <button id="btnComparar" class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2.5 px-8 rounded-xl shadow-lg">
-                            <i class="fas fa-trophy mr-2"></i>VERIFICAR
-                        </button>
-                        <button id="btnLimparComp" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-6 rounded-xl hidden">
-                            <i class="fas fa-undo mr-2"></i>SAIR DO MODO COMPARAÇÃO
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- BLOCO 4: TABELA -->
-            <div class="glass overflow-hidden">
-                <div id="compareBanner" class="compare-banner p-3 sm:p-4 hidden">
-                    <div class="flex items-center justify-center gap-3 text-center">
-                        <i class="fas fa-trophy text-yellow-400 text-xl"></i>
-                        <span id="compareResult" class="font-bold text-white text-sm sm:text-base"></span>
+                    <div class="flex-shrink-0 hidden md:block">
+                        <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 drop-shadow-lg opacity-90">
                     </div>
-                </div>
+                </header>
 
-                <div class="p-4 border-b border-white/5 bg-slate-900/60 flex justify-between items-center">
-                    <span class="font-black text-white uppercase text-sm sm:text-base">
-                        <i class="fas fa-list mr-2 text-emerald-400"></i><span id="tableTitle">RELAÇÃO COMPLETA</span>
-                    </span>
-                    <span class="text-xs bg-emerald-900/50 px-3 py-1 rounded-full text-emerald-300 font-mono">
-                        <span id="totalExibido">0</span> praças
-                    </span>
-                </div>
-                <div class="table-container">
-                    <table class="w-full text-left text-xs sm:text-sm">
-                        <thead class="bg-slate-900 text-slate-300 sticky top-0 uppercase font-mono text-[0.7rem]">
-                            <tr>
-                                <th class="p-3"># ANT.</th>
-                                <th class="p-3">NOME COMPLETO</th>
-                                <th class="p-3">ID FUNC</th>
-                                <th class="p-3">GRADUAÇÃO</th>
-                                <th class="p-3">DATA</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="text-gray-200 font-mono divide-y divide-white/5"></tbody>
-                    </table>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- EFETIVO -->
+                    <div class="stats-container border-l-4 border-bombeiros-orange">
+                        <div class="flex justify-around items-center">
+                            <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
+                                <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                                <span class="text-[9px] md:text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                                <div class="tooltip-box tt-left"><ul id="list-cap" class="text-left"></ul></div>
+                            </div>
+                            <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
+                                <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                                <span class="text-[9px] md:text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                                <div class="tooltip-box tt-center"><ul id="list-sgt" class="text-left"></ul></div>
+                            </div>
+                            <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
+                                <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                                <span class="text-[9px] md:text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                                <div class="tooltip-box tt-right"><ul id="list-sd" class="text-left"></ul></div>
+                            </div>
+                            <div class="w-px h-8 bg-white/10 mx-2"></div>
+                            <div class="group relative text-center">
+                                <span class="block text-3xl md:text-4xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
+                                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIATURAS -->
+                    <div class="stats-container border-l-4 border-fire-red">
+                        <div class="flex justify-around items-center">
+                            <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
+                                <span class="block text-3xl md:text-4xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
+                                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
+                                <div class="tooltip-box tt-left"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
+                            </div>
+                            <div class="w-px h-8 bg-white/10"></div>
+                            <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
+                                <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
+                                <span class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
+                                <div class="tooltip-box tt-right"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
 
-    <footer class="text-center py-5 text-slate-500 text-[0.65rem] uppercase tracking-[.2em] bg-[#0b1120]/80">
-             © CIA - 1º BBM · 2026 · Plataforma Desenvolvida por Gustavo Medeiros.
-    </footer>
+        <!-- ============================================== -->
+        <!-- CONTEÚDO ROLÁVEL (CARDS DAS CIAS) -->
+        <!-- ============================================== -->
+        <main class="w-full max-w-7xl mx-auto flex-grow p-4">
+            <div id="grid-cards" class="flex flex-col gap-8 pb-10"></div>
+        </main>
+
+        <footer class="mt-auto py-6 text-center border-t border-white/5">
+            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+                Sistema de Controle Operacional - 1º BBM - 2026
+            </p>
+            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
+        </footer>
+    </div>
 
     <script>
-        (function(){
-            "use strict";
+        const URL_DADOS = "https://script.google.com/macros/s/AKfycbytTWRqDymoXymP03pKWZlaQL7artZiBKahsg8Xu5cOg4j5AEQBTKcqy9olSGgqwK17/exec"; 
 
-            const CSV_URL = './dados/efetivo.csv';
-            
-            const loadingEl = document.getElementById('loadingOverlay');
-            const loadingStatus = document.getElementById('loadingStatus');
-            const dashboardEl = document.getElementById('mainDashboard');
-            const total1SgtEl = document.getElementById('total1Sgt');
-            const total2SgtEl = document.getElementById('total2Sgt');
-            const total3SgtEl = document.getElementById('total3Sgt');
-            const totalSdEl = document.getElementById('totalSd');
-            const totalSdTempEl = document.getElementById('totalSdTemp');
-            const totalGeralEl = document.getElementById('totalGeral');
-            const totalExibidoEl = document.getElementById('totalExibido');
-            const tableTitleEl = document.getElementById('tableTitle');
-            const tableBody = document.getElementById('tableBody');
-            const fAnt = document.getElementById('fAnt');
-            const fNome = document.getElementById('fNome');
-            const fId = document.getElementById('fId');
-            const fGrad = document.getElementById('fGrad');
-            const btnLimpar = document.getElementById('btnLimparFiltros');
-            const compareA = document.getElementById('compareA');
-            const compareB = document.getElementById('compareB');
-            const suggestionsA = document.getElementById('suggestionsA');
-            const suggestionsB = document.getElementById('suggestionsB');
-            const btnComparar = document.getElementById('btnComparar');
-            const btnLimparComp = document.getElementById('btnLimparComp');
-            const compareBanner = document.getElementById('compareBanner');
-            const compareResult = document.getElementById('compareResult');
+        // Definição das Companhias Oficiais e Cores
+        const GRUPOS_DEF = [
+            {
+                nome: "COMANDO E CONTROLE",
+                obms: ["OFICIAL DE DIA", "ESTADO MAIOR", "COBOM", "CCOB"],
+                corBarra: "bg-bombeiros-orange",
+                corTitulo: "text-bombeiros-orange"
+            },
+            {
+                nome: "1ª CIA",
+                obms: ["AÇORIANOS", "ASSUNÇÃO", "TERESÓPOLIS", "RESTINGA", "BELÉM NOVO"],
+                corBarra: "bg-bombeiros-orange",
+                corTitulo: "text-bombeiros-orange"
+            },
+            {
+                nome: "2ª CIA",
+                obms: ["FLORESTA", "PASSO D'AREIA", "PARTENON"],
+                corBarra: "bg-total-green", // Verde
+                corTitulo: "text-total-green" // Verde
+            },
+            {
+                nome: "BBS",
+                obms: ["TERRESTRE", "CANIL", "AQUÁTICA", "MERGULHO"],
+                corBarra: "bg-gray-500", // Cinza
+                corTitulo: "text-gray-400" // Cinza
+            }
+        ];
 
-            let dadosBrutos = [];
-            let dadosFiltrados = [];
-            let chartInstance = null;
-            let comparisonState = null;
+        const FUNCOES_FIXAS = [
+            "COMANDANTE DE GUARNIÇÃO",
+            "AUXILIAR DE LINHA DIREITA",
+            "AUXILIAR DE LINHA ESQUERDA",
+            "COV / OPERADOR / CONDUTOR",
+            "COMANDANTE DE SOCORRO",
+            "CHEFE DE LINHA DIREITA",
+            "CHEFE DE LINHA ESQUERDA",
+            "OFICIAL SUPERVISOR",
+            "MOTORISTA DE DIA",
+            "OPERADOR COBOM",
+            "CONDUTOR NAVAL",
+            "AUXILIAR DE CONDUTOR NAVAL",
+            "OFICIAL DE SV",
+            "OPERADOR CCOB",
+            "RESGATISTA 1",
+            "RESGATISTA 2",
+            "SOCORRISTA 1",
+            "SOCORRISTA 2",
+            "CINOTÉCNICO",
+            "MERGULHADOR",
+            "SOCORRISTA",
+            "RESGATISTA",
+            "MOTORISTA"
+        ];
 
-            function parseCSV(texto) {
-                const linhas = texto.split('\n').filter(l => l.trim() !== '');
-                if (linhas.length === 0) return [];
-                const dados = linhas.slice(1);
-                const militares = [];
-                for (let linha of dados) {
-                    if (linha.trim() === '') continue;
-                    const partes = linha.split(';');
-                    if (partes.length < 5) continue;
-                    let rank = partes[0].trim();
-                    const nome = partes[1].trim();
-                    const idFunc = partes[2].trim();
-                    const graduacao = partes[3].trim();
-                    const data = partes[4].trim();
-                    militares.push({ rank, nome, idFunc, graduacao, data });
+        function getDataOperacional() {
+            const agora = new Date();
+            if (agora.getHours() < 8) {
+                agora.setDate(agora.getDate() - 1);
+            }
+            return agora;
+        }
+
+        function formatarDataCurta(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = data.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+            return `${dia}${mes.charAt(0).toUpperCase() + mes.slice(1)}`;
+        }
+
+        function calcularTurno(raw) {
+            if(!raw) return "";
+            try {
+                const horasMatch = raw.match(/(\d{2}:\d{2})/g);
+                if (!horasMatch || horasMatch.length === 0) return "";
+
+                const dataOp = getDataOperacional();
+                const hoje = new Date(dataOp);
+                const amanha = new Date(dataOp);
+                amanha.setDate(amanha.getDate() + 1);
+
+                let hInicio = "08:00"; let hFim = "08:00";
+                let dInicio = hoje; let dFim = amanha; let carga = "24h";
+
+                if (horasMatch.length === 1) {
+                    const horaUnica = horasMatch[0];
+                    if (horaUnica === "20:00") {
+                        hInicio = "08:00"; hFim = "20:00"; dFim = hoje; carga = "12h";
+                    } else {
+                        hInicio = "08:00"; hFim = "08:00"; dFim = amanha; carga = "24h";
+                    }
                 }
-                return militares;
-            }
-
-            async function carregarDados() {
-                try {
-                    loadingStatus.textContent = 'Baixando CSV...';
-                    const response = await fetch(CSV_URL);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const texto = await response.text();
-                    dadosBrutos = parseCSV(texto);
-                    if (dadosBrutos.length === 0) throw new Error('Nenhum militar encontrado.');
-                    
-                    const ordemGrad = {
-                        '1º Sargento':1, '2º Sargento':2, '3º Sargento':3, 
-                        'Soldado':4, 'Soldado Temporário':5
-                    };
-                    dadosBrutos.sort((a,b) => {
-                        const ga = ordemGrad[a.graduacao] || 99;
-                        const gb = ordemGrad[b.graduacao] || 99;
-                        if (ga !== gb) return ga - gb;
-                        const ra = parseInt(a.rank);
-                        const rb = parseInt(b.rank);
-                        if (!isNaN(ra) && !isNaN(rb)) return ra - rb;
-                        if (isNaN(ra) && isNaN(rb)) return a.rank.localeCompare(b.rank);
-                        return isNaN(ra) ? 1 : -1;
-                    });
-                    
-                    dadosFiltrados = [...dadosBrutos];
-                    atualizarContadores();
-                    desenharGrafico();
-                    renderizarTabela();
-                    loadingEl.classList.add('hidden');
-                    dashboardEl.classList.remove('hidden');
-                } catch (erro) {
-                    console.error(erro);
-                    loadingStatus.innerHTML = `<span class="text-red-400">Erro: ${erro.message}</span>`;
-                    dadosBrutos = [{ rank:1, nome:"AUREO ROGERIO GAUTERIO DA VEIGA", idFunc:"2274175", graduacao:"1º Sargento", data:"ABR/2004" }];
-                    dadosFiltrados = [...dadosBrutos];
-                    atualizarContadores();
-                    desenharGrafico();
-                    renderizarTabela();
-                    loadingEl.classList.add('hidden');
-                    dashboardEl.classList.remove('hidden');
+                else if (horasMatch.length >= 2) {
+                    hInicio = horasMatch[0];
+                    hFim = horasMatch[1]; 
+                    if (hInicio === hFim) {
+                        dFim = amanha; carga = "24h";
+                    } else if (hInicio === "08:00" && hFim === "20:00") {
+                        dFim = hoje; carga = "12h";
+                    } else if (hInicio === "20:00" && hFim === "08:00") {
+                        dFim = amanha; carga = "12h";
+                    } else {
+                        const h1 = parseInt(hInicio.split(':')[0]);
+                        const h2 = parseInt(hFim.split(':')[0]);
+                        if (h2 < h1) dFim = amanha; else dFim = hoje;
+                        let diff = h2 - h1; if(diff < 0) diff += 24;
+                        carga = diff > 12 ? "24h" : "12h";
+                    }
                 }
-            }
 
-            function atualizarContadores() {
-                const counts = {};
-                dadosBrutos.forEach(m => counts[m.graduacao] = (counts[m.graduacao] || 0) + 1);
-                total1SgtEl.textContent = (counts['1º Sargento'] || 0).toLocaleString('pt-BR');
-                total2SgtEl.textContent = (counts['2º Sargento'] || 0).toLocaleString('pt-BR');
-                total3SgtEl.textContent = (counts['3º Sargento'] || 0).toLocaleString('pt-BR');
-                totalSdEl.textContent = (counts['Soldado'] || 0).toLocaleString('pt-BR');
-                totalSdTempEl.textContent = (counts['Soldado Temporário'] || 0).toLocaleString('pt-BR');
-                totalGeralEl.textContent = dadosBrutos.length.toLocaleString('pt-BR');
-            }
-            
-            function desenharGrafico() {
-                const ctx = document.getElementById('chartGraduacao').getContext('2d');
-                if (chartInstance) chartInstance.destroy();
-                
-                const counts = {
-                    '1º Sargento': 0,
-                    '2º Sargento': 0,
-                    '3º Sargento': 0,
-                    'Soldado': 0,
-                    'Soldado Temporário': 0
-                };
-                dadosBrutos.forEach(m => counts[m.graduacao]++);
-                
-                const data = [
-                    counts['1º Sargento'],
-                    counts['2º Sargento'],
-                    counts['3º Sargento'],
-                    counts['Soldado'],
-                    counts['Soldado Temporário']
-                ];
-                const labels = ['1º SGT', '2º SGT', '3º SGT', 'SOLDADOS', 'SD BMT'];
-                const cores = ['#eab308', '#f97316', '#0ea5e9', '#10b981', '#f59e0b'];
-                const totalGeral = data.reduce((a,b) => a+b, 0) || 1;
-                
-                chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Efetivo',
-                            data: data,
-                            backgroundColor: cores,
-                            borderColor: cores,
-                            borderWidth: 0,
-                            borderRadius: 10,
-                            borderSkipped: false,
-                            maxBarThickness: 90,
-                            hoverBackgroundColor: cores.map(c => c + 'cc')
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        layout: {
-                            padding: { top: 30, right: 10, left: 10, bottom: 0 }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(15,23,42,0.95)',
-                                titleColor: '#10b981',
-                                bodyColor: '#f1f5f9',
-                                borderColor: 'rgba(16,185,129,0.4)',
-                                borderWidth: 1,
-                                padding: 12,
-                                titleFont: { weight: 'bold', size: 13 },
-                                bodyFont: { size: 12 },
-                                callbacks: {
-                                    label: (ctx) => {
-                                        const v = ctx.parsed.y;
-                                        const p = ((v/totalGeral)*100).toFixed(1);
-                                        return `${v.toLocaleString('pt-BR')} militares (${p}%)`;
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                color: '#ffffff',
-                                anchor: 'end',
-                                align: 'top',
-                                offset: 4,
-                                font: { weight: 'bold', size: 13 },
-                                textAlign: 'center',
-                                formatter: (value) => {
-                                    const p = ((value/totalGeral)*100).toFixed(1);
-                                    return `${value.toLocaleString('pt-BR')}\n${p}%`;
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                ticks: {
-                                    color: '#e2e8f0',
-                                    font: { weight: 'bold', size: 13 }
-                                },
-                                grid: { display: false },
-                                border: { color: 'rgba(255,255,255,0.1)' }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grace: '15%',
-                                ticks: {
-                                    color: '#94a3b8',
-                                    font: { size: 11 }
-                                },
-                                grid: { color: 'rgba(255,255,255,0.05)' },
-                                border: { color: 'rgba(255,255,255,0.1)' }
-                            }
-                        },
-                        animation: {
-                            duration: 900,
-                            easing: 'easeOutQuart'
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            }
-            
-            function filtrarDados() {
-                if (comparisonState) sairModoComparacao(false);
+                const strDataIni = formatarDataCurta(dInicio);
+                const strDataFim = formatarDataCurta(dFim);
 
-                const ant = fAnt.value.trim().toUpperCase();
-                const nome = fNome.value.trim().toUpperCase();
-                const id = fId.value.trim();
-                const grad = fGrad.value;
+                return `
+                    <div class="mt-0.5 leading-snug flex items-center justify-center gap-1 bg-black/30 rounded px-1.5 py-0.5 w-max mx-auto border border-white/5">
+                        <span class="text-bombeiros-orange font-bold text-[9px]">${carga}</span> 
+                        <span class="text-gray-500 text-[8px]">|</span> 
+                        <span class="text-sky-blue font-bold text-[9px]">${hInicio}</span> 
+                        <i class="fas fa-arrow-right text-gray-600 text-[6px]"></i>
+                        <span class="text-sky-blue font-bold text-[9px]">${hFim}</span> 
+                        <span class="text-gray-500 text-[8px] ml-0.5">(${strDataFim})</span>
+                    </div>
+                `;
+            } catch(e) { console.error(e); return ""; }
+        }
+
+        function extrairID(nomeCompleto) {
+            const match = nomeCompleto.match(/(\d{7})/);
+            return match ? match[1] : null; 
+        }
+
+        function limparNomeBasico(nomeCompleto) {
+            return nomeCompleto.replace(/\d{7}\s+/, '').replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/\b\d+\b/g, '').trim();
+        }
+
+        function processarDados(dados) {
+            const estrutura = {};
+            const mapOficiais = new Map();
+            const mapSargentos = new Map();
+            const mapPracas = new Map();
+            const statsViaturas = { combate: new Set(), apoio: new Set() };
+
+            dados.forEach(d => {
+                let obmRaw = (d.obm || "").toUpperCase();
+                let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
+                let nomeBruto = (d.nome || "").trim().toUpperCase();
+                let funcBruta = (d.func || "").trim().toUpperCase();
                 
-                dadosFiltrados = dadosBrutos.filter(m => {
-                    if (ant && m.rank.toString().toUpperCase() !== ant) return false;
-                    if (nome && !m.nome.toUpperCase().includes(nome)) return false;
-                    if (id && !m.idFunc.includes(id)) return false;
-                    if (grad && m.graduacao !== grad) return false;
-                    return true;
-                });
-                renderizarTabela();
-            }
-            
-            function renderizarTabela() {
-                tableBody.innerHTML = '';
-                const display = dadosFiltrados.slice(0, 1000);
-                display.forEach(m => {
-                    const idxGlobal = dadosBrutos.indexOf(m);
-                    const tr = document.createElement('tr');
-                    
-                    let classes = 'hover:bg-white/5 border-b border-slate-700/40';
-                    let nomeExtra = '';
-                    
-                    if (comparisonState) {
-                        if (idxGlobal === comparisonState.winnerIdx) {
-                            classes += ' row-winner';
-                            nomeExtra = '<span class="trophy-icon ml-2 text-2xl" title="Mais antigo">🏆</span>';
-                        } else if (idxGlobal === comparisonState.loserIdx) {
-                            classes += ' row-compared';
-                            nomeExtra = '<span class="ml-2 text-slate-400 text-sm">🥈</span>';
+                funcBruta = funcBruta.replace(/\bND\b/g, '').replace(/\d+º\s*\d+/g, '').replace(/[0-9]/g, '').replace(/[-]/g, '').trim();
+
+                let funcaoFinal = "";
+                
+                for (const cargo of FUNCOES_FIXAS) {
+                    if (funcBruta.includes(cargo)) {
+                        funcaoFinal = cargo;
+                        break;
+                    }
+                }
+
+                if (funcaoFinal === "") {
+                    for (const cargo of FUNCOES_FIXAS) {
+                        if (nomeBruto.includes(cargo)) {
+                            funcaoFinal = cargo;
+                            nomeBruto = nomeBruto.replace(cargo, "").trim();
+                            break;
                         }
                     }
-                    
-                    tr.className = classes;
-                    
-                    let gradClass = 'text-emerald-400';
-                    if (m.graduacao.includes('1º')) gradClass = 'text-yellow-400';
-                    else if (m.graduacao.includes('2º')) gradClass = 'text-orange-400';
-                    else if (m.graduacao.includes('3º')) gradClass = 'text-sky-400';
-                    else if (m.graduacao.includes('Temporário')) gradClass = 'text-amber-400';
-                    
-                    tr.innerHTML = `<td class="p-3 text-center font-bold">${m.rank}</td>
-                        <td class="p-3 font-semibold">${m.nome}${nomeExtra}</td>
-                        <td class="p-3 text-blue-300">${m.idFunc}</td>
-                        <td class="p-3 ${gradClass} font-bold">${m.graduacao}</td>
-                        <td class="p-3 text-slate-400">${m.data}</td>`;
-                    tableBody.appendChild(tr);
-                });
-                totalExibidoEl.textContent = dadosFiltrados.length.toLocaleString('pt-BR');
-            }
-            
-            function resetFiltros() {
-                fAnt.value = fNome.value = fId.value = '';
-                fGrad.value = '';
-                if (comparisonState) sairModoComparacao(false);
-                dadosFiltrados = [...dadosBrutos];
-                renderizarTabela();
-            }
+                }
 
-            function setupAutocomplete(inputEl, suggestionsEl, targetInput) {
-                inputEl.addEventListener('input', function() {
-                    const val = this.value.trim().toUpperCase();
-                    if (val.length < 2) { suggestionsEl.classList.add('hidden'); return; }
-                    const matches = dadosBrutos.filter(m => m.nome.toUpperCase().includes(val) || m.idFunc.includes(val)).slice(0,8);
-                    if (!matches.length) { suggestionsEl.classList.add('hidden'); return; }
-                    suggestionsEl.innerHTML = '';
-                    matches.forEach(m => {
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        div.innerHTML = `<span class="font-bold">${m.nome}</span> <span class="text-xs text-slate-400 ml-2">${m.idFunc}</span>`;
-                        div.addEventListener('click', () => {
-                            targetInput.value = `${m.nome} (${m.idFunc})`;
-                            suggestionsEl.classList.add('hidden');
-                        });
-                        suggestionsEl.appendChild(div);
+                let idMilitar = extrairID(nomeBruto);
+                let idUnico = idMilitar ? idMilitar : nomeBruto;
+                let nomeExibicao = limparNomeBasico(nomeBruto);
+                let horaHTML = calcularTurno(d.horario || ""); 
+
+                // Identifica o Pelotão exato. Se não for nenhum conhecido, mantém o nome bruto como "OUTROS"
+                let obmKey = "OUTROS";
+                if(obmRaw.includes("AÇORIANOS")) obmKey = "AÇORIANOS";
+                else if(obmRaw.includes("ASSUNÇÃO")) obmKey = "ASSUNÇÃO";
+                else if(obmRaw.includes("TERESÓPOLIS")) obmKey = "TERESÓPOLIS";
+                else if(obmRaw.includes("RESTINGA")) obmKey = "RESTINGA";
+                else if(obmRaw.includes("BELÉM NOVO")) obmKey = "BELÉM NOVO";
+                else if(obmRaw.includes("FLORESTA")) obmKey = "FLORESTA";
+                else if(obmRaw.includes("PASSO D")) obmKey = "PASSO D'AREIA";
+                else if(obmRaw.includes("PARTENON")) obmKey = "PARTENON";
+                else if(obmRaw.includes("ESTADO MAIOR")) obmKey = "ESTADO MAIOR";
+                else if(obmRaw.includes("COBOM")) obmKey = "COBOM";
+                else if(obmRaw.includes("TERRESTRE")) obmKey = "TERRESTRE";
+                else if(obmRaw.includes("CANIL")) obmKey = "CANIL";
+                else if(obmRaw.includes("MERGULHO")) obmKey = "MERGULHO";
+                else if(obmRaw.includes("AQUÁTICA")) obmKey = "AQUÁTICA";
+                else if(obmRaw.includes("CCOB")) obmKey = "CCOB";
+                else if(obmRaw.includes("OFICIAL")) obmKey = "OFICIAL DE DIA";
+                else obmKey = obmRaw.substring(0, 20).trim(); // Fallback para pelotões não mapeados
+
+                if(!estrutura[obmKey]) estrutura[obmKey] = [];
+                
+                let viaturaObj = estrutura[obmKey].find(v => v.nome === vtr);
+                if(!viaturaObj) {
+                    viaturaObj = { nome: vtr, guarnicao: [] };
+                    estrutura[obmKey].push(viaturaObj);
+                }
+                
+                if(nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
+                    viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, h: horaHTML });
+
+                    const dadosMilitar = { n: nomeExibicao, f: funcaoFinal };
+
+                    if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) {
+                        mapPracas.set(idUnico, dadosMilitar);
+                    }
+                    else if(nomeBruto.includes("SGT")) {
+                        mapSargentos.set(idUnico, dadosMilitar);
+                    }
+                    else if(nomeBruto.match(/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/)) {
+                        mapOficiais.set(idUnico, dadosMilitar);
+                    }
+                    else {
+                        mapPracas.set(idUnico, dadosMilitar);
+                    }
+                }
+
+                if(vtr.includes("ABT")) {
+                    statsViaturas.combate.add(vtr);
+                }
+                else if(vtr.match(/\b(AR|AEM|AT|ATP|EMN)\b/)) {
+                    statsViaturas.apoio.add(vtr);
+                }
+            });
+
+            atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas);
+            renderizarCards(estrutura);
+        }
+
+        function atualizarStats(mapOficiais, mapSargentos, mapPracas, statsViaturas) {
+            const capArr = Array.from(mapOficiais.values());
+            const sgtArr = Array.from(mapSargentos.values());
+            const sdArr = Array.from(mapPracas.values());
+            const combArr = Array.from(statsViaturas.combate);
+            const apoioArr = Array.from(statsViaturas.apoio);
+
+            const fillList = (idL, arr) => {
+                const html = arr.map(item => `
+                    <li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left whitespace-normal break-words border-b border-white/5 pb-1 last:border-0">
+                        <span class="text-bombeiros-orange font-bold uppercase">• ${item.n}</span>
+                        ${item.f ? `<span class="text-white opacity-90 uppercase font-medium"> - ${item.f}</span>` : ''}
+                    </li>
+                `).join('');
+                document.getElementById(idL).innerHTML = html;
+            };
+
+            document.getElementById('count-cap').innerText = capArr.length;
+            fillList('list-cap', capArr);
+
+            document.getElementById('count-sgt').innerText = sgtArr.length;
+            fillList('list-sgt', sgtArr);
+
+            document.getElementById('count-sd').innerText = sdArr.length;
+            fillList('list-sd', sdArr);
+
+            document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
+            
+            document.getElementById('count-combate').innerText = combArr.length;
+            document.getElementById('list-combate').innerHTML = combArr.map(x => `<li>• ${x}</li>`).join('');
+
+            document.getElementById('count-apoio').innerText = apoioArr.length;
+            document.getElementById('list-apoio').innerHTML = apoioArr.map(x => `<li>• ${x}</li>`).join('');
+        }
+
+        function renderizarCards(estrutura) {
+            const container = document.getElementById('grid-cards');
+            container.innerHTML = "";
+
+            const gruposParaRenderizar = [];
+            const obmsAtribuidos = new Set();
+
+            // 1. Processa os grupos oficiais
+            GRUPOS_DEF.forEach(gDef => {
+                const obmsAtivos = gDef.obms.filter(obm => estrutura[obm] && estrutura[obm].length > 0);
+                if (obmsAtivos.length > 0) {
+                    gruposParaRenderizar.push({
+                        nome: gDef.nome,
+                        obms: obmsAtivos,
+                        corBarra: gDef.corBarra,
+                        corTitulo: gDef.corTitulo
                     });
-                    suggestionsEl.classList.remove('hidden');
+                    obmsAtivos.forEach(o => obmsAtribuidos.add(o));
+                }
+            });
+
+            // 2. Rastreador Automático: Pega qualquer pelotão que não estava na lista e agrupa em "OUTROS"
+            const obmsRestantes = Object.keys(estrutura).filter(obm => !obmsAtribuidos.has(obm) && estrutura[obm].length > 0);
+            if (obmsRestantes.length > 0) {
+                gruposParaRenderizar.push({
+                    nome: "DEMAIS PELOTÕES",
+                    obms: obmsRestantes,
+                    corBarra: "bg-sky-blue", // Fica com a barra azul para destacar que é extra
+                    corTitulo: "text-sky-blue"
                 });
-                inputEl.addEventListener('blur', () => setTimeout(() => suggestionsEl.classList.add('hidden'), 200));
             }
 
-            function compararMilitares() {
-                const valA = compareA.value.trim(), valB = compareB.value.trim();
-                
-                if (!valA || !valB) {
-                    mostrarErroBanner('Preencha os dois campos para comparar.');
-                    return;
-                }
+            // 3. Renderiza os Grupos na Tela
+            gruposParaRenderizar.forEach(grupo => {
+                const section = document.createElement('div');
+                section.className = "w-full flex flex-col mb-4";
 
-                const buscar = (v) => {
-                    if (!v) return null;
-                    const idMatch = v.match(/(\d{7})/);
-                    if (idMatch) return dadosBrutos.find(m => m.idFunc === idMatch[1]);
-                    return dadosBrutos.find(m => m.nome.toUpperCase().includes(v.toUpperCase()));
-                };
-                const mA = buscar(valA), mB = buscar(valB);
-                if (!mA || !mB) {
-                    mostrarErroBanner('Um ou ambos os militares não foram encontrados.');
-                    return;
-                }
-                if (mA === mB) {
-                    mostrarErroBanner('Selecione dois militares diferentes.');
-                    return;
-                }
-
-                const idxA = dadosBrutos.indexOf(mA);
-                const idxB = dadosBrutos.indexOf(mB);
-                
-                const winnerIdx = idxA < idxB ? idxA : idxB;
-                const loserIdx  = idxA < idxB ? idxB : idxA;
-                const winner = dadosBrutos[winnerIdx];
-                const loser  = dadosBrutos[loserIdx];
-
-                fAnt.value = fNome.value = fId.value = '';
-                fGrad.value = '';
-
-                comparisonState = { winnerIdx, loserIdx };
-                dadosFiltrados = [winner, loser];
-
-                tableTitleEl.innerHTML = 'MODO COMPARAÇÃO <span class="text-yellow-400">·</span> RESULTADO';
-                compareBanner.classList.remove('hidden');
-                compareResult.innerHTML = `
-                    <span class="text-yellow-300">🏆 MAIS ANTIGO:</span> 
-                    <span class="text-white">${winner.nome}</span> 
-                    <span class="text-emerald-300">(${winner.graduacao} · #${winner.rank})</span>
+                let html = `
+                    <h2 class="text-lg md:text-xl font-black ${grupo.corTitulo} border-b border-white/10 pb-1 mb-3 tracking-widest uppercase">
+                        ${grupo.nome}
+                    </h2>
+                    <div class="flex flex-col lg:flex-row gap-2 xl:gap-4 items-stretch w-full">
                 `;
-                btnLimparComp.classList.remove('hidden');
 
-                renderizarTabela();
+                grupo.obms.forEach(obmName => {
+                    const viaturasRaw = estrutura[obmName];
+                    const gruposUnicos = [];
+                    
+                    viaturasRaw.forEach(vtr => {
+                        const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
+                        const grupoExistente = gruposUnicos.find(g => g.assinatura === assinatura);
+                        if(grupoExistente && assinatura.length > 0) {
+                            grupoExistente.nomesVtrs.push(vtr.nome);
+                        } else {
+                            gruposUnicos.push({ assinatura: assinatura, nomesVtrs: [vtr.nome], guarnicao: vtr.guarnicao });
+                        }
+                    });
 
-                document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    html += `
+                        <div class="card-monitor flex-1 min-w-0">
+                            <div class="${grupo.corBarra} w-10 md:w-12 flex items-center justify-center py-2 flex-shrink-0">
+                                <h2 class="vertical-text text-white font-black text-sm md:text-lg tracking-widest uppercase shadow-black drop-shadow-md whitespace-nowrap">
+                                    ${obmName}
+                                </h2>
+                            </div>
+                            <div class="flex-grow p-2 flex flex-col gap-2 overflow-hidden bg-slate-800/50">
+                    `;
+
+                    gruposUnicos.forEach(grp => {
+                        grp.guarnicao.sort((a,b) => {
+                            const getScore = (role) => {
+                                let r = role.toUpperCase();
+                                if(r.includes("COMANDANTE")) return 1;
+                                if(r.includes("CONDUTOR") || r.includes("COV")) return 2;
+                                return 3;
+                            }
+                            return getScore(a.f || "") - getScore(b.f || "");
+                        });
+
+                        const listaVtrs = grp.nomesVtrs.join(' / ');
+
+                        html += `
+                            <div class="w-full flex flex-col items-center">
+                                <span class="text-bombeiros-yellow font-black text-[9px] tracking-widest uppercase border-b border-bombeiros-yellow/20 pb-0.5 mb-1.5 w-full text-center truncate">
+                                    ${listaVtrs}
+                                </span>
+                                <div class="w-full flex flex-col gap-2.5">
+                                    ${grp.guarnicao.map(m => `
+                                        <div class="flex flex-col items-center w-full">
+                                            <div class="text-moss-green font-black text-sm xl:text-base leading-none drop-shadow-md text-center w-full break-words">
+                                                ${m.n}
+                                            </div>
+                                            ${m.f ? `
+                                            <div class="text-gray-400 text-[8px] xl:text-[9px] font-bold uppercase tracking-wider mt-0.5 text-center w-full break-words">
+                                                ${m.f}
+                                            </div>` : ''}
+                                            ${m.h}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div></div>`;
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                container.appendChild(section);
+            });
+        }
+
+        function atualizarRelogio() {
+            const dataOp = getDataOperacional();
+            const agora = new Date();
+            document.getElementById('data-topo').innerText = dataOp.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            document.getElementById('hora-topo').innerText = agora.toLocaleTimeString('pt-BR');
+        }
+
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        async function iniciarSistema() {
+            try {
+                const req = await fetch(URL_DADOS);
+                const dados = await req.json();
+                if(dados.erro) throw new Error("Dados inválidos");
+                processarDados(dados);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').classList.remove('hidden');
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('msg-loading').innerText = "Reconectando...";
+                setTimeout(iniciarSistema, 5000); 
             }
+        }
 
-            function mostrarErroBanner(msg) {
-                compareBanner.classList.remove('hidden');
-                compareResult.innerHTML = `<span class="text-red-300"><i class="fas fa-exclamation-triangle mr-2"></i>${msg}</span>`;
-            }
-
-            function sairModoComparacao(rerender = true) {
-                comparisonState = null;
-                compareBanner.classList.add('hidden');
-                btnLimparComp.classList.add('hidden');
-                tableTitleEl.textContent = 'RELAÇÃO COMPLETA';
-                compareA.value = '';
-                compareB.value = '';
-                if (rerender) {
-                    dadosFiltrados = [...dadosBrutos];
-                    renderizarTabela();
-                }
-            }
-
-            fAnt.addEventListener('input', filtrarDados);
-            fNome.addEventListener('input', filtrarDados);
-            fId.addEventListener('input', filtrarDados);
-            fGrad.addEventListener('change', filtrarDados);
-            btnLimpar.addEventListener('click', resetFiltros);
-            btnComparar.addEventListener('click', compararMilitares);
-            btnLimparComp.addEventListener('click', () => sairModoComparacao(true));
-            setupAutocomplete(compareA, suggestionsA, compareA);
-            setupAutocomplete(compareB, suggestionsB, compareB);
-            
-            carregarDados();
-        })();
+        iniciarSistema();
+        setInterval(iniciarSistema, 60000); 
     </script>
 </body>
 </html>
