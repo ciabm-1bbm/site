@@ -52,12 +52,27 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .card-olive {
+
+        /* Cards de efetivo (verde-oliva) */
+        .card-grad {
             background-color: #8FBC8F;
-            border-left: 4px solid #2E5A2E !important;
+            border-left: 5px solid #2E5A2E;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .chart-container-3d {
-            filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.4));
+        .card-grad:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.4);
+        }
+        .card-total {
+            background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+            border-left: 5px solid #facc15;
+            color: #ffffff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-total .label, .card-total .value { color: #ffffff !important; }
+        .card-total:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.4);
         }
 
         /* Linha destacada do mais antigo na comparação */
@@ -81,10 +96,28 @@
             50% { transform: translateY(-4px) rotate(8deg); }
         }
 
-        /* Banner do modo comparação */
         .compare-banner {
             background: linear-gradient(90deg, rgba(250, 204, 21, 0.18), rgba(16, 185, 129, 0.18));
             border: 1px solid rgba(250, 204, 21, 0.4);
+        }
+
+        /* Section title */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            color: #e2e8f0;
+            text-transform: uppercase;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(16,185,129,0.3), transparent);
+            margin-left: 0.75rem;
         }
     </style>
 </head>
@@ -113,54 +146,74 @@
         </div>
 
         <div id="mainDashboard" class="hidden space-y-5">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                <div class="glass p-5 lg:col-span-1">
-                    <h3 class="text-sm font-bold text-slate-300 mb-4"><i class="fas fa-users text-emerald-400 mr-2"></i>EFETIVO TOTAL</h3>
-                    <div class="grid grid-cols-2 gap-3 text-center">
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800 font-semibold">1º SGT</span>
-                            <div class="text-3xl font-black text-gray-900" id="total1Sgt">0</div>
+
+            <!-- BLOCO 1: EFETIVO TOTAL -->
+            <div class="glass p-5">
+                <h3 class="section-title mb-4">
+                    <i class="fas fa-users text-emerald-400"></i>EFETIVO TOTAL POR GRADUAÇÃO
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div class="card-grad p-4 rounded-2xl text-center">
+                        <div class="flex items-center justify-center gap-1.5 mb-1">
+                            <i class="fas fa-medal text-yellow-700 text-sm"></i>
+                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">1º SGT</span>
                         </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800 font-semibold">2º SGT</span>
-                            <div class="text-3xl font-black text-gray-900" id="total2Sgt">0</div>
-                        </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800 font-semibold">3º SGT</span>
-                            <div class="text-3xl font-black text-gray-900" id="total3Sgt">0</div>
-                        </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800 font-semibold">SOLDADOS</span>
-                            <div class="text-3xl font-black text-gray-900" id="totalSd">0</div>
-                        </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800 font-semibold">SD BMT</span>
-                            <div class="text-3xl font-black text-gray-900" id="totalSdTemp">0</div>
-                        </div>
-                        <div class="card-olive p-3 rounded-2xl">
-                            <span class="text-xs text-gray-800 font-semibold">TOTAL</span>
-                            <div class="text-3xl font-black text-gray-900" id="totalGeral">0</div>
-                        </div>
+                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="total1Sgt">0</div>
                     </div>
-                </div>
-                
-                <div class="glass p-4 lg:col-span-2 flex flex-col">
-                    <h3 class="text-sm font-bold text-slate-300 mb-2"><i class="fas fa-chart-pie text-emerald-400 mr-2"></i>DISTRIBUIÇÃO</h3>
-                    <div class="relative w-full h-72 sm:h-80 chart-container-3d">
-                        <canvas id="chartGraduacao"></canvas>
+                    <div class="card-grad p-4 rounded-2xl text-center">
+                        <div class="flex items-center justify-center gap-1.5 mb-1">
+                            <i class="fas fa-medal text-orange-700 text-sm"></i>
+                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">2º SGT</span>
+                        </div>
+                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="total2Sgt">0</div>
+                    </div>
+                    <div class="card-grad p-4 rounded-2xl text-center">
+                        <div class="flex items-center justify-center gap-1.5 mb-1">
+                            <i class="fas fa-medal text-sky-700 text-sm"></i>
+                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">3º SGT</span>
+                        </div>
+                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="total3Sgt">0</div>
+                    </div>
+                    <div class="card-grad p-4 rounded-2xl text-center">
+                        <div class="flex items-center justify-center gap-1.5 mb-1">
+                            <i class="fas fa-shield-halved text-emerald-800 text-sm"></i>
+                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">SOLDADOS</span>
+                        </div>
+                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="totalSd">0</div>
+                    </div>
+                    <div class="card-grad p-4 rounded-2xl text-center">
+                        <div class="flex items-center justify-center gap-1.5 mb-1">
+                            <i class="fas fa-shield text-amber-700 text-sm"></i>
+                            <span class="label text-[0.7rem] text-gray-800 font-bold tracking-wide">SD BMT</span>
+                        </div>
+                        <div class="value text-3xl sm:text-4xl font-black text-gray-900 leading-none" id="totalSdTemp">0</div>
+                    </div>
+                    <div class="card-total p-4 rounded-2xl text-center">
+                        <div class="flex items-center justify-center gap-1.5 mb-1">
+                            <i class="fas fa-star text-yellow-300 text-sm"></i>
+                            <span class="label text-[0.7rem] font-bold tracking-wide">TOTAL</span>
+                        </div>
+                        <div class="value text-3xl sm:text-4xl font-black leading-none" id="totalGeral">0</div>
                     </div>
                 </div>
             </div>
 
-            <!-- BLOCO UNIFICADO: FILTROS + COMPARAÇÃO -->
+            <!-- BLOCO 2: GRÁFICO DE BARRAS VERTICAIS -->
+            <div class="glass p-5">
+                <h3 class="section-title mb-4">
+                    <i class="fas fa-chart-column text-emerald-400"></i>DISTRIBUIÇÃO DO EFETIVO POR GRADUAÇÃO
+                </h3>
+                <div class="relative w-full h-80 sm:h-96">
+                    <canvas id="chartGraduacao"></canvas>
+                </div>
+            </div>
+
+            <!-- BLOCO 3: FILTROS + COMPARAÇÃO -->
             <div class="glass p-5 space-y-5">
-                
-                <!-- Filtros gerais -->
                 <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <i class="fas fa-filter text-emerald-400"></i>
-                        <span class="text-sm font-black tracking-wider">FILTROS DA LISTA</span>
-                    </div>
+                    <h3 class="section-title mb-3">
+                        <i class="fas fa-filter text-emerald-400"></i>FILTROS DA LISTA
+                    </h3>
                     <div class="flex flex-wrap gap-3 items-center">
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-grow">
                             <input type="text" id="fAnt" placeholder="Antiguidade" class="filter-input text-sm">
@@ -181,15 +234,12 @@
                     </div>
                 </div>
 
-                <!-- Divisor -->
                 <div class="border-t border-white/10"></div>
 
-                <!-- Verificar antiguidade (integrado) -->
                 <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <i class="fas fa-balance-scale text-yellow-400"></i>
-                        <span class="text-sm font-black tracking-wider">VERIFICAR ANTIGUIDADE ENTRE DOIS MILITARES</span>
-                    </div>
+                    <h3 class="section-title mb-3">
+                        <i class="fas fa-balance-scale text-yellow-400"></i>VERIFICAR ANTIGUIDADE ENTRE DOIS MILITARES
+                    </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div class="relative">
                             <label class="block text-[0.7rem] font-bold text-slate-400 mb-1">MILITAR A</label>
@@ -213,9 +263,8 @@
                 </div>
             </div>
 
-            <!-- TABELA -->
+            <!-- BLOCO 4: TABELA -->
             <div class="glass overflow-hidden">
-                <!-- Banner que aparece em modo comparação -->
                 <div id="compareBanner" class="compare-banner p-3 sm:p-4 hidden">
                     <div class="flex items-center justify-center gap-3 text-center">
                         <i class="fas fa-trophy text-yellow-400 text-xl"></i>
@@ -288,7 +337,6 @@
             let dadosBrutos = [];
             let dadosFiltrados = [];
             let chartInstance = null;
-            // Estado da comparação: { winnerIdx, loserIdx } em índices globais (de dadosBrutos)
             let comparisonState = null;
 
             function parseCSV(texto) {
@@ -386,35 +434,85 @@
                 ];
                 const labels = ['1º SGT', '2º SGT', '3º SGT', 'SOLDADOS', 'SD BMT'];
                 const cores = ['#eab308', '#f97316', '#0ea5e9', '#10b981', '#f59e0b'];
+                const totalGeral = data.reduce((a,b) => a+b, 0) || 1;
                 
                 chartInstance = new Chart(ctx, {
-                    type: 'pie',
+                    type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
+                            label: 'Efetivo',
                             data: data,
                             backgroundColor: cores,
-                            borderWidth: 2,
-                            borderColor: '#000000'
+                            borderColor: cores,
+                            borderWidth: 0,
+                            borderRadius: 10,
+                            borderSkipped: false,
+                            maxBarThickness: 90,
+                            hoverBackgroundColor: cores.map(c => c + 'cc')
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: { top: 30, right: 10, left: 10, bottom: 0 }
+                        },
                         plugins: {
-                            legend: { 
-                                labels: { color: '#000000', font: {size: 14, weight: 'bold'} } 
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15,23,42,0.95)',
+                                titleColor: '#10b981',
+                                bodyColor: '#f1f5f9',
+                                borderColor: 'rgba(16,185,129,0.4)',
+                                borderWidth: 1,
+                                padding: 12,
+                                titleFont: { weight: 'bold', size: 13 },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const v = ctx.parsed.y;
+                                        const p = ((v/totalGeral)*100).toFixed(1);
+                                        return `${v.toLocaleString('pt-BR')} militares (${p}%)`;
+                                    }
+                                }
                             },
                             datalabels: {
-                                color: '#FFFFFF',
+                                color: '#ffffff',
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 4,
                                 font: { weight: 'bold', size: 13 },
-                                formatter: (value, ctx) => {
-                                    const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
-                                    const percent = ((value / total)*100).toFixed(1);
-                                    return `${value.toLocaleString('pt-BR')}\n(${percent}%)`;
-                                },
-                                textAlign: 'center'
+                                textAlign: 'center',
+                                formatter: (value) => {
+                                    const p = ((value/totalGeral)*100).toFixed(1);
+                                    return `${value.toLocaleString('pt-BR')}\n${p}%`;
+                                }
                             }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: '#e2e8f0',
+                                    font: { weight: 'bold', size: 13 }
+                                },
+                                grid: { display: false },
+                                border: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grace: '15%',
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: { size: 11 }
+                                },
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                border: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        },
+                        animation: {
+                            duration: 900,
+                            easing: 'easeOutQuart'
                         }
                     },
                     plugins: [ChartDataLabels]
@@ -422,7 +520,6 @@
             }
             
             function filtrarDados() {
-                // Se está em modo comparação, qualquer mudança nos filtros sai do modo
                 if (comparisonState) sairModoComparacao(false);
 
                 const ant = fAnt.value.trim().toUpperCase();
@@ -450,7 +547,6 @@
                     let classes = 'hover:bg-white/5 border-b border-slate-700/40';
                     let nomeExtra = '';
                     
-                    // Destaque do modo comparação
                     if (comparisonState) {
                         if (idxGlobal === comparisonState.winnerIdx) {
                             classes += ' row-winner';
@@ -536,25 +632,19 @@
                 const idxA = dadosBrutos.indexOf(mA);
                 const idxB = dadosBrutos.indexOf(mB);
                 
-                // O mais antigo é o de menor índice na lista já ordenada
                 const winnerIdx = idxA < idxB ? idxA : idxB;
                 const loserIdx  = idxA < idxB ? idxB : idxA;
                 const winner = dadosBrutos[winnerIdx];
                 const loser  = dadosBrutos[loserIdx];
 
-                // Limpa filtros gerais para evitar conflito visual
                 fAnt.value = fNome.value = fId.value = '';
                 fGrad.value = '';
 
-                // Ativa modo comparação
                 comparisonState = { winnerIdx, loserIdx };
-                // Mostra apenas os dois militares, com o mais antigo no topo
                 dadosFiltrados = [winner, loser];
 
-                // Atualiza UI
                 tableTitleEl.innerHTML = 'MODO COMPARAÇÃO <span class="text-yellow-400">·</span> RESULTADO';
                 compareBanner.classList.remove('hidden');
-                compareBanner.classList.remove('border-red-500');
                 compareResult.innerHTML = `
                     <span class="text-yellow-300">🏆 MAIS ANTIGO:</span> 
                     <span class="text-white">${winner.nome}</span> 
@@ -564,7 +654,6 @@
 
                 renderizarTabela();
 
-                // Rola até a tabela
                 document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
