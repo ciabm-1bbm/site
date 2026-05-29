@@ -65,7 +65,20 @@
         }
         .card-monitor:active { cursor: grabbing; }
         
-        /* Efeito de hover com a cor específica de cada setor */
+        /* Cores das bordas laterais dos cards e fundo do título vertical */
+        .card-vermelho { border-left: 5px solid #B91C1C; }
+        .card-vermelho .vertical-text { background: #B91C1C; }
+        
+        .card-amarelo { border-left: 5px solid #D97706; }
+        .card-amarelo .vertical-text { background: #D97706; }
+        
+        .card-verde { border-left: 5px solid #2E7D32; }
+        .card-verde .vertical-text { background: #2E7D32; }
+        
+        .card-laranja { border-left: 5px solid #FF8C00; }
+        .card-laranja .vertical-text { background: #FF8C00; }
+
+        /* Efeito de hover com a cor específica de cada setor - a borda do tooltip também segue a cor */
         .card-vermelho:hover {
             transform: translateY(-2px);
             box-shadow: 0 0 0 3px #B91C1C, 0 15px 30px rgba(0,0,0,0.5);
@@ -114,12 +127,6 @@
             justify-content: center;
             border-radius: 0.5rem 0 0 0.5rem;
         }
-
-        /* Cores das bordas laterais dos cards */
-        .card-vermelho { border-left: 5px solid #B91C1C; }
-        .card-amarelo { border-left: 5px solid #D97706; }
-        .card-verde { border-left: 5px solid #2E7D32; }
-        .card-laranja { border-left: 5px solid #FF8C00; }
 
         /* Cabeçalho de grupo - mais compacto */
         .grupo-header {
@@ -193,7 +200,7 @@
             margin-top: 2px; 
         }
         
-        /* Tooltip que acompanha o mouse */
+        /* Tooltip que acompanha o mouse - a cor da borda muda conforme a classe do card */
         .turno-tooltip {
             position: fixed;
             background: rgba(0, 0, 0, 0.95);
@@ -205,7 +212,7 @@
             white-space: nowrap;
             z-index: 9999;
             pointer-events: none;
-            border: 1px solid #FF8C00;
+            border: 1px solid;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             backdrop-filter: blur(4px);
             transition: opacity 0.15s ease;
@@ -347,12 +354,24 @@
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec";
 
         // Definição dos grupos com cores e ordem
+        // 1ª CIA: amarelo (#D97706)
+        // 2ª CIA: verde (#2E7D32)
+        // BBS: laranja (#FF8C00)
+        // COORDENAÇÃO: vermelho (#B91C1C)
         const GRUPOS = [
             { nome: "COORDENAÇÃO", corClasse: "vermelho", corHex: "#B91C1C", headerClass: "grupo-header-vermelho", cardClass: "card-vermelho", pelotoes: ["OFICIAL DE DIA", "COBOM", "CCOB"] },
             { nome: "1ª CIA", corClasse: "amarelo", corHex: "#D97706", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "ASSUNÇÃO", "BELÉM NOVO", "RESTINGA"] },
             { nome: "2ª CIA", corClasse: "verde", corHex: "#2E7D32", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["FLORESTA", "PASSO D'AREIA", "PARTENON", "TERESÓPOLIS"] },
             { nome: "BBS", corClasse: "laranja", corHex: "#FF8C00", headerClass: "grupo-header-laranja", cardClass: "card-laranja", pelotoes: ["TERRESTRE", "AQUÁTICA", "MERGULHO", "CANIL"] }
         ];
+
+        // Mapeamento da cor da borda do tooltip por classe do card
+        const TOOLTIP_BORDER_COLOR = {
+            'card-vermelho': '#B91C1C',
+            'card-amarelo': '#D97706',
+            'card-verde': '#2E7D32',
+            'card-laranja': '#FF8C00'
+        };
 
         const ORDEM_QUARTEIS = GRUPOS.flatMap(g => g.pelotoes);
         const FUNCOES_FIXAS = [
@@ -391,6 +410,7 @@
 
         // Tooltip global que segue o mouse
         let turnoTooltip = null;
+        let currentTooltipColor = '#FF8C00';
         
         function criarTooltip() {
             if (turnoTooltip) return;
@@ -400,9 +420,10 @@
             document.body.appendChild(turnoTooltip);
         }
         
-        function mostrarTooltip(event, turnoHTML) {
+        function mostrarTooltip(event, turnoHTML, borderColor) {
             if (!turnoTooltip) criarTooltip();
             turnoTooltip.innerHTML = turnoHTML;
+            turnoTooltip.style.borderColor = borderColor;
             turnoTooltip.style.display = 'block';
             turnoTooltip.style.left = (event.clientX + 15) + 'px';
             turnoTooltip.style.top = (event.clientY - 30) + 'px';
@@ -539,7 +560,7 @@
 
                 for (const pelotao of pelotoesExistentes) {
                     const viaturasRaw = estrutura[pelotao];
-                    const card = criarCardPelotao(pelotao, viaturasRaw, grupo.cardClass, grupo.corHex);
+                    const card = criarCardPelotao(pelotao, viaturasRaw, grupo.cardClass);
                     gridDiv.appendChild(card);
                 }
                 container.appendChild(gridDiv);
@@ -564,7 +585,7 @@
             }
         }
 
-        function criarCardPelotao(nomePelotao, viaturasRaw, classeCor, corHex) {
+        function criarCardPelotao(nomePelotao, viaturasRaw, cardClass) {
             const gruposUnicos = [];
             for (const vtr of viaturasRaw) {
                 const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
@@ -574,10 +595,13 @@
             }
 
             const card = document.createElement('div');
-            card.className = `card-monitor ${classeCor}`;
+            card.className = `card-monitor ${cardClass}`;
             card.setAttribute('data-pelotao', nomePelotao);
 
-            let content = `<div class="vertical-text" style="background: ${corHex};">${nomePelotao.substring(0, 14)}</div>`;
+            // Define a cor da borda do tooltip baseada na classe do card
+            const tooltipBorderColor = TOOLTIP_BORDER_COLOR[cardClass] || '#FF8C00';
+
+            let content = `<div class="vertical-text">${nomePelotao.substring(0, 14)}</div>`;
             content += `<div class="flex-grow p-2 flex flex-col gap-2">`;
 
             for (const grupo of gruposUnicos) {
@@ -596,7 +620,7 @@
                                 <div class="vtr-titulo">${listaVtrs}</div>
                                 <div class="w-full flex flex-col gap-1">`;
                 for (const m of grupo.guarnicao) {
-                    content += `<div class="militar-container" data-turno="${m.turno.replace(/"/g, '&quot;')}">
+                    content += `<div class="militar-container" data-turno="${(m.turno || '').replace(/"/g, '&quot;')}" data-border-color="${tooltipBorderColor}">
                                     <div class="militar-nome">${m.n}</div>
                                     ${m.f ? `<div class="militar-funcao">${m.f}</div>` : ''}
                                 </div>`;
@@ -606,13 +630,14 @@
             content += `</div>`;
             card.innerHTML = content;
             
-            // Adicionar eventos de mouse para mostrar tooltip com turno
+            // Adicionar eventos de mouse para mostrar tooltip com turno e a cor correta da borda
             const containers = card.querySelectorAll('.militar-container');
             containers.forEach(container => {
                 const turnoHTML = container.getAttribute('data-turno');
+                const borderColor = container.getAttribute('data-border-color');
                 if (turnoHTML && turnoHTML.trim() !== '') {
                     container.addEventListener('mousemove', function(e) {
-                        mostrarTooltip(e, turnoHTML);
+                        mostrarTooltip(e, turnoHTML, borderColor);
                     });
                     container.addEventListener('mouseleave', function() {
                         esconderTooltip();
