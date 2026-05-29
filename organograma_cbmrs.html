@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organograma — CBMRS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;
+  --bg2:#121821;
+  --panel:#161d27;
+  --line:#2a3543;
+  --txt:#e6edf3;
+  --txt-dim:#8b98a8;
+  --gold:#ffcb47;
+  --cbmrs-blue:#002b5c;
+
+  /* cores por nível */
+  --c-corp:#ffffff;
+  --c-comando:#ffcb47;   /* Comando-Geral */
+  --c-direcao:#7c9cff;   /* Órgãos de Direção */
+  --c-apoio:#34d3c4;     /* Departamentos de Apoio */
+  --c-regional:#ff8a3d;  /* Comandos Regionais */
+  --c-batalhao:#ff5a5a;  /* Batalhões */
+  --c-companhia:#ff8fa3; /* Companhias */
+  --c-pelotao:#ffd166;   /* Pelotões */
+  --c-grupo:#b5e48c;     /* Grupos */
+  --c-divisao:#9aa9ff;   /* Divisões internas */
+  --c-secao:#7fd8e8;     /* Seções */
+  --c-setor:#c4b5fd;     /* Setores */
+  --c-especial:#f06595;  /* Órgãos especiais (BBS/BESCI) */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(255,90,90,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(124,156,255,.08), transparent 55%),
+    var(--bg);
+  color:var(--txt);
+  font-family:'Barlow',sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ===== Header ===== */
+header{position:relative;z-index:2;padding:38px 28px 20px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,203,71,.04),transparent);}
+.brand{display:flex;align-items:center;gap:20px;max-width:1300px;margin:0 auto;justify-content:space-between}
+.logobox{flex:none;background:var(--cbmrs-blue);padding:8px 10px;border-radius:12px;
+  display:grid;place-items:center;box-shadow:0 8px 26px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12)}
+.logobox img{height:64px;width:auto;display:block}
+.logobox.missing{min-width:96px;min-height:80px;color:#cfe0f5;font-family:'Oswald';
+  font-size:12px;text-align:center;line-height:1.25;letter-spacing:.5px;text-transform:uppercase}
+.titleblock{flex:1;text-align:center;min-width:0}
+h1{font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(22px,3.4vw,36px);letter-spacing:1px;line-height:1.05;text-transform:uppercase}
+h1 span{color:var(--gold)}
+.sub{color:var(--txt-dim);font-size:13.5px;letter-spacing:.3px;margin-top:5px}
+.sub b{color:var(--c-batalhao);font-weight:600}
+@media(min-width:768px){.logobox img{height:80px}}
+@media(max-width:560px){
+  .brand{gap:10px}
+  .logobox{padding:6px}.logobox img{height:46px}
+  .sub{font-size:11.5px}
+}
+
+/* ===== Toolbar ===== */
+.toolbar{position:sticky;top:0;z-index:5;backdrop-filter:blur(10px);
+  background:rgba(13,17,23,.82);border-bottom:1px solid var(--line);
+  padding:12px 28px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.search{position:relative;flex:1 1 260px;max-width:420px}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  color:var(--txt);padding:10px 14px 10px 38px;font-family:'Barlow';font-size:14px;outline:none;transition:.2s}
+.search input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,203,71,.15)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+button.tool{background:var(--panel);border:1px solid var(--line);color:var(--txt);
+  padding:9px 14px;border-radius:10px;font-family:'Oswald';font-weight:500;letter-spacing:.4px;
+  font-size:13px;text-transform:uppercase;cursor:pointer;transition:.18s;white-space:nowrap}
+button.tool:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+button.tool.go{background:linear-gradient(145deg,#ff5a5a,#ff8a3d);border:none;color:#1a0e0e;font-weight:700}
+button.tool.go:hover{color:#1a0e0e;box-shadow:0 6px 20px rgba(255,90,90,.4)}
+
+/* ===== Legend ===== */
+.legend{max-width:1300px;margin:16px auto 0;padding:0 28px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center}
+.legend .item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt-dim)}
+.legend .dot{width:11px;height:11px;border-radius:3px}
+
+/* ===== Tree ===== */
+.wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:24px 28px 80px}
+.hint{text-align:center;color:var(--txt-dim);font-size:13px;margin:6px 0 22px;font-style:italic}
+.tree{margin-left:4px}
+.node{position:relative}
+.children{margin-left:26px;padding-left:18px;border-left:1.5px dashed var(--line);
+  overflow:hidden;max-height:0;opacity:0;transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s}
+.node.open>.children{max-height:200000px;opacity:1}
+
+.bar{display:flex;align-items:center;gap:10px;margin:5px 0;padding:9px 13px;border-radius:11px;
+  background:var(--panel);border:1px solid var(--line);cursor:pointer;position:relative;
+  transition:transform .15s, border-color .2s, background .2s;border-left-width:4px;
+  width:fit-content;max-width:100%}
+.bar:hover{transform:translateX(3px);background:var(--bg2)}
+.bar .tw{flex:none;width:18px;height:18px;display:grid;place-items:center;color:var(--txt-dim);
+  font-size:11px;transition:transform .3s;font-family:monospace}
+.node.open>.bar .tw{transform:rotate(90deg);color:var(--gold)}
+.bar .tw.leaf{opacity:.25}
+.bar .sig{font-family:'Oswald';font-weight:600;letter-spacing:.4px;font-size:15px}
+.bar .city{font-size:11.5px;color:var(--txt-dim);background:rgba(255,255,255,.04);
+  padding:2px 8px;border-radius:20px;border:1px solid var(--line)}
+.bar .badge{font-size:10.5px;color:var(--txt-dim);font-family:'Oswald';
+  letter-spacing:.5px;text-transform:uppercase;opacity:.7}
+.bar .count{font-size:11px;color:var(--txt-dim);font-family:'Oswald';
+  background:rgba(255,255,255,.05);padding:1px 8px;border-radius:20px}
+
+/* kind colors */
+.k-corp .sig{color:var(--c-corp)} .k-corp{border-left-color:var(--c-corp)}
+.k-comando .sig{color:var(--c-comando)} .k-comando{border-left-color:var(--c-comando)}
+.k-direcao .sig{color:var(--c-direcao)} .k-direcao{border-left-color:var(--c-direcao)}
+.k-apoio .sig{color:var(--c-apoio)} .k-apoio{border-left-color:var(--c-apoio)}
+.k-regional .sig{color:var(--c-regional)} .k-regional{border-left-color:var(--c-regional)}
+.k-batalhao .sig{color:var(--c-batalhao)} .k-batalhao{border-left-color:var(--c-batalhao)}
+.k-companhia .sig{color:var(--c-companhia)} .k-companhia{border-left-color:var(--c-companhia)}
+.k-pelotao .sig{color:var(--c-pelotao)} .k-pelotao{border-left-color:var(--c-pelotao)}
+.k-grupo .sig{color:var(--c-grupo)} .k-grupo{border-left-color:var(--c-grupo)}
+.k-divisao .sig{color:var(--c-divisao)} .k-divisao{border-left-color:var(--c-divisao)}
+.k-secao .sig{color:var(--c-secao)} .k-secao{border-left-color:var(--c-secao)}
+.k-setor .sig{color:var(--c-setor)} .k-setor{border-left-color:var(--c-setor)}
+.k-especial .sig{color:var(--c-especial)} .k-especial{border-left-color:var(--c-especial)}
+
+/* category headers */
+.cat{font-family:'Oswald';text-transform:uppercase;letter-spacing:2px;font-weight:500;
+  font-size:13px;color:var(--txt-dim);margin:28px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px}
+.cat::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--gold)}
+
+/* highlights */
+.bar.hl-bbm{background:linear-gradient(100deg,rgba(255,90,90,.16),var(--panel));
+  border-color:rgba(255,90,90,.55);box-shadow:0 0 0 1px rgba(255,90,90,.25), 0 6px 22px rgba(255,90,90,.18)}
+.bar.hl-cia{background:linear-gradient(100deg,rgba(255,203,71,.20),rgba(255,143,61,.10));
+  border-color:var(--gold);box-shadow:0 0 26px rgba(255,203,71,.35), inset 0 0 0 1px rgba(255,203,71,.4);
+  animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 22px rgba(255,203,71,.30), inset 0 0 0 1px rgba(255,203,71,.4)}
+  50%{box-shadow:0 0 36px rgba(255,203,71,.55), inset 0 0 0 1px rgba(255,203,71,.65)}}
+.bar.hl-cia .sig{color:var(--gold)}
+.star{color:var(--gold);font-size:14px;filter:drop-shadow(0 0 6px rgba(255,203,71,.8));animation:spin 6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.youtag{margin-left:auto;font-family:'Oswald';font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  background:var(--gold);color:#1a1206;padding:2px 9px;border-radius:20px;font-weight:700;
+  box-shadow:0 0 14px rgba(255,203,71,.6)}
+
+/* search states */
+.node.hidden{display:none}
+.bar.match{outline:2px solid var(--gold);outline-offset:1px}
+
+/* tooltip */
+#tip{position:fixed;z-index:50;max-width:340px;background:linear-gradient(160deg,#1b232f,#10151d);
+  border:1px solid var(--line);border-radius:14px;padding:14px 16px;pointer-events:none;
+  opacity:0;transform:translateY(6px);transition:opacity .18s, transform .18s;
+  box-shadow:0 18px 50px rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+#tip.show{opacity:1;transform:translateY(0)}
+#tip .tname{font-family:'Oswald';font-weight:600;font-size:15px;letter-spacing:.3px;margin-bottom:3px}
+#tip .tmeta{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-dim);margin-bottom:9px;
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#tip .tmeta .pill{padding:2px 8px;border-radius:20px;border:1px solid var(--line);font-size:10px}
+#tip .tdesc{font-size:13.5px;line-height:1.5;color:#cdd6e0}
+#tip .tpath{margin-top:9px;font-size:11px;color:var(--txt-dim);border-top:1px solid var(--line);padding-top:8px;font-style:italic}
+
+footer{text-align:center;color:var(--txt-dim);font-size:11.5px;padding:24px;border-top:1px solid var(--line);line-height:1.7}
+footer b{color:var(--c-batalhao)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:#3a4757}
+@media(max-width:640px){
+  .children{margin-left:14px;padding-left:12px}
+  .bar .badge{display:none}
+  header{padding:26px 16px 16px}.wrap{padding:18px 14px 60px}.toolbar{padding:10px 14px}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <div class="brand">
+    <div class="logobox"><img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="CBMRS"></div>
+    <div class="titleblock">
+      <h1>Organograma</h1>
+      <div class="sub">Corpo de Bombeiros Militar do Rio Grande do Sul · Regimento Interno (Portaria CBMRS nº 001/2025) · destaque: <b>1º BBM / Porto Alegre</b></div>
+    </div>
+    <div class="logobox"><img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" onerror="this.parentNode.classList.add('missing');this.parentNode.innerHTML='Brasão<br>1º BBM';"></div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="q" type="text" placeholder="Encontre aqui a sua unidade ou cidade" autocomplete="off">
+  </div>
+  <button class="tool go" id="goMine">★ Minha Unidade</button>
+  <button class="tool" id="expand">Expandir tudo</button>
+  <button class="tool" id="collapse">Recolher tudo</button>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="wrap">
+  <p class="hint">Clique em qualquer caixa para abrir os níveis abaixo · passe o mouse para ver a descrição e a competência</p>
+  <div class="tree" id="tree"></div>
+</div>
+
+<div id="tip"></div>
+
+<footer>
+  Estrutura conforme o Regimento Interno do CBMRS (Portaria CBMRS nº 001, de 03/01/2025).<br>
+  Visualização interativa não-oficial · unidade em destaque: <b>2ª CiaBM / 1º BBM / 1º CRBM</b>.
+</footer>
+
+<script>
+/* ============================================================
+   DESCRIÇÕES PADRÃO POR NÍVEL (usadas quando o nó não traz "d")
+   ============================================================ */
+const DEF = {
+  comando:"Órgão de Direção Estratégica (Nível Institucional).",
+  direcao:"Órgão de Direção Estratégica (Nível Institucional).",
+  apoio:"Órgão de Apoio Tático (Nível Departamental): planejamento, controle e execução das diretrizes do Comando.",
+  regional:"Comando Regional — escalão intermediário responsável pela gestão administrativo-operacional dos OCBM de sua circunscrição.",
+  batalhao:"Batalhão de Bombeiro Militar — executa as atividades constitucionais de segurança, proteção, salvamento, prevenção, combate a incêndios e defesa civil em sua área territorial.",
+  companhia:"Companhia de Bombeiro Militar — coordena, fiscaliza e comanda os pelotões em sua área de atuação.",
+  pelotao:"Pelotão de Bombeiro Militar — executa a prestação de serviços à comunidade, mantendo o efetivo pronto para pronta resposta às emergências.",
+  grupo:"Grupo de Bombeiro Militar — fração de no mínimo dez bombeiros militares; organiza efetivo e recursos e executa os serviços à comunidade.",
+  divisao:"Divisão — unidade de gestão subordinada ao órgão, responsável por planejar, orientar e acompanhar as atividades de sua área.",
+  secao:"Seção — desdobramento administrativo que executa fielmente as atribuições da sua finalidade, interna e externamente.",
+  setor:"Setor — desdobramento que executa tarefas específicas dentro da Seção ou administração onde se insere.",
+  especial:"Órgão de Nível Operacional Especial — atividades especializadas com abrangência diferenciada."
+};
+const KIND_NAME = {
+  corp:"Corporação",comando:"Comando",direcao:"Direção",apoio:"Apoio",regional:"Regional",
+  batalhao:"Batalhão",companhia:"Companhia",pelotao:"Pelotão",grupo:"Grupo",
+  divisao:"Divisão",secao:"Seção",setor:"Setor",especial:"Especial"
+};
+
+/* ============================================================
+   ATALHOS para montar a árvore operacional rapidamente
+   g(num, cidade)   -> Grupo
+   pel(num,cidade,[grupos])  -> Pelotão
+   cia(label,cidade,[pelotões], extras) -> Companhia
+   ============================================================ */
+const G  = (n,c)=>({s:n+"º GBM",c,k:"grupo"});
+const Gx = (label,c)=>({s:label,c,k:"grupo"});
+const PEL= (n,c,ch)=>({s:n+"º PelBM",c,k:"pelotao",ch});
+const CIA= (label,c,ch)=>({s:label,c,k:"companhia",ch});
+// 2 grupos padrão na mesma cidade
+const g2=(c)=>[G(1,c),G(2,c)];
+
+/* ============================================================
+   ÁRVORE COMPLETA
+   ============================================================ */
+const DATA = {s:"CBMRS",k:"corp",
+ d:"Corpo de Bombeiros Militar do Estado do RS — instituição permanente, organizada com base na hierarquia e na disciplina (art. 144, V, CF/88). Estrutura-se em três níveis: Institucional (Direção), Departamental (Apoio) e Operacional (Execução).",
+ ch:[
+
+ /* ===================== ÓRGÃOS DE DIREÇÃO ===================== */
+ {cat:"Órgãos de Direção — Nível Institucional"},
+
+ {s:"Cmt-G",k:"comando",badge:"Comandante-Geral",
+  d:"Comandante-Geral — Oficial do último posto do QOEM e autoridade primeira da Instituição. Coordenação geral das atividades, presidência da Comissão de Avaliação e Mérito e direção do Conselho Superior."},
+ {s:"SCmt-G",k:"comando",badge:"Subcomandante-Geral",
+  d:"Subcomandante-Geral — substituto do Comandante-Geral em ausências e impedimentos; assessora o Comando e preside as Subcomissões de Avaliação e Mérito."},
+ {s:"CSup",k:"comando",badge:"Conselho Superior",
+  d:"Conselho Superior — Oficiais do último posto do QOEM; assessoramento direto ao Comandante-Geral e manifestação em assuntos relevantes da Instituição."},
+
+ {s:"Corr-G",k:"direcao",badge:"Corregedoria-Geral",
+  d:"Corregedoria-Geral — órgão de disciplina, orientação e fiscalização da conduta dos bombeiros militares e servidores civis. Órgão central do Sistema de Correição (SisCorCBMRS).",
+  ch:[
+   {s:"DAdm/Corr-G",k:"divisao",d:"Divisão Administrativa da Corregedoria — logística, sargenteação, treinamento, desenvolvimento e procedimentos.",ch:[
+     {s:"SAdm",k:"secao"},{s:"SLog",k:"secao"},{s:"STrein",k:"secao",d:"Seção de Treinamento e Desenvolvimento."}]},
+   {s:"DJD",k:"divisao",d:"Divisão de Justiça e Disciplina — feitos administrativos investigatórios e disciplinares."},
+   {s:"DCIC",k:"divisao",d:"Divisão de Controle Interno Correcional — feitos disciplinares e regularidade normativa.",ch:[
+     {s:"SProc",k:"secao",d:"Seção de Procedimentos."}]},
+   {s:"DFE",k:"divisao",d:"Divisão de Feitos Especiais — diligências, mandados judiciais/extrajudiciais e investigações preliminares."},
+   {s:"OUV",k:"divisao",d:"Ouvidoria — protege os direitos dos usuários, registra desvios de ética e encaminha denúncias e reclamações."},
+   {s:"Cart",k:"divisao",d:"Cartório — protocolo, distribuição e controle de procedimentos; integra os sistemas de correição e o EPROC do TJM/RS."}
+  ]},
+
+ {s:"GCG",k:"direcao",badge:"Gabinete do Comandante-Geral",
+  d:"Gabinete do Comandante-Geral — assistência, assessoramento, suporte administrativo e transmissão das ordens do Comandante e do Subcomandante-Geral.",
+  ch:[
+   {s:"SecExec/GCG",k:"divisao",d:"Secretaria-Executiva — coordena e assessora as atividades do Gabinete.",ch:[
+     {s:"SeçExec-Cmt-G",k:"secao",d:"Seção Executiva do Comandante-Geral."},
+     {s:"SeçExec-SCmt-G",k:"secao",d:"Seção Executiva do Subcomandante-Geral.",ch:[
+       {s:"SetOpGVCT-N",k:"setor",d:"Setor da Operação Verão GVCT Norte."},
+       {s:"SetOpGVCT-S",k:"setor",d:"Setor da Operação Verão GVCT Sul."}]}]},
+   {s:"CI/GCG",k:"divisao",d:"Assessoria de Controle Interno — controle das atividades administrativas, custos, fiscalização e prestação de contas."},
+   {s:"AJCC/GCG",k:"divisao",d:"Assessoria Jurídica, Convênios e Contratos — manifestações jurídicas, análises contratuais e convênios."},
+   {s:"ACS/GCG",k:"divisao",d:"Assessoria de Comunicação Social — relações públicas, imprensa, publicidade e marketing institucional."},
+   {s:"ACI/GCG",k:"divisao",d:"Agência Central de Inteligência — coordena a atividade de inteligência e contrainteligência da Instituição.",ch:[
+     {s:"SAdm/ACI",k:"secao"},{s:"SAD/ACI",k:"secao",d:"Seção de Análise de Desastres."},{s:"SCint/ACI",k:"secao",d:"Seção de Contrainteligência."}]},
+   {s:"APERI/GCG",k:"divisao",d:"Assessoria de Planejamento Estratégico e Relações Institucionais."}
+  ]},
+
+ {s:"CAM",k:"direcao",badge:"Comissão de Avaliação e Mérito",
+  d:"Comissão de Avaliação e Mérito — assessora o Comando nas carreiras; controla, avalia e processa as promoções de Oficiais e Praças.",
+  ch:[
+   {s:"SAMO/CAM",k:"divisao",d:"Subcomissão de Avaliação e Mérito de Oficiais."},
+   {s:"SAMP/CAM",k:"divisao",d:"Subcomissão de Avaliação e Mérito de Praças."}
+  ]},
+
+ /* ===================== ÓRGÃOS DE APOIO ===================== */
+ {cat:"Órgãos de Apoio — Nível Departamental"},
+
+ {s:"DA",k:"apoio",badge:"Departamento Administrativo",
+  d:"Departamento Administrativo — recursos humanos, orçamento e finanças, logística, patrimônio e tecnologia da informação e comunicações.",
+  ch:[
+   {s:"DAdm/DA",k:"divisao",d:"Divisão Administrativa — padronização e trâmite de processos, movimentação de efetivos e produção normativa da pasta.",ch:[
+     {s:"AssJur",k:"secao",d:"Seção de Assessoria Jurídica."},{s:"CConv",k:"secao",d:"Seção de Convênios e Contratos."},
+     {s:"SAdmC",k:"secao",d:"Seção Administrativa e Correição."},{s:"SMov",k:"secao",d:"Seção de Movimentação."},
+     {s:"ALI/DAdm",k:"secao",d:"Agência Local de Inteligência."}]},
+   {s:"DLP",k:"divisao",d:"Divisão de Logística e Patrimônio — recursos materiais, carga patrimonial, veículos, catalogação, compras, material bélico, conservação e obras.",ch:[
+     {s:"AACC",k:"secao",d:"Assessoria Administrativa, de Catalogação e Compras.",ch:[
+       {s:"SAdm/AACC",k:"setor"},{s:"SComp",k:"setor",d:"Seção de Compras."},{s:"SCat",k:"setor",d:"Seção de Catalogação."}]},
+     {s:"AML",k:"secao",d:"Assessoria de Motomecanização e Logística.",ch:[
+       {s:"SMec",k:"setor",d:"Seção de Motomecanização.",ch:[{s:"SetMec",k:"setor"}]},{s:"SLog/AML",k:"setor",d:"Seção Logística."}]},
+     {s:"AMP",k:"secao",d:"Assessoria de Material Permanente.",ch:[
+       {s:"SPat",k:"setor",d:"Seção de Patrimônio."},{s:"SCO",k:"setor",d:"Seção de Conservação e de Obras."},{s:"SMB",k:"setor",d:"Seção de Material Bélico."}]}]},
+   {s:"DOF",k:"divisao",d:"Divisão de Orçamento e Finanças — controle e distribuição de recursos, vencimentos e vantagens, execução orçamentária.",ch:[
+     {s:"SAdm/DOF",k:"secao"},{s:"SCDR",k:"secao",d:"Seção de Controle e Distribuição de Recursos."},
+     {s:"SVV",k:"secao",d:"Seção de Vencimentos e Vantagens."},{s:"SCEO",k:"secao",d:"Seção de Controle e Execução Orçamentária."}]},
+   {s:"DRH",k:"divisao",d:"Divisão de Recursos Humanos — inclusão, inativação, afastamentos, recrutamento, mobilização, identificação e assistência social.",ch:[
+     {s:"SAdm/DRH",k:"secao"},{s:"SSRH",k:"secao",d:"Seção de Sistemas de RH."},
+     {s:"SIRA",k:"secao",d:"Seção de Inativações e Revisões de Atos.",ch:[{s:"SetInat",k:"setor"},{s:"SetRA",k:"setor",d:"Setor de Revisão de Atos."}]},
+     {s:"SA/DRH",k:"secao",d:"Seção de Acidentes."},{s:"SAP/DRH",k:"secao",d:"Seção de Afastamento e Prontuários."},
+     {s:"SRS",k:"secao",d:"Seção de Recrutamento e Seleção."},{s:"SMob",k:"secao",d:"Seção de Mobilização."},
+     {s:"SId",k:"secao",d:"Seção de Identificação."},{s:"SAS/DRH",k:"secao",d:"Seção de Assistência Social."}]},
+   {s:"DTIC",k:"divisao",d:"Divisão de Tecnologia da Informação e Comunicações.",ch:[
+     {s:"SAdm/DTIC",k:"secao"},{s:"STI",k:"secao",d:"Seção de Tecnologia da Informação."},{s:"SCOM",k:"secao",d:"Seção de Comunicações."}]}
+  ]},
+
+ {s:"DSPCI",k:"apoio",badge:"Segurança Contra Incêndio",
+  d:"Departamento de Segurança, Prevenção e Proteção Contra Incêndios — planejamento, controle e fiscalização da segurança contra incêndio e da investigação de sinistros em âmbito estadual.",
+  ch:[
+   {s:"DAdm/DSPCI",k:"divisao",d:"Divisão Administrativa — gestão administrativa e logística e controle dos procedimentos fiscalizatórios.",ch:[
+     {s:"SAdmC",k:"secao",d:"Seção Administrativa e Correição."},{s:"SPCom",k:"secao",d:"Seção de Planejamento e Comunicação."},{s:"SFisc",k:"secao",d:"Seção de Controle Fiscalizatório."}]},
+   {s:"DGN",k:"divisao",d:"Divisão de Gestão e Normatização — atos normativos, doutrina e padronização de segurança contra incêndio.",ch:[
+     {s:"SNor",k:"secao",d:"Seção de Normatização."},{s:"SQP",k:"secao",d:"Seção de Qualidade e Padronização."}]},
+   {s:"DPIS",k:"divisao",d:"Divisão de Pesquisa e Investigação de Sinistros — doutrina, sistemas e bancos de dados de investigação.",ch:[
+     {s:"SPIS",k:"secao",d:"Seção de Pesquisa e Investigação de Sinistros."},{s:"SGS",k:"secao",d:"Seção de Gerenciamento de Sistemas."}]}
+  ]},
+
+ {s:"ABM",k:"apoio",badge:"Academia de Bombeiro Militar",
+  d:"Academia de Bombeiro Militar — ensino, capacitação continuada, saúde física do efetivo e pesquisa científica da Instituição.",
+  ch:[
+   {s:"DAdm/ABM",k:"divisao",d:"Divisão Administrativa — administração, correição, inteligência, comunicação social e logística da ABM.",ch:[
+     {s:"SCCor",k:"secao",d:"Seção de Comando e Correição.",ch:[{s:"SetCCor",k:"setor"},{s:"SetComS",k:"setor",d:"Setor de Comunicação Social."}]},
+     {s:"ALI/ABM",k:"secao",d:"Agência Local de Inteligência."},{s:"SPess",k:"secao",d:"Seção de Pessoal."},
+     {s:"SLog/ABM",k:"secao",d:"Seção de Logística.",ch:[{s:"SetComF",k:"setor",d:"Setor de Compras e Finanças."},{s:"SetPat",k:"setor",d:"Setor de Patrimônio e Almoxarifado."},{s:"SetTrans",k:"setor",d:"Setor de Transporte."}]}]},
+   {s:"DEns",k:"divisao",d:"Divisão de Ensino — diretrizes pedagógicas, currículos, cursos, editais e Educação à Distância.",ch:[
+     {s:"SProj",k:"secao",d:"Seção de Projetos, Editais e Educação Continuada."},{s:"SCPEaD",k:"secao",d:"Seção de Coordenação Pedagógica e EAD."},
+     {s:"SAS/DEns",k:"secao",d:"Seção de Avaliação e Seleção."},{s:"SAPS",k:"secao",d:"Seção de Administração, Planejamento e Supervisão."}]},
+   {s:"OPETA",k:"divisao",d:"Órgão de Pesquisa, Ensino, Treinamento e Avaliação — escolas militares e formação de civis auxiliares.",ch:[
+     {s:"SAdm/OPETA",k:"secao"},
+     {s:"EsEF",k:"secao",d:"Escola de Educação Física.",ch:[{s:"SetTreinA",k:"setor",d:"Setor Treinamento e Avaliação."},{s:"SetEP",k:"setor",d:"Setor de Estudo e Pesquisa."}]},
+     {s:"ESSCID",k:"secao",d:"Escola Superior de Segurança Contra Incêndio e Desastres.",ch:[{s:"SEns/ESSCID",k:"setor",d:"Setor de Ensino."},{s:"CAL/ESSCID",k:"setor",d:"Corpo de Alunos."}]},
+     {s:"EsBo",k:"secao",d:"Escola de Bombeiro Militar.",ch:[{s:"SetFHC",k:"setor",d:"Setor de Formação e Habilitação de Condutores."},{s:"SetEns/EsBo",k:"setor",d:"Setor de Ensino."},{s:"CAL/EsBo",k:"setor",d:"Corpo de Alunos."}]},
+     {s:"ESCAB",k:"secao",d:"Escola de Serviços Civis Auxiliares de Bombeiro.",ch:[{s:"SetAdm/ESCAB",k:"setor"},{s:"SetCT",k:"setor",d:"Setor de Cursos e Treinamentos."}]}]}
+  ]},
+
+ {s:"AODC",k:"apoio",badge:"Operações e Defesa Civil",
+  d:"Assessoria de Operações, Defesa Civil e Serviços Civis Auxiliares de Bombeiro — planejamento, direção, controle e execução das operações e da defesa civil.",
+  ch:[
+   {s:"DAdm/AODC",k:"divisao",d:"Divisão Administrativa.",ch:[
+     {s:"SAdmC",k:"secao",d:"Seção Administrativa e Correição."},{s:"SANorm",k:"secao",d:"Seção de Análise Normativa."}]},
+   {s:"DODC/AODC",k:"divisao",d:"Divisão de Operações e Defesa Civil — aprimoramento do serviço operacional e qualificação técnica.",ch:[
+     {s:"SOp",k:"secao",d:"Seção de Operações."},{s:"SPlan",k:"secao",d:"Seção de Planejamento."}]},
+   {s:"DSCAB",k:"divisao",d:"Divisão de Serviços Civis e Auxiliares de Bombeiro."},
+   {s:"DMO/AODC",k:"divisao",d:"Divisão de Monitoramento Operacional — monitoramento climático e operacional e estatística.",ch:[
+     {s:"SMOP",k:"secao",d:"Seção de Monitoramento Operacional."},{s:"SCE",k:"secao",d:"Seção de Controle e Estatística."}]},
+   {s:"DOA/AODC",k:"divisao",d:"Divisão de Operações Aéreas — emprego das aeronaves conforme regulamentação da ANAC.",ch:[
+     {s:"ComAer",k:"secao",d:"Comando Aéreo.",ch:[{s:"SOper",k:"setor",d:"Seção de Operações."},{s:"SMant",k:"setor",d:"Seção de Manutenção."},{s:"SSOp",k:"setor",d:"Seção de Segurança Operacional."}]}]}
+  ]},
+
+ /* ===================== APOIO E EXECUÇÃO — CRBM ===================== */
+ {cat:"Órgãos de Apoio e Execução — Comandos Regionais"},
+
+ /* ----------- 1º CRBM ----------- */
+ {s:"1º CRBM",c:"Porto Alegre",k:"regional",
+  d:"1º Comando Regional de Bombeiro Militar — circunscrição com sede em Porto Alegre.",
+  ch:[
+   {s:"DAdmC/1ºCRBM",k:"divisao"},{s:"ARI/1ºCRBM",k:"divisao",d:"Agência Regional de Inteligência."},
+   {s:"DODC/1ºCRBM",k:"divisao",d:"Divisão de Operações e Defesa Civil."},{s:"DLPF/1ºCRBM",k:"divisao",d:"Divisão de Logística, Patrimônio e Finanças."},
+   {s:"DCS/1ºCRBM",k:"divisao",d:"Divisão de Comunicação Social."},{s:"DSCI/1ºCRBM",k:"divisao",d:"Divisão de Segurança Contra Incêndio."},
+
+   {s:"1º BBM",c:"Porto Alegre",k:"batalhao",hl:"cia",
+    d:"1º Batalhão de Bombeiro Militar — sede em Porto Alegre. Seu batalhão.",
+    ch:[
+     {s:"SAdmC/1ºBBM",k:"secao",d:"Seção Administrativa e Correição."},{s:"SODC/1ºBBM",k:"secao",d:"Seção de Operações e Defesa Civil."},{s:"ALI/1ºBBM",k:"secao",d:"Agência Local de Inteligência."},
+     CIA("1ª CiaBM","Porto Alegre",[
+       {s:"SComC",k:"secao",d:"Setor de Comando e Correição."},
+       PEL(1,"B. Açorianos",g2("B. Açorianos")),
+       PEL(2,"B. Teresópolis",g2("B. Teresópolis")),
+       PEL(3,"B. Assunção",g2("B. Assunção")),
+       PEL(4,"B. Restinga",g2("B. Restinga")),
+       PEL(5,"B. Belém Novo",g2("B. Belém Novo"))]),
+     {s:"2ª CiaBM",c:"Porto Alegre",k:"companhia",
+       d:"2ª Companhia de Bombeiro Militar do 1º BBM — sede em Porto Alegre.",
+       ch:[
+       {s:"SComC",k:"secao",d:"Setor de Comando e Correição."},
+       PEL(1,"B. Floresta",g2("B. Floresta")),
+       PEL(2,"B. Passo d'Areia",g2("B. Passo d'Areia")),
+       PEL(3,"B. Partenon",g2("B. Partenon"))]}
+    ]},
+
+   {s:"8º BBM",c:"Canoas",k:"batalhao",
+    d:"8º Batalhão de Bombeiro Militar — sede em Canoas.",
+    ch:[
+     {s:"SAdmC/8ºBBM",k:"secao"},{s:"SODC/8ºBBM",k:"secao"},{s:"ALI/8ºBBM",k:"secao"},{s:"SSeg/8ºBBM",k:"secao",d:"Seção de Segurança Contra Incêndio."},
+     CIA("1ª CiaBM","Canoas",[
+       PEL(1,"Canoas",[G(1,"Canoas"),Gx("2º GBM","B. Mathias Velho"),Gx("3º GBM","Nova Santa Rita"),Gx("GBS","Canoas")]),
+       PEL(2,"Esteio",g2("Esteio")),
+       PEL(3,"Sapucaia do Sul",g2("Sapucaia do Sul"))]),
+     CIA("2ª CiaBM","Gravataí",[
+       PEL(1,"Gravataí",g2("Gravataí")),
+       PEL(2,"Alvorada",g2("Alvorada")),
+       PEL(3,"Cachoeirinha",g2("Cachoeirinha")),
+       PEL(4,"Viamão",g2("Viamão"))])
+    ]},
+
+   {s:"9º BBM",c:"Tramandaí",k:"batalhao",
+    d:"9º Batalhão de Bombeiro Militar — sede em Tramandaí.",
+    ch:[
+     {s:"SAdmC/9ºBBM",k:"secao"},{s:"SODC/9ºBBM",k:"secao"},{s:"ALI/9ºBBM",k:"secao"},{s:"SSeg/9ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Tramandaí",[
+       PEL(1,"Tramandaí",g2("Tramandaí")),
+       PEL(2,"Cidreira",[G(1,"Cidreira"),G(2,"Cidreira"),Gx("3º GBM","Balneário Pinhal")]),
+       PEL(3,"Imbé",[G(1,"Imbé")])]),
+     CIA("2ª CEBM","Capão da Canoa",[
+       PEL(1,"Capão da Canoa",g2("Capão da Canoa")),
+       PEL(2,"Osório",g2("Osório")),
+       PEL(3,"Santo Antônio da Patrulha",g2("Santo Antônio da Patrulha"))]),
+     CIA("3ª CiaBM","Torres",[
+       PEL(1,"Torres",g2("Torres")),
+       PEL(2,"Terra de Areia",g2("Terra de Areia"))])
+    ]},
+
+   {s:"BBS",c:"Porto Alegre",k:"especial",
+    d:"Batalhão de Busca e Salvamento — Órgão Especial de abrangência estadual: mergulho, salvamento aquático, salvamento em altura, estrutura colapsada, cães, produtos perigosos, entre outras especialidades. Subordinado administrativamente ao 1º CRBM e operacionalmente ao Subcomandante-Geral.",
+    ch:[
+     {s:"SAdmC/BBS",k:"secao"},{s:"SODC/BBS",k:"secao"},
+     CIA("1ª CiaBM","Porto Alegre",[
+       {s:"SComC",k:"secao"},
+       {s:"1º Pel Terrestre",c:"Porto Alegre",k:"pelotao",d:"1º Pelotão Terrestre."},
+       {s:"2º Pel Canil",c:"Porto Alegre",k:"pelotao",d:"2º Pelotão Canil (busca e resgate com cães)."}]),
+     CIA("2ª CiaBM","Porto Alegre",[
+       {s:"SComC",k:"secao"},
+       {s:"1º Pel Aquática",c:"Porto Alegre",k:"pelotao",d:"1º Pelotão de Salvamento Aquático."},
+       {s:"2º Pel Mergulho",c:"Porto Alegre",k:"pelotao",d:"2º Pelotão de Mergulho."}])
+    ]}
+  ]},
+
+ /* ----------- 2º CRBM ----------- */
+ {s:"2º CRBM",c:"Caxias do Sul",k:"regional",
+  d:"2º Comando Regional de Bombeiro Militar — sede em Caxias do Sul.",
+  ch:[
+   {s:"DAdmC/2ºCRBM",k:"divisao"},{s:"ARI/2ºCRBM",k:"divisao"},{s:"DODC/2ºCRBM",k:"divisao"},
+   {s:"DLPF/2ºCRBM",k:"divisao"},{s:"DCS/2ºCRBM",k:"divisao"},{s:"DSCI/2ºCRBM",k:"divisao"},
+
+   {s:"2º BBM",c:"São Leopoldo",k:"batalhao",d:"2º Batalhão de Bombeiro Militar — sede em São Leopoldo.",ch:[
+     {s:"SAdm/2ºBBM",k:"secao"},{s:"SODC/2ºBBM",k:"secao"},{s:"ALI/2ºBBM",k:"secao"},{s:"SSeg/2ºBBM",k:"secao"},
+     CIA("1ª CiaBM","São Leopoldo",[
+       PEL(1,"São Leopoldo",g2("São Leopoldo")),PEL(2,"Montenegro",g2("Montenegro")),
+       PEL(3,"Portão",g2("Portão")),PEL(4,"Triunfo",g2("Triunfo"))]),
+     CIA("2ª CiaBM","Novo Hamburgo",[
+       PEL(1,"Novo Hamburgo",g2("Novo Hamburgo")),PEL(2,"Dois Irmãos",g2("Dois Irmãos")),
+       PEL(3,"Campo Bom",g2("Campo Bom")),PEL(4,"Estância Velha",g2("Estância Velha")),PEL(5,"Ivoti",g2("Ivoti"))]),
+     CIA("3ª CiaBM","Sapiranga",[
+       PEL(1,"Sapiranga",g2("Sapiranga")),PEL(2,"Parobé",g2("Parobé"))])
+   ]},
+
+   {s:"5º BBM",c:"Caxias do Sul",k:"batalhao",d:"5º Batalhão de Bombeiro Militar — sede em Caxias do Sul.",ch:[
+     {s:"SAdmC/5ºBBM",k:"secao"},{s:"SODC/5ºBBM",k:"secao"},{s:"ALI/5ºBBM",k:"secao"},{s:"SSeg/5ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Caxias do Sul",[
+       PEL(1,"Caxias do Sul",[G(1,"Caxias do Sul"),Gx("2º GBM","B. Zona Norte"),Gx("3º GBM","B. Desvio Rizzo")]),
+       PEL(2,"B. Cruzeiro",[Gx("1º GBM","B. Cruzeiro"),Gx("2º GBM","Aeroporto")]),
+       PEL(3,"Flores da Cunha",g2("Flores da Cunha")),PEL(4,"São Marcos",g2("São Marcos")),PEL(5,"Vacaria",g2("Vacaria"))]),
+     CIA("2ª CiaBM","Gramado",[
+       PEL(1,"Gramado",g2("Gramado")),PEL(2,"Canela",g2("Canela")),PEL(3,"Taquara",g2("Taquara"))]),
+     CIA("3ª CiaBM","Bento Gonçalves",[
+       PEL(1,"Bento Gonçalves",g2("Bento Gonçalves")),PEL(2,"B. Fenavinho",g2("B. Fenavinho")),
+       PEL(3,"Farroupilha",g2("Farroupilha")),PEL(4,"Veranópolis",g2("Veranópolis")),PEL(5,"Lagoa Vermelha",g2("Lagoa Vermelha"))])
+   ]},
+
+   {s:"7º BBM",c:"Passo Fundo",k:"batalhao",d:"7º Batalhão de Bombeiro Militar — sede em Passo Fundo.",ch:[
+     {s:"SAdmC/7ºBBM",k:"secao"},{s:"SODC/7ºBBM",k:"secao"},{s:"ALI/7ºBBM",k:"secao"},{s:"SSeg/7ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Passo Fundo",[
+       PEL(1,"Passo Fundo",g2("Passo Fundo")),PEL(2,"Aeroporto",g2("Aeroporto")),
+       PEL(3,"Guaporé",g2("Guaporé")),PEL(4,"Soledade",g2("Soledade"))]),
+     CIA("2ª CEBM","Erechim",[
+       PEL(1,"Erechim",[G(1,"Erechim"),Gx("2º GBM","B. Três Vendas")]),
+       PEL(2,"Nonoai",g2("Nonoai")),PEL(3,"Getúlio Vargas",g2("Getúlio Vargas"))]),
+     CIA("3ª CiaBM","Carazinho",[
+       PEL(1,"Carazinho",g2("Carazinho")),PEL(2,"Tapera",g2("Tapera")),PEL(3,"Sarandi",g2("Sarandi"))])
+   ]}
+  ]},
+
+ /* ----------- 3º CRBM ----------- */
+ {s:"3º CRBM",c:"Pelotas",k:"regional",
+  d:"3º Comando Regional de Bombeiro Militar — sede em Pelotas.",
+  ch:[
+   {s:"DAdmC/3ºCRBM",k:"divisao"},{s:"ARI/3ºCRBM",k:"divisao"},{s:"DODC/3ºCRBM",k:"divisao"},
+   {s:"DLPF/3ºCRBM",k:"divisao"},{s:"DCS/3ºCRBM",k:"divisao"},{s:"DSCI/3ºCRBM",k:"divisao"},
+
+   {s:"3º BBM",c:"Rio Grande",k:"batalhao",d:"3º Batalhão de Bombeiro Militar — sede em Rio Grande.",ch:[
+     {s:"SAdmC/3ºBBM",k:"secao"},{s:"SODC/3ºBBM",k:"secao"},{s:"ALI/3ºBBM",k:"secao"},{s:"SSeg/3ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Rio Grande",[
+       PEL(1,"Rio Grande",[G(1,"Rio Grande"),Gx("2º GBM","B. Trevo"),Gx("3º GBM","B. Cassino")]),
+       PEL(2,"São José do Norte",[G(1,"São José do Norte")]),
+       PEL(3,"Santa Vitória do Palmar",[G(1,"Santa Vitória do Palmar")])]),
+     CIA("2ª CiaBM","Pelotas",[
+       PEL(1,"Pelotas",[G(1,"Pelotas"),Gx("2º GBM","B. Fragata"),Gx("3º GBM","B. Três Vendas")]),
+       PEL(2,"Jaguarão",[G(1,"Jaguarão")]),
+       PEL(3,"Canguçu",g2("Canguçu"))])
+   ]},
+
+   {s:"10º BBM",c:"Santana do Livramento",k:"batalhao",d:"10º Batalhão de Bombeiro Militar — sede em Santana do Livramento.",ch:[
+     {s:"SAdmC/10ºBBM",k:"secao"},{s:"SODC/10ºBBM",k:"secao"},{s:"ALI/10ºBBM",k:"secao"},{s:"SSeg/10ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Santana do Livramento",[
+       PEL(1,"Santana do Livramento",[G(1,"Santana do Livramento"),Gx("2º GBM","B. Armour")]),
+       PEL(2,"Quaraí",g2("Quaraí")),PEL(3,"Rosário do Sul",g2("Rosário do Sul"))]),
+     CIA("2ª CiaBM","Bagé",[
+       PEL(1,"Bagé",g2("Bagé")),PEL(2,"Dom Pedrito",g2("Dom Pedrito")),PEL(3,"São Gabriel",g2("São Gabriel"))])
+   ]},
+
+   {s:"13º BBM",c:"Uruguaiana",k:"batalhao",d:"13º Batalhão de Bombeiro Militar — sede em Uruguaiana.",ch:[
+     {s:"SAdmC/13ºBBM",k:"secao"},{s:"SODC/13ºBBM",k:"secao"},{s:"ALI/13ºBBM",k:"secao"},{s:"SSeg/13ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Uruguaiana",[
+       PEL(1,"Uruguaiana",[G(1,"Uruguaiana"),Gx("2º GBM","Barra do Quaraí")]),
+       PEL(2,"Alegrete",g2("Alegrete"))]),
+     CIA("2ª CiaBM","São Borja",[
+       PEL(1,"São Borja",g2("São Borja")),PEL(2,"Itaqui",[G(1,"Itaqui")]),PEL(3,"Santiago",g2("Santiago"))])
+   ]}
+  ]},
+
+ /* ----------- 4º CRBM ----------- */
+ {s:"4º CRBM",c:"Santa Maria",k:"regional",
+  d:"4º Comando Regional de Bombeiro Militar — sede em Santa Maria.",
+  ch:[
+   {s:"DAdmC/4ºCRBM",k:"divisao"},{s:"ARI/4ºCRBM",k:"divisao"},{s:"DODC/4ºCRBM",k:"divisao"},
+   {s:"DLPF/4ºCRBM",k:"divisao"},{s:"DCS/4ºCRBM",k:"divisao"},{s:"DSCI/4ºCRBM",k:"divisao"},
+
+   {s:"4º BBM",c:"Santa Maria",k:"batalhao",d:"4º Batalhão de Bombeiro Militar — sede em Santa Maria.",ch:[
+     {s:"SAdmC/4ºBBM",k:"secao"},{s:"SODC/4ºBBM",k:"secao"},{s:"ALI/4ºBBM",k:"secao"},{s:"SSeg/4ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Santa Maria",[
+       PEL(1,"Santa Maria",g2("Santa Maria")),
+       PEL(2,"B. Pq. Pinheiro Machado",g2("B. Pq. Pinheiro Machado")),
+       PEL(3,"B. Camobi",g2("B. Camobi")),PEL(4,"Restinga Seca",g2("Restinga Seca")),
+       PEL(5,"São Pedro do Sul",g2("São Pedro do Sul")),PEL(6,"Júlio de Castilhos",g2("Júlio de Castilhos"))]),
+     CIA("2ª CiaBM","Cachoeira do Sul",[
+       PEL(1,"Cachoeira do Sul",[G(1,"Cachoeira do Sul"),Gx("2º GBM","B. São José")]),
+       PEL(2,"Caçapava do Sul",[G(1,"Caçapava do Sul"),Gx("2º GBM","São Sepé")])])
+   ]},
+
+   {s:"6º BBM",c:"Santa Cruz do Sul",k:"batalhao",d:"6º Batalhão de Bombeiro Militar — sede em Santa Cruz do Sul.",ch:[
+     {s:"SAdmC/6ºBBM",k:"secao"},{s:"SODC/6ºBBM",k:"secao"},{s:"ALI/6ºBBM",k:"secao"},{s:"SSeg/6ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Santa Cruz do Sul",[
+       PEL(1,"Santa Cruz do Sul",[G(1,"Santa Cruz do Sul"),Gx("2º GBM","B. Distrito"),Gx("3º GBM","Vera Cruz")]),
+       PEL(2,"Rio Pardo",[G(1,"Rio Pardo"),G(2,"Rio Pardo"),Gx("3º GBM","Encruzilhada do Sul")])]),
+     CIA("2ª CiaBM","Lajeado",[
+       PEL(1,"Lajeado",[G(1,"Lajeado"),G(2,"Lajeado"),Gx("3º GBM","Encantado")]),
+       PEL(2,"Estrela",g2("Estrela")),PEL(3,"Venâncio Aires",g2("Venâncio Aires")),PEL(4,"Taquari",g2("Taquari"))]),
+     CIA("3ª CiaBM","Guaíba",[
+       PEL(1,"Guaíba",g2("Guaíba")),PEL(2,"São Jerônimo",g2("São Jerônimo")),
+       PEL(3,"Camaquã",g2("Camaquã")),PEL(4,"São Lourenço",g2("São Lourenço"))])
+   ]},
+
+   {s:"11º BBM",c:"Santo Ângelo",k:"batalhao",d:"11º Batalhão de Bombeiro Militar — sede em Santo Ângelo.",ch:[
+     {s:"SAdmC/11ºBBM",k:"secao"},{s:"SODC/11ºBBM",k:"secao"},{s:"ALI/11ºBBM",k:"secao"},{s:"SSeg/11ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Santo Ângelo",[
+       PEL(1,"Santo Ângelo",[G(1,"Santo Ângelo"),G(2,"Santo Ângelo"),Gx("3º GBM","Aeroporto")]),
+       PEL(2,"São Luiz Gonzaga",g2("São Luiz Gonzaga"))]),
+     CIA("2ª CiaBM","Santa Rosa",[
+       PEL(1,"Santa Rosa",g2("Santa Rosa")),PEL(2,"Giruá",g2("Giruá")),PEL(3,"Horizontina",g2("Horizontina")),
+       PEL(4,"Três Passos",g2("Três Passos")),PEL(5,"Três de Maio",g2("Três de Maio"))])
+   ]},
+
+   {s:"12º BBM",c:"Ijuí",k:"batalhao",d:"12º Batalhão de Bombeiro Militar — sede em Ijuí.",ch:[
+     {s:"SAdmC/12ºBBM",k:"secao"},{s:"SODC/12ºBBM",k:"secao"},{s:"ALI/12ºBBM",k:"secao"},{s:"SSeg/12ºBBM",k:"secao"},
+     CIA("1ª CiaBM","Ijuí",[
+       PEL(1,"Ijuí",g2("Ijuí")),PEL(2,"Panambi",g2("Panambi"))]),
+     CIA("2ª CiaBM","Cruz Alta",[
+       PEL(1,"Cruz Alta",g2("Cruz Alta")),PEL(2,"Ibirubá",[G(1,"Ibirubá")])]),
+     CIA("3ª CiaBM","Frederico Westphalen",[
+       PEL(1,"Frederico Westphalen",g2("Frederico Westphalen")),PEL(2,"Palmeira das Missões",g2("Palmeira das Missões"))])
+   ]}
+  ]},
+
+ /* ===================== ÓRGÃO ESPECIAL — BESCI ===================== */
+ {cat:"Órgão Especial — Apoio e Execução Estadual"},
+
+ {s:"BESCI",c:"Porto Alegre",k:"especial",
+  d:"Batalhão Especial de Segurança Contra Incêndio — abrangência estadual. Subordinado operacionalmente ao DSPCI e, como órgão de apoio, ao Comandante-Geral, com autonomia administrativa.",
+  ch:[
+   {s:"DAdm/BESCI",k:"divisao",d:"Divisão Administrativa e Correição.",ch:[
+     {s:"SAdmC/BESCI",k:"secao",d:"Seção Administrativa e Correição (com ALI).",},
+     {s:"SAP/BESCI",k:"secao",d:"Seção de Atendimento ao Público.",ch:[
+       {s:"SetProt",k:"setor",d:"Setor de Protocolo."},{s:"SetArq",k:"setor",d:"Setor de Arquivamento."},{s:"AtTec",k:"setor",d:"Central de Atendimento Técnico."}]}]},
+   {s:"DAPPCI",k:"divisao",d:"Divisão de Análise de Planos de Prevenção e Proteção Contra Incêndio.",ch:[
+     {s:"SAPSPCI",k:"secao",d:"Seção de Análise de Planos Simplificados."},{s:"SAPPCI",k:"secao",d:"Seção de Análise de Planos na Forma Completa."}]},
+   {s:"DVFE",k:"divisao",d:"Divisão de Vistoria e Fiscalização de Edificações.",ch:[
+     {s:"SVE",k:"secao",d:"Seção de Vistoria de Edificações."},{s:"SFisc",k:"secao",d:"Seção de Fiscalização."}]}
+  ]}
+ ]
+};
+
+/* ============================================================
+   RENDERIZAÇÃO
+   ============================================================ */
+const tree = document.getElementById('tree');
+const tip = document.getElementById('tip');
+let MINE = null; // referência ao nó da 2ª Cia
+
+function countDescendants(node){
+  if(!node.ch) return 0;
+  let n=node.ch.filter(c=>!c.cat).length;
+  node.ch.forEach(c=>{ if(!c.cat) n+=countDescendants(c); });
+  return n;
+}
+
+function buildNode(node, pathArr){
+  if(node.cat){
+    const h=document.createElement('div');
+    h.className='cat';
+    h.textContent=node.cat;
+    return h;
+  }
+  const wrap=document.createElement('div');
+  wrap.className='node';
+  const hasCh=node.ch && node.ch.length;
+  const myPath=[...pathArr,node.s];
+
+  const bar=document.createElement('div');
+  bar.className='bar k-'+node.k;
+  if(node.hl==='bbm') bar.classList.add('hl-bbm');
+  if(node.hl==='cia'){ bar.classList.add('hl-cia'); }
+  if(node.badge) bar.classList.add('has-badge');
+
+  // twisty
+  const tw=document.createElement('span');
+  tw.className='tw'+(hasCh?'':' leaf');
+  tw.textContent=hasCh?'▶':'•';
+  bar.appendChild(tw);
+
+  const sig=document.createElement('span');
+  sig.className='sig';
+  sig.textContent=node.s;
+  bar.appendChild(sig);
+
+  if(node.c){
+    const city=document.createElement('span');
+    city.className='city';
+    city.textContent=node.c;
+    bar.appendChild(city);
+  }
+
+  if(node.badge){
+    const bd=document.createElement('span');
+    bd.className='badge';
+    bd.textContent=node.badge;
+    bar.appendChild(bd);
+  } else if(hasCh){
+    const ct=document.createElement('span');
+    ct.className='count';
+    ct.textContent=countDescendants(node);
+    bar.appendChild(ct);
+  }
+
+  // tooltip data
+  const desc=node.d || DEF[node.k] || '';
+  bar.dataset.name=node.s;
+  bar.dataset.kind=KIND_NAME[node.k]||'';
+  bar.dataset.city=node.c||'';
+  bar.dataset.desc=desc;
+  bar.dataset.path=pathArr.join('  ›  ');
+  bar._search=(node.s+' '+(node.c||'')+' '+desc).toLowerCase();
+
+  // events
+  bar.addEventListener('mouseenter',e=>showTip(bar));
+  bar.addEventListener('mousemove',moveTip);
+  bar.addEventListener('mouseleave',hideTip);
+
+  wrap.appendChild(bar);
+
+  if(hasCh){
+    const kids=document.createElement('div');
+    kids.className='children';
+    node.ch.forEach(c=>kids.appendChild(buildNode(c,myPath)));
+    wrap.appendChild(kids);
+    bar.addEventListener('click',()=>{ wrap.classList.toggle('open'); });
+  }
+
+  if(node.hl==='cia') MINE=wrap;
+  wrap.__node=node;
+  return wrap;
+}
+
+DATA.ch.forEach(c=>tree.appendChild(buildNode(c,[DATA.s])));
+
+/* ===== Tooltip ===== */
+function showTip(bar){
+  tip.innerHTML=
+    `<div class="tname">${bar.dataset.name}</div>
+     <div class="tmeta"><span class="pill">${bar.dataset.kind}</span>${bar.dataset.city?`<span class="pill">📍 ${bar.dataset.city}</span>`:''}</div>
+     <div class="tdesc">${bar.dataset.desc}</div>
+     ${bar.dataset.path?`<div class="tpath">${bar.dataset.path}</div>`:''}`;
+  tip.classList.add('show');
+}
+function moveTip(e){
+  const pad=16, w=tip.offsetWidth, h=tip.offsetHeight;
+  let x=e.clientX+pad, y=e.clientY+pad;
+  if(x+w>innerWidth) x=e.clientX-w-pad;
+  if(y+h>innerHeight) y=e.clientY-h-pad;
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+function hideTip(){ tip.classList.remove('show'); }
+
+/* ===== Controles ===== */
+document.getElementById('expand').onclick=()=>document.querySelectorAll('.node').forEach(n=>{if(n.querySelector(':scope>.children'))n.classList.add('open')});
+document.getElementById('collapse').onclick=()=>document.querySelectorAll('.node').forEach(n=>n.classList.remove('open'));
+
+function openPathTo(el){
+  let p=el;
+  while(p && p!==tree){
+    if(p.classList && p.classList.contains('node')) p.classList.add('open');
+    p=p.parentElement;
+  }
+}
+document.getElementById('goMine').onclick=()=>{
+  if(!MINE) return;
+  openPathTo(MINE);
+  setTimeout(()=>{
+    const bar=MINE.querySelector(':scope>.bar');
+    bar.scrollIntoView({behavior:'smooth',block:'center'});
+  },120);
+};
+
+/* ===== Busca ===== */
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const term=q.value.trim().toLowerCase();
+  const allNodes=[...document.querySelectorAll('.node')];
+  if(!term){
+    allNodes.forEach(n=>{n.classList.remove('hidden');});
+    return;
+  }
+  // primeiro esconde todos
+  allNodes.forEach(n=>n.classList.add('hidden'));
+  allNodes.forEach(n=>{
+    const bar=n.querySelector(':scope>.bar');
+    if(bar && bar._search.includes(term)){
+      // revela o nó, seus ancestrais (abrindo-os) e descendentes
+      let p=n;
+      while(p && p!==tree.parentElement){
+        if(p.classList && p.classList.contains('node')){ p.classList.remove('hidden'); p.classList.add('open'); }
+        p=p.parentElement;
+      }
+      n.querySelectorAll('.node').forEach(d=>d.classList.remove('hidden'));
+    }
+  });
+});
+
+/* ===== Legenda ===== */
+const legendItems=[
+  ['comando','Comando-Geral'],['direcao','Direção'],['apoio','Departamentos'],
+  ['regional','Cmdo Regional'],['batalhao','Batalhão'],['companhia','Companhia'],
+  ['pelotao','Pelotão'],['grupo','Grupo'],['especial','Órgão Especial'],
+  ['divisao','Divisão'],['secao','Seção'],['setor','Setor']
+];
+const leg=document.getElementById('legend');
+legendItems.forEach(([k,label])=>{
+  const it=document.createElement('div');it.className='item';
+  it.innerHTML=`<span class="dot" style="background:var(--c-${k})"></span>${label}`;
+  leg.appendChild(it);
+});
+
+/* ===== Estado inicial: abre o caminho até a 2ª Cia ===== */
+window.addEventListener('load',()=>{
+  if(MINE){ openPathTo(MINE); }
+});
+</script>
+</body>
+</html>
