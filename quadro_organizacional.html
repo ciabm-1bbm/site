@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadro Organizacional — 1º CRBM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117; --bg2:#121821; --panel:#161d27; --line:#2a3543;
+  --txt:#e6edf3; --txt-dim:#8b98a8; --gold:#ffcb47; --cbmrs-blue:#002b5c;
+  --c-root:#ffffff;
+  --c-regional:#ff8a3d;
+  --c-divisao:#9aa9ff;
+  --c-chefia:#ffcb47;
+  --c-batalhao:#ff5a5a;
+  --c-hq:#34d3c4;
+  --c-secao:#7fd8e8;
+  --c-companhia:#ff8fa3;
+  --c-pelotao:#ffd166;
+  --c-grupo:#b5e48c;
+  --c-funcao:#9aa9b8;
+  --c-especial:#f06595;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:
+  radial-gradient(1200px 600px at 80% -10%, rgba(255,90,90,.10), transparent 60%),
+  radial-gradient(900px 500px at -10% 10%, rgba(124,156,255,.08), transparent 55%),
+  var(--bg);
+  color:var(--txt);font-family:'Barlow',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* Header */
+header{position:relative;z-index:2;padding:34px 28px 18px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,203,71,.04),transparent)}
+.brand{display:flex;align-items:center;gap:20px;max-width:1300px;margin:0 auto;justify-content:space-between}
+.logobox{flex:none;background:var(--cbmrs-blue);padding:8px 10px;border-radius:12px;display:grid;place-items:center;
+  box-shadow:0 8px 26px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12)}
+.logobox img{height:64px;width:auto;display:block}
+.logobox.missing{min-width:96px;min-height:80px;color:#cfe0f5;font-family:'Oswald';font-size:12px;text-align:center;line-height:1.25;letter-spacing:.5px;text-transform:uppercase}
+.titleblock{flex:1;text-align:center;min-width:0}
+h1{font-family:'Oswald',sans-serif;font-weight:600;font-size:clamp(20px,3.2vw,33px);letter-spacing:1px;line-height:1.05;text-transform:uppercase}
+.sub{color:var(--txt-dim);font-size:13px;letter-spacing:.3px;margin-top:5px}
+.sub b{color:var(--c-batalhao);font-weight:600}
+@media(min-width:768px){.logobox img{height:80px}}
+@media(max-width:560px){.brand{gap:10px}.logobox{padding:6px}.logobox img{height:44px}.sub{font-size:11px}}
+
+/* Toolbar */
+.toolbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);background:rgba(13,17,23,.85);
+  border-bottom:1px solid var(--line);padding:12px 28px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.search{position:relative;flex:1 1 260px;max-width:440px}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  padding:10px 14px 10px 38px;font-family:'Barlow';font-size:14px;outline:none;transition:.2s}
+.search input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,203,71,.15)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+button.tool{background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:9px 14px;border-radius:10px;
+  font-family:'Oswald';font-weight:500;letter-spacing:.4px;font-size:13px;text-transform:uppercase;cursor:pointer;transition:.18s;white-space:nowrap}
+button.tool:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+button.tool.go{background:linear-gradient(145deg,#ff5a5a,#ff8a3d);border:none;color:#1a0e0e;font-weight:700}
+button.tool.go:hover{color:#1a0e0e;box-shadow:0 6px 20px rgba(255,90,90,.4)}
+
+.wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:22px 28px 80px}
+
+/* Resumo dashboard */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:6px 0 22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;border-top:3px solid var(--c-regional);position:relative}
+.card.bbm{border-top-color:var(--c-batalhao)} .card.bbs{border-top-color:var(--c-especial)}
+.card.total{border-top-color:var(--gold);background:linear-gradient(160deg,rgba(255,203,71,.10),var(--panel))}
+.card.hl{box-shadow:0 0 26px rgba(255,203,71,.30);border-color:var(--gold);animation:glow 2.6s ease-in-out infinite}
+.card .cname{font-family:'Oswald';font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--txt-dim)}
+.card .cnum{font-family:'Oswald';font-weight:700;font-size:30px;line-height:1.1;margin-top:2px}
+.card .cnum small{font-size:12px;color:var(--txt-dim);font-weight:400;letter-spacing:.5px}
+.card.total .cnum{color:var(--gold)}
+
+/* Resumo table */
+details.resumo{margin:0 0 22px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+details.resumo>summary{cursor:pointer;list-style:none;padding:13px 16px;font-family:'Oswald';letter-spacing:1px;
+  text-transform:uppercase;font-size:13px;color:var(--txt);display:flex;align-items:center;gap:10px}
+details.resumo>summary::-webkit-details-marker{display:none}
+details.resumo>summary::before{content:"▸";color:var(--gold);transition:transform .25s}
+details.resumo[open]>summary::before{transform:rotate(90deg)}
+.tablewrap{overflow-x:auto}
+table.qo{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
+table.qo th,table.qo td{padding:8px 10px;text-align:center;border-top:1px solid var(--line)}
+table.qo thead th{font-family:'Oswald';font-weight:500;letter-spacing:.5px;text-transform:uppercase;font-size:11px;color:var(--txt-dim);background:var(--bg2)}
+table.qo .grp{font-size:9.5px;color:var(--txt-dim);letter-spacing:1px}
+table.qo td.u{text-align:left;font-family:'Oswald';letter-spacing:.4px;white-space:nowrap}
+table.qo td.tt{font-family:'Oswald';font-weight:600;color:var(--gold)}
+table.qo tr.hl td{background:rgba(255,203,71,.08)}
+table.qo tr.total td{font-family:'Oswald';font-weight:600;border-top:2px solid var(--gold);background:rgba(255,203,71,.06)}
+table.qo td.z{color:#46525f}
+
+/* Legends */
+.legend{max-width:1300px;margin:0 auto 16px;display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center}
+.legend .item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--txt-dim)}
+.legend .dot{width:11px;height:11px;border-radius:3px}
+.hint{text-align:center;color:var(--txt-dim);font-size:13px;margin:4px 0 18px;font-style:italic}
+
+/* Tree */
+.tree{margin-left:4px}
+.node{position:relative}
+.children{margin-left:24px;padding-left:18px;border-left:1.5px dashed var(--line);overflow:hidden;max-height:0;opacity:0;transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s}
+.node.open>.children{max-height:200000px;opacity:1}
+.bar{display:flex;align-items:center;gap:10px;margin:5px 0;padding:9px 13px;border-radius:11px;background:var(--panel);
+  border:1px solid var(--line);cursor:pointer;position:relative;transition:transform .15s,border-color .2s,background .2s;
+  border-left-width:4px;width:fit-content;max-width:100%}
+.bar:hover{transform:translateX(3px);background:var(--bg2)}
+.bar .tw{flex:none;width:18px;height:18px;display:grid;place-items:center;color:var(--txt-dim);font-size:11px;transition:transform .3s;font-family:monospace}
+.node.open>.bar .tw{transform:rotate(90deg);color:var(--gold)}
+.bar .tw.leaf{opacity:.25}
+.bar .sig{font-family:'Oswald';font-weight:600;letter-spacing:.4px;font-size:15px}
+.bar .city{font-size:11.5px;color:var(--txt-dim);background:rgba(255,255,255,.04);padding:2px 8px;border-radius:20px;border:1px solid var(--line)}
+.bar .soma{font-family:'Oswald';font-weight:600;font-size:12.5px;color:var(--gold);background:rgba(255,203,71,.10);
+  border:1px solid rgba(255,203,71,.30);padding:1px 9px;border-radius:20px}
+.bar .soma small{color:var(--txt-dim);font-weight:400;font-size:10px;letter-spacing:.4px}
+.bar .soma.ac{color:var(--txt-dim);background:rgba(255,255,255,.04);border-color:var(--line);text-transform:uppercase;font-size:10px;letter-spacing:.6px}
+
+.k-root .sig{color:var(--c-root)} .k-root{border-left-color:var(--c-root)}
+.k-regional .sig{color:var(--c-regional)} .k-regional{border-left-color:var(--c-regional)}
+.k-divisao .sig{color:var(--c-divisao)} .k-divisao{border-left-color:var(--c-divisao)}
+.k-chefia .sig{color:var(--c-chefia)} .k-chefia{border-left-color:var(--c-chefia)}
+.k-batalhao .sig{color:var(--c-batalhao)} .k-batalhao{border-left-color:var(--c-batalhao)}
+.k-hq .sig{color:var(--c-hq)} .k-hq{border-left-color:var(--c-hq)}
+.k-secao .sig{color:var(--c-secao)} .k-secao{border-left-color:var(--c-secao)}
+.k-companhia .sig{color:var(--c-companhia)} .k-companhia{border-left-color:var(--c-companhia)}
+.k-pelotao .sig{color:var(--c-pelotao)} .k-pelotao{border-left-color:var(--c-pelotao)}
+.k-grupo .sig{color:var(--c-grupo)} .k-grupo{border-left-color:var(--c-grupo)}
+.k-funcao .sig{color:var(--c-funcao)} .k-funcao{border-left-color:var(--c-funcao)}
+.k-especial .sig{color:var(--c-especial)} .k-especial{border-left-color:var(--c-especial)}
+
+.cat{font-family:'Oswald';text-transform:uppercase;letter-spacing:2px;font-weight:500;font-size:13px;color:var(--txt-dim);
+  margin:26px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.cat::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--gold)}
+
+.bar.hl{background:linear-gradient(100deg,rgba(255,203,71,.20),rgba(255,143,61,.10));border-color:var(--gold);
+  box-shadow:0 0 26px rgba(255,203,71,.35), inset 0 0 0 1px rgba(255,203,71,.4);animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 22px rgba(255,203,71,.30), inset 0 0 0 1px rgba(255,203,71,.35)}
+  50%{box-shadow:0 0 36px rgba(255,203,71,.55), inset 0 0 0 1px rgba(255,203,71,.6)}}
+.bar.hl .sig{color:var(--gold)}
+.node.hidden{display:none}
+
+/* Tooltip */
+#tip{position:fixed;z-index:60;max-width:340px;background:linear-gradient(160deg,#1b232f,#10151d);border:1px solid var(--line);
+  border-radius:14px;padding:14px 16px;pointer-events:none;opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s;
+  box-shadow:0 18px 50px rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+#tip.show{opacity:1;transform:translateY(0)}
+#tip .tname{font-family:'Oswald';font-weight:600;font-size:15px;letter-spacing:.3px;margin-bottom:3px}
+#tip .tmeta{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-dim);margin-bottom:4px;display:flex;gap:8px;flex-wrap:wrap}
+#tip .tmeta .pill{padding:2px 8px;border-radius:20px;border:1px solid var(--line);font-size:10px}
+.glabel{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--txt-dim);margin:8px 0 3px}
+.rankgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.rc{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;padding:4px 6px;display:flex;flex-direction:column;gap:1px;align-items:center}
+.rc span{font-size:9px;letter-spacing:.3px;color:var(--txt-dim);text-transform:uppercase}
+.rc b{font-size:15px;font-family:'Oswald'}
+.rc.z{opacity:.3}
+.ranktot{margin-top:8px;font-size:12px;border-top:1px solid var(--line);padding-top:7px}
+.ranktot b{color:var(--gold);font-family:'Oswald';font-size:16px}
+#tip .tnote{margin-top:8px;font-size:12px;line-height:1.45;color:#e9c46a;background:rgba(233,196,106,.08);border-radius:8px;padding:6px 9px}
+#tip .tpath{margin-top:8px;font-size:11px;color:var(--txt-dim);border-top:1px solid var(--line);padding-top:7px;font-style:italic}
+
+footer{text-align:center;color:var(--txt-dim);font-size:11.5px;padding:24px;border-top:1px solid var(--line);line-height:1.8}
+footer b{color:var(--gold)}
+::-webkit-scrollbar{width:11px;height:11px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}::-webkit-scrollbar-thumb:hover{background:#3a4757}
+@media(max-width:640px){.children{margin-left:14px;padding-left:12px}header{padding:24px 16px 14px}.wrap{padding:18px 14px 60px}.toolbar{padding:10px 14px}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <div class="brand">
+    <div class="logobox"><img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" alt="CBMRS"></div>
+    <div class="titleblock">
+      <h1>Quadro Organizacional</h1>
+      <div class="sub">1º Comando Regional de Bombeiro Militar — efetivo previsto por posto e graduação · BG nº 18 (07/05/2026) · destaque: <b>1º BBM</b></div>
+    </div>
+    <div class="logobox"><img src="images/brasao_1BBM_PARA_site.png" alt="Brasão 1º BBM" onerror="this.parentNode.classList.add('missing');this.parentNode.innerHTML='Brasão<br>1º BBM';"></div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="q" type="text" placeholder="Encontre aqui o setor, unidade ou cidade" autocomplete="off">
+  </div>
+  <button class="tool go" id="goMine">★ Minha Unidade</button>
+  <button class="tool" id="expand">Expandir tudo</button>
+  <button class="tool" id="collapse">Recolher tudo</button>
+</div>
+
+<div class="wrap">
+  <div class="cards" id="cards"></div>
+
+  <details class="resumo" id="resumoBox">
+    <summary>Quadro Resumo — Efetivo Previsto por Posto/Graduação</summary>
+    <div class="tablewrap"><table class="qo" id="resumoTable"></table></div>
+  </details>
+
+  <div class="legend" id="legend"></div>
+  <p class="hint">Clique para abrir os níveis · passe o mouse para ver o detalhamento de vagas por posto e graduação · número dourado = total de vagas</p>
+  <div class="tree" id="tree"></div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+const RK=['Cel','TCel','Maj','Cap','1º Ten','1º Sgt','2º Sgt','Sd'];
+const Z=[0,0,0,0,0,0,0,0];
+const KIND_NAME={root:'Comando Regional',regional:'Comando Regional',divisao:'Divisão',chefia:'Chefia/Comando',
+  batalhao:'Batalhão',hq:'Comando do Batalhão',secao:'Seção',companhia:'Companhia',pelotao:'Pelotão',
+  grupo:'Grupo',funcao:'Função',especial:'Órgão Especial'};
+
+/* helpers */
+const gbm=(name,s1,s2,sd)=>({s:name,k:'grupo',r:[0,0,0,0,0,s1,s2,sd]});
+const cmtTen=()=>({s:'Comandante',k:'funcao',r:[0,0,0,0,1,0,0,0]});
+const aux=()=>({s:'Auxiliar de Pelotão',k:'funcao',r:Z,note:'Função acumulada pelo 1º Sgt QPBM mais antigo do Pelotão.'});
+const pel=(nome,cidade,grupos)=>({s:nome,c:cidade,k:'pelotao',ch:[cmtTen(),aux(),...grupos]});
+const setor=(s1,s2,sd)=>({s:'Setor de Comando e Correição',k:'secao',r:[0,0,0,0,0,s1,s2,sd]});
+const cia=(nome,cidade,setorNode,pelotoes)=>({s:nome,c:cidade,k:'companhia',
+  ch:[{s:'Comandante',k:'funcao',r:[0,0,0,1,0,0,0,0]},setorNode,...pelotoes]});
+
+/* ===== Comando Regional ===== */
+const comandoRegional={s:'Comando Regional',c:'Porto Alegre',k:'regional',
+  d:'Órgão de comando do 1º CRBM e suas divisões de apoio (sede em Porto Alegre).',ch:[
+  {s:'Cmt do 1º CRBM',k:'chefia',r:[1,0,0,0,0,0,0,0],d:'Comandante Regional (Cel QOEM).'},
+  {s:'DAdmC',k:'divisao',r:[0,0,0,0,1,1,0,2],d:'Divisão Administrativa e Correicional.'},
+  {s:'ARI',k:'divisao',r:[0,0,0,0,0,1,2,4],d:'Agência Regional de Inteligência.',note:'Chefia (Maj) acumulada pelo chefe da DSCI.'},
+  {s:'DODC',k:'divisao',r:[0,0,0,0,0,0,1,3],d:'Divisão de Operações e Defesa Civil.'},
+  {s:'DLPF',k:'divisao',r:[0,0,0,0,0,0,2,3],d:'Divisão de Logística, Patrimônio e Finanças.'},
+  {s:'DCS',k:'divisao',r:Z,d:'Divisão de Comunicação Social.',note:'Sem efetivo próprio previsto neste quadro.'},
+  {s:'DSCI',k:'divisao',r:[0,0,1,0,0,0,1,3],d:'Divisão de Segurança Contra Incêndio.'}
+]};
+
+/* ===== 1º BBM (DESTAQUE) ===== */
+const bbm1={s:'1º BBM',c:'Porto Alegre',k:'batalhao',hl:true,
+  d:'1º Batalhão de Bombeiro Militar — sede em Porto Alegre. Seu batalhão.',ch:[
+  {s:'Comando do Batalhão',k:'hq',d:'Comando e Estado-Maior do 1º BBM.',ch:[
+    {s:'Comandante',k:'chefia',r:[0,1,0,0,0,0,0,0],d:'Comandante do BBM (TCel QOEM).'},
+    {s:'Subcomandante',k:'chefia',r:Z,note:'Função acumulada pelo Oficial QOEM mais antigo do BBM, excetuado o Comandante.'},
+    {s:'SAdmC',k:'secao',r:[0,0,1,1,0,2,5,4],d:'Seção Administrativa e Correição.'},
+    {s:'SODC',k:'secao',r:[0,0,0,1,0,4,5,10],d:'Seção de Operações e Defesa Civil.'},
+    {s:'ALI',k:'secao',r:Z,d:'Agência Local de Inteligência.',note:'Função acumulada pelo Cap QOEM da SAdmC.'}
+  ]},
+  cia('1ª Cia BM','Porto Alegre',setor(1,2,1),[
+    pel('1º Pel BM','Açorianos',[gbm('1º GBM',1,1,8),gbm('2º GBM',1,2,8)]),
+    pel('2º Pel BM','Teresópolis',[gbm('1º GBM',1,2,7),gbm('2º GBM',1,1,8)]),
+    pel('3º Pel BM','Assunção',[gbm('1º GBM',1,2,7),gbm('2º GBM',1,1,7)]),
+    pel('4º Pel BM','Restinga',[gbm('1º GBM',1,2,8),gbm('2º GBM',1,1,7)]),
+    pel('5º Pel BM','Belém Novo',[gbm('1º GBM',1,2,7),gbm('2º GBM',1,1,7)])
+  ]),
+  cia('2ª Cia BM','Porto Alegre',setor(1,2,1),[
+    pel('1º Pel BM','Floresta',[gbm('1º GBM',1,2,7),gbm('2º GBM',1,1,8)]),
+    pel('2º Pel BM',"Passo D'Areia",[gbm('1º GBM',1,2,7),gbm('2º GBM',1,1,8)]),
+    pel('3º Pel BM','Partenon',[gbm('1º GBM',1,2,8),gbm('2º GBM',1,2,7)])
+  ])
+]};
+
+/* ===== 8º BBM ===== */
+const bbm8={s:'8º BBM',c:'Canoas',k:'batalhao',d:'8º Batalhão de Bombeiro Militar — sede em Canoas.',ch:[
+  {s:'Comando do Batalhão',k:'hq',ch:[
+    {s:'Comandante',k:'chefia',r:[0,1,0,0,0,0,0,0]},
+    {s:'Subcomandante',k:'chefia',r:Z,note:'Função acumulada pelo Oficial QOEM mais antigo do BBM, excetuado o Comandante.'},
+    {s:'SAdmC',k:'secao',r:[0,0,0,0,0,3,7,6],note:'Cap QOEM acumulado pela Sseg.'},
+    {s:'SODC',k:'secao',r:[0,0,0,0,0,1,1,2],note:'Cap QOEM acumulado pela Sseg.'},
+    {s:'ALI',k:'secao',r:Z,note:'Cap QOEM acumulado pela Sseg.'},
+    {s:'Sseg',k:'secao',r:[0,0,1,1,0,5,6,11],d:'Seção de Segurança Contra Incêndio.'}
+  ]},
+  cia('1ª Cia BM','Canoas',setor(0,1,1),[
+    pel('1º Pel BM','Canoas',[gbm('1º GBM',1,2,9),gbm('2º GBM (Mathias Velho)',0,2,9),gbm('3º GBM (N. Sta Rita)',1,1,9),gbm('GBS',1,0,9)]),
+    pel('2º Pel BM','Esteio',[gbm('1º GBM',1,1,8),gbm('2º GBM',2,1,7)]),
+    pel('3º Pel BM','Sapucaia do Sul',[gbm('1º GBM',1,2,8),gbm('2º GBM',1,1,9)])
+  ]),
+  cia('2ª Cia BM','Gravataí',setor(0,1,1),[
+    pel('1º Pel BM','Gravataí',[gbm('1º GBM',1,1,8),gbm('2º GBM',1,1,8)]),
+    pel('2º Pel BM','Alvorada',[gbm('1º GBM',1,2,9),gbm('2º GBM',1,1,8)]),
+    pel('3º Pel BM','Cachoeirinha',[gbm('1º GBM',1,1,8),gbm('2º GBM',1,2,8)]),
+    pel('4º Pel BM','Viamão',[gbm('1º GBM',1,1,8),gbm('2º GBM',1,2,8)])
+  ])
+]};
+
+/* ===== 9º BBM ===== */
+const bbm9={s:'9º BBM',c:'Tramandaí',k:'batalhao',d:'9º Batalhão de Bombeiro Militar — sede em Tramandaí.',ch:[
+  {s:'Comando do Batalhão',k:'hq',ch:[
+    {s:'Comandante',k:'chefia',r:[0,1,0,0,0,0,0,0]},
+    {s:'Subcomandante',k:'chefia',r:Z,note:'Função acumulada pelo Oficial QOEM mais antigo do BBM, excetuado o Comandante.'},
+    {s:'SAdmC',k:'secao',r:[0,0,0,0,0,1,5,9],note:'Cap QOEM acumulado pela Sseg.'},
+    {s:'SODC',k:'secao',r:[0,0,0,0,0,0,2,1],note:'Cap QOEM acumulado pela Sseg.'},
+    {s:'ALI',k:'secao',r:[0,0,0,0,0,1,1,1],note:'Cap QOEM acumulado pela Sseg.'},
+    {s:'Sseg',k:'secao',r:[0,0,1,1,0,1,4,6],d:'Seção de Segurança Contra Incêndio.'}
+  ]},
+  cia('1ª Cia BM','Tramandaí',setor(1,1,1),[
+    pel('1º Pel BM','Tramandaí',[gbm('1º GBM',1,1,10),gbm('2º GBM',1,3,9)]),
+    pel('2º Pel BM','Cidreira',[gbm('1º GBM',2,1,8),gbm('2º GBM',1,1,8),gbm('3º GBM (Balneário Pinhal)',1,1,8)]),
+    pel('3º Pel BM','Imbé',[gbm('1º GBM',1,1,9)])
+  ]),
+  cia('2ª Cia BM','Capão da Canoa',setor(1,1,1),[
+    pel('1º Pel BM','Capão da Canoa',[gbm('1º GBM',1,1,9),gbm('2º GBM',2,1,8)]),
+    pel('2º Pel BM','Osório',[gbm('1º GBM',2,2,8),gbm('2º GBM',2,2,8)]),
+    pel('3º Pel BM','Santo Antônio da Patrulha',[gbm('1º GBM',2,1,10),gbm('2º GBM',1,1,10)])
+  ]),
+  cia('3ª Cia BM','Torres',setor(2,0,1),[
+    pel('1º Pel BM','Torres',[gbm('1º GBM',3,2,8),gbm('2º GBM',2,2,8)]),
+    pel('2º Pel BM','Terra de Areia',[gbm('1º GBM',1,2,8),gbm('2º GBM',1,2,8)])
+  ])
+]};
+
+/* ===== BBS ===== */
+const bbs={s:'BBS',c:'Porto Alegre',k:'especial',
+  d:'Batalhão de Busca e Salvamento — órgão especial de abrangência estadual (mergulho, canil, aquático, terrestre).',ch:[
+  {s:'Comandante',k:'chefia',r:[0,0,1,0,0,0,0,0],d:'Comandante do BBS (Maj QOEM).'},
+  {s:'Subcomandante',k:'chefia',r:Z,note:'Função acumulada pelo Oficial QOEM mais antigo, exceto o Comandante.'},
+  {s:'SAdmC',k:'secao',r:[0,0,0,1,0,3,2,1],note:'Uma função acumulada pelo Cmt do 2º Pel - Canil/1ª Cia.'},
+  {s:'SODC',k:'secao',r:[0,0,0,0,0,0,1,2],note:'Cap acumulado pela SAdmC; 1º Sgt acumulado pelo 1º Sgt da ALI.'},
+  {s:'ALI',k:'secao',r:[0,0,0,0,0,1,1,1],note:'Cap acumulado pela SAdmC.'},
+  {s:'1ª Cia',k:'companhia',c:'Porto Alegre',ch:[
+    {s:'Comandante',k:'funcao',r:[0,0,0,1,0,0,0,0]},
+    {s:'1º Pel - Terrestre',k:'pelotao',r:[0,0,0,0,0,1,5,16],d:'Salvamento terrestre.'},
+    {s:'2º Pel - Canil',k:'pelotao',r:[0,0,0,0,1,1,4,12],d:'Busca e resgate com cães.'}
+  ]},
+  {s:'2ª Cia',k:'companhia',c:'Porto Alegre',ch:[
+    {s:'Comandante',k:'funcao',r:[0,0,0,1,0,0,0,0]},
+    {s:'1º Pel - Aquática',k:'pelotao',r:[0,0,0,0,1,0,4,11],d:'Salvamento aquático.'},
+    {s:'2º Pel - Mergulho',k:'pelotao',r:[0,0,0,0,1,2,4,16],d:'Operações de mergulho.'}
+  ]}
+]};
+
+const ROOT={s:'1º CRBM',c:'Porto Alegre',k:'root',d:'1º Comando Regional de Bombeiro Militar — total geral previsto.',
+  ch:[comandoRegional,bbm1,bbm8,bbm9,bbs]};
+
+/* ===== Agregação de vagas ===== */
+function agg(node){
+  if(node._agg) return node._agg;
+  let r=[...(node.r||Z)];
+  if(node.ch) node.ch.forEach(c=>{ if(c.cat) return; const cr=agg(c); for(let i=0;i<8;i++) r[i]+=cr[i]; });
+  node._agg=r; return r;
+}
+const sum=r=>r.reduce((a,b)=>a+b,0);
+
+/* ===== Resumo (cards + tabela) ===== */
+const resumoUnits=[
+  {node:comandoRegional,label:'Comando Regional',cls:''},
+  {node:bbm1,label:'1º BBM',cls:'bbm hl'},
+  {node:bbm8,label:'8º BBM',cls:'bbm'},
+  {node:bbm9,label:'9º BBM',cls:'bbm'},
+  {node:bbs,label:'BBS',cls:'bbs'}
+];
+const cardsEl=document.getElementById('cards');
+resumoUnits.forEach(u=>{
+  const t=sum(agg(u.node));
+  const d=document.createElement('div');d.className='card '+u.cls;
+  d.innerHTML=`<div class="cname">${u.label}</div><div class="cnum">${t} <small>vagas</small></div>`;
+  cardsEl.appendChild(d);
+});
+const totAll=sum(agg(ROOT));
+const dc=document.createElement('div');dc.className='card total';
+dc.innerHTML=`<div class="cname">Total 1º CRBM</div><div class="cnum">${totAll} <small>vagas</small></div>`;
+cardsEl.appendChild(dc);
+
+/* tabela resumo */
+const rt=document.getElementById('resumoTable');
+let thead=`<thead>
+  <tr><th rowspan="2" class="u">Unidade</th><th colspan="4" class="grp">Oficiais — QOEM</th><th class="grp">QTBM</th><th colspan="3" class="grp">Praças — QPBM</th><th rowspan="2">Total</th></tr>
+  <tr>${RK.map(n=>`<th>${n}</th>`).join('')}</tr></thead>`;
+let rows='';
+resumoUnits.forEach(u=>{
+  const r=agg(u.node),t=sum(r);
+  rows+=`<tr class="${u.cls.includes('hl')?'hl':''}"><td class="u">${u.label}</td>${r.map(v=>`<td class="${v?'':'z'}">${v}</td>`).join('')}<td class="tt">${t}</td></tr>`;
+});
+const rAll=agg(ROOT);
+rows+=`<tr class="total"><td class="u">Total 1º CRBM</td>${rAll.map(v=>`<td>${v}</td>`).join('')}<td>${sum(rAll)}</td></tr>`;
+rt.innerHTML=thead+'<tbody>'+rows+'</tbody>';
+
+/* ===== Árvore ===== */
+const tree=document.getElementById('tree');
+const tip=document.getElementById('tip');
+let MINE=null;
+
+function buildNode(node,pathArr){
+  if(node.cat){const h=document.createElement('div');h.className='cat';h.textContent=node.cat;return h;}
+  const wrap=document.createElement('div');wrap.className='node';
+  const hasCh=node.ch&&node.ch.length;
+  const myPath=[...pathArr,node.s];
+  const bar=document.createElement('div');bar.className='bar k-'+node.k;
+  if(node.hl){bar.classList.add('hl');}
+
+  const tw=document.createElement('span');tw.className='tw'+(hasCh?'':' leaf');tw.textContent=hasCh?'▶':'•';bar.appendChild(tw);
+  const sig=document.createElement('span');sig.className='sig';sig.textContent=node.s;bar.appendChild(sig);
+  if(node.c){const city=document.createElement('span');city.className='city';city.textContent=node.c;bar.appendChild(city);}
+
+  const r=agg(node),t=sum(r);
+  const soma=document.createElement('span');
+  if(t===0&&node.note){soma.className='soma ac';soma.textContent='acum.';}
+  else{soma.className='soma';soma.innerHTML=t+' <small>vg</small>';}
+  bar.appendChild(soma);
+
+  // tooltip data
+  bar.dataset.name=node.s;
+  bar.dataset.kind=KIND_NAME[node.k]||'';
+  bar.dataset.city=node.c||'';
+  bar.dataset.desc=node.d||'';
+  bar.dataset.note=node.note||'';
+  bar.dataset.r=JSON.stringify(r);
+  bar.dataset.path=pathArr.join('  ›  ');
+  bar._search=(node.s+' '+(node.c||'')+' '+(node.d||'')).toLowerCase();
+  bar.addEventListener('mouseenter',()=>showTip(bar));
+  bar.addEventListener('mousemove',moveTip);
+  bar.addEventListener('mouseleave',hideTip);
+
+  wrap.appendChild(bar);
+  if(hasCh){
+    const kids=document.createElement('div');kids.className='children';
+    node.ch.forEach(c=>kids.appendChild(buildNode(c,myPath)));
+    wrap.appendChild(kids);
+    bar.addEventListener('click',()=>wrap.classList.toggle('open'));
+  }
+  if(node.hl) MINE=wrap;
+  return wrap;
+}
+ROOT.ch.forEach(c=>tree.appendChild(buildNode(c,[ROOT.s])));
+
+function rankGrid(r){
+  const cells=RK.map((n,i)=>`<div class="rc ${r[i]?'':'z'}"><span>${n}</span><b>${r[i]}</b></div>`).join('');
+  return `<div class="glabel">Vagas por posto / graduação</div><div class="rankgrid">${cells}</div>
+          <div class="ranktot">Total de vagas: <b>${sum(r)}</b></div>`;
+}
+function showTip(bar){
+  const r=JSON.parse(bar.dataset.r);
+  tip.innerHTML=
+   `<div class="tname">${bar.dataset.name}</div>
+    <div class="tmeta"><span class="pill">${bar.dataset.kind}</span>${bar.dataset.city?`<span class="pill">📍 ${bar.dataset.city}</span>`:''}</div>
+    ${bar.dataset.desc?`<div style="font-size:13px;color:#cdd6e0;line-height:1.45">${bar.dataset.desc}</div>`:''}
+    ${rankGrid(r)}
+    ${bar.dataset.note?`<div class="tnote">↳ ${bar.dataset.note}</div>`:''}
+    ${bar.dataset.path?`<div class="tpath">${bar.dataset.path}</div>`:''}`;
+  tip.classList.add('show');
+}
+function moveTip(e){
+  const pad=16,w=tip.offsetWidth,h=tip.offsetHeight;
+  let x=e.clientX+pad,y=e.clientY+pad;
+  if(x+w>innerWidth)x=e.clientX-w-pad;
+  if(y+h>innerHeight)y=e.clientY-h-pad;
+  tip.style.left=x+'px';tip.style.top=y+'px';
+}
+function hideTip(){tip.classList.remove('show');}
+
+/* controles */
+document.getElementById('expand').onclick=()=>document.querySelectorAll('.node').forEach(n=>{if(n.querySelector(':scope>.children'))n.classList.add('open')});
+document.getElementById('collapse').onclick=()=>document.querySelectorAll('.node').forEach(n=>n.classList.remove('open'));
+function openPathTo(el){let p=el;while(p&&p!==tree){if(p.classList&&p.classList.contains('node'))p.classList.add('open');p=p.parentElement;}}
+document.getElementById('goMine').onclick=()=>{
+  if(!MINE)return;openPathTo(MINE);
+  setTimeout(()=>MINE.querySelector(':scope>.bar').scrollIntoView({behavior:'smooth',block:'center'}),120);
+};
+
+/* busca */
+const q=document.getElementById('q');
+q.addEventListener('input',()=>{
+  const term=q.value.trim().toLowerCase();
+  const all=[...document.querySelectorAll('.node')];
+  if(!term){all.forEach(n=>n.classList.remove('hidden'));return;}
+  all.forEach(n=>n.classList.add('hidden'));
+  all.forEach(n=>{
+    const bar=n.querySelector(':scope>.bar');
+    if(bar&&bar._search.includes(term)){
+      let p=n;while(p&&p!==tree.parentElement){if(p.classList&&p.classList.contains('node')){p.classList.remove('hidden');p.classList.add('open');}p=p.parentElement;}
+      n.querySelectorAll('.node').forEach(d=>d.classList.remove('hidden'));
+    }
+  });
+});
+
+/* legenda de níveis */
+const legendItems=[['regional','Cmdo Regional'],['divisao','Divisão'],['chefia','Comando/Chefia'],['batalhao','Batalhão'],
+  ['hq','Comando do Btl'],['secao','Seção'],['companhia','Companhia'],['pelotao','Pelotão'],['grupo','Grupo'],
+  ['funcao','Função'],['especial','Órgão Especial']];
+const leg=document.getElementById('legend');
+legendItems.forEach(([k,label])=>{const it=document.createElement('div');it.className='item';it.innerHTML=`<span class="dot" style="background:var(--c-${k})"></span>${label}`;leg.appendChild(it);});
+
+/* abre caminho até o 1º BBM no início */
+window.addEventListener('load',()=>{if(MINE)openPathTo(MINE);});
+</script>
+
+<footer>
+  Fonte: Quadro Organizacional do 1º CRBM, <b>publicado no BG nº 18 de 07/05/2026</b> (efeitos a contar de 1º/05/2026).<br>
+  Comandante-Geral: Cel QOEM Ricardo Mattei Santos · Visualização interativa não-oficial · destaque: <b>1º BBM / Porto Alegre</b>.
+</footer>
+</body>
+</html>
