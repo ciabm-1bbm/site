@@ -20,7 +20,7 @@
                         'sky-blue': '#38bdf8',
                         'vermelho-fosco': '#B91C1C',
                         'amarelo-queimado': '#D97706',
-                        'verde-oliva': '#4B5563',
+                        'verde-militar': '#2E7D32',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -50,7 +50,7 @@
         }
         .content-wrapper { position: relative; z-index: 10; }
 
-        /* Card base */
+        /* Card base - mais compacto */
         .card-monitor {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
@@ -60,29 +60,55 @@
             break-inside: avoid;
             display: flex; 
             overflow: hidden;
-            min-height: 140px;
             cursor: grab;
+            position: relative;
         }
         .card-monitor:active { cursor: grabbing; }
-        .card-monitor:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        
+        /* Efeito de hover com a cor específica de cada setor */
+        .card-vermelho:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px #B91C1C, 0 15px 30px rgba(0,0,0,0.5);
             background: rgba(30, 41, 59, 0.98);
-            border-color: rgba(255, 140, 0, 0.5);
+            border-color: #B91C1C;
+            z-index: 50;
+        }
+        
+        .card-amarelo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px #D97706, 0 15px 30px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.98);
+            border-color: #D97706;
+            z-index: 50;
+        }
+        
+        .card-verde:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px #2E7D32, 0 15px 30px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.98);
+            border-color: #2E7D32;
+            z-index: 50;
+        }
+        
+        .card-laranja:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px #FF8C00, 0 15px 30px rgba(0,0,0,0.5);
+            background: rgba(30, 41, 59, 0.98);
+            border-color: #FF8C00;
             z-index: 50;
         }
 
-        /* Título vertical dentro do card - FONTE MAIOR */
+        /* Título vertical dentro do card - mais compacto */
         .vertical-text {
             writing-mode: vertical-rl;
             transform: rotate(180deg);
             text-align: center;
             white-space: nowrap;
             font-weight: 900;
-            font-size: 1.3rem;
-            letter-spacing: 3px;
-            padding: 16px 4px;
-            width: 56px;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            padding: 12px 4px;
+            width: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -90,35 +116,37 @@
         }
 
         /* Cores das bordas laterais dos cards */
-        .card-vermelho { border-left: 6px solid #B91C1C; }
-        .card-amarelo { border-left: 6px solid #D97706; }
-        .card-verde { border-left: 6px solid #4B5563; }
-        .card-laranja { border-left: 6px solid #FF8C00; }
+        .card-vermelho { border-left: 5px solid #B91C1C; }
+        .card-amarelo { border-left: 5px solid #D97706; }
+        .card-verde { border-left: 5px solid #2E7D32; }
+        .card-laranja { border-left: 5px solid #FF8C00; }
 
-        /* Cabeçalho de grupo (acima dos cards) - FONTE MAIOR */
+        /* Cabeçalho de grupo - mais compacto */
         .grupo-header {
             background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(8px);
             border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 1rem;
             text-align: center;
             font-weight: 900;
-            font-size: 1.5rem;
-            letter-spacing: 3px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
             border: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
-        .grupo-header-vermelho { background: linear-gradient(135deg, #7F1D1D, #991B1B); border-left: 6px solid #B91C1C; }
-        .grupo-header-amarelo { background: linear-gradient(135deg, #92400E, #B45309); border-left: 6px solid #D97706; }
-        .grupo-header-verde { background: linear-gradient(135deg, #1F2937, #374151); border-left: 6px solid #4B5563; }
-        .grupo-header-laranja { background: linear-gradient(135deg, #9A3412, #C2410C); border-left: 6px solid #FF8C00; }
+        
+        .grupo-header-vermelho { background: linear-gradient(135deg, #7F1D1D, #991B1B); border-left: 5px solid #B91C1C; }
+        .grupo-header-amarelo { background: linear-gradient(135deg, #92400E, #B45309); border-left: 5px solid #D97706; }
+        .grupo-header-verde { background: linear-gradient(135deg, #1B5E20, #2E7D32); border-left: 5px solid #2E7D32; }
+        .grupo-header-laranja { background: linear-gradient(135deg, #9A3412, #C2410C); border-left: 5px solid #FF8C00; }
 
         .stats-container {
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 1rem;
-            padding: 1rem;
+            padding: 0.75rem;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
@@ -138,10 +166,86 @@
 
         #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
 
-        /* Estilos internos do card (militares) */
-        .militar-nome { color: #9BE36D; font-weight: 800; font-size: 0.95rem; text-align: center; }
-        .militar-funcao { color: #ccc; font-size: 0.7rem; text-align: center; margin-top: 2px; }
-        .turno-box { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 2px 8px; display: inline-flex; gap: 6px; font-size: 0.7rem; margin-top: 4px; }
+        /* Estilos internos do card - mais compactos */
+        .militar-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 4px 6px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .militar-container:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .militar-nome { 
+            color: #9BE36D; 
+            font-weight: 800; 
+            font-size: 0.85rem; 
+            text-align: center; 
+            line-height: 1.2;
+        }
+        .militar-funcao { 
+            color: #aaa; 
+            font-size: 0.65rem; 
+            text-align: center; 
+            margin-top: 2px; 
+        }
+        
+        /* Tooltip que acompanha o mouse */
+        .turno-tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 9999;
+            pointer-events: none;
+            border: 1px solid #FF8C00;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.15s ease;
+            font-family: monospace;
+        }
+        
+        .turno-carga { color: #FF8C00; font-weight: 700; margin-right: 5px; }
+        .turno-horario { color: #38bdf8; }
+        
+        /* Container do grupo de viatura - mais compacto */
+        .grupo-vtr {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .vtr-titulo {
+            color: #FFD700;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        
+        /* Grid mais compacto */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-cards { grid-template-columns: 1fr; }
+            .vertical-text { width: 40px; font-size: 0.9rem; padding: 8px 2px; }
+        }
     </style>
 </head>
 <body class="hero-background">
@@ -154,88 +258,88 @@
 
     <div class="content-wrapper flex flex-col min-h-screen p-4 hidden" id="app">
         
-        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-6 mb-8 border-b border-white/10 gap-6">
+        <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 mb-6 border-b border-white/10 gap-4">
             <div class="flex-shrink-0">
-                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-20 md:h-24 drop-shadow-lg">
+                <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png" class="h-16 md:h-20 drop-shadow-lg">
             </div>
             <div class="text-center flex-grow">
-                <h1 class="text-3xl md:text-5xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
+                <h1 class="text-2xl md:text-4xl font-black text-white uppercase leading-tight tracking-tighter drop-shadow-xl">
                     Guarnição Operacional
                 </h1>
-                <h2 class="text-lg md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
+                <h2 class="text-base md:text-xl font-bold text-bombeiros-orange mt-1 uppercase tracking-widest">
                     EM PORTO ALEGRE
                 </h2>
-                <div class="flex justify-center items-center gap-4 mt-4 text-xs font-mono text-gray-400 bg-black/30 px-4 py-2 rounded-full border border-white/5 inline-flex">
+                <div class="flex justify-center items-center gap-4 mt-3 text-xs font-mono text-gray-400 bg-black/30 px-3 py-1 rounded-full border border-white/5 inline-flex">
                     <span id="data-topo" class="font-bold text-white uppercase">--/--/----</span>
                     <span>|</span>
                     <span>ATUALIZADO ÀS <span id="hora-topo" class="text-green-400 font-bold">--:--</span></span>
                 </div>
             </div>
             <div class="flex-shrink-0">
-                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-20 md:h-24 drop-shadow-lg opacity-90">
+                <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" class="h-16 md:h-20 drop-shadow-lg opacity-90">
             </div>
         </header>
 
         <main class="w-full max-w-7xl mx-auto flex-grow">
             <!-- Stats (Efetivo e Viaturas) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 <div class="stats-container border-l-4 border-bombeiros-orange">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-3 tracking-wider flex items-center gap-2">
                         <i class="fas fa-users text-bombeiros-orange"></i> EFETIVO (ESCALA DO DIA)
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
-                            <span class="text-[10px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
-                            <div class="tooltip-box tt-left"><ul id="list-cap" class="text-left"></ul></div>
+                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-cap">0</span>
+                            <span class="text-[9px] font-bold text-bombeiros-orange uppercase tracking-wide">OFICIAIS</span>
+                            <div class="tooltip-box tt-left"><ul id="list-cap" class="text-left text-[10px]"></ul></div>
                         </div>
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
-                            <span class="text-[10px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
-                            <div class="tooltip-box tt-center"><ul id="list-sgt" class="text-left"></ul></div>
+                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sgt">0</span>
+                            <span class="text-[9px] font-bold text-bombeiros-yellow uppercase tracking-wide">SARGENTOS</span>
+                            <div class="tooltip-box tt-center"><ul id="list-sgt" class="text-left text-[10px]"></ul></div>
                         </div>
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
-                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
-                            <div class="tooltip-box tt-right"><ul id="list-sd" class="text-left"></ul></div>
+                            <span class="block text-2xl md:text-3xl font-black text-white leading-none drop-shadow-md" id="count-sd">0</span>
+                            <span class="text-[9px] font-bold text-blue-400 uppercase tracking-wide">SOLDADOS</span>
+                            <div class="tooltip-box tt-right"><ul id="list-sd" class="text-left text-[10px]"></ul></div>
                         </div>
-                        <div class="w-px h-10 bg-white/10 mx-2"></div>
+                        <div class="w-px h-8 bg-white/10 mx-2"></div>
                         <div class="group relative text-center">
-                            <span class="block text-4xl md:text-5xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
+                            <span class="block text-3xl md:text-4xl font-black text-total-green leading-none drop-shadow-md" id="count-total">0</span>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">TOTAL</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-container border-l-4 border-fire-red">
-                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-4 tracking-wider flex items-center gap-2">
+                    <h3 class="text-gray-400 font-bold uppercase text-xs mb-3 tracking-wider flex items-center gap-2">
                         <i class="fas fa-truck text-fire-red"></i> VIATURAS EM QAP
                     </h3>
                     <div class="flex justify-around items-center">
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                            <span class="block text-4xl md:text-5xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
-                            <div class="tooltip-box tt-left"><ul id="list-combate" class="text-xs text-left text-gray-300"></ul></div>
+                            <span class="block text-3xl md:text-4xl font-black text-fire-red leading-none drop-shadow-md" id="count-combate">0</span>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">COMBATE (ABT)</span>
+                            <div class="tooltip-box tt-left"><ul id="list-combate" class="text-[10px] text-left text-gray-300"></ul></div>
                         </div>
-                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="w-px h-8 bg-white/10"></div>
                         <div class="group relative text-center cursor-pointer md:cursor-help" tabindex="0">
-                            <span class="block text-4xl md:text-5xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
-                            <div class="tooltip-box tt-right"><ul id="list-apoio" class="text-xs text-left text-gray-300"></ul></div>
+                            <span class="block text-3xl md:text-4xl font-black text-white leading-none drop-shadow-md" id="count-apoio">0</span>
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">APOIO (AR, AEM, AT...)</span>
+                            <div class="tooltip-box tt-right"><ul id="list-apoio" class="text-[10px] text-left text-gray-300"></ul></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Área onde serão inseridos os grupos com cabeçalhos e cards -->
-            <div id="grupos-container" class="space-y-8"></div>
+            <div id="grupos-container" class="space-y-6"></div>
         </main>
 
-        <footer class="mt-auto py-6 text-center border-t border-white/5">
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">
+        <footer class="mt-auto py-4 text-center border-t border-white/5">
+            <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">
                 Sistema de Controle Operacional - 1º BBM - 2026
             </p>
-            <p class="text-[9px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
+            <p class="text-[8px] text-gray-600 mt-1">Desenvolvido por Gustavo Medeiros</p>
         </footer>
     </div>
 
@@ -245,8 +349,8 @@
         // Definição dos grupos com cores e ordem
         const GRUPOS = [
             { nome: "COORDENAÇÃO", corClasse: "vermelho", corHex: "#B91C1C", headerClass: "grupo-header-vermelho", cardClass: "card-vermelho", pelotoes: ["OFICIAL DE DIA", "COBOM", "CCOB"] },
-            { nome: "1ª CIA", corClasse: "amarelo", corHex: "#D97706", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "TERESÓPOLIS", "ASSUNÇÃO", "RESTINGA", "BELÉM NOVO"] },
-            { nome: "2ª CIA", corClasse: "verde", corHex: "#4B5563", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["FLORESTA", "PASSO D'AREIA", "PARTENON"] },
+            { nome: "1ª CIA", corClasse: "amarelo", corHex: "#D97706", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "ASSUNÇÃO", "BELÉM NOVO", "RESTINGA"] },
+            { nome: "2ª CIA", corClasse: "verde", corHex: "#2E7D32", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["FLORESTA", "PASSO D'AREIA", "PARTENON", "TERESÓPOLIS"] },
             { nome: "BBS", corClasse: "laranja", corHex: "#FF8C00", headerClass: "grupo-header-laranja", cardClass: "card-laranja", pelotoes: ["TERRESTRE", "AQUÁTICA", "MERGULHO", "CANIL"] }
         ];
 
@@ -260,23 +364,23 @@
             "MERGULHADOR", "SOCORRISTA", "RESGATISTA", "MOTORISTA"
         ];
 
-        // Funções auxiliares (turno, limpeza, etc)
+        // Função de turno simplificada
         function calcularTurno(raw) {
             if (!raw) return "";
             try {
                 const partes = raw.trim().split(/\s+/);
                 if (partes.length === 1) {
                     const h = partes[0];
-                    if (h === "20:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">12h</span> <span class="text-sky-blue">20:00→08:00</span></div>`;
-                    if (h === "08:00") return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">24h</span> <span class="text-sky-blue">08:00→08:00</span></div>`;
-                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">?</span> <span class="text-sky-blue">${h}</span></div>`;
+                    if (h === "20:00") return `<span class="turno-carga">12h</span> <span class="turno-horario">20:00→08:00</span>`;
+                    if (h === "08:00") return `<span class="turno-carga">24h</span> <span class="turno-horario">08:00→08:00</span>`;
+                    return `<span class="turno-carga">?</span> <span class="turno-horario">${h}</span>`;
                 } else if (partes.length >= 2) {
                     let inicio = partes[0], fim = partes[1];
                     let carga = "";
                     if (inicio === "08:00" && fim === "20:00") carga = "12h";
                     else if (inicio === "20:00" && fim === "08:00") carga = "12h";
                     else carga = "24h";
-                    return `<div class="turno-box"><span class="text-bombeiros-orange font-bold">${carga}</span> <span class="text-sky-blue">${inicio}→${fim}</span></div>`;
+                    return `<span class="turno-carga">${carga}</span> <span class="turno-horario">${inicio}→${fim}</span>`;
                 }
                 return "";
             } catch(e) { return ""; }
@@ -285,6 +389,29 @@
         function extrairID(nome) { let m=nome.match(/(\d{7})/); return m?m[1]:null; }
         function limparNomeBasico(nome) { return nome.replace(/\d{7}\s+/,'').replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/\b\d+\b/g,'').trim(); }
 
+        // Tooltip global que segue o mouse
+        let turnoTooltip = null;
+        
+        function criarTooltip() {
+            if (turnoTooltip) return;
+            turnoTooltip = document.createElement('div');
+            turnoTooltip.className = 'turno-tooltip';
+            turnoTooltip.style.display = 'none';
+            document.body.appendChild(turnoTooltip);
+        }
+        
+        function mostrarTooltip(event, turnoHTML) {
+            if (!turnoTooltip) criarTooltip();
+            turnoTooltip.innerHTML = turnoHTML;
+            turnoTooltip.style.display = 'block';
+            turnoTooltip.style.left = (event.clientX + 15) + 'px';
+            turnoTooltip.style.top = (event.clientY - 30) + 'px';
+        }
+        
+        function esconderTooltip() {
+            if (turnoTooltip) turnoTooltip.style.display = 'none';
+        }
+        
         function processarDados(dadosRecebidos) {
             console.log("📦 Dados recebidos:", dadosRecebidos);
             let dadosArray = Array.isArray(dadosRecebidos) ? dadosRecebidos : (dadosRecebidos.dados || []);
@@ -293,7 +420,6 @@
                 return;
             }
 
-            // Atualizar timestamp
             const timestamp = dadosRecebidos.timestamp_extracao || new Date().toISOString();
             const dataObj = new Date(timestamp);
             if (!isNaN(dataObj.getTime())) {
@@ -305,7 +431,6 @@
                 document.getElementById('hora-topo').innerHTML = agora.toLocaleTimeString('pt-BR');
             }
 
-            // Processar estrutura de pelotões
             const estrutura = {};
             const mapOficiais = new Map(), mapSargentos = new Map(), mapPracas = new Map();
             const statsViaturas = { combate: new Set(), apoio: new Set() };
@@ -332,7 +457,7 @@
                 let idMilitar = extrairID(nomeBruto);
                 let idUnico = idMilitar || nomeBruto;
                 let nomeExibicao = limparNomeBasico(nomeBruto);
-                let horaHTML = calcularTurno(d.horario || ""); 
+                let turnoHTML = calcularTurno(d.horario || ""); 
 
                 let obmKey = "OUTROS";
                 for (let grupo of GRUPOS) {
@@ -363,7 +488,7 @@
                     estrutura[obmKey].push(viaturaObj);
                 }
                 if (nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, h: horaHTML });
+                    viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, turno: turnoHTML });
                     const dadosMilitar = { n: nomeExibicao, f: funcaoFinal };
                     if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) mapPracas.set(idUnico, dadosMilitar);
                     else if (nomeBruto.includes("SGT")) mapSargentos.set(idUnico, dadosMilitar);
@@ -383,16 +508,16 @@
         function atualizarStats(oficiais, sgt, pracas, viaturas) {
             const capArr = Array.from(oficiais.values()), sgtArr = Array.from(sgt.values()), sdArr = Array.from(pracas.values());
             const fillList = (idL, arr) => {
-                document.getElementById(idL).innerHTML = arr.map(item => `<li class="mb-1.5 leading-tight text-[10px] md:text-xs text-left break-words border-b border-white/5 pb-1 last:border-0"><span class="text-bombeiros-orange font-bold text-xs uppercase">• ${item.n}</span>${item.f ? `<span class="text-white opacity-90 uppercase"> - ${item.f}</span>` : ''}</li>`).join('');
+                document.getElementById(idL).innerHTML = arr.map(item => `<li class="mb-1 leading-tight text-[9px] md:text-[10px] text-left break-words border-b border-white/5 pb-1 last:border-0"><span class="text-bombeiros-orange font-bold uppercase">• ${item.n}</span>${item.f ? `<span class="text-white opacity-90"> - ${item.f}</span>` : ''}</li>`).join('');
             };
             document.getElementById('count-cap').innerText = capArr.length; fillList('list-cap', capArr);
             document.getElementById('count-sgt').innerText = sgtArr.length; fillList('list-sgt', sgtArr);
             document.getElementById('count-sd').innerText = sdArr.length; fillList('list-sd', sdArr);
             document.getElementById('count-total').innerText = capArr.length + sgtArr.length + sdArr.length;
             document.getElementById('count-combate').innerText = viaturas.combate.size;
-            document.getElementById('list-combate').innerHTML = Array.from(viaturas.combate).map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-combate').innerHTML = Array.from(viaturas.combate).map(x => `<li class="text-[9px]">• ${x}</li>`).join('');
             document.getElementById('count-apoio').innerText = viaturas.apoio.size;
-            document.getElementById('list-apoio').innerHTML = Array.from(viaturas.apoio).map(x => `<li>• ${x}</li>`).join('');
+            document.getElementById('list-apoio').innerHTML = Array.from(viaturas.apoio).map(x => `<li class="text-[9px]">• ${x}</li>`).join('');
         }
 
         function renderizarCardsPorGrupo(estrutura) {
@@ -400,29 +525,25 @@
             container.innerHTML = '';
 
             for (const grupo of GRUPOS) {
-                // Filtra os pelotões que existem na estrutura
                 const pelotoesExistentes = grupo.pelotoes.filter(p => estrutura[p] && estrutura[p].length > 0);
                 if (pelotoesExistentes.length === 0) continue;
 
-                // Cria cabeçalho do grupo
                 const headerDiv = document.createElement('div');
                 headerDiv.className = `grupo-header ${grupo.headerClass}`;
                 headerDiv.innerHTML = `<h3 class="text-white text-center font-black tracking-wider">${grupo.nome}</h3>`;
                 container.appendChild(headerDiv);
 
-                // Grid para os cards deste grupo
                 const gridDiv = document.createElement('div');
-                gridDiv.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-8';
+                gridDiv.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6';
                 gridDiv.setAttribute('data-grupo', grupo.nome);
 
                 for (const pelotao of pelotoesExistentes) {
                     const viaturasRaw = estrutura[pelotao];
-                    const card = criarCardPelotao(pelotao, viaturasRaw, grupo.cardClass);
+                    const card = criarCardPelotao(pelotao, viaturasRaw, grupo.cardClass, grupo.corHex);
                     gridDiv.appendChild(card);
                 }
                 container.appendChild(gridDiv);
 
-                // Inicializar Sortable para este grid
                 if (typeof Sortable !== 'undefined') {
                     new Sortable(gridDiv, {
                         animation: 150,
@@ -443,8 +564,7 @@
             }
         }
 
-        function criarCardPelotao(nomePelotao, viaturasRaw, classeCor) {
-            // Agrupa viaturas por guarnição (mesmo conjunto de IDs)
+        function criarCardPelotao(nomePelotao, viaturasRaw, classeCor, corHex) {
             const gruposUnicos = [];
             for (const vtr of viaturasRaw) {
                 const assinatura = vtr.guarnicao.map(m => m.id).sort().join('|');
@@ -457,18 +577,10 @@
             card.className = `card-monitor ${classeCor}`;
             card.setAttribute('data-pelotao', nomePelotao);
 
-            // Título vertical (cor do fundo de acordo com a classe do grupo)
-            let corFundo = '';
-            if (classeCor === 'card-vermelho') corFundo = '#B91C1C';
-            else if (classeCor === 'card-amarelo') corFundo = '#D97706';
-            else if (classeCor === 'card-verde') corFundo = '#4B5563';
-            else corFundo = '#FF8C00';
-
-            let content = `<div class="vertical-text" style="background: ${corFundo};">${nomePelotao.substring(0, 14)}</div>`;
-            content += `<div class="flex-grow p-3 flex flex-col gap-4">`;
+            let content = `<div class="vertical-text" style="background: ${corHex};">${nomePelotao.substring(0, 14)}</div>`;
+            content += `<div class="flex-grow p-2 flex flex-col gap-2">`;
 
             for (const grupo of gruposUnicos) {
-                // Ordenar militares: Comandante primeiro, depois COV, depois outros
                 grupo.guarnicao.sort((a,b) => {
                     const getScore = (r) => {
                         let u = (r.f || "").toUpperCase();
@@ -480,20 +592,34 @@
                 });
 
                 const listaVtrs = grupo.nomesVtrs.join(' / ');
-                content += `<div class="w-full flex flex-col items-center bg-black/20 rounded-lg p-2">
-                                <span class="text-bombeiros-yellow font-black text-xs tracking-widest uppercase border-b border-bombeiros-yellow/30 pb-1 mb-2">${listaVtrs}</span>
-                                <div class="w-full flex flex-col gap-2">`;
+                content += `<div class="grupo-vtr">
+                                <div class="vtr-titulo">${listaVtrs}</div>
+                                <div class="w-full flex flex-col gap-1">`;
                 for (const m of grupo.guarnicao) {
-                    content += `<div class="flex flex-col items-center w-full bg-white/5 rounded p-1">
+                    content += `<div class="militar-container" data-turno="${m.turno.replace(/"/g, '&quot;')}">
                                     <div class="militar-nome">${m.n}</div>
                                     ${m.f ? `<div class="militar-funcao">${m.f}</div>` : ''}
-                                    <div class="w-full flex justify-center mt-1">${m.h}</div>
                                 </div>`;
                 }
                 content += `</div></div>`;
             }
             content += `</div>`;
             card.innerHTML = content;
+            
+            // Adicionar eventos de mouse para mostrar tooltip com turno
+            const containers = card.querySelectorAll('.militar-container');
+            containers.forEach(container => {
+                const turnoHTML = container.getAttribute('data-turno');
+                if (turnoHTML && turnoHTML.trim() !== '') {
+                    container.addEventListener('mousemove', function(e) {
+                        mostrarTooltip(e, turnoHTML);
+                    });
+                    container.addEventListener('mouseleave', function() {
+                        esconderTooltip();
+                    });
+                }
+            });
+            
             return card;
         }
 
@@ -511,6 +637,8 @@
             }
         }
 
+        // Inicializar tooltip e carregar dados
+        criarTooltip();
         carregarDados();
         setInterval(carregarDados, 60000);
     </script>
