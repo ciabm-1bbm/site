@@ -78,7 +78,7 @@
         .card-laranja { border-left: 5px solid #FF8C00; }
         .card-laranja .vertical-text { background: #FF8C00; }
 
-        /* Efeito de hover com a cor específica de cada setor - a borda do tooltip também segue a cor */
+        /* Efeito de hover com a cor específica de cada setor */
         .card-vermelho:hover {
             transform: translateY(-2px);
             box-shadow: 0 0 0 3px #B91C1C, 0 15px 30px rgba(0,0,0,0.5);
@@ -173,14 +173,18 @@
 
         #loading { position: fixed; inset: 0; background: #0f172a; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
 
-        /* Estilos internos do card - mais compactos */
+        /* Estilos internos do card - NOME ESQUERDA / FUNÇÃO DIREITA */
         .militar-container {
             width: 100%;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 6px;
-            padding: 4px 6px;
+            padding: 6px 10px;
             transition: all 0.2s ease;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
         }
         .militar-container:hover {
             background: rgba(255, 255, 255, 0.08);
@@ -190,17 +194,20 @@
             color: #9BE36D; 
             font-weight: 800; 
             font-size: 0.85rem; 
-            text-align: center; 
+            text-align: left; 
             line-height: 1.2;
+            flex: 1;
         }
         .militar-funcao { 
             color: #aaa; 
             font-size: 0.65rem; 
-            text-align: center; 
-            margin-top: 2px; 
+            text-align: right; 
+            font-weight: 500;
+            flex-shrink: 0;
+            max-width: 50%;
         }
         
-        /* Tooltip que acompanha o mouse - a cor da borda muda conforme a classe do card */
+        /* Tooltip que acompanha o mouse */
         .turno-tooltip {
             position: fixed;
             background: rgba(0, 0, 0, 0.95);
@@ -252,6 +259,7 @@
         @media (max-width: 768px) {
             .grid-cards { grid-template-columns: 1fr; }
             .vertical-text { width: 40px; font-size: 0.9rem; padding: 8px 2px; }
+            .militar-funcao { font-size: 0.6rem; max-width: 55%; }
         }
     </style>
 </head>
@@ -354,10 +362,6 @@
         const URL_DADOS = "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec";
 
         // Definição dos grupos com cores e ordem
-        // 1ª CIA: amarelo (#D97706)
-        // 2ª CIA: verde (#2E7D32)
-        // BBS: laranja (#FF8C00)
-        // COORDENAÇÃO: vermelho (#B91C1C)
         const GRUPOS = [
             { nome: "COORDENAÇÃO", corClasse: "vermelho", corHex: "#B91C1C", headerClass: "grupo-header-vermelho", cardClass: "card-vermelho", pelotoes: ["OFICIAL DE DIA", "COBOM", "CCOB"] },
             { nome: "1ª CIA", corClasse: "amarelo", corHex: "#D97706", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "ASSUNÇÃO", "BELÉM NOVO", "RESTINGA"] },
@@ -365,7 +369,6 @@
             { nome: "BBS", corClasse: "laranja", corHex: "#FF8C00", headerClass: "grupo-header-laranja", cardClass: "card-laranja", pelotoes: ["TERRESTRE", "AQUÁTICA", "MERGULHO", "CANIL"] }
         ];
 
-        // Mapeamento da cor da borda do tooltip por classe do card
         const TOOLTIP_BORDER_COLOR = {
             'card-vermelho': '#B91C1C',
             'card-amarelo': '#D97706',
@@ -383,7 +386,6 @@
             "MERGULHADOR", "SOCORRISTA", "RESGATISTA", "MOTORISTA"
         ];
 
-        // Função de turno simplificada
         function calcularTurno(raw) {
             if (!raw) return "";
             try {
@@ -408,9 +410,7 @@
         function extrairID(nome) { let m=nome.match(/(\d{7})/); return m?m[1]:null; }
         function limparNomeBasico(nome) { return nome.replace(/\d{7}\s+/,'').replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/\b\d+\b/g,'').trim(); }
 
-        // Tooltip global que segue o mouse
         let turnoTooltip = null;
-        let currentTooltipColor = '#FF8C00';
         
         function criarTooltip() {
             if (turnoTooltip) return;
@@ -598,7 +598,6 @@
             card.className = `card-monitor ${cardClass}`;
             card.setAttribute('data-pelotao', nomePelotao);
 
-            // Define a cor da borda do tooltip baseada na classe do card
             const tooltipBorderColor = TOOLTIP_BORDER_COLOR[cardClass] || '#FF8C00';
 
             let content = `<div class="vertical-text">${nomePelotao.substring(0, 14)}</div>`;
@@ -630,7 +629,6 @@
             content += `</div>`;
             card.innerHTML = content;
             
-            // Adicionar eventos de mouse para mostrar tooltip com turno e a cor correta da borda
             const containers = card.querySelectorAll('.militar-container');
             containers.forEach(container => {
                 const turnoHTML = container.getAttribute('data-turno');
@@ -662,7 +660,6 @@
             }
         }
 
-        // Inicializar tooltip e carregar dados
         criarTooltip();
         carregarDados();
         setInterval(carregarDados, 60000);
