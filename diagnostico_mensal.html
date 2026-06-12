@@ -509,9 +509,9 @@ var INC_26=[48,36,28,27,23,18,17,17];
 var INC_25=[26,27,20,22,39,10,15,21];
 
 var HIST_LBL=["Jun/2021","Jun/2022","Nov/2022","Nov/2023","Ago/2024","Out/2025","Fev/2026","Jun/2026"];
-var HIST_TOT=[220,175,174,142,139,135,137,164];
+var HIST_TOT=[220,175,174,142,139,135,137,125];
 var HIST_AER=[66,57,53,0,9,0,0,0];
-var HIST_OP=[154,118,121,142,130,135,137,164];
+var HIST_OP=[154,118,121,142,130,135,137,125];
 
 var HIST_PELS_DATA=[
   {n:"Açorianos",    d:[23,19,21,24,21,16,19,17],cor:"#E8421A"},
@@ -657,7 +657,7 @@ new Chart(document.getElementById("cHistTotal"),{type:"bar",data:{labels:HIST_LB
   {label:"Efetivo Total BBM",data:HIST_TOT,backgroundColor:HIST_TOT.map(function(v,i){return i===HIST_TOT.length-1?"rgba(255,107,53,.7)":"rgba(232,66,26,.45)";}),borderColor:HIST_TOT.map(function(v,i){return i===HIST_TOT.length-1?"#FF6B35":"#E8421A";}),borderWidth:1.5,borderRadius:5,order:2},
   {label:"Pelotão Aeroporto",data:HIST_AER,backgroundColor:"rgba(245,166,35,.35)",borderColor:"#F5A623",borderWidth:1.5,borderRadius:5,order:2},
   {label:"Tendência (linha)",data:HIST_TOT,type:"line",borderColor:"#FF6B35",borderWidth:2.5,tension:.3,pointBackgroundColor:HIST_TOT.map(function(v,i){return i===0?"#E74C3C":i===5?"#E74C3C":"#FF6B35";}),pointRadius:5,pointHoverRadius:7,backgroundColor:"transparent",order:1}
-]},options:{responsive:true,plugins:{legend:LEG,tooltip:tt({title:function(i){return i[0].label;},label:function(ctx){if(ctx.dataset.type==="line")return" Tendência: "+ctx.parsed.y;if(ctx.datasetIndex===0){var aer=HIST_AER[ctx.dataIndex];var op=ctx.parsed.y-aer;return[" Total BBM: "+ctx.parsed.y," Aeroporto: "+aer," Operacional: "+op];}return" Aeroporto: "+ctx.parsed.y;},afterBody:function(i){var idx=i[0].dataIndex;if(idx===0)return["Início do período — pico histórico"];if(idx===2)return["Extinção gradual do Aeroporto"];if(idx===3)return["Aeroporto extinto — militares aposentados"];if(idx===5)return["Menor efetivo registrado no período"];if(idx===7)return["Atual — Partenon reativado + novas turmas"];return[];}})},scales:{x:{ticks:{color:"#8FA8C8",font:{family:"Barlow Condensed",size:11}},grid:{color:"rgba(255,255,255,.05)"}},y:{beginAtZero:false,min:100,ticks:{color:"#8FA8C8",font:{family:"Barlow Condensed"}},grid:{color:"rgba(255,255,255,.05)"}}}}});
+]},options:{responsive:true,plugins:{legend:LEG,tooltip:tt({title:function(i){return i[0].label;},label:function(ctx){if(ctx.dataset.type==="line")return" Tendência: "+ctx.parsed.y;if(ctx.datasetIndex===0){var aer=HIST_AER[ctx.dataIndex];var op=ctx.parsed.y-aer;return[" Total BBM: "+ctx.parsed.y," Aeroporto: "+aer," Operacional: "+op];}return" Aeroporto: "+ctx.parsed.y;},afterBody:function(i){var idx=i[0].dataIndex;if(idx===0)return["Início do período — pico histórico"];if(idx===2)return["Extinção gradual do Aeroporto"];if(idx===3)return["Aeroporto extinto — militares aposentados"];if(idx===5)return["Menor efetivo registrado no período"];if(idx===7)return["Jun/2026 — Efetivo nos Pelotões: 125","(Total BBM: 164 — contabilizado só pelotões)"];return[];}})},scales:{x:{ticks:{color:"#8FA8C8",font:{family:"Barlow Condensed",size:11}},grid:{color:"rgba(255,255,255,.05)"}},y:{beginAtZero:false,min:100,ticks:{color:"#8FA8C8",font:{family:"Barlow Condensed"}},grid:{color:"rgba(255,255,255,.05)"}}}}});
 
 // Evolução por pelotão (mantido como estava + Aeroporto)
 var pelDs=HIST_PELS_DATA.map(function(p){return{label:p.n,data:p.d,borderColor:p.cor,backgroundColor:"transparent",borderWidth:2,tension:.3,borderDash:p.dash?[5,3]:undefined,pointBackgroundColor:p.cor,pointRadius:p.d.map(function(v){return v===null?0:4;}),pointHoverRadius:6,spanGaps:false};});
