@@ -69,8 +69,8 @@
         .card-vermelho { border-left: 5px solid #B91C1C; }
         .card-vermelho .vertical-text { background: #B91C1C; }
         
-        .card-amarelo { border-left: 5px solid #D97706; }
-        .card-amarelo .vertical-text { background: #D97706; }
+        .card-amarelo { border-left: 5px solid #EAB308; }
+        .card-amarelo .vertical-text { background: #EAB308; }
         
         .card-verde { border-left: 5px solid #2E7D32; }
         .card-verde .vertical-text { background: #2E7D32; }
@@ -89,9 +89,9 @@
         
         .card-amarelo:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 0 3px #D97706, 0 15px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 0 0 3px #EAB308, 0 15px 30px rgba(0,0,0,0.5);
             background: rgba(30, 41, 59, 0.98);
-            border-color: #D97706;
+            border-color: #EAB308;
             z-index: 50;
         }
         
@@ -144,10 +144,11 @@
             transition: all 0.3s ease;
         }
         
-        .grupo-header-vermelho { background: linear-gradient(135deg, #7F1D1D, #991B1B); border-left: 5px solid #B91C1C; }
-        .grupo-header-amarelo { background: linear-gradient(135deg, #92400E, #B45309); border-left: 5px solid #D97706; }
-        .grupo-header-verde { background: linear-gradient(135deg, #1B5E20, #2E7D32); border-left: 5px solid #2E7D32; }
-        .grupo-header-laranja { background: linear-gradient(135deg, #9A3412, #C2410C); border-left: 5px solid #FF8C00; }
+        .grupo-header-vermelho { background: linear-gradient(135deg, #DC2626, #B91C1C); border-left: 5px solid #B91C1C; }
+        .grupo-header-amarelo { background: linear-gradient(135deg, #EAB308, #CA8A04); border-left: 5px solid #EAB308; }
+        .grupo-header-verde { background: linear-gradient(135deg, #2E7D32, #1B5E20); border-left: 5px solid #2E7D32; }
+        .grupo-header-laranja { background: linear-gradient(135deg, #FF8C00, #E07B00); border-left: 5px solid #FF8C00; }
+        .grupo-header h3 { text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
 
         .stats-container {
             background: rgba(15, 23, 42, 0.8);
@@ -184,7 +185,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
         .militar-container:hover {
             background: rgba(255, 255, 255, 0.08);
@@ -193,18 +194,27 @@
         .militar-nome { 
             color: #9BE36D; 
             font-weight: 800; 
-            font-size: 0.85rem; 
+            font-size: 0.76rem; 
             text-align: left; 
             line-height: 1.2;
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .militar-funcao { 
             color: #aaa; 
-            font-size: 0.65rem; 
+            font-size: 0.55rem; 
             text-align: right; 
             font-weight: 500;
-            flex-shrink: 0;
-            max-width: 50%;
+            line-height: 1.15;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 44%;
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-break: normal;
         }
         
         /* Tooltip que acompanha o mouse */
@@ -228,6 +238,26 @@
         
         .turno-carga { color: #FF8C00; font-weight: 700; margin-right: 5px; }
         .turno-horario { color: #38bdf8; }
+
+        /* Selinho de turno (12h/24h) entre o nome e a função */
+        .militar-turno {
+            font-size: 0.5rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            padding: 1px 5px;
+            border-radius: 999px;
+            line-height: 1.4;
+            flex: 0 0 auto;
+            align-self: center;
+            text-align: center;
+            white-space: nowrap;
+            font-family: monospace;
+        }
+        .turno-24 { color: #cbd5e1; background: rgba(255, 255, 255, 0.10); }
+        .turno-12 { color: #7dd3fc; background: rgba(56, 189, 248, 0.16); }
+        /* Linhas de 12h ficam mais apagadas para diferenciar das de 24h */
+        .militar-container.turno-meio { opacity: 0.55; }
+        .militar-container.turno-meio:hover { opacity: 0.85; }
         
         /* Container do grupo de viatura - mais compacto */
         .grupo-vtr {
@@ -259,7 +289,8 @@
         @media (max-width: 768px) {
             .grid-cards { grid-template-columns: 1fr; }
             .vertical-text { width: 40px; font-size: 0.9rem; padding: 8px 2px; }
-            .militar-funcao { font-size: 0.6rem; max-width: 55%; }
+            .militar-funcao { font-size: 0.5rem; }
+            .militar-nome { font-size: 0.72rem; }
         }
     </style>
 </head>
@@ -364,14 +395,14 @@
         // Definição dos grupos com cores e ordem
         const GRUPOS = [
             { nome: "COORDENAÇÃO", corClasse: "vermelho", corHex: "#B91C1C", headerClass: "grupo-header-vermelho", cardClass: "card-vermelho", pelotoes: ["OFICIAL DE DIA", "COBOM", "CCOB"] },
-            { nome: "1ª CIA", corClasse: "amarelo", corHex: "#D97706", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "ASSUNÇÃO", "BELÉM NOVO", "RESTINGA"] },
-            { nome: "2ª CIA", corClasse: "verde", corHex: "#2E7D32", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["FLORESTA", "PASSO D'AREIA", "PARTENON", "TERESÓPOLIS"] },
+            { nome: "1ª CIA", corClasse: "amarelo", corHex: "#EAB308", headerClass: "grupo-header-amarelo", cardClass: "card-amarelo", pelotoes: ["AÇORIANOS", "ASSUNÇÃO", "BELÉM NOVO", "RESTINGA"] },
+            { nome: "2ª CIA", corClasse: "verde", corHex: "#2E7D32", headerClass: "grupo-header-verde", cardClass: "card-verde", pelotoes: ["TERESÓPOLIS", "FLORESTA", "PASSO D'AREIA", "PARTENON"] },
             { nome: "BBS", corClasse: "laranja", corHex: "#FF8C00", headerClass: "grupo-header-laranja", cardClass: "card-laranja", pelotoes: ["TERRESTRE", "AQUÁTICA", "MERGULHO", "CANIL"] }
         ];
 
         const TOOLTIP_BORDER_COLOR = {
             'card-vermelho': '#B91C1C',
-            'card-amarelo': '#D97706',
+            'card-amarelo': '#EAB308',
             'card-verde': '#2E7D32',
             'card-laranja': '#FF8C00'
         };
@@ -385,6 +416,24 @@
             "RESGATISTA 1", "RESGATISTA 2", "SOCORRISTA 1", "SOCORRISTA 2", "CINOTÉCNICO",
             "MERGULHADOR", "SOCORRISTA", "RESGATISTA", "MOTORISTA"
         ];
+        // Ordenada da mais longa para a mais curta: garante que "AUXILIAR DE CONDUTOR
+        // NAVAL" seja reconhecida antes de "CONDUTOR NAVAL", etc.
+        const FUNCOES_ORDENADAS = [...FUNCOES_FIXAS].sort((a, b) => b.length - a.length);
+
+        // Abreviações exibidas no card (o nome completo é mantido internamente
+        // para não afetar a ordenação por cargo).
+        const ABREVIACOES = {
+            "COMANDANTE DE GUARNIÇÃO": "CG",
+            "COV / OPERADOR / CONDUTOR": "COV",
+            "CHEFE DE LINHA ESQUERDA": "LINHA",
+            "CHEFE DE LINHA DIREITA": "LINHA",
+            "AUXILIAR DE LINHA ESQUERDA": "LINHA",
+            "AUXILIAR DE LINHA DIREITA": "LINHA"
+        };
+        function abreviarFuncao(f) {
+            if (!f) return "";
+            return ABREVIACOES[f] || f;
+        }
 
         function calcularTurno(raw) {
             if (!raw) return "";
@@ -405,6 +454,13 @@
                 }
                 return "";
             } catch(e) { return ""; }
+        }
+
+        // Extrai apenas "12h" ou "24h" do HTML já calculado pelo calcularTurno.
+        function cargaDoTurnoHTML(turnoHTML) {
+            const m = (turnoHTML || "").match(/turno-carga">([^<]+)</);
+            const v = m ? m[1].trim() : "";
+            return (v === "12h" || v === "24h") ? v : "";
         }
 
         function extrairID(nome) { let m=nome.match(/(\d{7})/); return m?m[1]:null; }
@@ -463,18 +519,21 @@
                 let funcBruta = (d.func || "").trim().toUpperCase();
                 funcBruta = funcBruta.replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/[0-9]/g,'').replace(/[-]/g,'').trim();
                 let funcaoFinal = "";
-                for (const cargo of FUNCOES_FIXAS) {
-                    if (funcBruta.includes(cargo)) { funcaoFinal = cargo; break; }
+                // Procura a função MAIS ESPECÍFICA presente na função ou no nome
+                // (a fonte combinada cobre casos em que parte da função vazou para o nome).
+                const fonte = (funcBruta + " " + nomeBruto).replace(/\s+/g, " ").trim();
+                for (const cargo of FUNCOES_ORDENADAS) {
+                    if (fonte.includes(cargo)) { funcaoFinal = cargo; break; }
                 }
-                if (!funcaoFinal) {
-                    for (const cargo of FUNCOES_FIXAS) {
-                        if (nomeBruto.includes(cargo)) {
-                            funcaoFinal = cargo;
-                            nomeBruto = nomeBruto.replace(cargo, "").trim();
-                            break;
-                        }
-                    }
+                // Caso clássico de vazamento: "AUXILIAR DE" cai no nome e a função fica só "CONDUTOR NAVAL".
+                if (funcaoFinal === "CONDUTOR NAVAL" && /AUXILIAR DE/.test(nomeBruto)) {
+                    funcaoFinal = "AUXILIAR DE CONDUTOR NAVAL";
                 }
+                // Remove do NOME a função e quaisquer fragmentos de função que tenham vazado.
+                for (const frag of ["AUXILIAR DE CONDUTOR NAVAL", "CONDUTOR NAVAL", "AUXILIAR DE", funcaoFinal]) {
+                    if (frag) nomeBruto = nomeBruto.split(frag).join(" ");
+                }
+                nomeBruto = nomeBruto.replace(/\s+/g, " ").trim();
                 let idMilitar = extrairID(nomeBruto);
                 let idUnico = idMilitar || nomeBruto;
                 let nomeExibicao = limparNomeBasico(nomeBruto);
@@ -509,7 +568,7 @@
                     estrutura[obmKey].push(viaturaObj);
                 }
                 if (nomeExibicao !== "ND" && !nomeExibicao.includes("A CONFIRMAR")) {
-                    viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, turno: turnoHTML });
+                    viaturaObj.guarnicao.push({ f: funcaoFinal, n: nomeExibicao, id: idUnico, turno: turnoHTML, carga: cargaDoTurnoHTML(turnoHTML) });
                     const dadosMilitar = { n: nomeExibicao, f: funcaoFinal };
                     if (nomeBruto.includes("SD ") || nomeBruto.includes("SOLDADO ")) mapPracas.set(idUnico, dadosMilitar);
                     else if (nomeBruto.includes("SGT")) mapSargentos.set(idUnico, dadosMilitar);
@@ -619,9 +678,10 @@
                                 <div class="vtr-titulo">${listaVtrs}</div>
                                 <div class="w-full flex flex-col gap-1">`;
                 for (const m of grupo.guarnicao) {
-                    content += `<div class="militar-container" data-turno="${(m.turno || '').replace(/"/g, '&quot;')}" data-border-color="${tooltipBorderColor}">
+                    content += `<div class="militar-container ${m.carga === '12h' ? 'turno-meio' : ''}" data-turno="${(m.turno || '').replace(/"/g, '&quot;')}" data-border-color="${tooltipBorderColor}">
                                     <div class="militar-nome">${m.n}</div>
-                                    ${m.f ? `<div class="militar-funcao">${m.f}</div>` : ''}
+                                    ${m.carga ? `<div class="militar-turno ${m.carga === '12h' ? 'turno-12' : 'turno-24'}">${m.carga}</div>` : ''}
+                                    ${m.f ? `<div class="militar-funcao">${abreviarFuncao(m.f)}</div>` : ''}
                                 </div>`;
                 }
                 content += `</div></div>`;
