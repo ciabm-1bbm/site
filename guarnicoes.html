@@ -194,28 +194,29 @@
         .militar-nome { 
             color: #9BE36D; 
             font-weight: 800; 
-            font-size: 0.76rem; 
+            font-size: 0.74rem; 
             text-align: left; 
-            line-height: 1.2;
-            flex: 1 1 auto;
+            line-height: 1.15;
+            flex: 0 1 auto;
             min-width: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .militar-funcao { 
             color: #aaa; 
             font-size: 0.55rem; 
-            text-align: right; 
+            text-align: center; 
             font-weight: 500;
             line-height: 1.15;
             flex: 0 1 auto;
             min-width: 0;
-            max-width: 44%;
+            max-width: 40%;
             white-space: normal;
             overflow-wrap: break-word;
             word-break: normal;
         }
+        .militar-turno { flex: 0 0 auto; text-align: right; }
         
         /* Tooltip que acompanha o mouse */
         .turno-tooltip {
@@ -239,25 +240,26 @@
         .turno-carga { color: #FF8C00; font-weight: 700; margin-right: 5px; }
         .turno-horario { color: #38bdf8; }
 
-        /* Selinho de turno (12h/24h) entre o nome e a função */
-        .militar-turno {
+        /* Selinho de turno (pílula colorida) à direita do card */
+        .turno-pill {
+            display: inline-block;
             font-size: 0.5rem;
             font-weight: 800;
             letter-spacing: 0.03em;
-            padding: 1px 5px;
+            padding: 1px 6px;
             border-radius: 999px;
             line-height: 1.4;
-            flex: 0 0 auto;
-            align-self: center;
-            text-align: center;
             white-space: nowrap;
             font-family: monospace;
         }
-        .turno-24 { color: #cbd5e1; background: rgba(255, 255, 255, 0.10); }
-        .turno-12 { color: #7dd3fc; background: rgba(56, 189, 248, 0.16); }
-        /* Linhas de 12h ficam mais apagadas para diferenciar das de 24h */
-        .militar-container.turno-meio { opacity: 0.55; }
-        .militar-container.turno-meio:hover { opacity: 0.85; }
+        /* 24h em verde; os demais turnos (12h, 8h, 6h...) em laranja fraco */
+        .turno-24 { color: #6EE7A8; background: rgba(46, 125, 50, 0.30); }
+        .turno-parcial { color: #FFC08A; background: rgba(255, 140, 0, 0.16); }
+        /* Turnos parciais: nome e função levemente apagados (selinho continua nítido) */
+        .militar-container.turno-meio .militar-nome,
+        .militar-container.turno-meio .militar-funcao { opacity: 0.6; }
+        .militar-container.turno-meio:hover .militar-nome,
+        .militar-container.turno-meio:hover .militar-funcao { opacity: 0.9; }
         
         /* Container do grupo de viatura - mais compacto */
         .grupo-vtr {
@@ -290,7 +292,7 @@
             .grid-cards { grid-template-columns: 1fr; }
             .vertical-text { width: 40px; font-size: 0.9rem; padding: 8px 2px; }
             .militar-funcao { font-size: 0.5rem; }
-            .militar-nome { font-size: 0.72rem; }
+            .militar-nome { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -428,39 +430,99 @@
             "CHEFE DE LINHA ESQUERDA": "LINHA",
             "CHEFE DE LINHA DIREITA": "LINHA",
             "AUXILIAR DE LINHA ESQUERDA": "LINHA",
-            "AUXILIAR DE LINHA DIREITA": "LINHA"
+            "AUXILIAR DE LINHA DIREITA": "LINHA",
+            "CONDUTOR NAVAL": "C. NAVAL",
+            "AUXILIAR DE CONDUTOR NAVAL": "AUX. C. NAVAL",
+            "OPERADOR COBOM": "OP. COBOM",
+            "OPERADOR CCOB": "OP. CCOB",
+            "MOTORISTA DE DIA": "MOTORISTA DO OFICIAL"
         };
         function abreviarFuncao(f) {
             if (!f) return "";
             return ABREVIACOES[f] || f;
         }
 
+        // ===== Separação robusta de FUNÇÃO x NOME DE GUERRA =====
+        // Princípio: graduação e função vêm de conjuntos FIXOS; o nome de guerra é
+        // o que varia. Detectamos a função por palavras que só existem em funções
+        // (mesmo que ela tenha se partido entre os campos do E193) e removemos
+        // esses termos; o que sobra é a graduação + o nome de guerra.
+
+        // Detecta a função canônica a partir do texto (nome+função juntos).
+        function detectarFuncao(t) {
+            const s = " " + t + " ";
+            const has = (re) => re.test(s);
+            if (has(/LINHA DIREITA/))  return has(/AUXILIAR/) ? "AUXILIAR DE LINHA DIREITA"  : "CHEFE DE LINHA DIREITA";
+            if (has(/LINHA ESQUERDA/)) return has(/AUXILIAR/) ? "AUXILIAR DE LINHA ESQUERDA" : "CHEFE DE LINHA ESQUERDA";
+            if (has(/AUXILIAR/) && has(/CONDUTOR NAVAL/)) return "AUXILIAR DE CONDUTOR NAVAL";
+            if (has(/CONDUTOR NAVAL/)) return "CONDUTOR NAVAL";
+            if (has(/MERGULHADOR/))    return "MERGULHADOR";
+            if (has(/CINOT[ÉE]CNICO/)) return "CINOTÉCNICO";
+            if (has(/RESGATISTA/))     return "RESGATISTA";
+            if (has(/SOCORRISTA/))     return "SOCORRISTA";
+            if (has(/OPERADOR COBOM/)) return "OPERADOR COBOM";
+            if (has(/OPERADOR CCOB/))  return "OPERADOR CCOB";
+            if (has(/COMANDANTE|GUARNIÇÃO/)) return "COMANDANTE DE GUARNIÇÃO";
+            if (has(/\bCOV\b/) || has(/OPERADOR CONDUTOR/) || has(/\bCONDUTOR\b/)) return "COV / OPERADOR / CONDUTOR";
+            if (has(/OFICIAL SUPERVISOR/)) return "OFICIAL SUPERVISOR";
+            if (has(/MOTORISTA/))      return "MOTORISTA DE DIA";
+            if (has(/OFICIAL/))        return "OFICIAL DE SV";
+            if (has(/\bOPERADOR\b/))   return "OPERADOR";
+            return "";
+        }
+
+        // Termos de função a remover do nome (ordem: dos mais longos aos mais curtos).
+        // "DE", "DA", "DO" NÃO entram (aparecem em nomes como "DE LIMA", "DA SILVA").
+        const TERMOS_FUNCAO = [
+            "COMANDANTE DE GUARNIÇÃO", "AUXILIAR DE CONDUTOR NAVAL", "COV OPERADOR CONDUTOR",
+            "CHEFE DE LINHA DIREITA", "CHEFE DE LINHA ESQUERDA", "AUXILIAR DE LINHA DIREITA",
+            "AUXILIAR DE LINHA ESQUERDA", "OPERADOR CONDUTOR", "CONDUTOR NAVAL", "OPERADOR COBOM",
+            "OPERADOR CCOB", "MOTORISTA DE DIA", "OFICIAL SUPERVISOR", "OFICIAL DE SV",
+            "DE GUARNIÇÃO", "LINHA DIREITA", "LINHA ESQUERDA", "DE LINHA", "CHEFE DE", "AUXILIAR DE",
+            "COMANDANTE", "RESGATISTA", "MERGULHADOR", "CINOTÉCNICO", "CINOTECNICO", "SOCORRISTA",
+            "MOTORISTA", "OPERADOR", "CONDUTOR", "GUARNIÇÃO", "NAVAL", "SUPERVISOR", "OFICIAL",
+            "LINHA", "DIREITA", "ESQUERDA", "COBOM", "CCOB", "COV"
+        ];
+        function removerTermosFuncao(t) {
+            let s = " " + t + " ";
+            for (const termo of TERMOS_FUNCAO) {
+                const esc = termo.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, "\\s+");
+                const re = new RegExp("\\s" + esc + "(?=\\s)", "g");
+                let prev;
+                do { prev = s; s = s.replace(re, " "); } while (s !== prev);
+            }
+            return s.replace(/\s+/g, " ").trim();
+        }
+
         function calcularTurno(raw) {
             if (!raw) return "";
             try {
-                const partes = raw.trim().split(/\s+/);
-                if (partes.length === 1) {
-                    const h = partes[0];
-                    if (h === "20:00") return `<span class="turno-carga">12h</span> <span class="turno-horario">20:00→08:00</span>`;
-                    if (h === "08:00") return `<span class="turno-carga">24h</span> <span class="turno-horario">08:00→08:00</span>`;
-                    return `<span class="turno-carga">?</span> <span class="turno-horario">${h}</span>`;
-                } else if (partes.length >= 2) {
-                    let inicio = partes[0], fim = partes[1];
-                    let carga = "";
-                    if (inicio === "08:00" && fim === "20:00") carga = "12h";
-                    else if (inicio === "20:00" && fim === "08:00") carga = "12h";
-                    else carga = "24h";
-                    return `<span class="turno-carga">${carga}</span> <span class="turno-horario">${inicio}→${fim}</span>`;
+                const horas = raw.match(/\b\d{1,2}:\d{2}\b/g) || [];
+                if (!horas.length) return "";
+                const toMin = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
+                let carga = "", faixa = "";
+                if (horas.length >= 2) {
+                    const inicio = horas[0], fim = horas[1];
+                    let diff = toMin(fim) - toMin(inicio);
+                    if (diff <= 0) diff += 24 * 60;      // virada de dia
+                    let h = Math.round(diff / 60);
+                    if (h === 0) h = 24;
+                    carga = h + "h";
+                    faixa = inicio + "→" + fim;
+                } else {
+                    const h = horas[0];
+                    if (h === "20:00") { carga = "12h"; faixa = "20:00→08:00"; }
+                    else { carga = "24h"; faixa = h + "→" + h; }
                 }
-                return "";
+                return `<span class="turno-carga">${carga}</span> <span class="turno-horario">${faixa}</span>`;
             } catch(e) { return ""; }
         }
 
-        // Extrai apenas "12h" ou "24h" do HTML já calculado pelo calcularTurno.
+        // Extrai a carga (ex.: "6h", "12h", "24h") do HTML calculado por calcularTurno.
         function cargaDoTurnoHTML(turnoHTML) {
             const m = (turnoHTML || "").match(/turno-carga">([^<]+)</);
             const v = m ? m[1].trim() : "";
-            return (v === "12h" || v === "24h") ? v : "";
+            return /^\d{1,2}h$/.test(v) ? v : "";
         }
 
         function extrairID(nome) { let m=nome.match(/(\d{7})/); return m?m[1]:null; }
@@ -517,24 +579,23 @@
                 let vtr = (d.vtr || "").replace(/\(.*\)/, '').trim();
                 let nomeBruto = (d.nome || "").trim().toUpperCase();
                 let funcBruta = (d.func || "").trim().toUpperCase();
-                funcBruta = funcBruta.replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/[0-9]/g,'').replace(/[-]/g,'').trim();
-                let funcaoFinal = "";
-                // Procura a função MAIS ESPECÍFICA presente na função ou no nome
-                // (a fonte combinada cobre casos em que parte da função vazou para o nome).
-                const fonte = (funcBruta + " " + nomeBruto).replace(/\s+/g, " ").trim();
-                for (const cargo of FUNCOES_ORDENADAS) {
-                    if (fonte.includes(cargo)) { funcaoFinal = cargo; break; }
-                }
-                // Caso clássico de vazamento: "AUXILIAR DE" cai no nome e a função fica só "CONDUTOR NAVAL".
-                if (funcaoFinal === "CONDUTOR NAVAL" && /AUXILIAR DE/.test(nomeBruto)) {
-                    funcaoFinal = "AUXILIAR DE CONDUTOR NAVAL";
-                }
-                // Remove do NOME a função e quaisquer fragmentos de função que tenham vazado.
-                for (const frag of ["AUXILIAR DE CONDUTOR NAVAL", "CONDUTOR NAVAL", "AUXILIAR DE", funcaoFinal]) {
-                    if (frag) nomeBruto = nomeBruto.split(frag).join(" ");
-                }
-                nomeBruto = nomeBruto.replace(/\s+/g, " ").trim();
-                let idMilitar = extrairID(nomeBruto);
+                // Junta os dois campos (o E193 às vezes parte a função entre eles),
+                // limpa matrícula/números/barras e normaliza espaços.
+                let texto = (nomeBruto + " " + funcBruta)
+                    .replace(/\bND\b/g, ' ')
+                    .replace(/\d{7}/g, ' ')
+                    .replace(/\d+º\s*\d+/g, ' ')
+                    .replace(/[0-9]/g, ' ')
+                    .replace(/[\/\-]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                // FUNÇÃO: detectada por assinatura (palavras que só existem em funções).
+                let funcaoFinal = detectarFuncao(texto);
+                // NOME (graduação + nome de guerra): o texto sem nenhum termo de função.
+                nomeBruto = removerTermosFuncao(texto);
+
+                let idMilitar = extrairID(d.nome || "");
                 let idUnico = idMilitar || nomeBruto;
                 let nomeExibicao = limparNomeBasico(nomeBruto);
                 let turnoHTML = calcularTurno(d.horario || ""); 
@@ -678,10 +739,10 @@
                                 <div class="vtr-titulo">${listaVtrs}</div>
                                 <div class="w-full flex flex-col gap-1">`;
                 for (const m of grupo.guarnicao) {
-                    content += `<div class="militar-container ${m.carga === '12h' ? 'turno-meio' : ''}" data-turno="${(m.turno || '').replace(/"/g, '&quot;')}" data-border-color="${tooltipBorderColor}">
+                    content += `<div class="militar-container ${m.carga && m.carga !== '24h' ? 'turno-meio' : ''}" data-turno="${(m.turno || '').replace(/"/g, '&quot;')}" data-border-color="${tooltipBorderColor}">
                                     <div class="militar-nome">${m.n}</div>
-                                    ${m.carga ? `<div class="militar-turno ${m.carga === '12h' ? 'turno-12' : 'turno-24'}">${m.carga}</div>` : ''}
                                     ${m.f ? `<div class="militar-funcao">${abreviarFuncao(m.f)}</div>` : ''}
+                                    ${m.carga ? `<div class="militar-turno"><span class="turno-pill ${m.carga === '24h' ? 'turno-24' : 'turno-parcial'}">${m.carga}</span></div>` : ''}
                                 </div>`;
                 }
                 content += `</div></div>`;
