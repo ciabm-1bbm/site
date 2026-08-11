@@ -1,0 +1,80 @@
+name: Auditoria Prévia de Escalas
+
+on:
+  schedule:
+    # Toda segunda-feira às 06:00 (Brasília = UTC-3 → 09:00 UTC)
+    - cron: '0 9 * * 1'
+    # Último "pente-fino" do mês: dia 1º às 07:00 de Brasília, auditando o mês anterior
+    - cron: '0 10 1 * *'
+  workflow_dispatch:          # permite rodar manualmente pelo site do GitHub
+    inputs:
+      audit_date:
+        description: 'Auditar do dia 1 até esta data (AAAA-MM-DD). Vazio = hoje.'
+        required: false
+      audit_mes:
+        description: 'Mês a coletar (1-12). Vazio = mês corrente.'
+        required: false
+      audit_ano:
+        description: 'Ano a coletar. Vazio = ano corrente.'
+        required: false
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: auditoria/package-lock.json
+
+      - name: Instalar dependências
+        working-directory: auditoria
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Coletar guarnição do E-193 (dia 1 até a data da auditoria)
+        working-directory: auditoria
+        env:
+          E193_URL:  ${{ secrets.E193_URL }}
+          E193_USER: ${{ secrets.E193_USER }}
+          E193_PASS: ${{ secrets.E193_PASS }}
+          OBMS: "AÇORIANOS,TERESÓPOLIS,ASSUNÇÃO,RESTINGA,BELÉM NOVO,FLORESTA,PASSO,PARTENON"
+          AUDIT_DATE: ${{ github.event.inputs.audit_date }}
+          AUDIT_MES:  ${{ github.event.inputs.audit_mes }}
+          AUDIT_ANO:  ${{ github.event.inputs.audit_ano }}
+          APP_URL:    ${{ secrets.APP_URL }}
+          APP_TOKEN:  ${{ secrets.APP_TOKEN }}
+        run: node coleta-e193.js
+
+      - name: Rodar auditoria (documentos do Drive + guarnição coletada)
+        working-directory: auditoria
+        env:
+          DRIVE_BRIDGE_URL:   ${{ secrets.DRIVE_BRIDGE_URL }}
+          DRIVE_BRIDGE_TOKEN: ${{ secrets.DRIVE_BRIDGE_TOKEN }}
+          COTA_HE:            ${{ vars.COTA_HE }}
+        run: node rodar-auditoria.js
+
+      - name: Publicar relatório no site da CIA
+        run: |
+          mkdir -p auditorias
+          MES=$(date +%Y-%m)
+          cp auditoria/saida/relatorio.html "auditorias/auditoria-$MES.html"
+          cp auditoria/saida/relatorio.html  auditorias/ultima.html
+          cp auditoria/saida/apontamentos.csv "auditorias/apontamentos-$MES.csv"
+          git config user.name  "Auditoria Automática"
+          git config user.email "actions@users.noreply.github.com"
+          git add auditorias
+          git diff --staged --quiet || git commit -m "Auditoria prévia — $(date +%d/%m/%Y)"
+          git push
+
+      - name: Guardar resultado como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: auditoria-${{ github.run_number }}
+          path: auditoria/saida/
+          retention-days: 90

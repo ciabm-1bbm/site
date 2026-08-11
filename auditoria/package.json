@@ -1,0 +1,14 @@
+{
+  "name": "auditoria-previa-1bbm",
+  "version": "1.0.0",
+  "description": "Auditoria Prévia de Escalas e Mapas de Efetividade — 1º BBM/CBMRS",
+  "scripts": {
+    "coletar": "node coleta-e193.js",
+    "auditar": "node rodar-auditoria.js",
+    "tudo": "npm run coletar && npm run auditar"
+  },
+  "dependencies": {
+    "playwright": "^1.47.0",
+    "xlsx": "^0.18.5"
+  }
+}
