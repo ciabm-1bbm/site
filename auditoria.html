@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditoria Prévia de Escalas e Mapas · 1º BBM</title>
+<meta name="description" content="Sistema de Auditoria Prévia de Escalas e Mapas de Efetividade — CBMRS, 1º Batalhão de Bombeiro Militar, 1ª e 2ª Companhia">
+<link rel="icon" href="images/brasao_1BBM_PARA_site.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ===================================================================
+     COLE AQUI O ENDEREÇO /exec DO SISTEMA (Implantar > Gerenciar
+     implantações > URL do App da Web). É o único ponto a alterar
+     quando o link do Apps Script mudar.
+     =================================================================== -->
+<script>
+  const URL_SISTEMA = "https://script.google.com/macros/s/AKfycbyXweJVD7cEHfCYIN-DtZNz55T3kEuY04z2YL_YDhec7vkjk_d_mGosrwqBjiQVBijE/exec";
+</script>
+
+<style>
+:root{
+  --navy-950:#070E1D; --navy-900:#0A1428; --navy-800:#101E3C; --navy-700:#1A2C52;
+  --gold:#C9A227; --gold-hi:#E8C34A; --gold-dim:#8C7420;
+  --ink:#E9EDF6; --ink-mut:#93A3C4; --ink-dim:#5E6E92; --line:#22345E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--navy-950);color:var(--ink);font-family:'Barlow',sans-serif;
+  display:flex;flex-direction:column;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(1100px 500px at 70% -10%, rgba(201,162,39,.07), transparent 60%),
+             radial-gradient(900px 600px at -10% 110%, rgba(39,64,122,.25), transparent 60%)}
+
+/* ---------- barra do portal ---------- */
+.topo{position:relative;z-index:2;display:flex;align-items:center;gap:16px;
+  padding:12px 22px;border-bottom:2px solid var(--gold);background:var(--navy-900);
+  box-shadow:0 4px 20px rgba(0,0,0,.35);flex-wrap:wrap}
+.topo img{height:42px;width:auto}
+.topo .tit{flex:1;min-width:200px}
+.topo .ey{font-family:'Oswald';font-size:10px;letter-spacing:.26em;color:var(--gold);text-transform:uppercase}
+.topo .tit h1{font-family:'Oswald';font-weight:700;font-size:17px;letter-spacing:.04em;
+  text-transform:uppercase;line-height:1.2;margin-top:2px}
+.voltar{font-family:'Oswald';font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-mut);text-decoration:none;border:1px solid var(--line);border-radius:8px;
+  padding:9px 16px;transition:.2s;white-space:nowrap}
+.voltar:hover{color:var(--gold);border-color:var(--gold-dim);background:var(--navy-800)}
+@media(max-width:640px){
+  .topo{padding:10px 14px;gap:10px}
+  .topo img{height:32px}
+  .topo .tit h1{font-size:14px}
+  .topo .ey{font-size:9px;letter-spacing:.18em}
+}
+
+/* ---------- área do sistema ---------- */
+.palco{flex:1;position:relative;z-index:1;min-height:0}
+iframe{width:100%;height:100%;border:0;display:block;background:var(--navy-950)}
+
+/* ---------- carregando ---------- */
+.load{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:16px;background:var(--navy-950);transition:opacity .4s;z-index:3}
+.load.off{opacity:0;pointer-events:none}
+.spin{width:42px;height:42px;border:3px solid var(--navy-700);border-top-color:var(--gold);
+  border-radius:50%;animation:g 1s linear infinite}
+@keyframes g{to{transform:rotate(360deg)}}
+.load p{font-family:'Oswald';font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mut)}
+.aviso{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:30px;text-align:center;z-index:4;background:var(--navy-950)}
+.aviso h2{font-family:'Oswald';color:var(--gold-hi);font-size:19px;letter-spacing:.05em;text-transform:uppercase}
+.aviso p{color:var(--ink-mut);font-size:14px;max-width:520px;line-height:1.6}
+.aviso a{display:inline-block;margin-top:8px;font-family:'Oswald';font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--navy-950);background:linear-gradient(180deg,var(--gold-hi),var(--gold));
+  border-radius:8px;padding:12px 24px;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <img src="https://www.bombeiros.rs.gov.br/themes/sitecbmrs/images/logos/logo.png"
+       alt="CBMRS" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+  <div class="tit">
+    <div class="ey">CBMRS — 1º Batalhão de Bombeiro Militar — 1ª e 2ª Companhia</div>
+    <h1>Auditoria Prévia de Escalas e Mapas de Efetividade</h1>
+  </div>
+  <a class="voltar" href="index.html">← Portal da CIA</a>
+  <img src="images/brasao_1BBM_PARA_site.png" alt="1º BBM" onerror="this.style.display='none'">
+</div>
+
+<div class="palco">
+  <div class="load" id="load">
+    <div class="spin"></div>
+    <p>Abrindo o sistema de auditoria…</p>
+  </div>
+
+  <div class="aviso" id="aviso">
+    <h2>Sistema indisponível nesta janela</h2>
+    <p>O navegador bloqueou a exibição do sistema dentro do portal — costuma acontecer
+       quando há bloqueadores de conteúdo ou restrição de terceiros ativa.
+       Use o acesso direto abaixo.</p>
+    <a id="direto" href="#" target="_blank" rel="noopener">Abrir o sistema em nova aba</a>
+  </div>
+
+  <iframe id="quadro" title="Sistema de Auditoria Prévia" src="about:blank"
+          allow="clipboard-write; fullscreen"></iframe>
+</div>
+
+<script>
+(function(){
+  var quadro = document.getElementById('quadro');
+  var load   = document.getElementById('load');
+  var aviso  = document.getElementById('aviso');
+  document.getElementById('direto').href = URL_SISTEMA;
+
+  if (URL_SISTEMA.indexOf('COLE_AQUI') >= 0) {
+    load.classList.add('off');
+    aviso.style.display = 'flex';
+    aviso.querySelector('h2').textContent = 'Endereço do sistema não configurado';
+    aviso.querySelector('p').textContent =
+      'Edite este arquivo e informe em URL_SISTEMA o endereço /exec do aplicativo web do Apps Script.';
+    return;
+  }
+
+  quadro.src = URL_SISTEMA;
+
+  var carregou = false;
+  quadro.addEventListener('load', function(){
+    carregou = true;
+    load.classList.add('off');
+    setTimeout(function(){ load.style.display = 'none'; }, 450);
+  });
+
+  // se em 20s nada carregar, oferece o acesso direto
+  setTimeout(function(){
+    if (!carregou) { load.classList.add('off'); aviso.style.display = 'flex'; }
+  }, 20000);
+})();
+</script>
+</body>
+</html>
