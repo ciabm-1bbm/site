@@ -170,7 +170,11 @@ main{flex:1;position:relative;padding:16px 0 8px}
 }
 .card-guarnicao h3{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;letter-spacing:2px}
 .card-guarnicao .vtr{font-size:12px;letter-spacing:2px;color:var(--cor);font-weight:700;margin-bottom:10px}
-.fotos{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;align-content:start}
+/* auto-fill com largura mínima: todas do mesmo tamanho, proporção 3x4 travada,
+   e a quantidade por linha se ajusta ao tamanho da guarnição. */
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));
+  gap:6px;align-content:start;justify-items:center}
+.militar{width:100%;max-width:80px}
 .militar{text-align:center}
 .retrato{
   position:relative;width:100%;aspect-ratio:3/4;border-radius:6px;overflow:hidden;
@@ -178,9 +182,9 @@ main{flex:1;position:relative;padding:16px 0 8px}
   display:grid;place-items:center;
 }
 .retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.retrato .iniciais{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--txt-fraco)}
-.militar .nm{font-size:10.5px;font-weight:700;margin-top:4px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.militar .fn{font-size:8.5px;letter-spacing:1px;color:var(--txt-fraco);text-transform:uppercase}
+.retrato .iniciais{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--txt-fraco)}
+.militar .nm{font-size:9.5px;font-weight:700;margin-top:4px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.militar .fn{font-size:8px;letter-spacing:1px;color:var(--txt-fraco);text-transform:uppercase}
 
 /* ---------- Rodapé ---------- */
 footer{
@@ -312,18 +316,32 @@ body.parado{cursor:none}
   letter-spacing:.5px;color:var(--txt-fraco);text-transform:none}
 .mes-aviso{flex-basis:100%;font-size:12px;color:var(--ouro);letter-spacing:.5px}
 
-.barras-mes{flex:1;min-height:0;display:grid;gap:2px;align-content:stretch}
-/* Dez naturezas no mesmo quadrante: a fonte encolhe até caberem todas sem
-   corte. Ainda legível a três metros, que é a distância da sala. */
-.barra-nat{display:grid;grid-template-columns:186px 1fr 40px 40px;align-items:center;gap:8px}
-.barra-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
-  letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
-.barra-nat .trilha{height:13px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
-.barra-nat .trilha i{display:block;height:100%;background:var(--c);border-radius:3px;
-  transition:width .7s ease}
-.barra-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;
-  text-align:right;font-variant-numeric:tabular-nums;color:var(--c);line-height:1}
-.barra-nat .pct{font-size:11px;text-align:right;color:var(--txt-fraco);font-variant-numeric:tabular-nums}
+/* Duas colunas: mês à esquerda, dia à direita. Cada natureza é uma linha
+   onde a própria barra é o fundo — sem coluna separada para o gráfico, o
+   rótulo ganha a largura toda e para de ser cortado. */
+.barras-mes{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.col-nat{display:flex;flex-direction:column;min-height:0}
+.col-cab{flex:none;display:flex;align-items:baseline;gap:9px;padding-bottom:5px;
+  margin-bottom:5px;border-bottom:2px solid var(--c)}
+.col-cab b{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;
+  line-height:.85;font-variant-numeric:tabular-nums;color:var(--c)}
+.col-cab span{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;
+  letter-spacing:2px;color:var(--txt);line-height:1.1;text-transform:uppercase}
+.col-cab span i{display:block;font-style:normal;font-family:'Inter',sans-serif;
+  font-size:10px;font-weight:400;letter-spacing:.5px;color:var(--txt-fraco);text-transform:none}
+.lista-nat{flex:1;min-height:0;display:grid;gap:2px;align-content:start}
+.linha-nat{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;
+  padding:1px 7px;border-radius:3px;border-left:3px solid var(--c);
+  background:linear-gradient(90deg,
+    color-mix(in srgb, var(--c) 30%, transparent) var(--p),
+    rgba(255,255,255,.035) var(--p))}
+.linha-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
+  letter-spacing:.3px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--txt);line-height:1.25}
+.col-nat .vazio-dia{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;color:var(--txt-fraco);font-size:12px;
+  border:2px dashed var(--linha);border-radius:8px;padding:10px;line-height:1.5}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -461,7 +479,12 @@ const CONFIG = {
   arquivoMesAtual: "dados/PAINEL_MES_ATUAL.csv",
 
   // Pasta com os 3x4. Nome do arquivo = ID funcional (7 dígitos) + .jpg
-  urlFotos: "https://raw.githubusercontent.com/ciabm-1bbm/site/main/fotos/",
+  // Pasta das fotos 3x4. O painel tenta dois nomes de arquivo, nesta ordem:
+  //   1) nomedeguerra_idfuncional.jpg   (ex.: medeiros_2822130.jpg)
+  //   2) idfuncional.jpg                (ex.: 2822130.jpg)
+  // Assim vale o nome que for mais prático de organizar, e a matrícula
+  // sozinha continua funcionando como rede de segurança.
+  urlFotos: "https://raw.githubusercontent.com/ciabm-1bbm/site/main/images/fotos-ciosp/",
 
   intervaloDados: 15000,   // releitura das ocorrências (muda o tempo todo)
   intervaloEscala: 300000, // releitura da escala (muda uma vez por dia)
@@ -885,7 +908,7 @@ function processarCSVMes(txt, refMes){
   // rodapé: "735 registros - Total 722 OCs". Contar linha por linha inflaria o
   // número na TV, então cada ocorrência entra uma vez só.
   const vistas = new Set(), vistasHoje = new Set();
-  const porNatureza = {};
+  const porNatureza = {}, porNaturezaHoje = {};
   let linhasLidas = 0, ultimaData = null, horaMaisTarde = null;
 
   for (const r of linhas){
@@ -925,6 +948,8 @@ function processarCSVMes(txt, refMes){
     }
     const nat = normalizarNatureza(r[colNat]);
     porNatureza[nat] = (porNatureza[nat] || 0) + 1;
+    if (data && chaveDia(data) === hojeChave)
+      porNaturezaHoje[nat] = (porNaturezaHoje[nat] || 0) + 1;
   }
 
   // "Cobre hoje" não é o mesmo que "hoje teve zero". Se a última data do
@@ -933,10 +958,11 @@ function processarCSVMes(txt, refMes){
   const cobreHoje = ultimaData && chaveDia(ultimaData) === hojeChave;
 
   return {
-    total: vistas.size, porNatureza, refMes,
+    total: vistas.size, porNatureza, porNaturezaHoje, refMes,
     hoje: vistasHoje.size, cobreHoje, ultimaData, horaMaisTarde,
     linhas: linhas.length, jaFiltrado,
     tipos: Object.entries(porNatureza).sort((a, b) => b[1] - a[1]),
+    tiposHoje: Object.entries(porNaturezaHoje).sort((a, b) => b[1] - a[1]),
     ultimoDia: ultimaData ? ultimaData.getDate() : null
   };
 }
@@ -972,40 +998,53 @@ function renderMes(){
       <span>Não consegui ler o consolidado de ocorrências no repositório.</span></div>`;
     return;
   }
-  const hoje = new Date();
-  const hora = m.horaMaisTarde || hoje.toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
+  const agora = new Date();
   const dias = m.atrasado
     ? "mês fechado"
-    : (m.ultimoDia || hoje.getDate()) + " dias de " + MES_EXTENSO[m.refMes.getMonth()];
+    : (m.ultimoDia || agora.getDate()) + " dias de " + MES_EXTENSO[m.refMes.getMonth()];
 
-  // O número do dia só aparece quando o consolidado realmente alcança hoje.
-  // Um "0 hoje" vindo de arquivo desatualizado seria lido na sala como
-  // "nenhuma ocorrência até agora", que é bem diferente de "não sei ainda".
-  const blocoHoje = m.cobreHoje
-    ? `<div class="mes-hoje"><div class="mes-hoje-n">${m.hoje}</div>
-         <div class="mes-hoje-t">HOJE<br><span>desde 00:00 · última ${hora}</span></div></div>`
-    : `<div class="mes-hoje sem"><div class="mes-hoje-n">—</div>
-         <div class="mes-hoje-t">HOJE<br><span>${m.ultimaData
-            ? "consolidado vai até " + String(m.ultimaData.getDate()).padStart(2,"0") + "/" + String(m.ultimaData.getMonth()+1).padStart(2,"0")
-            : "sem data no arquivo"}</span></div></div>`;
+  // O cabeçalho de cima some: os totais passaram para o topo de cada coluna,
+  // onde o comandante lê os dois números de uma olhada só.
+  $("mes-cab").innerHTML = m.atrasado
+    ? `<div class="mes-aviso">${MES_EXTENSO[m.refMes.getMonth()]} — o mês corrente ainda não foi compilado</div>`
+    : "";
+  $("mes-cab").style.display = m.atrasado ? "flex" : "none";
 
-  $("mes-cab").innerHTML = `
-    <div class="mes-total">${m.total}</div>
-    <div class="mes-txt"><b>ocorrências atendidas</b><br>${dias} · 1º BBM</div>
-    ${blocoHoje}
-    ${m.atrasado ? `<div class="mes-aviso">${MES_EXTENSO[m.refMes.getMonth()]} — o mês corrente ainda não foi compilado</div>` : ""}`;
+  // Uma linha por natureza; a barra é o fundo da própria linha.
+  const linhas = (tipos, total) => {
+    const max = Math.max(1, ...tipos.map(t => t[1]));
+    return tipos.slice(0, 10).map(([nat, n]) => `
+      <div class="linha-nat" style="--c:${COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"]};--p:${(n / max * 100).toFixed(0)}%">
+        <span class="rot">${CURTO_NATUREZA[nat] || nat}</span>
+        <span class="val">${n}</span>
+      </div>`).join("");
+  };
 
-  const tipos = m.tipos.slice(0, 10);   // o E193 tem 10 naturezas
-  const max = Math.max(1, ...tipos.map(t => t[1]));
-  $("barras-mes").innerHTML = tipos.map(([nat, n]) => {
-    const cor = COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"];
-    return `<div class="barra-nat" style="--c:${cor}">
-      <div class="rot">${CURTO_NATUREZA[nat] || nat}</div>
-      <div class="trilha"><i style="width:${(n / max * 100).toFixed(1)}%"></i></div>
-      <div class="val">${n}</div>
-      <div class="pct">${Math.round(n / m.total * 100)}%</div>
+  const colunaMes = `
+    <div class="col-nat" style="--c:var(--laranja)">
+      <div class="col-cab"><b>${m.total}</b><span>No mês<i>${dias}</i></span></div>
+      <div class="lista-nat">${linhas(m.tipos, m.total)}</div>
     </div>`;
-  }).join("");
+
+  // "Sem cobertura" não é o mesmo que "zero hoje". Se o arquivo não alcança
+  // hoje, a coluna diz isso em vez de mostrar um zero que seria lido como
+  // "nenhuma ocorrência até agora".
+  const hora = m.horaMaisTarde ? " · última " + m.horaMaisTarde : "";
+  const colunaDia = !m.cobreHoje
+    ? `<div class="col-nat" style="--c:var(--txt-fraco)">
+         <div class="col-cab"><b>—</b><span>Hoje<i>consolidado vai até ${m.ultimaData
+            ? String(m.ultimaData.getDate()).padStart(2,"0") + "/" + String(m.ultimaData.getMonth()+1).padStart(2,"0")
+            : "data desconhecida"}</i></span></div>
+         <div class="vazio-dia">A leitura ainda não alcança o dia de hoje.</div>
+       </div>`
+    : `<div class="col-nat" style="--c:var(--ok)">
+         <div class="col-cab"><b>${m.hoje}</b><span>Hoje<i>desde 00:00${hora}</i></span></div>
+         <div class="lista-nat">${m.tiposHoje.length
+            ? linhas(m.tiposHoje, m.hoje)
+            : `<div class="vazio-dia">Nenhuma ocorrência atendida hoje até agora.</div>`}</div>
+       </div>`;
+
+  $("barras-mes").innerHTML = colunaMes + colunaDia;
 }
 
 /* Guarnição de um pelotão no turno corrente, sem repetir gente.
@@ -1151,7 +1190,7 @@ function renderPanorama(){
   // AODC, que é o caso fora da rede do e193 — entra o consolidado.
   const mostraLista = oco.length > 0;
   $("lista-ocorrencias").style.display = mostraLista ? "flex" : "none";
-  $("mes-cab").style.display    = mostraLista ? "none" : "flex";
+  $("mes-cab").style.display    = "none";   // controlado por renderMes
   $("barras-mes").style.display = mostraLista ? "none" : "grid";
 
   if (mostraLista){
@@ -1216,7 +1255,7 @@ function renderGuarnicoes(){
               <div class="militar">
                 <div class="retrato">
                   <span class="iniciais">${iniciais(m.nome)}</span>
-                  ${/^\d{7}$/.test(m.id) ? `<img src="${CONFIG.urlFotos}${m.id}.jpg" alt="" loading="lazy" onerror="this.remove()">` : ""}
+                  ${idFuncional(m.id) ? `<img src="${CONFIG.urlFotos}${nomeArquivo(m.nome)}_${m.id}.jpg" data-reserva="${CONFIG.urlFotos}${m.id}.jpg" alt="" loading="lazy" onerror="if(this.dataset.reserva){this.src=this.dataset.reserva;this.dataset.reserva='';}else{this.remove();}">` : ""}
                 </div>
                 <div class="nm">${m.nome}</div>
                 <div class="fn">${m.funcao}</div>
@@ -1224,6 +1263,16 @@ function renderGuarnicoes(){
           </div>
         </div>`).join("")}
     </div>`;
+}
+
+/* Nome de guerra em forma de arquivo: sem graduação, sem acento, minúsculo.
+   "SGT PEREIRA" → "pereira"; "SD DA SILVA" → "da-silva". */
+const GRADUACOES = /^(SD|CB|SGT|ST|SUB|ASP|TEN|CAP|MAJ|TC|CEL|AL|\d+º)$/;
+function nomeArquivo(nome){
+  const partes = String(nome || "").toUpperCase().split(/\s+/).filter(Boolean);
+  while (partes.length > 1 && GRADUACOES.test(partes[0])) partes.shift();
+  return partes.join("-").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase().replace(/[^a-z0-9-]/g,"");
 }
 
 function iniciais(nome){
