@@ -1,0 +1,61 @@
+# .github/workflows/ocorrencias.yml
+#
+# Atualiza dados/PAINEL_MES_ATUAL.csv com o relatório do 1º BBM, do dia 1 do
+# mês corrente até hoje. O painel do CIOSP lê esse arquivo direto do raw do
+# GitHub — não precisa de mais nada.
+
+name: Ocorrências do mês (1º BBM)
+
+on:
+  schedule:
+    # A cada hora cheia. O GitHub usa UTC: 3h à frente de Porto Alegre.
+    # De hora em hora cobre o dia todo sem precisar pensar em fuso.
+    - cron: "0 * * * *"
+  workflow_dispatch:        # permite rodar na mão pelo botão do Actions
+
+# Necessário para o passo de commit escrever de volta no repositório
+permissions:
+  contents: write
+
+concurrency:
+  # Se uma execução demorar mais que a hora, a próxima espera em vez de
+  # rodar junto — duas sessões simultâneas no E193 dão problema.
+  group: ocorrencias
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Playwright
+        run: |
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Coletar o relatório
+        env:
+          E193_USUARIO: ${{ secrets.E193_USUARIO }}
+          E193_SENHA: ${{ secrets.E193_SENHA }}
+        run: node scripts/coletar-ocorrencias.mjs
+
+      - name: Publicar o arquivo
+        run: |
+          git config user.name  "coletor-ocorrencias"
+          git config user.email "actions@users.noreply.github.com"
+          git add dados/PAINEL_MES_ATUAL.csv
+          # Sem mudança nenhuma não há o que commitar, e isso é normal:
+          # se ninguém atendeu ocorrência na última hora, o arquivo é o mesmo.
+          if git diff --staged --quiet; then
+            echo "Nada mudou desde a última coleta."
+          else
+            git commit -m "Ocorrências do mês — $(TZ=America/Sao_Paulo date '+%d/%m %H:%M')"
+            git push
+          fi
