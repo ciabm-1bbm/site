@@ -229,26 +229,26 @@ footer{
 /* Anéis por pelotão. No meio vai a viatura, na volta o efetivo de serviço
    AGORA. O arco é proporcional ao maior pelotão da leitura, então dá para
    comparar as frações de relance, sem ler número por número. */
-.aneis{flex:1;min-height:0;display:grid;gap:6px;
+.aneis{flex:1;min-height:0;display:grid;gap:4px;
   grid-template-columns:repeat(5,1fr);align-content:center;justify-items:center}
 .anel-pel{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
-.anel-pel .rosca{position:relative;width:112px;height:112px}
+.anel-pel .rosca{position:relative;width:92px;height:92px}
 .anel-pel svg{width:100%;height:100%;transform:rotate(-90deg)}
 .anel-pel svg circle{fill:none;stroke-linecap:round}
 .anel-pel .trilho{stroke:rgba(255,255,255,.08);stroke-width:9}
 .anel-pel .arco{stroke:var(--c);stroke-width:9;transition:stroke-dasharray .6s ease}
 .anel-pel .centro{position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:1px;text-align:center;padding:0 8px}
-.anel-pel .vtr-num{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;
+.anel-pel .vtr-num{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
   letter-spacing:.5px;line-height:1;color:var(--txt);white-space:nowrap}
-.anel-pel .vtr-num.dupla{font-size:15px}
+.anel-pel .vtr-num.dupla{font-size:12.5px}
 .anel-pel .vtr-num + .vtr-num{margin-top:1px;color:var(--txt-fraco)}
 .anel-pel .contagem{position:absolute;top:-3px;left:50%;transform:translateX(-50%);
-  min-width:32px;height:32px;padding:0 7px;border-radius:99px;background:var(--c);color:#0b1120;
+  min-width:27px;height:27px;padding:0 6px;border-radius:99px;background:var(--c);color:#0b1120;
   display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;
-  font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;
   box-shadow:0 2px 8px rgba(0,0,0,.5)}
-.anel-pel .rotulo{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;
+.anel-pel .rotulo{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
   letter-spacing:1px;color:var(--txt);text-align:center;line-height:1.05;
   max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .anel-pel.zerado{opacity:.32}
@@ -265,32 +265,34 @@ body.parado{cursor:none}
 /* Tooltip da guarnição. Fica pendurado no palco, não dentro do quadrante:
    o quadrante tem overflow:hidden e cortaria a caixa pela metade. */
 #tooltip{
+  /* Sem transform: a posição é calculada no script, que mede a caixa e a
+     encaixa dentro do palco. Assim ela nunca vaza pela borda da TV. */
   position:absolute;z-index:50;pointer-events:none;opacity:0;
-  transform:translate(-50%,-100%);transition:opacity .14s ease;
+  transition:opacity .14s ease;
   background:rgba(10,16,28,.97);border:1px solid var(--c,var(--linha));
   border-top:4px solid var(--c,var(--laranja));border-radius:10px;
-  padding:12px 16px 13px;min-width:250px;max-width:420px;
+  padding:10px 13px 11px;min-width:215px;max-width:360px;
   box-shadow:0 12px 40px rgba(0,0,0,.7)}
 #tooltip.on{opacity:1}
-#tooltip h4{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;
-  letter-spacing:2px;color:var(--c);margin-bottom:2px}
-#tooltip .sub{font-size:12px;letter-spacing:2px;text-transform:uppercase;
-  color:var(--txt-fraco);margin-bottom:10px}
+#tooltip h4{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;
+  letter-spacing:1.5px;color:var(--c);margin-bottom:2px}
+#tooltip .sub{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--txt-fraco);margin-bottom:8px}
 #tooltip .vtr-bloco{margin-top:9px}
 #tooltip .vtr-bloco:first-of-type{margin-top:0}
-#tooltip .vtr-cab{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;
+#tooltip .vtr-cab{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
   letter-spacing:1px;color:var(--txt);padding-bottom:3px;margin-bottom:5px;
   border-bottom:1px solid var(--linha);display:flex;justify-content:space-between;gap:14px}
 #tooltip .vtr-cab span{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
   letter-spacing:1px;color:var(--txt-fraco)}
 #tooltip ul{list-style:none;display:flex;flex-direction:column;gap:3px}
-#tooltip li{display:flex;justify-content:space-between;gap:16px;font-size:14px;line-height:1.25}
+#tooltip li{display:flex;justify-content:space-between;gap:14px;font-size:12.5px;line-height:1.25}
 #tooltip li b{font-weight:600;color:var(--txt)}
 #tooltip li i{font-style:normal;font-size:11px;letter-spacing:1px;text-transform:uppercase;
   color:var(--txt-fraco);white-space:nowrap;padding-top:2px}
 #tooltip li.repetido i{color:var(--laranja)}
-#tooltip .rodape-tip{margin-top:9px;padding-top:7px;border-top:1px solid var(--linha);
-  font-size:11.5px;color:var(--txt-fraco)}
+#tooltip .rodape-tip{margin-top:8px;padding-top:6px;border-top:1px solid var(--linha);
+  font-size:11px;color:var(--txt-fraco)}
 .anel-pel{cursor:pointer}
 .anel-pel:hover .rosca{filter:brightness(1.18)}
 
@@ -1338,9 +1340,24 @@ function ligarTooltip(){
     // divididas pela escala para virar coordenada dentro do palco.
     const r = alvo.getBoundingClientRect(), p = palco.getBoundingClientRect();
     const k = p.width / 1920;
-    const x = (r.left + r.width / 2 - p.left) / k;
-    const y = (r.top - p.top) / k - 12;
-    tip.style.left = Math.max(150, Math.min(1770, x)) + "px";
+    const centro = (r.left + r.width / 2 - p.left) / k;
+    const topo   = (r.top - p.top) / k;
+    const base   = (r.bottom - p.top) / k;
+
+    // Mede a caixa já preenchida e encaixa dentro do palco. Sem isto, um anel
+    // perto da borda joga metade do balão para fora da TV — que foi o que
+    // aconteceu com os pelotões da ponta.
+    tip.style.left = "0px"; tip.style.top = "0px";
+    const larg = tip.offsetWidth, alt = tip.offsetHeight;
+    const M = 10;   // respiro até a borda
+
+    // Acima do anel por padrão; se não couber, vai para baixo.
+    let y = topo - alt - 12;
+    if (y < M) y = base + 12;
+    y = Math.max(M, Math.min(1080 - alt - M, y));
+
+    const x = Math.max(M, Math.min(1920 - larg - M, centro - larg / 2));
+    tip.style.left = x + "px";
     tip.style.top  = y + "px";
     tip.classList.add("on");
   });
