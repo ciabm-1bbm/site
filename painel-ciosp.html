@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel CIOSP — 1º BBM</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PAINEL CIOSP — 1º BBM
+   Alvo: TV 55" 1920x1080 via HDMI, modo quiosque, sem interação.
+   Palco fixo de 1920x1080 escalado por transform: nunca há scroll.
+   ============================================================ */
+
+:root{
+  --bg:        #0b1120;
+  --bg-card:   rgba(30, 41, 59, .82);
+  --linha:     rgba(255,255,255,.10);
+  --txt:       #e8eef7;
+  --txt-fraco: #8fa3bd;
+  --laranja:   #FF8C00;
+  --ouro:      #FFD700;
+  --vermelho:  #B91C1C;
+  --amarelo:   #EAB308;
+  --verde:     #2E7D32;
+  --ok:        #4ade80;
+  --alerta:    #f87171;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:'Inter',sans-serif;color:var(--txt)}
+
+#viewport{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
+#palco{
+  width:1920px;height:1080px;transform-origin:center center;position:relative;
+  padding:18px 24px 0;display:flex;flex-direction:column;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(30,41,59,.55) 0%, rgba(11,17,32,.97) 70%),
+    var(--bg);
+}
+#palco::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:url('https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true') center/620px no-repeat;
+  opacity:.05;filter:grayscale(100%);
+}
+#palco > *{position:relative;z-index:1}
+
+/* ---------- Cabeçalho ---------- */
+header{display:flex;align-items:center;gap:26px;padding-bottom:14px;border-bottom:2px solid var(--linha)}
+header img{height:64px}
+.titulo{flex:1}
+.titulo h1{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;letter-spacing:3px;line-height:1}
+.titulo h1 b{color:var(--laranja)}
+.titulo p{font-size:15px;color:var(--txt-fraco);letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+
+.relogio{text-align:right;line-height:1}
+.relogio .hora{font-family:'Barlow Condensed',sans-serif;font-size:72px;font-weight:700;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.relogio .data{font-size:15px;color:var(--txt-fraco);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* Anel de atualização: a assinatura do painel. Fecha a volta a cada ciclo
+   e some por um instante quando os dados chegam. */
+.pulso{display:flex;flex-direction:column;align-items:center;gap:6px;width:96px}
+.anel{width:64px;height:64px;transform:rotate(-90deg)}
+.anel circle{fill:none;stroke-width:5;stroke-linecap:round}
+.anel .trilho{stroke:rgba(255,255,255,.10)}
+.anel .barra{stroke:var(--laranja);transition:stroke-dashoffset .95s linear,stroke .3s}
+.pulso.erro .anel .barra{stroke:var(--alerta)}
+.pulso .rotulo{font-size:11px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase;text-align:center}
+.pulso.erro .rotulo{color:var(--alerta)}
+
+/* ---------- Telas ---------- */
+main{flex:1;position:relative;padding:16px 0 8px}
+.tela{position:absolute;inset:16px 0 8px;opacity:0;pointer-events:none;transition:opacity .5s ease}
+.tela.ativa{opacity:1;pointer-events:auto}
+
+/* ---------- Tela 1: 4 quadrantes ---------- */
+#tela-panorama{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:16px}
+
+.painel{
+  background:var(--bg-card);border:1px solid var(--linha);border-radius:12px;
+  border-left:6px solid var(--cor,var(--laranja));
+  padding:16px 22px;display:flex;flex-direction:column;overflow:hidden;
+}
+.painel > h2{
+  font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:3px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--linha);flex:none;
+}
+.painel > h2 .selo{
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;
+  color:var(--cor);background:color-mix(in srgb,var(--cor) 18%,transparent);
+  border:1px solid color-mix(in srgb,var(--cor) 45%,transparent);
+  padding:3px 10px;border-radius:99px;
+}
+.corpo{flex:1;min-height:0;display:flex;flex-direction:column}
+
+/* Q1 — viaturas */
+.numerao{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
+.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:104px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
+.numerao .rot{font-size:15px;color:var(--txt-fraco);letter-spacing:3px;text-transform:uppercase;line-height:1.3}
+.numerao .rot b{display:block;font-size:22px;color:var(--txt);letter-spacing:1px}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0;margin-top:8px}
+.split section{display:flex;flex-direction:column;min-height:0}
+.split h3{font-size:12px;letter-spacing:3px;color:var(--txt-fraco);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between}
+.split h3 span{color:var(--txt);font-weight:900;font-size:16px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;overflow:hidden}
+.chip{
+  font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:600;letter-spacing:1px;
+  background:rgba(255,255,255,.06);border:1px solid var(--linha);border-radius:6px;padding:3px 9px;
+  border-bottom:3px solid var(--c,var(--laranja));
+}
+
+/* Q2 — efetivo por pelotão */
+.pelotoes{flex:1;min-height:0;display:grid;grid-template-rows:repeat(auto-fit,minmax(0,1fr));gap:5px;align-content:start}
+.linha-pel{display:grid;grid-template-columns:168px 1fr 46px;align-items:center;gap:12px}
+.linha-pel .nome{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:600;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.linha-pel .barra{height:16px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.linha-pel .barra i{display:block;height:100%;background:var(--c);border-radius:4px;transition:width .6s ease}
+.linha-pel .qtd{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+
+/* Q3 — tropa */
+.grade-tropa{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:none}
+.bloco{background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;padding:12px 14px;text-align:center}
+.bloco .v{font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.bloco .k{font-size:12px;letter-spacing:3px;color:var(--txt-fraco);text-transform:uppercase;margin-top:4px}
+
+.turnos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;flex:1;min-height:0}
+.turno{border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:16px;border:1px solid var(--linha)}
+.turno.dia{background:linear-gradient(135deg,rgba(234,179,8,.16),rgba(234,179,8,.04));border-color:rgba(234,179,8,.35)}
+.turno.noite{background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(56,189,248,.04));border-color:rgba(56,189,248,.35)}
+.turno .icone{font-size:38px;line-height:1}
+.turno .v{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.turno .k{font-size:12px;letter-spacing:3px;color:var(--txt-fraco);text-transform:uppercase}
+.turno .h{font-size:13px;color:var(--txt-fraco);margin-top:2px}
+
+/* Q4 — ocorrências */
+.ocorrencias{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.ocorrencia{
+  display:grid;grid-template-columns:78px 1fr auto;gap:14px;align-items:center;
+  background:rgba(255,255,255,.04);border:1px solid var(--linha);border-left:4px solid var(--vermelho);
+  border-radius:8px;padding:10px 14px;
+}
+.ocorrencia .hora{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;line-height:1}
+.ocorrencia .situacao{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.ocorrencia .nat{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:600;letter-spacing:1px}
+.ocorrencia .end{font-size:14px;color:var(--txt-fraco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ocorrencia .vtrs{display:flex;gap:5px}
+
+.vazio{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  color:var(--txt-fraco);text-align:center;border:2px dashed var(--linha);border-radius:10px;
+}
+.vazio .icone{font-size:52px;opacity:.4}
+.vazio strong{font-family:'Barlow Condensed',sans-serif;font-size:26px;letter-spacing:2px;color:var(--txt)}
+.vazio span{font-size:14px;max-width:420px;line-height:1.5}
+
+/* ---------- Tela 2: guarnições com foto ---------- */
+#tela-guarnicoes{display:flex;flex-direction:column;gap:14px}
+.faixa-grupo{
+  font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:4px;
+  padding:5px 16px;border-radius:8px;background:var(--cor);color:#fff;flex:none;
+}
+.grade-guarnicoes{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:12px}
+.card-guarnicao{
+  background:var(--bg-card);border:1px solid var(--linha);border-left:5px solid var(--cor);
+  border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;
+}
+.card-guarnicao h3{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;letter-spacing:2px}
+.card-guarnicao .vtr{font-size:12px;letter-spacing:2px;color:var(--cor);font-weight:700;margin-bottom:10px}
+.fotos{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;align-content:start}
+.militar{text-align:center}
+.retrato{
+  position:relative;width:100%;aspect-ratio:3/4;border-radius:6px;overflow:hidden;
+  background:rgba(255,255,255,.06);border:1px solid var(--linha);
+  display:grid;place-items:center;
+}
+.retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.retrato .iniciais{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:var(--txt-fraco)}
+.militar .nm{font-size:10.5px;font-weight:700;margin-top:4px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.militar .fn{font-size:8.5px;letter-spacing:1px;color:var(--txt-fraco);text-transform:uppercase}
+
+/* ---------- Rodapé ---------- */
+footer{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:8px 2px 10px;border-top:1px solid var(--linha);
+  font-size:12px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase;
+}
+.pontos{display:flex;gap:7px}
+.pontos i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .3s,width .3s}
+.pontos i.on{background:var(--laranja);width:26px;border-radius:5px}
+
+
+/* Placar das ocorrências: é o número que se lê da porta da sala. Verde e
+   parado quando não há nada; vermelho e respirando quando há. */
+.placar{display:flex;align-items:center;gap:20px;flex:none;padding:4px 0 14px;
+  border-bottom:1px solid var(--linha);margin-bottom:12px}
+.placar .n{font-family:'Barlow Condensed',sans-serif;font-size:100px;font-weight:700;
+  line-height:.78;font-variant-numeric:tabular-nums;min-width:120px;text-align:center}
+.placar .rot{font-family:'Barlow Condensed',sans-serif;font-size:29px;font-weight:700;
+  letter-spacing:3px;line-height:1.05}
+.placar .repartido{display:flex;flex-direction:column;gap:4px;margin-left:auto;text-align:right}
+.placar .repartido span{font-size:14px;font-weight:700;letter-spacing:1px;white-space:nowrap}
+
+#painel-oco.calmo{--cor:var(--ok)}
+#painel-oco.calmo .placar .n{color:var(--ok)}
+#painel-oco.ativo{--cor:#ef4444}
+#painel-oco.ativo .placar .n{color:#ff5a4d}
+#painel-oco.ativo{box-shadow:0 0 0 2px rgba(239,68,68,.5), 0 0 32px rgba(239,68,68,.22);
+  animation:respira 2.6s ease-in-out infinite}
+@keyframes respira{50%{box-shadow:0 0 0 2px rgba(239,68,68,.9), 0 0 46px rgba(239,68,68,.45)}}
+
+/* Viaturas já empenhadas: ficam fora da contagem de disponíveis, mas
+   continuam visíveis — sumir com elas esconderia metade do quadro. */
+.empenhadas{flex:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--linha);
+  display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--txt-fraco)}
+.empenhadas b{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-fraco);margin-right:4px}
+.empenhadas .chip{opacity:.62;text-decoration:line-through}
+
+.nota-turno{flex:none;margin-top:12px;font-size:13px;color:var(--txt-fraco);text-align:center}
+.nota-turno b{color:var(--txt)}
+
+/* Anéis por pelotão. No meio vai a viatura, na volta o efetivo de serviço
+   AGORA. O arco é proporcional ao maior pelotão da leitura, então dá para
+   comparar as frações de relance, sem ler número por número. */
+.aneis{flex:1;min-height:0;display:grid;gap:6px;
+  grid-template-columns:repeat(5,1fr);align-content:center;justify-items:center}
+.anel-pel{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
+.anel-pel .rosca{position:relative;width:112px;height:112px}
+.anel-pel svg{width:100%;height:100%;transform:rotate(-90deg)}
+.anel-pel svg circle{fill:none;stroke-linecap:round}
+.anel-pel .trilho{stroke:rgba(255,255,255,.08);stroke-width:9}
+.anel-pel .arco{stroke:var(--c);stroke-width:9;transition:stroke-dasharray .6s ease}
+.anel-pel .centro{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;text-align:center;padding:0 8px}
+.anel-pel .vtr-num{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;
+  letter-spacing:.5px;line-height:1;color:var(--txt);white-space:nowrap}
+.anel-pel .vtr-num.dupla{font-size:15px}
+.anel-pel .vtr-num + .vtr-num{margin-top:1px;color:var(--txt-fraco)}
+.anel-pel .contagem{position:absolute;top:-3px;left:50%;transform:translateX(-50%);
+  min-width:32px;height:32px;padding:0 7px;border-radius:99px;background:var(--c);color:#0b1120;
+  display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;
+  font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;
+  box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.anel-pel .rotulo{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;
+  letter-spacing:1px;color:var(--txt);text-align:center;line-height:1.05;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.anel-pel.zerado{opacity:.32}
+.anel-pel.zerado .contagem{background:rgba(255,255,255,.14);color:var(--txt-fraco)}
+
+.selo-turno{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;
+  padding:3px 10px;border-radius:99px}
+
+/* Cursor: sumido enquanto ninguém mexe (é um telão), reaparece ao primeiro
+   movimento do mouse e some de novo depois de três segundos parado. */
+html,body{cursor:default}
+body.parado{cursor:none}
+
+/* Tooltip da guarnição. Fica pendurado no palco, não dentro do quadrante:
+   o quadrante tem overflow:hidden e cortaria a caixa pela metade. */
+#tooltip{
+  position:absolute;z-index:50;pointer-events:none;opacity:0;
+  transform:translate(-50%,-100%);transition:opacity .14s ease;
+  background:rgba(10,16,28,.97);border:1px solid var(--c,var(--linha));
+  border-top:4px solid var(--c,var(--laranja));border-radius:10px;
+  padding:12px 16px 13px;min-width:250px;max-width:420px;
+  box-shadow:0 12px 40px rgba(0,0,0,.7)}
+#tooltip.on{opacity:1}
+#tooltip h4{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;
+  letter-spacing:2px;color:var(--c);margin-bottom:2px}
+#tooltip .sub{font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--txt-fraco);margin-bottom:10px}
+#tooltip .vtr-bloco{margin-top:9px}
+#tooltip .vtr-bloco:first-of-type{margin-top:0}
+#tooltip .vtr-cab{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;
+  letter-spacing:1px;color:var(--txt);padding-bottom:3px;margin-bottom:5px;
+  border-bottom:1px solid var(--linha);display:flex;justify-content:space-between;gap:14px}
+#tooltip .vtr-cab span{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:1px;color:var(--txt-fraco)}
+#tooltip ul{list-style:none;display:flex;flex-direction:column;gap:3px}
+#tooltip li{display:flex;justify-content:space-between;gap:16px;font-size:14px;line-height:1.25}
+#tooltip li b{font-weight:600;color:var(--txt)}
+#tooltip li i{font-style:normal;font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--txt-fraco);white-space:nowrap;padding-top:2px}
+#tooltip li.repetido i{color:var(--laranja)}
+#tooltip .rodape-tip{margin-top:9px;padding-top:7px;border-top:1px solid var(--linha);
+  font-size:11.5px;color:var(--txt-fraco)}
+.anel-pel{cursor:pointer}
+.anel-pel:hover .rosca{filter:brightness(1.18)}
+
+/* Consolidado do mês. Ocupa o quadrante quando não há ocorrência correndo —
+   ou quando o AODC não responde, que é o caso fora da rede do e193. */
+.mes-cab{flex:none;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--linha)}
+.mes-total{font-family:'Barlow Condensed',sans-serif;font-size:70px;font-weight:700;
+  line-height:.82;font-variant-numeric:tabular-nums;color:var(--laranja)}
+.mes-txt{font-size:14px;color:var(--txt-fraco);line-height:1.35}
+.mes-txt b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:23px;
+  font-weight:700;letter-spacing:2px;color:var(--txt);text-transform:uppercase}
+.mes-hoje{margin-left:auto;display:flex;align-items:center;gap:10px;
+  padding:6px 14px 7px;border-radius:10px;border:1px solid rgba(74,222,128,.35);
+  background:rgba(74,222,128,.10)}
+.mes-hoje.sem{border-color:var(--linha);background:rgba(255,255,255,.03)}
+.mes-hoje-n{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;
+  line-height:.85;font-variant-numeric:tabular-nums;color:var(--ok)}
+.mes-hoje.sem .mes-hoje-n{color:var(--txt-fraco)}
+.mes-hoje-t{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;
+  letter-spacing:2px;line-height:1.05;color:var(--txt)}
+.mes-hoje-t span{font-family:'Inter',sans-serif;font-size:11px;font-weight:400;
+  letter-spacing:.5px;color:var(--txt-fraco);text-transform:none}
+.mes-aviso{flex-basis:100%;font-size:12px;color:var(--ouro);letter-spacing:.5px}
+
+.barras-mes{flex:1;min-height:0;display:grid;gap:5px;align-content:stretch}
+.barra-nat{display:grid;grid-template-columns:200px 1fr 52px 46px;align-items:center;gap:10px}
+.barra-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;
+  letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.barra-nat .trilha{height:20px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.barra-nat .trilha i{display:block;height:100%;background:var(--c);border-radius:4px;
+  transition:width .7s ease}
+.barra-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;
+  text-align:right;font-variant-numeric:tabular-nums;color:var(--c)}
+.barra-nat .pct{font-size:13px;text-align:right;color:var(--txt-fraco);font-variant-numeric:tabular-nums}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="viewport"><div id="palco">
+
+  <header>
+    <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="">
+    <div class="titulo">
+      <h1>CIOSP · <b>1º BATALHÃO</b> DE BOMBEIROS MILITARES</h1>
+      <p id="rotulo-tela">Panorama operacional do dia</p>
+    </div>
+    <div class="pulso" id="pulso">
+      <svg class="anel" viewBox="0 0 64 64">
+        <circle class="trilho" cx="32" cy="32" r="27"></circle>
+        <circle class="barra" id="anel-barra" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="rotulo" id="pulso-rotulo">Atualizando</div>
+    </div>
+    <div class="relogio">
+      <div class="hora" id="hora">--:--:--</div>
+      <div class="data" id="data">—</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== TELA 1 ===== -->
+    <div class="tela ativa" id="tela-panorama">
+
+      <div class="painel" style="--cor:var(--laranja)">
+        <h2>Viaturas disponíveis <span class="selo" id="selo-vtr">—</span></h2>
+        <div class="corpo">
+          <div class="numerao">
+            <div class="n" id="vtr-total">0</div>
+            <div class="rot">prontas para empenho<br><b id="vtr-escala">de 0 na escala</b></div>
+          </div>
+          <div class="split">
+            <section>
+              <h3>Combate <span id="vtr-combate-n">0</span></h3>
+              <div class="chips" id="vtr-combate"></div>
+            </section>
+            <section>
+              <h3>Apoio e resgate <span id="vtr-apoio-n">0</span></h3>
+              <div class="chips" id="vtr-apoio"></div>
+            </section>
+          </div>
+          <div class="empenhadas" id="vtr-empenhadas"></div>
+        </div>
+      </div>
+
+      <div class="painel" style="--cor:var(--amarelo)">
+        <h2>De serviço agora <span class="selo" id="selo-pel">—</span></h2>
+        <div class="corpo"><div class="aneis" id="lista-pelotoes"></div></div>
+      </div>
+
+      <div class="painel" style="--cor:var(--verde)">
+        <h2>Tropa de serviço <span class="selo" id="selo-tropa">—</span></h2>
+        <div class="corpo">
+          <div class="grade-tropa">
+            <div class="bloco"><div class="v" id="t-of">0</div><div class="k">Oficiais</div></div>
+            <div class="bloco"><div class="v" id="t-sgt">0</div><div class="k">Sargentos</div></div>
+            <div class="bloco"><div class="v" id="t-pr">0</div><div class="k">Praças</div></div>
+          </div>
+          <div class="turnos">
+            <div class="turno dia">
+              <div class="icone">☀</div>
+              <div><div class="v" id="t-dia">0</div><div class="k">Diurno</div><div class="h">08:00 → 20:00</div></div>
+            </div>
+            <div class="turno noite">
+              <div class="icone">☾</div>
+              <div><div class="v" id="t-noite">0</div><div class="k">Noturno</div><div class="h">20:00 → 08:00</div></div>
+            </div>
+          </div>
+          <div class="nota-turno" id="nota-24h">—</div>
+        </div>
+      </div>
+
+      <div class="painel calmo" id="painel-oco">
+        <h2>Ocorrências em andamento <span class="selo" id="selo-oco">—</span></h2>
+        <div class="corpo">
+          <div class="placar" id="placar-oco">
+            <div class="n" id="oco-n">0</div>
+            <div class="rot" id="oco-rot">—</div>
+            <div class="repartido" id="oco-repartido"></div>
+          </div>
+          <div class="ocorrencias" id="lista-ocorrencias"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== TELA 2 ===== -->
+    <div class="tela" id="tela-guarnicoes"></div>
+  </main>
+
+  <div id="tooltip"></div>
+
+  <footer>
+    <div id="rodape-fonte">Fonte: Sistema E-193 · CBMRS</div>
+    <div class="pontos" id="pontos"></div>
+    <div id="rodape-atualizacao">Aguardando primeira leitura</div>
+  </footer>
+
+</div></div>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO — é aqui que se mexe no dia a dia
+   ============================================================ */
+const CONFIG = {
+  // Mesma fonte já usada pelo guarnicoes.html (Apps Script do scraper E-193)
+  urlGuarnicoes: "https://script.google.com/macros/s/AKfycbyJtHsY61b2wj8ZATEAZGoYeNx4-3G2GqDCds1RA8nF8JBHR2FVXRuEEzoq9MmyMONF/exec",
+
+  // Ocorrências ativas — mesma fonte do painel do AODC. O oc.php devolve HTML,
+  // não JSON, e é lido pelo mesmo interpretador do painel oficial.
+  // Os caminhos são tentados em ordem até um responder:
+  //   "/aodc/oc.php"  → funciona hospedado dentro do e193, e também sob o servidor.py
+  //   "proxy.php"     → quando o painel estiver num servidor com PHP
+  fontesOcorrencias: ["/aodc/oc.php", "proxy.php"],
+
+  // Consolidado mensal de ocorrências — mesmo repositório da página de estatísticas
+  repoDados: "https://raw.githubusercontent.com/ciabm-1bbm/site/main",
+  // Exportação CSV do E193 › Relatórios › Mapa › Calor BBM, filtrada no 1º BBM,
+  // do dia 1 até hoje. É a fonte preferida: já vem filtrada e alcança o dia.
+  arquivoMesAtual: "dados/PAINEL_MES_ATUAL.csv",
+
+  // Pasta com os 3x4. Nome do arquivo = ID funcional (7 dígitos) + .jpg
+  urlFotos: "https://raw.githubusercontent.com/ciabm-1bbm/site/main/fotos/",
+
+  intervaloDados: 15000,   // releitura das ocorrências (muda o tempo todo)
+  intervaloEscala: 300000, // releitura da escala (muda uma vez por dia)
+  intervaloTelas: 25000    // troca entre panorama e guarnições
+};
+
+/* Só o 1º BBM. O BBS é outra unidade e fica fora de tudo.
+   Cores escolhidas para ler a três metros num fundo escuro: o verde
+   institucional (#2E7D32) some na TV, então vai um tom mais aberto. */
+const GRUPOS = [
+  { nome:"1ª CIA",      cor:"#EAB308", pelotoes:["AÇORIANOS","ASSUNÇÃO","BELÉM NOVO","RESTINGA"] },
+  { nome:"2ª CIA",      cor:"#22C55E", pelotoes:["TERESÓPOLIS","FLORESTA","PASSO D'AREIA","PARTENON"] },
+  { nome:"COORDENAÇÃO", cor:"#EF4444", pelotoes:["OFICIAL DE DIA","COBOM","CCOB"] }
+];
+const COR_PELOTAO = {};
+GRUPOS.forEach(g => g.pelotoes.forEach(p => COR_PELOTAO[p] = g.cor));
+
+/* ============================================================
+   PARSING — portado do guarnicoes.html para manter o mesmo
+   comportamento de separação função × nome de guerra
+   ============================================================ */
+const ABREV = {
+  "COMANDANTE DE GUARNIÇÃO":"CG", "COV / OPERADOR / CONDUTOR":"COV",
+  "CHEFE DE LINHA ESQUERDA":"LINHA", "CHEFE DE LINHA DIREITA":"LINHA",
+  "AUXILIAR DE LINHA ESQUERDA":"LINHA", "AUXILIAR DE LINHA DIREITA":"LINHA",
+  "CONDUTOR NAVAL":"C. NAVAL", "AUXILIAR DE CONDUTOR NAVAL":"AUX. NAVAL",
+  "OPERADOR COBOM":"OP. COBOM", "OPERADOR CCOB":"OP. CCOB", "MOTORISTA DE DIA":"MOT. OFICIAL"
+};
+const TERMOS_FUNCAO = [
+  "COMANDANTE DE GUARNIÇÃO","AUXILIAR DE CONDUTOR NAVAL","COV OPERADOR CONDUTOR",
+  "CHEFE DE LINHA DIREITA","CHEFE DE LINHA ESQUERDA","AUXILIAR DE LINHA DIREITA",
+  "AUXILIAR DE LINHA ESQUERDA","OPERADOR CONDUTOR","CONDUTOR NAVAL","OPERADOR COBOM",
+  "OPERADOR CCOB","MOTORISTA DE DIA","OFICIAL SUPERVISOR","OFICIAL DE SV",
+  "DE GUARNIÇÃO","LINHA DIREITA","LINHA ESQUERDA","DE LINHA","CHEFE DE","AUXILIAR DE",
+  "COMANDANTE","RESGATISTA","MERGULHADOR","CINOTÉCNICO","CINOTECNICO","SOCORRISTA",
+  "MOTORISTA","OPERADOR","CONDUTOR","GUARNIÇÃO","NAVAL","SUPERVISOR","OFICIAL",
+  "LINHA","DIREITA","ESQUERDA","COBOM","CCOB","COV"
+];
+
+function detectarFuncao(t){
+  const s = " " + t + " ", has = re => re.test(s);
+  if (has(/LINHA DIREITA/))  return has(/AUXILIAR/) ? "AUXILIAR DE LINHA DIREITA"  : "CHEFE DE LINHA DIREITA";
+  if (has(/LINHA ESQUERDA/)) return has(/AUXILIAR/) ? "AUXILIAR DE LINHA ESQUERDA" : "CHEFE DE LINHA ESQUERDA";
+  if (has(/AUXILIAR/) && has(/CONDUTOR NAVAL/)) return "AUXILIAR DE CONDUTOR NAVAL";
+  if (has(/CONDUTOR NAVAL/)) return "CONDUTOR NAVAL";
+  if (has(/MERGULHADOR/))    return "MERGULHADOR";
+  if (has(/CINOT[ÉE]CNICO/)) return "CINOTÉCNICO";
+  if (has(/RESGATISTA/))     return "RESGATISTA";
+  if (has(/SOCORRISTA/))     return "SOCORRISTA";
+  if (has(/OPERADOR COBOM/)) return "OPERADOR COBOM";
+  if (has(/OPERADOR CCOB/))  return "OPERADOR CCOB";
+  if (has(/COMANDANTE|GUARNIÇÃO/)) return "COMANDANTE DE GUARNIÇÃO";
+  if (has(/\bCOV\b/) || has(/OPERADOR CONDUTOR/) || has(/\bCONDUTOR\b/)) return "COV / OPERADOR / CONDUTOR";
+  if (has(/OFICIAL SUPERVISOR/)) return "OFICIAL SUPERVISOR";
+  if (has(/MOTORISTA/)) return "MOTORISTA DE DIA";
+  if (has(/OFICIAL/))   return "OFICIAL DE SV";
+  if (has(/\bOPERADOR\b/)) return "OPERADOR";
+  return "";
+}
+function removerTermosFuncao(t){
+  let s = " " + t + " ";
+  for (const termo of TERMOS_FUNCAO){
+    const esc = termo.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&').replace(/\s+/g,"\\s+");
+    const re = new RegExp("\\s" + esc + "(?=\\s)","g");
+    let prev; do { prev = s; s = s.replace(re," "); } while (s !== prev);
+  }
+  return s.replace(/\s+/g," ").trim();
+}
+const abreviar = f => ABREV[f] || f || "";
+const extrairID = n => (String(n).match(/(\d{7})/) || [])[1] || null;
+const limparNome = n => n.replace(/\d{7}\s+/,'').replace(/\bND\b/g,'').replace(/\d+º\s*\d+/g,'').replace(/\b\d+\b/g,'').trim();
+
+/* Turno. Diurno é 08:00–20:00; noturno, 20:00–08:00. Quem faz 24 h assume às
+   08:00 e só sai às 08:00 do dia seguinte, então atravessa as duas janelas e
+   conta nas duas — por isso a função devolve uma lista, não um valor só.
+   O E-193 escreve "08:00 às 08:00" (24 h), "20:00 às 08:00" (12 h noturnas),
+   às vezes só a hora de início. Percorre o intervalo de meia em meia hora e
+   marca as janelas tocadas: resolve qualquer carga, inclusive as de 6 h. */
+function turnosDoHorario(raw){
+  const horas = String(raw||"").match(/\b\d{1,2}:\d{2}\b/g) || [];
+  if (!horas.length) return [];
+  const emMin = h => { const [a,b] = h.split(":").map(Number); return a*60 + b; };
+  const inicio = emMin(horas[0]);
+  let dur;
+  if (horas.length >= 2){
+    dur = emMin(horas[1]) - inicio;
+    if (dur <= 0) dur += 1440;          // virada de dia
+  } else {
+    dur = horas[0] === "20:00" ? 720 : 1440;
+  }
+  const janelas = new Set();
+  for (let m = 0; m < dur; m += 30){
+    const h = Math.floor(((inicio + m) % 1440) / 60);
+    janelas.add(h >= 8 && h < 20 ? "dia" : "noite");
+    if (janelas.size === 2) break;
+  }
+  return [...janelas];
+}
+
+/* Turno que está correndo neste instante. É o que separa "escalado hoje" de
+   "de serviço agora" — um pelotão com 7 no dia inteiro tem 3 na guarnição
+   do momento, e é esse o número que interessa numa sala de operações. */
+function turnoAgora(){
+  const h = new Date().getHours();
+  return (h >= 8 && h < 20) ? "dia" : "noite";
+}
+const deServicoAgora = m => !m.turnos || m.turnos.includes(turnoAgora());
+
+/* Prefixo de viatura numa forma comparável: o AODC escreve ABT-656 e a escala,
+   ABT-0656. Sem isso, viatura empenhada não casaria com a da escala. */
+const chaveVtr = v => String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"")
+  .replace(/^([A-Z]+)0*(\d+)$/, "$1$2");
+// Devolve o pelotão do 1º BBM ou null. Null significa "não é nosso" e a linha
+// inteira é descartada — não entra em efetivo, viatura, foto nem ocorrência.
+function normalizarPelotao(obmRaw){
+  const o = (obmRaw||"").toUpperCase();
+  for (const g of GRUPOS) for (const p of g.pelotoes) if (o === p) return p;
+  if (o.includes("ESTADO MAIOR")) return "OFICIAL DE DIA";
+  if (o.includes("PASSO D"))      return "PASSO D'AREIA";
+  for (const g of GRUPOS) for (const p of g.pelotoes) if (o.includes(p)) return p;
+  return null;
+}
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+let estado = { pelotoes:{}, vtrCombate:new Set(), vtrApoio:new Set(),
+               oficiais:new Map(), sargentos:new Map(), pracas:new Map(),
+               dia:new Set(), noite:new Set(), vinteQuatro:new Set(),
+             ocorrencias:[], mes:null, carimbo:null };
+
+function processarGuarnicoes(bruto){
+  const dados = Array.isArray(bruto) ? bruto : (bruto.dados || []);
+  const e = { pelotoes:{}, vtrCombate:new Set(), vtrApoio:new Set(),
+              oficiais:new Map(), sargentos:new Map(), pracas:new Map(),
+              dia:new Set(), noite:new Set(), vinteQuatro:new Set(),
+              ocorrencias:estado.ocorrencias, mes:estado.mes,
+              carimbo: bruto.timestamp_extracao || new Date().toISOString() };
+
+  for (const d of dados){
+    const pel = normalizarPelotao(d.obm);
+    if (!pel) continue;   // fração de outra unidade (BBS etc.) — descartada
+
+    const vtr = (d.vtr || "").replace(/\(.*\)/,"").trim();
+    const texto = ((d.nome||"") + " " + (d.func||"")).toUpperCase()
+      .replace(/\bND\b/g,' ').replace(/\d{7}/g,' ').replace(/\d+º\s*\d+/g,' ')
+      .replace(/[0-9]/g,' ').replace(/[\/\-]/g,' ').replace(/\s+/g,' ').trim();
+
+    const funcao   = detectarFuncao(texto);
+    const nomeBase = removerTermosFuncao(texto);
+    const nome     = limparNome(nomeBase);
+    if (!nome || nome === "ND" || nome.includes("A CONFIRMAR")) { registrarVtr(e, vtr); continue; }
+
+    const id = extrairID(d.nome || "") || nome;
+
+    // O turno acompanha o militar: é o que permite contar depois só quem
+    // está de serviço na hora em que a TV está sendo olhada.
+    const turnos = turnosDoHorario(d.horario);
+
+    (e.pelotoes[pel] ||= []);
+    let g = e.pelotoes[pel].find(x => x.vtr === vtr);
+    if (!g) { g = { vtr, guarnicao: [] }; e.pelotoes[pel].push(g); }
+    if (!g.guarnicao.some(m => m.id === id)) g.guarnicao.push({ id, nome, funcao: abreviar(funcao), turnos });
+
+    const reg = { nome, funcao, turnos };
+    if (/\bSD\b|SOLDADO/.test(nomeBase))                 e.pracas.set(id, reg);
+    else if (/\bSGT\b|SARGENTO/.test(nomeBase))          e.sargentos.set(id, reg);
+    else if (/\b(CAP|TEN|MAJ|TC|CEL|ASP)\b/.test(nomeBase)) e.oficiais.set(id, reg);
+    else                                                  e.pracas.set(id, reg);
+
+    if (turnos.includes("dia"))   e.dia.add(id);
+    if (turnos.includes("noite")) e.noite.add(id);
+    if (turnos.length === 2)      e.vinteQuatro.add(id);
+
+    registrarVtr(e, vtr);
+  }
+  estado = e;
+}
+function registrarVtr(e, vtr){
+  if (!vtr) return;
+  if (vtr.includes("ABT")) e.vtrCombate.add(vtr);
+  else if (/\b(AR|AEM|AT|ATP|EMN)\b/.test(vtr)) e.vtrApoio.add(vtr);
+}
+
+/* ============================================================
+   OCORRÊNCIAS — leitura do AODC
+   O oc.php devolve HTML, não JSON. O interpretador abaixo é o
+   mesmo do painel oficial (e193/painel/painel.html): trabalha
+   sobre o texto puro da página, não sobre a marcação, para
+   sobreviver a mudanças de desenho.
+   ============================================================ */
+const SITUACOES = {
+  SemVtr: { cor:"#c2551f", curto:"Sem viatura", sinal:"!" },
+  Desl:   { cor:"#EAB308", curto:"Deslocando",  sinal:"▲" },
+  Cheg:   { cor:"#4ade80", curto:"No local",    sinal:"●" },
+  Retor:  { cor:"#8fa3bd", curto:"Retornando",  sinal:"▼" }
+};
+
+const RE_OC   = /^(\d{5,7})\s+(\d{2}-\d{2}-\d{4})\s+(\d{1,2}:\d{2})$/;
+const RE_NUM  = /^(\d{5,7})$/;
+const RE_DT   = /^(\d{2}-\d{2}-\d{4})\s+(\d{1,2}:\d{2})$/;
+const RE_PREF = /^([A-Z]{1,5}-?\d{2,6})$/;
+const RE_SIT  = /^(Desl|Cheg|Retor)\w*\.?:?\s*(\d{1,2}:\d{2})$/i;
+const RE_VTR1 = /^([A-Z]{1,5}-?\d{2,6})\s+(.+?)\s+(Desl|Cheg|Retor)\w*\.?:?\s*(\d{1,2}:\d{2})$/i;
+const sitNome = s => ({ d:"Desl", c:"Cheg", r:"Retor" })[s[0].toLowerCase()];
+
+// Compara nomes de fração ignorando acento, ponto e apóstrofo: o AODC escreve
+// "PASSO D`AREIA" e a nossa lista, "PASSO D'AREIA".
+const chaveFracao = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  .toUpperCase().replace(/[^A-Z0-9]/g,"");
+const FRACOES_NOSSAS = new Set(GRUPOS.flatMap(g => g.pelotoes).map(chaveFracao));
+
+function leViaturas(linhas){
+  const vtr = [];
+  let sitPend = null, horaPend = null;
+  for (const l of linhas){
+    const um = l.match(RE_VTR1);
+    if (um){ vtr.push({ prefixo:um[1].toUpperCase(), guarnicao:um[2].trim(), sit:sitNome(um[3]), hora:um[4] }); continue; }
+    const st = l.match(RE_SIT);
+    if (st){
+      sitPend = sitNome(st[1]); horaPend = st[2];
+      const ult = vtr[vtr.length-1];
+      if (ult && !ult.sit){ ult.sit = sitPend; ult.hora = horaPend; sitPend = null; }
+      continue;
+    }
+    const pf = l.match(RE_PREF);
+    if (pf){ vtr.push({ prefixo:pf[1].toUpperCase(), guarnicao:"", sit:sitPend, hora:horaPend }); sitPend = null; horaPend = null; continue; }
+    const ult = vtr[vtr.length-1];
+    if (ult && !ult.guarnicao && l.length <= 34 && !/\d{2}:\d{2}/.test(l)) ult.guarnicao = l.trim();
+  }
+  return vtr.filter(v => v.prefixo).map(v => ({
+    ...v, sit: v.sit || "Cheg", hora: v.hora || "—", guarnicao: v.guarnicao || "—"
+  }));
+}
+
+function acharOcorrencias(linhas){
+  const achadas = [];
+  for (let i = 0; i < linhas.length; i++){
+    const junto = linhas[i].match(RE_OC);
+    if (junto){ achadas.push({ ini:i, fimCab:i, id:junto[1], dh:junto[2]+" "+junto[3] }); continue; }
+    const num = linhas[i].match(RE_NUM);
+    if (!num) continue;
+    for (let k = i+1; k <= Math.min(i+2, linhas.length-1); k++){
+      if (RE_NUM.test(linhas[k])) break;
+      const dt = linhas[k].match(RE_DT);
+      if (dt){ achadas.push({ ini:i, fimCab:k, id:num[1], dh:dt[1]+" "+dt[2] }); i = k; break; }
+    }
+  }
+  return achadas;
+}
+
+// Situação da ocorrência = a da viatura mais adiantada. Sem viatura tem estado
+// próprio: é ocorrência aberta sem ninguém empenhado, e isso precisa aparecer.
+const sitOcorrencia = o => !o.vtrs.length ? "SemVtr"
+  : o.vtrs.some(v => v.sit === "Desl") ? "Desl"
+  : o.vtrs.some(v => v.sit === "Cheg") ? "Cheg" : "Retor";
+
+function lerAODC(html){
+  const linhas = String(html)
+    .replace(/<[^>]+>/g,"\n").replace(/&nbsp;/g," ")
+    .split(/\r?\n/).map(l => l.replace(/\s+/g," ").trim()).filter(Boolean);
+
+  const achadas = acharOcorrencias(linhas);
+  const todas = achadas.map((oc, n) => {
+    const fim = n+1 < achadas.length ? achadas[n+1].ini - 1 : linhas.length;
+    const natureza = (linhas[oc.ini-1] || "DIVERSOS").toUpperCase();
+    const municipio = (linhas[oc.fimCab+1] || "").toUpperCase();
+    const loc = linhas[oc.fimCab+2] || "";
+    const p = loc.split(" - ");
+    const bairro = p.length > 1 ? p.shift().trim() : "";
+    const rua = p.join(" - ").trim();
+    let j = oc.fimCab+3;
+    if (/^\d{1,2}$/.test(linhas[j] || "")) j++;   // grau de prioridade
+    const vtrs = leViaturas(linhas.slice(j, fim));
+    const o = {
+      numero: oc.id, hora: oc.dh.slice(11), natureza, municipio,
+      endereco: [bairro, rua].filter(x => x && x !== "—" && x !== "0").join(" — "),
+      vtrs
+    };
+    o.situacao = { chave: sitOcorrencia(o), ...SITUACOES[sitOcorrencia(o)] };
+    return o;
+  });
+
+  // Só sobe para a TV o que é do 1º BBM: guarnição numa das nossas frações,
+  // ou viatura que está na escala de hoje. Nada de filtrar por município —
+  // ocorrência em Porto Alegre pode ser de outra unidade, e a nossa VTR pode
+  // estar atendendo fora da capital.
+  const naEscala = new Set([...estado.vtrCombate, ...estado.vtrApoio].map(v => v.toUpperCase()));
+  const nossas = todas.filter(o => o.vtrs.some(v =>
+    FRACOES_NOSSAS.has(chaveFracao(v.guarnicao)) || naEscala.has(v.prefixo)
+  ));
+
+  const ordem = { SemVtr:0, Desl:1, Cheg:2, Retor:3 };
+  nossas.sort((a, b) =>
+    ordem[a.situacao.chave] - ordem[b.situacao.chave] ||
+    b.vtrs.length - a.vtrs.length ||
+    String(b.hora).localeCompare(String(a.hora))
+  );
+  return Object.assign(nossas, { totalEstado: todas.length });
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+
+/* ============================================================
+   OCORRÊNCIAS DO MÊS — CSV compilado no repositório
+   Mesma fonte da página de estatísticas. Diferente do AODC, isto
+   é acumulado: do dia 1 até hoje. Serve de lastro para o quadrante
+   quando não há ocorrência correndo — ou quando o AODC não responde,
+   que é o caso de qualquer máquina fora da rede do e193.
+   ============================================================ */
+const MESES_CSV = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+const MES_EXTENSO = ["janeiro","fevereiro","março","abril","maio","junho",
+                     "julho","agosto","setembro","outubro","novembro","dezembro"];
+
+// Cores das naturezas, iguais às da página de estatísticas, para o comando
+// não ter de reaprender a legenda ao trocar de tela.
+const COR_NATUREZA = {
+  "INCÊNDIO":"#FFD700", "MANEJO DE INSETOS":"#B8860B", "BUSCA E RESGATE":"#F97316",
+  "CORTE DE ÁRVORE":"#4ADE80", "AÇÕES PREVENTIVAS":"#87CEEB",
+  "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"#60A5FA", "PRÉ-HOSPITALAR":"#EF4444",
+  "PRODUTOS PERIGOSOS":"#E2E8F0", "TROTE":"#A78BFA", "OUTROS":"#64748B"
+};
+const CURTO_NATUREZA = {
+  "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"VISTORIA DE SEG.",
+  "MANEJO DE INSETOS":"INSETOS", "AÇÕES PREVENTIVAS":"PREVENTIVAS",
+  "PRODUTOS PERIGOSOS":"PROD. PERIGOSOS"
+};
+
+function normalizarNatureza(bruta){
+  const n = (bruta || "").toUpperCase().trim();
+  if (n.includes("INCÊNDIO") || n.includes("INCENDIO")) return "INCÊNDIO";
+  if (n.includes("INSETO")) return "MANEJO DE INSETOS";
+  if (n.includes("SALVAMENTO") || n.includes("BUSCA") || n.includes("RESGATE")) return "BUSCA E RESGATE";
+  if (n.includes("APH") || n.includes("PRÉ-HOSPITALAR") || n.includes("PRE-HOSPITALAR")) return "PRÉ-HOSPITALAR";
+  if (n.includes("VISTORIA")) return "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
+  if (n.includes("CORTE") && (n.includes("ÁRVORE") || n.includes("ARVORE"))) return "CORTE DE ÁRVORE";
+  if (n.includes("PREVENTIVA")) return "AÇÕES PREVENTIVAS";
+  if (n.includes("PRODUTO") && n.includes("PERIGOSO")) return "PRODUTOS PERIGOSOS";
+  if (n.includes("TROTE")) return "TROTE";
+  return n || "OUTROS";
+}
+
+// CSV com aspas, vírgula dentro de célula e quebra de linha protegida.
+function lerCSV(txt){
+  const linhas = []; let l = [], c = "", asp = false;
+  for (let i = 0; i < txt.length; i++){
+    const ch = txt[i];
+    if (asp){
+      if (ch === '"'){ if (txt[i+1] === '"'){ c += '"'; i++; } else asp = false; }
+      else c += ch;
+    }
+    else if (ch === '"') asp = true;
+    else if (ch === ","){ l.push(c); c = ""; }
+    else if (ch === "\n"){ l.push(c); linhas.push(l); l = []; c = ""; }
+    else if (ch !== "\r") c += ch;
+  }
+  if (c !== "" || l.length){ l.push(c); linhas.push(l); }
+  if (!linhas.length) return [];
+  const cab = linhas[0].map(x => x.trim());
+  return linhas.slice(1).filter(x => x.some(v => v && v.trim()))
+    .map(x => Object.fromEntries(cab.map((k, i) => [k, (x[i] || "").trim()])));
+}
+
+// Acha a coluna pelo que o cabeçalho contém, sem exigir nome exato — é o
+// mesmo critério da página de estatísticas, e sobrevive a renomeação.
+// Chave compacta do cabeçalho: "Nº Oc." → "noc". Serve para casar nomes de
+// coluna que têm pontuação no meio e que o casamento por trecho erraria.
+const chaveCol = k => (k||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  .toLowerCase().replace(/[^a-z0-9]/g,"");
+function acharColunaExata(linha, chaves){
+  for (const k of Object.keys(linha)) if (chaves.includes(chaveCol(k))) return k;
+  return null;
+}
+
+function acharColuna(linha, padroes){
+  const chaves = Object.keys(linha);
+  const limpas = chaves.map(k => k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""));
+  for (const p of padroes){ const i = limpas.findIndex(k => k.includes(p)); if (i !== -1) return chaves[i]; }
+  return null;
+}
+
+const chaveNome = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  .toUpperCase().replace(/[^A-Z0-9]/g,"");
+const PELOTOES_1BBM = GRUPOS.flatMap(g => g.pelotoes).map(chaveNome);
+
+function processarCSVMes(txt, refMes){
+  const linhas = lerCSV(txt);
+  if (!linhas.length) return null;
+  const c0 = linhas[0];
+  const colNat  = acharColuna(c0, ["nat","emerg","tipo"]);
+  const colPel  = acharColuna(c0, ["obm","guarni","pelotao","pel "]);
+  const colVtr  = acharColuna(c0, ["viatura","prefixo","vtr"]);
+  const colData = acharColuna(c0, ["data","date"]);
+  const colNum  = acharColunaExata(c0, ["noc","nooc","numerooc","numoc","nocorrencia","ocorrencia"]);
+  if (!colNat) return null;
+
+  // O relatório "Mapa de Calor — Filtro BBM" já sai filtrado pelo 1º BBM e
+  // não traz coluna de OBM. Sem essa coluna, filtrar por nome de pelotão
+  // descartaria quase tudo — então o arquivo é aceito inteiro.
+  const jaFiltrado = !colPel;
+
+  const agora = new Date();
+  const limite = new Date(agora); limite.setHours(23,59,59,999);
+  const chaveDia = d => d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+  const hojeChave = chaveDia(agora);
+
+  // Uma ocorrência com duas viaturas vem em duas linhas. O E193 mostra isso no
+  // rodapé: "735 registros - Total 722 OCs". Contar linha por linha inflaria o
+  // número na TV, então cada ocorrência entra uma vez só.
+  const vistas = new Set(), vistasHoje = new Set();
+  const porNatureza = {};
+  let linhasLidas = 0, ultimaData = null, horaMaisTarde = null;
+
+  for (const r of linhas){
+    if (!r[colNat]) continue;
+
+    if (!jaFiltrado){
+      const pel = chaveNome(r[colPel] || "");
+      const vtr = (r[colVtr] || "").toUpperCase();
+      if (!PELOTOES_1BBM.some(p => pel.includes(p)) && !/\bAR-?\d/.test(vtr)) continue;
+    }
+
+    // "01/08/2026 - 01:07" ou "01/08/2026"
+    let data = null, hora = null;
+    if (colData && r[colData]){
+      const md = String(r[colData]).match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+      if (md){
+        const ano = md[3].length === 2 ? 2000 + +md[3] : +md[3];
+        data = new Date(ano, +md[2] - 1, +md[1]);
+        if (data > limite) continue;   // lançamento adiantado não infla o painel
+      }
+      const mh = String(r[colData]).match(/(\d{1,2}):(\d{2})/);
+      if (mh) hora = mh[1].padStart(2,"0") + ":" + mh[2];
+    }
+
+    // Sem número de OC, cada linha vale por uma — é o melhor que dá para fazer.
+    const id = colNum && r[colNum] ? String(r[colNum]).trim()
+             : "linha:" + (linhasLidas++);
+    if (vistas.has(id)) continue;
+    vistas.add(id);
+
+    if (data){
+      if (!ultimaData || data > ultimaData) ultimaData = data;
+      if (chaveDia(data) === hojeChave){
+        vistasHoje.add(id);
+        if (hora && (!horaMaisTarde || hora > horaMaisTarde)) horaMaisTarde = hora;
+      }
+    }
+    const nat = normalizarNatureza(r[colNat]);
+    porNatureza[nat] = (porNatureza[nat] || 0) + 1;
+  }
+
+  // "Cobre hoje" não é o mesmo que "hoje teve zero". Se a última data do
+  // arquivo for anterior a hoje, o consolidado não chegou até aqui — e
+  // escrever 0 nesse caso seria mentir para a sala.
+  const cobreHoje = ultimaData && chaveDia(ultimaData) === hojeChave;
+
+  return {
+    total: vistas.size, porNatureza, refMes,
+    hoje: vistasHoje.size, cobreHoje, ultimaData, horaMaisTarde,
+    linhas: linhas.length, jaFiltrado,
+    tipos: Object.entries(porNatureza).sort((a, b) => b[1] - a[1]),
+    ultimoDia: ultimaData ? ultimaData.getDate() : null
+  };
+}
+
+async function buscarEstatisticasMes(){
+  const hoje = new Date();
+  // Tenta o mês corrente e, se ainda não foi compilado, recua um mês —
+  // dizendo na tela que o número é do mês fechado, não do atual.
+  for (let recuo = 0; recuo <= 1; recuo++){
+    const ref = new Date(hoje.getFullYear(), hoje.getMonth() - recuo, 1);
+    // Ordem: primeiro o arquivo do painel (exportação do Mapa de Calor por BBM,
+    // que já vem filtrada e vai até hoje); depois o consolidado mensal.
+    const arquivos = recuo === 0
+      ? [CONFIG.arquivoMesAtual, `dados/${MESES_CSV[ref.getMonth()]}_${ref.getFullYear()}.csv`]
+      : [`dados/${MESES_CSV[ref.getMonth()]}_${ref.getFullYear()}.csv`];
+    for (const arq of arquivos){
+      try {
+        const r = await fetch(`${CONFIG.repoDados}/${arq}?t=${Date.now()}`);
+        if (!r.ok) continue;
+        const dados = processarCSVMes(await r.text(), ref);
+        if (dados && dados.total){ dados.atrasado = recuo > 0; dados.arquivo = arq; return dados; }
+      } catch(e){ /* próximo arquivo */ }
+    }
+  }
+  return null;
+}
+
+function renderMes(){
+  const m = estado.mes;
+  if (!m){
+    $("mes-cab").innerHTML = "";
+    $("barras-mes").innerHTML = `<div class="vazio"><div class="icone">◌</div><strong>Estatística indisponível</strong>
+      <span>Não consegui ler o consolidado de ocorrências no repositório.</span></div>`;
+    return;
+  }
+  const hoje = new Date();
+  const hora = m.horaMaisTarde || hoje.toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
+  const dias = m.atrasado
+    ? "mês fechado"
+    : (m.ultimoDia || hoje.getDate()) + " dias de " + MES_EXTENSO[m.refMes.getMonth()];
+
+  // O número do dia só aparece quando o consolidado realmente alcança hoje.
+  // Um "0 hoje" vindo de arquivo desatualizado seria lido na sala como
+  // "nenhuma ocorrência até agora", que é bem diferente de "não sei ainda".
+  const blocoHoje = m.cobreHoje
+    ? `<div class="mes-hoje"><div class="mes-hoje-n">${m.hoje}</div>
+         <div class="mes-hoje-t">HOJE<br><span>última às ${hora}</span></div></div>`
+    : `<div class="mes-hoje sem"><div class="mes-hoje-n">—</div>
+         <div class="mes-hoje-t">HOJE<br><span>${m.ultimaData
+            ? "consolidado vai até " + String(m.ultimaData.getDate()).padStart(2,"0") + "/" + String(m.ultimaData.getMonth()+1).padStart(2,"0")
+            : "sem data no arquivo"}</span></div></div>`;
+
+  $("mes-cab").innerHTML = `
+    <div class="mes-total">${m.total}</div>
+    <div class="mes-txt"><b>ocorrências atendidas</b><br>${dias} · 1º BBM</div>
+    ${blocoHoje}
+    ${m.atrasado ? `<div class="mes-aviso">${MES_EXTENSO[m.refMes.getMonth()]} — o mês corrente ainda não foi compilado</div>` : ""}`;
+
+  const tipos = m.tipos.slice(0, 6);
+  const max = Math.max(1, ...tipos.map(t => t[1]));
+  $("barras-mes").innerHTML = tipos.map(([nat, n]) => {
+    const cor = COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"];
+    return `<div class="barra-nat" style="--c:${cor}">
+      <div class="rot">${CURTO_NATUREZA[nat] || nat}</div>
+      <div class="trilha"><i style="width:${(n / max * 100).toFixed(1)}%"></i></div>
+      <div class="val">${n}</div>
+      <div class="pct">${Math.round(n / m.total * 100)}%</div>
+    </div>`;
+  }).join("");
+}
+
+/* Guarnição de um pelotão no turno corrente, sem repetir gente.
+   O mesmo militar às vezes é lançado em duas viaturas — cobrindo a ABT e a AR
+   na mesma escala. Ele é UMA pessoa: conta uma vez só, e as viaturas dele
+   ficam juntas no registro para o tooltip poder mostrar isso. */
+function guarnicaoDoPelotao(nome, apenasAgora = true){
+  const grupos = estado.pelotoes[nome] || [];
+  const porId = new Map();
+  const vtrs = [];
+  for (const g of grupos){
+    const naEscala = apenasAgora ? g.guarnicao.filter(deServicoAgora) : g.guarnicao;
+    if (g.vtr && naEscala.length && !vtrs.includes(g.vtr)) vtrs.push(g.vtr);
+    for (const m of naEscala){
+      const ja = porId.get(m.id);
+      if (ja){ if (g.vtr && !ja.vtrs.includes(g.vtr)) ja.vtrs.push(g.vtr); }
+      else porId.set(m.id, { ...m, vtrs: g.vtr ? [g.vtr] : [] });
+    }
+  }
+  return { nome, vtrs, militares: [...porId.values()] };
+}
+
+function renderPanorama(){
+  // ── Viaturas ──────────────────────────────────────────────────────────
+  // Disponível = está na escala do dia e NÃO aparece em nenhuma ocorrência
+  // ativa. É a pergunta que a sala faz: com o que ainda posso contar agora?
+  const oco = estado.ocorrencias;
+  const empenhadas = new Set();
+  oco.forEach(o => o.vtrs.forEach(v => empenhadas.add(chaveVtr(v.prefixo))));
+
+  const livre = v => !empenhadas.has(chaveVtr(v));
+  const comb  = [...estado.vtrCombate].sort().filter(livre);
+  const apoio = [...estado.vtrApoio].sort().filter(livre);
+  const naEscala = estado.vtrCombate.size + estado.vtrApoio.size;
+  const fora = [...estado.vtrCombate, ...estado.vtrApoio].sort().filter(v => !livre(v));
+
+  $("vtr-total").textContent     = comb.length + apoio.length;
+  $("vtr-combate-n").textContent = comb.length;
+  $("vtr-apoio-n").textContent   = apoio.length;
+  $("vtr-escala").textContent    = "de " + naEscala + " na escala do dia";
+  $("selo-vtr").textContent      = fora.length ? fora.length + " empenhadas" : "nenhuma empenhada";
+  const chips = arr => arr.map(v => `<span class="chip" style="--c:${corDaVtr(v)}">${v}</span>`).join("");
+  $("vtr-combate").innerHTML = chips(comb) || `<span class="chip">nenhuma livre</span>`;
+  $("vtr-apoio").innerHTML   = chips(apoio) || `<span class="chip">nenhuma livre</span>`;
+  $("vtr-empenhadas").innerHTML = fora.length
+    ? `<b>Empenhadas</b>` + chips(fora)
+    : `<b>Empenhadas</b><span style="opacity:.7">nenhuma — frota inteira disponível</span>`;
+
+  // ── Efetivo de serviço AGORA, por pelotão ─────────────────────────────
+  // A escala do dia traz o turno inteiro: Teresópolis aparece com 7 porque
+  // soma diurno e noturno. Aqui entra só quem cobre o turno corrente — 3 num
+  // pelotão de uma ABT, 5 onde há também uma AR com 2 por turno.
+  const agora = turnoAgora();
+  const ordemPel = GRUPOS.flatMap(g => g.pelotoes);
+  const pel = Object.keys(estado.pelotoes)
+    .map(nome => guarnicaoDoPelotao(nome))
+    .sort((a, b) => ordemPel.indexOf(a.nome) - ordemPel.indexOf(b.nome));
+
+  // Total por ID, não pela soma dos pelotões: militar lançado em duas frações
+  // seria contado duas vezes na soma simples.
+  const idsUnicos = new Set();
+  pel.forEach(p => p.militares.forEach(m => idsUnicos.add(m.id)));
+
+  const maxPel = Math.max(1, ...pel.map(p => p.militares.length));
+  const totalAgora = idsUnicos.size;
+  $("selo-pel").innerHTML = `<span class="selo-turno" style="background:${agora === "dia" ? "rgba(234,179,8,.2)" : "rgba(56,189,248,.2)"};color:${agora === "dia" ? "#EAB308" : "#38bdf8"}">${agora === "dia" ? "☀ DIURNO" : "☾ NOTURNO"}</span> ${totalAgora} militares`;
+
+  const R = 48, C = 2 * Math.PI * R;
+  $("lista-pelotoes").innerHTML = pel.map(p => {
+    const cor = COR_PELOTAO[p.nome] || "#FF8C00";
+    const n = p.militares.length;
+    const arco = n ? (n / maxPel) * C : 0;
+    const nums = p.vtrs.length
+      ? p.vtrs.slice(0, 2).map(v => `<div class="vtr-num${p.vtrs.length > 1 ? " dupla" : ""}">${v}</div>`).join("")
+      : `<div class="vtr-num dupla" style="color:var(--txt-fraco)">sem VTR</div>`;
+    return `
+    <div class="anel-pel ${n ? "" : "zerado"}" style="--c:${cor}" data-pel="${p.nome}">
+      <div class="rosca">
+        <svg viewBox="0 0 112 112">
+          <circle class="trilho" cx="56" cy="56" r="${R}"></circle>
+          <circle class="arco" cx="56" cy="56" r="${R}"
+                  stroke-dasharray="${arco.toFixed(1)} ${(C - arco).toFixed(1)}"></circle>
+        </svg>
+        <div class="centro">${nums}</div>
+        <div class="contagem">${n}</div>
+      </div>
+      <div class="rotulo">${p.nome}</div>
+    </div>`;
+  }).join("");
+
+  // ── Tropa ─────────────────────────────────────────────────────────────
+  const conta = mapa => [...mapa.values()].filter(deServicoAgora).length;
+  const of = conta(estado.oficiais), sg = conta(estado.sargentos), pr = conta(estado.pracas);
+  $("t-of").textContent = of; $("t-sgt").textContent = sg; $("t-pr").textContent = pr;
+  $("selo-tropa").textContent = (of + sg + pr) + " no turno corrente";
+  $("t-dia").textContent   = estado.dia.size;
+  $("t-noite").textContent = estado.noite.size;
+  const n24 = estado.vinteQuatro.size;
+  // Sem esta linha os dois números pareceriam não fechar com o total.
+  $("nota-24h").innerHTML = n24
+    ? `<b>${n24}</b> ${n24 === 1 ? "militar está" : "militares estão"} em turno de 24 h e ${n24 === 1 ? "conta" : "contam"} nas duas faixas`
+    : "Nenhum militar em turno de 24 h nesta escala";
+
+  // ── Ocorrências ───────────────────────────────────────────────────────
+  const painel = $("painel-oco");
+  const semLeitura = !oco.length && !oco.totalEstado;
+  painel.classList.toggle("ativo", oco.length > 0);
+  painel.classList.toggle("calmo", oco.length === 0);
+
+  $("oco-n").textContent = semLeitura ? (estado.mes ? estado.mes.total : "—") : oco.length;
+  $("oco-rot").innerHTML = semLeitura ? "No mês<br>até hoje"
+    : oco.length === 0 ? "Nenhuma<br>em andamento"
+    : (oco.length === 1 ? "Ocorrência<br>em andamento" : "Ocorrências<br>em andamento");
+  $("selo-oco").textContent = semLeitura ? "consolidado do mês" : (oco.totalEstado || 0) + " no estado";
+
+  const porSit = {};
+  oco.forEach(o => { porSit[o.situacao.chave] = (porSit[o.situacao.chave] || 0) + 1; });
+  $("oco-repartido").innerHTML = ["SemVtr","Desl","Cheg","Retor"]
+    .filter(k => porSit[k])
+    .map(k => `<span style="color:${SITUACOES[k].cor}">${SITUACOES[k].sinal} ${porSit[k]} ${SITUACOES[k].curto.toLowerCase()}</span>`)
+    .join("");
+
+  // Ocorrência correndo manda no quadrante: numa sala de operações, o que está
+  // acontecendo agora vale mais que o acumulado do mês. Sem ocorrência — ou sem
+  // AODC, que é o caso fora da rede do e193 — entra o consolidado.
+  const mostraLista = oco.length > 0;
+  $("lista-ocorrencias").style.display = mostraLista ? "flex" : "none";
+  $("mes-cab").style.display    = mostraLista ? "none" : "flex";
+  $("barras-mes").style.display = mostraLista ? "none" : "grid";
+
+  if (mostraLista){
+    $("lista-ocorrencias").innerHTML = oco.slice(0, 4).map(o => `
+        <div class="ocorrencia" style="border-left-color:${o.situacao.cor}">
+          <div>
+            <div class="hora">${o.hora}</div>
+            <div class="situacao" style="color:${o.situacao.cor}">${o.situacao.sinal} ${o.situacao.curto}</div>
+          </div>
+          <div>
+            <div class="nat">${o.natureza}</div>
+            <div class="end">${o.municipio}${o.endereco ? " · " + o.endereco : ""} · nº ${o.numero}</div>
+          </div>
+          <div class="vtrs">${o.vtrs.map(v => `<span class="chip" style="--c:${SITUACOES[v.sit] ? SITUACOES[v.sit].cor : "#FF8C00"}">${v.prefixo}</span>`).join("") || `<span class="chip">sem VTR</span>`}</div>
+        </div>`).join("")
+      + (oco.length > 4 ? `<div class="nota-turno">e mais ${oco.length - 4} — a lista completa fica no painel do AODC</div>` : "");
+  } else {
+    renderMes();
+  }
+}
+
+function corDaVtr(v){
+  for (const [pel, gs] of Object.entries(estado.pelotoes))
+    if (gs.some(g => g.vtr === v)) return COR_PELOTAO[pel] || "#FF8C00";
+  return "#FF8C00";
+}
+
+/* Tela das fotos: 1ª e 2ª Cia numa página só, sem paginação. Um card por
+   pelotão (não por viatura), porque um pelotão que sai com duas viaturas
+   viraria dois cards e estouraria a grade de oito. */
+const GRUPOS_COM_FOTO = ["1ª CIA", "2ª CIA"];
+
+function guarnicoesParaFoto(){
+  const cards = [];
+  for (const grupo of GRUPOS.filter(g => GRUPOS_COM_FOTO.includes(g.nome))){
+    for (const pel of grupo.pelotoes){
+      // apenasAgora = true: a tela mostra quem está de serviço neste turno,
+      // não a escala do dia inteiro. Sala de situação é sobre o momento.
+      const g = guarnicaoDoPelotao(pel);
+      if (g.militares.length) cards.push({ pelotao: pel, cor: grupo.cor, ...g });
+    }
+  }
+  return cards;
+}
+
+function renderGuarnicoes(){
+  const tela = $("tela-guarnicoes");
+  const cards = guarnicoesParaFoto();
+  if (!cards.length){
+    tela.innerHTML = `<div class="vazio"><div class="icone">◌</div><strong>Sem guarnições montadas</strong>
+      <span>Nenhum militar da 1ª ou 2ª Cia consta de serviço no turno corrente.</span></div>`;
+    return;
+  }
+  tela.innerHTML = `
+    <div class="grade-guarnicoes">
+      ${cards.map(c => `
+        <div class="card-guarnicao" style="--cor:${c.cor}">
+          <h3>${c.pelotao}</h3>
+          <div class="vtr">${c.vtrs.join(" · ") || "sem viatura"}</div>
+          <div class="fotos">
+            ${c.militares.slice(0, 10).map(m => `
+              <div class="militar">
+                <div class="retrato">
+                  <span class="iniciais">${iniciais(m.nome)}</span>
+                  ${/^\d{7}$/.test(m.id) ? `<img src="${CONFIG.urlFotos}${m.id}.jpg" alt="" loading="lazy" onerror="this.remove()">` : ""}
+                </div>
+                <div class="nm">${m.nome}</div>
+                <div class="fn">${m.funcao}</div>
+              </div>`).join("")}
+          </div>
+        </div>`).join("")}
+    </div>`;
+}
+
+function iniciais(nome){
+  const p = nome.split(/\s+/).filter(w => w.length > 2);
+  return ((p[0]||"")[0] || "?") + ((p[p.length-1]||"")[0] || "");
+}
+
+
+/* ============================================================
+   TOOLTIP — a guarnição por trás de cada anel
+   ============================================================ */
+function montarTooltip(pel){
+  const g = guarnicaoDoPelotao(pel);
+  const cor = COR_PELOTAO[pel] || "#FF8C00";
+  if (!g.militares.length)
+    return `<h4>${pel}</h4><div class="sub">Ninguém de serviço neste turno</div>`;
+
+  // Agrupa por viatura para o tooltip ficar com a cara da guarnição real.
+  const porVtr = new Map();
+  for (const m of g.militares)
+    for (const v of (m.vtrs.length ? m.vtrs : ["sem viatura"]))
+      (porVtr.get(v) || porVtr.set(v, []).get(v)).push(m);
+
+  const blocos = [...porVtr.entries()].map(([vtr, ms]) => `
+    <div class="vtr-bloco">
+      <div class="vtr-cab">${vtr}<span>${ms.length} ${ms.length === 1 ? "militar" : "militares"}</span></div>
+      <ul>${ms.map(m => `<li class="${m.vtrs.length > 1 ? "repetido" : ""}">
+        <b>${m.nome}</b><i>${m.funcao || "—"}${m.vtrs.length > 1 ? " · nas 2 VTR" : ""}</i></li>`).join("")}</ul>
+    </div>`).join("");
+
+  const emDuas = g.militares.filter(m => m.vtrs.length > 1).length;
+  return `<h4>${pel}</h4>
+    <div class="sub">${g.militares.length} de serviço · turno ${turnoAgora() === "dia" ? "diurno" : "noturno"}</div>
+    ${blocos}
+    ${emDuas ? `<div class="rodape-tip">${emDuas} ${emDuas === 1 ? "militar aparece" : "militares aparecem"} em duas viaturas e ${emDuas === 1 ? "conta" : "contam"} uma vez só.</div>` : ""}`;
+}
+
+function ligarTooltip(){
+  const tip = $("tooltip"), palco = $("palco");
+  $("lista-pelotoes").addEventListener("mouseover", e => {
+    const alvo = e.target.closest(".anel-pel");
+    if (!alvo) return;
+    const pel = alvo.dataset.pel;
+    tip.style.setProperty("--c", COR_PELOTAO[pel] || "#FF8C00");
+    tip.innerHTML = montarTooltip(pel);
+
+    // O palco é escalado por transform, então as medidas de tela precisam ser
+    // divididas pela escala para virar coordenada dentro do palco.
+    const r = alvo.getBoundingClientRect(), p = palco.getBoundingClientRect();
+    const k = p.width / 1920;
+    const x = (r.left + r.width / 2 - p.left) / k;
+    const y = (r.top - p.top) / k - 12;
+    tip.style.left = Math.max(150, Math.min(1770, x)) + "px";
+    tip.style.top  = y + "px";
+    tip.classList.add("on");
+  });
+  $("lista-pelotoes").addEventListener("mouseout", e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest(".anel-pel")) tip.classList.remove("on");
+  });
+}
+
+/* Cursor some sozinho quando ninguém está mexendo — é um telão, não um
+   computador de mesa —, mas volta assim que alguém encosta no mouse. */
+let sumirCursor;
+addEventListener("mousemove", () => {
+  document.body.classList.remove("parado");
+  clearTimeout(sumirCursor);
+  sumirCursor = setTimeout(() => document.body.classList.add("parado"), 3000);
+});
+document.body.classList.add("parado");
+
+/* ============================================================
+   CICLO DE VIDA
+   ============================================================ */
+const CIRC = 2 * Math.PI * 27;
+let fonteOcOk = null;   // caminho do AODC que respondeu por último
+let ultimaEscala = 0, ultimoMes = 0;
+
+async function buscarDados(){
+  const pulso = $("pulso"), falhas = [];
+
+  // ── Escala do dia (Apps Script) ───────────────────────────────────────
+  // Chamada idêntica à do guarnicoes.html: sem parâmetro anti-cache e sem
+  // cache:"no-store". O /exec responde com um redirecionamento, e qualquer
+  // enfeite a mais na requisição costuma derrubá-la.
+  if (!estado.carimbo || Date.now() - ultimaEscala > CONFIG.intervaloEscala){
+    try {
+      const req = await fetch(CONFIG.urlGuarnicoes);
+      if (!req.ok) throw new Error("HTTP " + req.status);
+      const dados = await req.json();
+      const linhas = Array.isArray(dados) ? dados : (dados.dados || []);
+      if (!linhas.length) throw new Error("a ponte respondeu, mas sem nenhuma linha de escala");
+      processarGuarnicoes(dados);
+      ultimaEscala = Date.now();
+    } catch(err){
+      falhas.push("escala: " + err.message);
+    }
+  }
+
+  // ── Ocorrências (AODC) ────────────────────────────────────────────────
+  // Em bloco próprio: se a escala falhar, as ocorrências ainda entram, e
+  // vice-versa. Antes uma falha derrubava as duas de uma vez.
+  // Consolidado do mês: relido de hora em hora, é número acumulado e não muda
+  // de minuto a minuto.
+  if (!estado.mes || Date.now() - ultimoMes > 3600000){
+    const m = await buscarEstatisticasMes();
+    if (m){ estado.mes = m; ultimoMes = Date.now(); }
+    else falhas.push("consolidado do mês: CSV não encontrado no repositório");
+  }
+
+  let leuOco = false;
+  for (const f of fonteOcOk ? [fonteOcOk] : CONFIG.fontesOcorrencias){
+    try {
+      const r2 = await fetch(f + (f.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+      if (!r2.ok) continue;
+      const lidas = lerAODC(await r2.text());
+      if (lidas.totalEstado){ estado.ocorrencias = lidas; fonteOcOk = f; leuOco = true; break; }
+    } catch(e){ /* tenta o próximo caminho */ }
+  }
+  if (!leuOco) falhas.push("AODC: nenhum caminho respondeu (" + CONFIG.fontesOcorrencias.join(", ") + ")");
+
+  renderPanorama();
+  renderGuarnicoes();
+
+  // ── Estado da leitura ─────────────────────────────────────────────────
+  // Dizer QUAL fonte falhou e por quê. "Sem sinal" sozinho não permite
+  // descobrir nada de dentro da sala de operações.
+  pulso.classList.toggle("erro", falhas.length >= 2);
+  $("pulso-rotulo").textContent = falhas.length === 0 ? "No ar"
+    : falhas.length === 1 ? "Parcial" : "Sem sinal";
+  $("rodape-atualizacao").textContent = falhas.length === 0
+    ? "Última leitura " + new Date(estado.carimbo).toLocaleTimeString("pt-BR")
+    : falhas.join(" · ");
+  if (falhas.length) console.warn("Painel CIOSP —", falhas.join(" | "));
+}
+
+function tickRelogio(){
+  const a = new Date();
+  $("hora").textContent = a.toLocaleTimeString("pt-BR");
+  $("data").textContent = a.toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
+}
+
+let restante = CONFIG.intervaloDados / 1000;
+function tickAnel(){
+  restante -= 1;
+  if (restante <= 0){ restante = CONFIG.intervaloDados / 1000; buscarDados(); }
+  $("anel-barra").style.strokeDashoffset = CIRC * (1 - restante / (CONFIG.intervaloDados / 1000));
+}
+
+let telaAtual = 0;
+const TELAS = [
+  { el:"tela-panorama",   rotulo:"Panorama operacional do dia" },
+  { el:"tela-guarnicoes", rotulo:"Guarnições de serviço agora — 1ª e 2ª Cia" }
+];
+function trocarTela(i){
+  telaAtual = (i + TELAS.length) % TELAS.length;
+  TELAS.forEach((t, k) => $(t.el).classList.toggle("ativa", k === telaAtual));
+  $("rotulo-tela").textContent = TELAS[telaAtual].rotulo;
+  $("pontos").innerHTML = TELAS.map((_, k) => `<i class="${k === telaAtual ? "on" : ""}"></i>`).join("");
+  if (telaAtual === 1) renderGuarnicoes();
+}
+
+function ajustarEscala(){
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+  $("palco").style.transform = `scale(${s})`;
+}
+
+// Teclas úteis na sala: 1/2 força a tela, F entra em tela cheia, R relê agora.
+addEventListener("keydown", e => {
+  if (e.key === "1") trocarTela(0);
+  if (e.key === "2") trocarTela(1);
+  if (e.key.toLowerCase() === "f") document.documentElement.requestFullscreen?.();
+  if (e.key.toLowerCase() === "r") buscarDados();
+});
+addEventListener("resize", ajustarEscala);
+
+ajustarEscala();
+ligarTooltip();
+tickRelogio();
+trocarTela(0);
+buscarDados();
+setInterval(tickRelogio, 1000);
+setInterval(tickAnel, 1000);
+setInterval(() => trocarTela(telaAtual + 1), CONFIG.intervaloTelas);
+
+</script>
+</body>
+</html>
