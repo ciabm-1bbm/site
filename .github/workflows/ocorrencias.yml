@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Instalar Playwright
         run: |
@@ -41,10 +41,33 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Coletar o relatório
+        # A credencial já existe num Secret criado para o coletor da escala.
+        # Aqui vão os nomes possíveis: Secret que não existe chega vazio, e o
+        # script usa o primeiro que vier preenchido. Se o seu nome não estiver
+        # na lista, acrescente uma linha no mesmo formato.
         env:
-          E193_USUARIO: ${{ secrets.E193_USUARIO }}
-          E193_SENHA: ${{ secrets.E193_SENHA }}
+          E193_USUARIO:  ${{ secrets.E193_USUARIO }}
+          E193_USER:     ${{ secrets.E193_USER }}
+          E193_LOGIN:    ${{ secrets.E193_LOGIN }}
+          E193_ID:       ${{ secrets.E193_ID }}
+          ID_FUNCIONAL:  ${{ secrets.ID_FUNCIONAL }}
+          USUARIO_E193:  ${{ secrets.USUARIO_E193 }}
+          E193_SENHA:    ${{ secrets.E193_SENHA }}
+          E193_PASSWORD: ${{ secrets.E193_PASSWORD }}
+          E193_PASS:     ${{ secrets.E193_PASS }}
+          SENHA_E193:    ${{ secrets.SENHA_E193 }}
         run: node scripts/coletar-ocorrencias.mjs
+
+      # Print e HTML da tela onde parou. Sem isto, uma falha de login vira
+      # só "timeout" e não dá para descobrir nada.
+      - name: Guardar o diagnóstico quando falhar
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico
+          path: diagnostico/
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Publicar o arquivo
         run: |
