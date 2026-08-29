@@ -321,7 +321,10 @@ body.parado{cursor:none}
 /* Duas colunas: mês à esquerda, dia à direita. Cada natureza é uma linha
    onde a própria barra é o fundo — sem coluna separada para o gráfico, o
    rótulo ganha a largura toda e para de ser cortado. */
-.barras-mes{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.barras-mes{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+/* Divisória entre o mês e o dia: são dois recortes de tempo diferentes e
+   precisam ser lidos como blocos separados. */
+.col-nat + .col-nat{border-left:2px solid var(--linha);padding-left:18px}
 .col-nat{display:flex;flex-direction:column;min-height:0}
 .col-cab{flex:none;display:flex;align-items:baseline;gap:9px;padding-bottom:5px;
   margin-bottom:5px;border-bottom:2px solid var(--c)}
@@ -347,6 +350,11 @@ body.parado{cursor:none}
   box-shadow:0 0 7px color-mix(in srgb, var(--c) 60%, transparent);transition:width .6s ease}
 .linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
   text-align:right;font-variant-numeric:tabular-nums;color:var(--c);line-height:1.2}
+/* Só as do dia abrem detalhe: para o mês, listar guarnição de 700 ocorrências
+   não diria nada útil. */
+.linha-nat.detalhavel{cursor:pointer;border-radius:3px}
+.linha-nat.detalhavel:hover{background:rgba(255,255,255,.06)}
+.linha-nat.detalhavel:hover .rot{color:var(--c)}
 .col-nat .vazio-dia{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;text-align:center;color:var(--txt-fraco);font-size:12px;
   border:2px dashed var(--linha);border-radius:8px;padding:10px;line-height:1.5}
@@ -916,7 +924,8 @@ function processarCSVMes(txt, refMes){
   // rodapé: "735 registros - Total 722 OCs". Contar linha por linha inflaria o
   // número na TV, então cada ocorrência entra uma vez só.
   const vistas = new Set(), vistasHoje = new Set();
-  const porNatureza = {}, porNaturezaHoje = {};
+  const porNatureza = {};
+  const detalheHoje = {};   // natureza → { ocs, vtrs } do dia de hoje
   let linhasLidas = 0, ultimaData = null, horaMaisTarde = null;
 
   for (const r of linhas){
@@ -944,6 +953,18 @@ function processarCSVMes(txt, refMes){
     // Sem número de OC, cada linha vale por uma — é o melhor que dá para fazer.
     const id = colNum && r[colNum] ? String(r[colNum]).trim()
              : "linha:" + (linhasLidas++);
+
+    // As viaturas são colhidas ANTES da deduplicação: uma ocorrência com duas
+    // viaturas vem em duas linhas, e a segunda seria descartada logo abaixo.
+    if (data && chaveDia(data) === hojeChave){
+      const nat = normalizarNatureza(r[colNat]);
+      const d = (detalheHoje[nat] = detalheHoje[nat] || { ocs: new Set(), vtrs: new Set() });
+      d.ocs.add(id);
+      String(r[colVtr] || "").split(/[;,\/]+/)
+        .map(v => v.trim().toUpperCase()).filter(Boolean)
+        .forEach(v => d.vtrs.add(v));
+    }
+
     if (vistas.has(id)) continue;
     vistas.add(id);
 
@@ -954,10 +975,8 @@ function processarCSVMes(txt, refMes){
         if (hora && (!horaMaisTarde || hora > horaMaisTarde)) horaMaisTarde = hora;
       }
     }
-    const nat = normalizarNatureza(r[colNat]);
-    porNatureza[nat] = (porNatureza[nat] || 0) + 1;
-    if (data && chaveDia(data) === hojeChave)
-      porNaturezaHoje[nat] = (porNaturezaHoje[nat] || 0) + 1;
+    porNatureza[normalizarNatureza(r[colNat])] =
+      (porNatureza[normalizarNatureza(r[colNat])] || 0) + 1;
   }
 
   // "Cobre hoje" não é o mesmo que "hoje teve zero". Se a última data do
@@ -966,11 +985,12 @@ function processarCSVMes(txt, refMes){
   const cobreHoje = ultimaData && chaveDia(ultimaData) === hojeChave;
 
   return {
-    total: vistas.size, porNatureza, porNaturezaHoje, refMes,
+    total: vistas.size, porNatureza, detalheHoje, refMes,
     hoje: vistasHoje.size, cobreHoje, ultimaData, horaMaisTarde,
     linhas: linhas.length, jaFiltrado,
     tipos: Object.entries(porNatureza).sort((a, b) => b[1] - a[1]),
-    tiposHoje: Object.entries(porNaturezaHoje).sort((a, b) => b[1] - a[1]),
+    tiposHoje: Object.entries(detalheHoje)
+      .map(([nat, d]) => [nat, d.ocs.size]).sort((a, b) => b[1] - a[1]),
     ultimoDia: ultimaData ? ultimaData.getDate() : null
   };
 }
@@ -1019,10 +1039,11 @@ function renderMes(){
   $("mes-cab").style.display = m.atrasado ? "flex" : "none";
 
   // Uma linha por natureza; a barra é o fundo da própria linha.
-  const linhas = (tipos, total) => {
+  const linhas = (tipos, doDia) => {
     const max = Math.max(1, ...tipos.map(t => t[1]));
     return tipos.slice(0, 10).map(([nat, n]) => `
-      <div class="linha-nat" style="--c:${COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"]}">
+      <div class="linha-nat${doDia ? " detalhavel" : ""}"${doDia ? ` data-nat="${nat.replace(/"/g, "&quot;")}"` : ""}
+           style="--c:${COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"]}">
         <span class="rot">${CURTO_NATUREZA[nat] || nat}</span>
         <span class="trilha"><i style="width:${(n / max * 100).toFixed(0)}%"></i></span>
         <span class="val">${n}</span>
@@ -1032,7 +1053,7 @@ function renderMes(){
   const colunaMes = `
     <div class="col-nat" style="--c:var(--laranja)">
       <div class="col-cab"><b>${m.total}</b><span>No mês<i>${dias}</i></span></div>
-      <div class="lista-nat">${linhas(m.tipos, m.total)}</div>
+      <div class="lista-nat">${linhas(m.tipos, false)}</div>
     </div>`;
 
   // "Sem cobertura" não é o mesmo que "zero hoje". Se o arquivo não alcança
@@ -1049,7 +1070,7 @@ function renderMes(){
     : `<div class="col-nat" style="--c:var(--ok)">
          <div class="col-cab"><b>${m.hoje}</b><span>Hoje<i>desde 00:00${hora}</i></span></div>
          <div class="lista-nat">${m.tiposHoje.length
-            ? linhas(m.tiposHoje, m.hoje)
+            ? linhas(m.tiposHoje, true)
             : `<div class="vazio-dia">Nenhuma ocorrência atendida hoje até agora.</div>`}</div>
        </div>`;
 
@@ -1327,42 +1348,94 @@ function montarTooltip(pel){
     ${emDuas ? `<div class="rodape-tip">${emDuas} ${emDuas === 1 ? "militar aparece" : "militares aparecem"} em duas viaturas e ${emDuas === 1 ? "conta" : "contam"} uma vez só.</div>` : ""}`;
 }
 
-function ligarTooltip(){
+/* Posicionamento do balão, usado pelos anéis e pelas barras do dia.
+   Mede a caixa já preenchida e a encaixa dentro do palco — sem isto, um alvo
+   perto da borda joga metade do balão para fora da TV. */
+function mostrarBalao(alvo, html, cor){
   const tip = $("tooltip"), palco = $("palco");
+  tip.style.setProperty("--c", cor);
+  tip.innerHTML = html;
+
+  const r = alvo.getBoundingClientRect(), p = palco.getBoundingClientRect();
+  const k = p.width / 1920;
+  const centro = (r.left + r.width / 2 - p.left) / k;
+  const topo   = (r.top - p.top) / k;
+  const base   = (r.bottom - p.top) / k;
+
+  tip.style.left = "0px"; tip.style.top = "0px";
+  const larg = tip.offsetWidth, alt = tip.offsetHeight, M = 10;
+
+  let y = topo - alt - 12;              // acima por padrão
+  if (y < M) y = base + 12;             // não coube? vai para baixo
+  y = Math.max(M, Math.min(1080 - alt - M, y));
+  const x = Math.max(M, Math.min(1920 - larg - M, centro - larg / 2));
+
+  tip.style.left = x + "px";
+  tip.style.top  = y + "px";
+  tip.classList.add("on");
+}
+const esconderBalao = () => $("tooltip").classList.remove("on");
+
+/* De qual pelotão é uma viatura. A resposta vem da escala do dia, então vale
+   para as viaturas que estão de serviço; para as demais, fica o prefixo. */
+function pelotaoDaVtr(prefixo){
+  const k = chaveVtr(prefixo);
+  for (const pel in estado.pelotoes)
+    if ((estado.pelotoes[pel] || []).some(g => g.vtr && chaveVtr(g.vtr) === k)) return pel;
+  return null;
+}
+
+/* Quem atendeu as ocorrências de uma natureza hoje, agrupado por pelotão. */
+function montarBalaoNatureza(nat){
+  const d = (estado.mes && estado.mes.detalheHoje) ? estado.mes.detalheHoje[nat] : null;
+  const cor = COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"];
+  if (!d) return { cor, html: `<h4>${nat}</h4><div class="sub">Sem detalhe para esta natureza</div>` };
+
+  const porPelotao = new Map(), semPelotao = [];
+  for (const v of d.vtrs){
+    const pel = pelotaoDaVtr(v);
+    if (pel){
+      if (!porPelotao.has(pel)) porPelotao.set(pel, []);
+      porPelotao.get(pel).push(v);
+    } else semPelotao.push(v);
+  }
+
+  const n = d.ocs.size;
+  const blocos = [...porPelotao.entries()].map(([pel, vtrs]) => `
+    <div class="vtr-bloco">
+      <div class="vtr-cab" style="color:${COR_PELOTAO[pel] || "#FF8C00"}">${pel}
+        <span>${vtrs.join(" · ")}</span></div>
+    </div>`).join("");
+
+  return { cor, html: `
+    <h4>${CURTO_NATUREZA[nat] || nat}</h4>
+    <div class="sub">${n} ${n === 1 ? "ocorrência atendida hoje" : "ocorrências atendidas hoje"}</div>
+    ${blocos || ""}
+    ${semPelotao.length ? `<div class="rodape-tip">Fora da escala de hoje: ${semPelotao.join(", ")}</div>` : ""}
+    ${!porPelotao.size && !semPelotao.length ? `<div class="rodape-tip">Nenhuma viatura registrada.</div>` : ""}` };
+}
+
+function ligarTooltip(){
+  // Anéis: a guarnição do pelotão
   $("lista-pelotoes").addEventListener("mouseover", e => {
     const alvo = e.target.closest(".anel-pel");
     if (!alvo) return;
     const pel = alvo.dataset.pel;
-    tip.style.setProperty("--c", COR_PELOTAO[pel] || "#FF8C00");
-    tip.innerHTML = montarTooltip(pel);
-
-    // O palco é escalado por transform, então as medidas de tela precisam ser
-    // divididas pela escala para virar coordenada dentro do palco.
-    const r = alvo.getBoundingClientRect(), p = palco.getBoundingClientRect();
-    const k = p.width / 1920;
-    const centro = (r.left + r.width / 2 - p.left) / k;
-    const topo   = (r.top - p.top) / k;
-    const base   = (r.bottom - p.top) / k;
-
-    // Mede a caixa já preenchida e encaixa dentro do palco. Sem isto, um anel
-    // perto da borda joga metade do balão para fora da TV — que foi o que
-    // aconteceu com os pelotões da ponta.
-    tip.style.left = "0px"; tip.style.top = "0px";
-    const larg = tip.offsetWidth, alt = tip.offsetHeight;
-    const M = 10;   // respiro até a borda
-
-    // Acima do anel por padrão; se não couber, vai para baixo.
-    let y = topo - alt - 12;
-    if (y < M) y = base + 12;
-    y = Math.max(M, Math.min(1080 - alt - M, y));
-
-    const x = Math.max(M, Math.min(1920 - larg - M, centro - larg / 2));
-    tip.style.left = x + "px";
-    tip.style.top  = y + "px";
-    tip.classList.add("on");
+    mostrarBalao(alvo, montarTooltip(pel), COR_PELOTAO[pel] || "#FF8C00");
   });
   $("lista-pelotoes").addEventListener("mouseout", e => {
-    if (!e.relatedTarget || !e.relatedTarget.closest(".anel-pel")) tip.classList.remove("on");
+    if (!e.relatedTarget || !e.relatedTarget.closest(".anel-pel")) esconderBalao();
+  });
+
+  // Barras do dia: quais pelotões atenderam aquelas ocorrências
+  $("barras-mes").addEventListener("mouseover", e => {
+    const alvo = e.target.closest(".linha-nat.detalhavel");
+    if (!alvo) return;
+    const { cor, html } = montarBalaoNatureza(alvo.dataset.nat);
+    mostrarBalao(alvo, html, cor);
+  });
+  $("barras-mes").addEventListener("mouseout", e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest(".linha-nat.detalhavel")) esconderBalao();
   });
 }
 
