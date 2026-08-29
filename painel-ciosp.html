@@ -323,22 +323,28 @@ body.parado{cursor:none}
 .col-nat{display:flex;flex-direction:column;min-height:0}
 .col-cab{flex:none;display:flex;align-items:baseline;gap:9px;padding-bottom:5px;
   margin-bottom:5px;border-bottom:2px solid var(--c)}
-.col-cab b{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;
+.col-cab b{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;
   line-height:.85;font-variant-numeric:tabular-nums;color:var(--c)}
-.col-cab span{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;
+.col-cab span{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
   letter-spacing:2px;color:var(--txt);line-height:1.1;text-transform:uppercase}
 .col-cab span i{display:block;font-style:normal;font-family:'Inter',sans-serif;
   font-size:10px;font-weight:400;letter-spacing:.5px;color:var(--txt-fraco);text-transform:none}
-.lista-nat{flex:1;min-height:0;display:grid;gap:2px;align-content:start}
-.linha-nat{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;
-  padding:1px 7px;border-radius:3px;border-left:3px solid var(--c);
-  background:linear-gradient(90deg,
-    color-mix(in srgb, var(--c) 30%, transparent) var(--p),
-    rgba(255,255,255,.035) var(--p))}
-.linha-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
-  letter-spacing:.3px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;
-  font-variant-numeric:tabular-nums;color:var(--txt);line-height:1.25}
+/* align-content:stretch + grid-auto-rows:1fr faz as linhas se distribuírem
+   pela altura que houver: cabem as 10 sem corte, seja qual for o quadrante. */
+.lista-nat{flex:1;min-height:0;display:grid;gap:2px;align-content:stretch;
+  grid-auto-rows:minmax(0,1fr)}
+/* Rótulo, barra e número em colunas próprias: o nome da natureza tem espaço
+   garantido e nunca é cortado. A barra é a cor cheia; o trilho atrás é que
+   fica fraco — a cor forte é o dado, não o fundo. */
+.linha-nat{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(46px,1fr) 30px;
+  align-items:center;gap:7px}
+.linha-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:.2px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.linha-nat .trilha{height:10px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.linha-nat .trilha i{display:block;height:100%;border-radius:3px;background:var(--c);
+  box-shadow:0 0 7px color-mix(in srgb, var(--c) 60%, transparent);transition:width .6s ease}
+.linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
+  text-align:right;font-variant-numeric:tabular-nums;color:var(--c);line-height:1.2}
 .col-nat .vazio-dia{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;text-align:center;color:var(--txt-fraco);font-size:12px;
   border:2px dashed var(--linha);border-radius:8px;padding:10px;line-height:1.5}
@@ -1014,8 +1020,9 @@ function renderMes(){
   const linhas = (tipos, total) => {
     const max = Math.max(1, ...tipos.map(t => t[1]));
     return tipos.slice(0, 10).map(([nat, n]) => `
-      <div class="linha-nat" style="--c:${COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"]};--p:${(n / max * 100).toFixed(0)}%">
+      <div class="linha-nat" style="--c:${COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"]}">
         <span class="rot">${CURTO_NATUREZA[nat] || nat}</span>
+        <span class="trilha"><i style="width:${(n / max * 100).toFixed(0)}%"></i></span>
         <span class="val">${n}</span>
       </div>`).join("");
   };
@@ -1189,6 +1196,9 @@ function renderPanorama(){
   // acontecendo agora vale mais que o acumulado do mês. Sem ocorrência — ou sem
   // AODC, que é o caso fora da rede do e193 — entra o consolidado.
   const mostraLista = oco.length > 0;
+  // O placar repete os totais que já estão no topo de cada coluna. Escondê-lo
+  // quando o gráfico está no ar devolve altura para as dez naturezas caberem.
+  $("placar-oco").style.display = mostraLista ? "flex" : "none";
   $("lista-ocorrencias").style.display = mostraLista ? "flex" : "none";
   $("mes-cab").style.display    = "none";   // controlado por renderMes
   $("barras-mes").style.display = mostraLista ? "none" : "grid";
