@@ -292,36 +292,38 @@ body.parado{cursor:none}
 
 /* Consolidado do mês. Ocupa o quadrante quando não há ocorrência correndo —
    ou quando o AODC não responde, que é o caso fora da rede do e193. */
-.mes-cab{flex:none;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-  padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--linha)}
-.mes-total{font-family:'Barlow Condensed',sans-serif;font-size:70px;font-weight:700;
+.mes-cab{flex:none;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding-bottom:7px;margin-bottom:7px;border-bottom:1px solid var(--linha)}
+.mes-total{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:700;
   line-height:.82;font-variant-numeric:tabular-nums;color:var(--laranja)}
 .mes-txt{font-size:14px;color:var(--txt-fraco);line-height:1.35}
-.mes-txt b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:23px;
+.mes-txt b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:19px;
   font-weight:700;letter-spacing:2px;color:var(--txt);text-transform:uppercase}
 .mes-hoje{margin-left:auto;display:flex;align-items:center;gap:10px;
   padding:6px 14px 7px;border-radius:10px;border:1px solid rgba(74,222,128,.35);
   background:rgba(74,222,128,.10)}
 .mes-hoje.sem{border-color:var(--linha);background:rgba(255,255,255,.03)}
-.mes-hoje-n{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;
+.mes-hoje-n{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;
   line-height:.85;font-variant-numeric:tabular-nums;color:var(--ok)}
 .mes-hoje.sem .mes-hoje-n{color:var(--txt-fraco)}
-.mes-hoje-t{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;
+.mes-hoje-t{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
   letter-spacing:2px;line-height:1.05;color:var(--txt)}
 .mes-hoje-t span{font-family:'Inter',sans-serif;font-size:11px;font-weight:400;
   letter-spacing:.5px;color:var(--txt-fraco);text-transform:none}
 .mes-aviso{flex-basis:100%;font-size:12px;color:var(--ouro);letter-spacing:.5px}
 
-.barras-mes{flex:1;min-height:0;display:grid;gap:5px;align-content:stretch}
-.barra-nat{display:grid;grid-template-columns:200px 1fr 52px 46px;align-items:center;gap:10px}
-.barra-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;
-  letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
-.barra-nat .trilha{height:20px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
-.barra-nat .trilha i{display:block;height:100%;background:var(--c);border-radius:4px;
+.barras-mes{flex:1;min-height:0;display:grid;gap:2px;align-content:stretch}
+/* Dez naturezas no mesmo quadrante: a fonte encolhe até caberem todas sem
+   corte. Ainda legível a três metros, que é a distância da sala. */
+.barra-nat{display:grid;grid-template-columns:186px 1fr 40px 40px;align-items:center;gap:8px}
+.barra-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;
+  letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.barra-nat .trilha{height:13px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.barra-nat .trilha i{display:block;height:100%;background:var(--c);border-radius:3px;
   transition:width .7s ease}
-.barra-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;
-  text-align:right;font-variant-numeric:tabular-nums;color:var(--c)}
-.barra-nat .pct{font-size:13px;text-align:right;color:var(--txt-fraco);font-variant-numeric:tabular-nums}
+.barra-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;
+  text-align:right;font-variant-numeric:tabular-nums;color:var(--c);line-height:1}
+.barra-nat .pct{font-size:11px;text-align:right;color:var(--txt-fraco);font-variant-numeric:tabular-nums}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -981,7 +983,7 @@ function renderMes(){
   // "nenhuma ocorrência até agora", que é bem diferente de "não sei ainda".
   const blocoHoje = m.cobreHoje
     ? `<div class="mes-hoje"><div class="mes-hoje-n">${m.hoje}</div>
-         <div class="mes-hoje-t">HOJE<br><span>última às ${hora}</span></div></div>`
+         <div class="mes-hoje-t">HOJE<br><span>desde 00:00 · última ${hora}</span></div></div>`
     : `<div class="mes-hoje sem"><div class="mes-hoje-n">—</div>
          <div class="mes-hoje-t">HOJE<br><span>${m.ultimaData
             ? "consolidado vai até " + String(m.ultimaData.getDate()).padStart(2,"0") + "/" + String(m.ultimaData.getMonth()+1).padStart(2,"0")
@@ -993,7 +995,7 @@ function renderMes(){
     ${blocoHoje}
     ${m.atrasado ? `<div class="mes-aviso">${MES_EXTENSO[m.refMes.getMonth()]} — o mês corrente ainda não foi compilado</div>` : ""}`;
 
-  const tipos = m.tipos.slice(0, 6);
+  const tipos = m.tipos.slice(0, 10);   // o E193 tem 10 naturezas
   const max = Math.max(1, ...tipos.map(t => t[1]));
   $("barras-mes").innerHTML = tipos.map(([nat, n]) => {
     const cor = COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"];
@@ -1010,20 +1012,38 @@ function renderMes(){
    O mesmo militar às vezes é lançado em duas viaturas — cobrindo a ABT e a AR
    na mesma escala. Ele é UMA pessoa: conta uma vez só, e as viaturas dele
    ficam juntas no registro para o tooltip poder mostrar isso. */
+const idFuncional = id => /^\d{7}$/.test(String(id || ""));
+
+/* Funde lançamentos do mesmo militar. Dedup só por ID não bastava: quando a
+   matrícula não é lida numa das linhas, o ID vira o próprio nome, e a mesma
+   pessoa aparecia duas vezes — foi o caso dos dois COV do ABT dos Açorianos.
+   Regra: duas matrículas válidas e diferentes são duas pessoas; fora isso,
+   mesmo nome de guerra é a mesma pessoa. */
+function fundirMilitares(entradas){
+  const saida = [];
+  for (const e of entradas){
+    const chave = chaveNome(e.nome);
+    const alvo = saida.find(x =>
+      (idFuncional(x.id) && idFuncional(e.id)) ? x.id === e.id : chaveNome(x.nome) === chave);
+    if (alvo){
+      e.vtrs.forEach(v => { if (!alvo.vtrs.includes(v)) alvo.vtrs.push(v); });
+      if (!idFuncional(alvo.id) && idFuncional(e.id)) alvo.id = e.id;
+      if (!alvo.funcao && e.funcao) alvo.funcao = e.funcao;
+    } else saida.push(e);
+  }
+  return saida;
+}
+
 function guarnicaoDoPelotao(nome, apenasAgora = true){
   const grupos = estado.pelotoes[nome] || [];
-  const porId = new Map();
+  const entradas = [];
   const vtrs = [];
   for (const g of grupos){
     const naEscala = apenasAgora ? g.guarnicao.filter(deServicoAgora) : g.guarnicao;
     if (g.vtr && naEscala.length && !vtrs.includes(g.vtr)) vtrs.push(g.vtr);
-    for (const m of naEscala){
-      const ja = porId.get(m.id);
-      if (ja){ if (g.vtr && !ja.vtrs.includes(g.vtr)) ja.vtrs.push(g.vtr); }
-      else porId.set(m.id, { ...m, vtrs: g.vtr ? [g.vtr] : [] });
-    }
+    for (const m of naEscala) entradas.push({ ...m, vtrs: g.vtr ? [g.vtr] : [] });
   }
-  return { nome, vtrs, militares: [...porId.values()] };
+  return { nome, vtrs, militares: fundirMilitares(entradas) };
 }
 
 function renderPanorama(){
@@ -1224,8 +1244,13 @@ function montarTooltip(pel){
   // Agrupa por viatura para o tooltip ficar com a cara da guarnição real.
   const porVtr = new Map();
   for (const m of g.militares)
-    for (const v of (m.vtrs.length ? m.vtrs : ["sem viatura"]))
-      (porVtr.get(v) || porVtr.set(v, []).get(v)).push(m);
+    for (const v of (m.vtrs.length ? m.vtrs : ["sem viatura"])){
+      if (!porVtr.has(v)) porVtr.set(v, []);
+      const lista = porVtr.get(v);
+      // A fusão já garante uma entrada por pessoa; esta guarda evita repetir
+      // caso a mesma viatura apareça duas vezes na leitura.
+      if (!lista.some(x => chaveNome(x.nome) === chaveNome(m.nome))) lista.push(m);
+    }
 
   const blocos = [...porVtr.entries()].map(([vtr, ms]) => `
     <div class="vtr-bloco">
