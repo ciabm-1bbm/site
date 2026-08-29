@@ -410,6 +410,8 @@ body.parado{cursor:none}
             <div class="repartido" id="oco-repartido"></div>
           </div>
           <div class="ocorrencias" id="lista-ocorrencias"></div>
+          <div class="mes-cab" id="mes-cab"></div>
+          <div class="barras-mes" id="barras-mes"></div>
         </div>
       </div>
 
@@ -443,6 +445,12 @@ const CONFIG = {
   //   "/aodc/oc.php"  → funciona hospedado dentro do e193, e também sob o servidor.py
   //   "proxy.php"     → quando o painel estiver num servidor com PHP
   fontesOcorrencias: ["/aodc/oc.php", "proxy.php"],
+
+  // Espelho publicado no repositório pelo coletor. É o caminho que funciona
+  // fora da rede do e193: o navegador não lê o oc.php de outro domínio, mas
+  // lê o JSON de casa sem problema. Fica alguns minutos atrás do tempo real,
+  // que é a cadência do GitHub Actions.
+  espelhoOcorrencias: "dados/AODC_ATIVAS.json",
 
   // Consolidado mensal de ocorrências — mesmo repositório da página de estatísticas
   repoDados: "https://raw.githubusercontent.com/ciabm-1bbm/site/main",
@@ -709,6 +717,30 @@ const sitOcorrencia = o => !o.vtrs.length ? "SemVtr"
   : o.vtrs.some(v => v.sit === "Desl") ? "Desl"
   : o.vtrs.some(v => v.sit === "Cheg") ? "Cheg" : "Retor";
 
+// Aceita tanto o HTML cru do oc.php quanto o JSON já interpretado pelo
+// coletor. O filtro do 1º BBM roda igual nos dois casos, num lugar só.
+function filtrar1BBM(todas){
+  const naEscala = new Set([...estado.vtrCombate, ...estado.vtrApoio].map(v => chaveVtr(v)));
+  const nossas = todas.filter(o => o.vtrs.some(v =>
+    FRACOES_NOSSAS.has(chaveFracao(v.guarnicao)) || naEscala.has(chaveVtr(v.prefixo))
+  ));
+  const ordem = { SemVtr:0, Desl:1, Cheg:2, Retor:3 };
+  nossas.sort((a, b) =>
+    ordem[a.situacao.chave] - ordem[b.situacao.chave] ||
+    b.vtrs.length - a.vtrs.length ||
+    String(b.hora).localeCompare(String(a.hora))
+  );
+  return Object.assign(nossas, { totalEstado: todas.length });
+}
+
+function lerEspelho(json){
+  const todas = (json.ocorrencias || []).map(o => {
+    const chave = sitOcorrencia(o);
+    return { ...o, situacao: { chave, ...SITUACOES[chave] } };
+  });
+  return filtrar1BBM(todas);
+}
+
 function lerAODC(html){
   const linhas = String(html)
     .replace(/<[^>]+>/g,"\n").replace(/&nbsp;/g," ")
@@ -735,22 +767,7 @@ function lerAODC(html){
     return o;
   });
 
-  // Só sobe para a TV o que é do 1º BBM: guarnição numa das nossas frações,
-  // ou viatura que está na escala de hoje. Nada de filtrar por município —
-  // ocorrência em Porto Alegre pode ser de outra unidade, e a nossa VTR pode
-  // estar atendendo fora da capital.
-  const naEscala = new Set([...estado.vtrCombate, ...estado.vtrApoio].map(v => v.toUpperCase()));
-  const nossas = todas.filter(o => o.vtrs.some(v =>
-    FRACOES_NOSSAS.has(chaveFracao(v.guarnicao)) || naEscala.has(v.prefixo)
-  ));
-
-  const ordem = { SemVtr:0, Desl:1, Cheg:2, Retor:3 };
-  nossas.sort((a, b) =>
-    ordem[a.situacao.chave] - ordem[b.situacao.chave] ||
-    b.vtrs.length - a.vtrs.length ||
-    String(b.hora).localeCompare(String(a.hora))
-  );
-  return Object.assign(nossas, { totalEstado: todas.length });
+  return filtrar1BBM(todas);
 }
 
 /* ============================================================
