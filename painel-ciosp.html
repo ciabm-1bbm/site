@@ -321,14 +321,19 @@ body.parado{cursor:none}
 /* Duas colunas: mês à esquerda, dia à direita. Cada natureza é uma linha
    onde a própria barra é o fundo — sem coluna separada para o gráfico, o
    rótulo ganha a largura toda e para de ser cortado. */
-.barras-mes{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-/* Divisória entre o mês e o dia: são dois recortes de tempo diferentes e
-   precisam ser lidos como blocos separados. */
-.col-nat + .col-nat{border-left:2px solid var(--linha);padding-left:18px}
+/* Dois blocos de tempo (mês e dia), cada um repartido em natureza e pelotão. */
+.barras-mes{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bloco-tempo{display:flex;flex-direction:column;min-height:0}
+.bloco-tempo + .bloco-tempo{border-left:2px solid var(--linha);padding-left:16px}
+.duplo{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col-nat{display:flex;flex-direction:column;min-height:0}
+.sub-cab{flex:none;font-size:9.5px;font-weight:700;letter-spacing:1.6px;
+  text-transform:uppercase;color:var(--txt-fraco);padding-bottom:3px;margin-bottom:3px;
+  border-bottom:1px solid var(--linha)}
 .col-nat{display:flex;flex-direction:column;min-height:0}
 .col-cab{flex:none;display:flex;align-items:baseline;gap:9px;padding-bottom:5px;
   margin-bottom:5px;border-bottom:2px solid var(--c)}
-.col-cab b{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;
+.col-cab b{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;
   line-height:.85;font-variant-numeric:tabular-nums;color:var(--c)}
 .col-cab span{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
   letter-spacing:2px;color:var(--txt);line-height:1.1;text-transform:uppercase}
@@ -341,23 +346,63 @@ body.parado{cursor:none}
 /* Rótulo, barra e número em colunas próprias: o nome da natureza tem espaço
    garantido e nunca é cortado. A barra é a cor cheia; o trilho atrás é que
    fica fraco — a cor forte é o dado, não o fundo. */
-.linha-nat{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(46px,1fr) 30px;
-  align-items:center;gap:7px}
-.linha-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;
+.linha-nat{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(26px,.75fr) 24px;
+  align-items:center;gap:5px}
+.linha-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;
   letter-spacing:.2px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.linha-nat .trilha{height:10px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.linha-nat .trilha{height:8px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
 .linha-nat .trilha i{display:block;height:100%;border-radius:3px;background:var(--c);
   box-shadow:0 0 7px color-mix(in srgb, var(--c) 60%, transparent);transition:width .6s ease}
-.linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
+.linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
   text-align:right;font-variant-numeric:tabular-nums;color:var(--c);line-height:1.2}
 /* Só as do dia abrem detalhe: para o mês, listar guarnição de 700 ocorrências
    não diria nada útil. */
 .linha-nat.detalhavel{cursor:pointer;border-radius:3px}
 .linha-nat.detalhavel:hover{background:rgba(255,255,255,.06)}
 .linha-nat.detalhavel:hover .rot{color:var(--c)}
+.rodape-pel{flex:none;font-size:9.5px;color:var(--txt-fraco);text-align:right;
+  padding-top:3px;margin-top:2px;border-top:1px solid var(--linha)}
+.bloco-tempo .vazio-dia,
 .col-nat .vazio-dia{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;text-align:center;color:var(--txt-fraco);font-size:12px;
   border:2px dashed var(--linha);border-radius:8px;padding:10px;line-height:1.5}
+
+/* ─── Tela de PC ───────────────────────────────────────────────────────
+   Na TV o palco é uma folha fixa de 1920x1080 encolhida para caber, e isso
+   funciona bem em qualquer monitor deitado. O problema é a janela estreita
+   ou em pé — num notebook com o navegador pela metade, tudo vira letra de
+   formiga. Abaixo de 1100px de largura, ou quando a janela fica mais alta
+   que larga, o palco deixa de ser folha fixa: os quadrantes empilham numa
+   coluna só e a página rola normalmente. */
+@media (max-width:1100px), (max-aspect-ratio:1/1){
+  html,body{overflow:auto}
+  #viewport{position:static;display:block;min-height:100vh}
+  #palco{width:100%;height:auto;min-height:100vh;transform:none!important;padding:14px}
+  #palco::before{background-size:340px}
+
+  header{flex-wrap:wrap;gap:14px}
+  .titulo h1{font-size:26px;letter-spacing:1px}
+  .relogio .hora{font-size:46px}
+
+  main{flex:none}
+  .tela{position:static;opacity:1;pointer-events:auto;display:none}
+  .tela.ativa{display:block}
+  #tela-panorama{grid-template-columns:1fr;grid-template-rows:none;gap:12px}
+  .painel{min-height:300px}
+
+  .aneis{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+  .barras-mes{grid-template-columns:1fr;gap:12px}
+  .bloco-tempo + .bloco-tempo{border-left:0;padding-left:0;
+    border-top:2px solid var(--linha);padding-top:12px}
+  .grade-guarnicoes{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    grid-template-rows:none}
+  .linha-nat{grid-template-columns:minmax(0,1.3fr) minmax(40px,1fr) 28px}
+  .barras-mes .lista-nat{grid-auto-rows:22px}
+
+  /* Com a página rolando, o balão preso ao palco ficaria fora de lugar. */
+  #tooltip{display:none}
+  body.parado{cursor:default}
+}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -837,10 +882,16 @@ const COR_NATUREZA = {
   "PRODUTOS PERIGOSOS":"#E2E8F0", "TROTE":"#A78BFA", "OUTROS":"#64748B"
 };
 const CURTO_NATUREZA = {
-  "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"VISTORIA DE SEG.",
+  "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"VISTORIA",
   "MANEJO DE INSETOS":"INSETOS", "AÇÕES PREVENTIVAS":"PREVENTIVAS",
-  "PRODUTOS PERIGOSOS":"PROD. PERIGOSOS"
+  "PRODUTOS PERIGOSOS":"PERIGOSOS", "BUSCA E RESGATE":"BUSCA/RESGATE",
+  "CORTE DE ÁRVORE":"ÁRVORE", "PRÉ-HOSPITALAR":"PRÉ-HOSPITALAR"
 };
+
+// Os oito pelotões operacionais do 1º BBM, na ordem da 1ª e da 2ª Cia.
+const PELOTOES_OPERACIONAIS = GRUPOS
+  .filter(g => g.nome === "1ª CIA" || g.nome === "2ª CIA")
+  .flatMap(g => g.pelotoes);
 
 function normalizarNatureza(bruta){
   const n = (bruta || "").toUpperCase().trim();
@@ -926,6 +977,10 @@ function processarCSVMes(txt, refMes){
   const vistas = new Set(), vistasHoje = new Set();
   const porNatureza = {};
   const detalheHoje = {};   // natureza → { ocs, vtrs } do dia de hoje
+  // viatura → ocorrências que ela atendeu. O vínculo com o pelotão é feito só
+  // na hora de desenhar, usando a escala corrente — assim ele acompanha a
+  // escala do dia em vez de depender de uma tabela fixa de prefixos.
+  const vtrsMes = {}, vtrsDia = {};
   let linhasLidas = 0, ultimaData = null, horaMaisTarde = null;
 
   for (const r of linhas){
@@ -956,13 +1011,18 @@ function processarCSVMes(txt, refMes){
 
     // As viaturas são colhidas ANTES da deduplicação: uma ocorrência com duas
     // viaturas vem em duas linhas, e a segunda seria descartada logo abaixo.
+    const prefixos = String(r[colVtr] || "").split(/[;,\/]+/)
+      .map(v => v.trim().toUpperCase()).filter(Boolean);
+    prefixos.forEach(v => (vtrsMes[v] = vtrsMes[v] || new Set()).add(id));
+
     if (data && chaveDia(data) === hojeChave){
       const nat = normalizarNatureza(r[colNat]);
       const d = (detalheHoje[nat] = detalheHoje[nat] || { ocs: new Set(), vtrs: new Set() });
       d.ocs.add(id);
-      String(r[colVtr] || "").split(/[;,\/]+/)
-        .map(v => v.trim().toUpperCase()).filter(Boolean)
-        .forEach(v => d.vtrs.add(v));
+      prefixos.forEach(v => {
+        d.vtrs.add(v);
+        (vtrsDia[v] = vtrsDia[v] || new Set()).add(id);
+      });
     }
 
     if (vistas.has(id)) continue;
@@ -985,7 +1045,7 @@ function processarCSVMes(txt, refMes){
   const cobreHoje = ultimaData && chaveDia(ultimaData) === hojeChave;
 
   return {
-    total: vistas.size, porNatureza, detalheHoje, refMes,
+    total: vistas.size, porNatureza, detalheHoje, vtrsMes, vtrsDia, refMes,
     hoje: vistasHoje.size, cobreHoje, ultimaData, horaMaisTarde,
     linhas: linhas.length, jaFiltrado,
     tipos: Object.entries(porNatureza).sort((a, b) => b[1] - a[1]),
@@ -1018,6 +1078,27 @@ async function buscarEstatisticasMes(){
   return null;
 }
 
+/* Ocorrências por pelotão. O vínculo vem da escala corrente: a viatura que
+   está de serviço hoje diz de qual pelotão ela é. Uma ocorrência atendida por
+   duas viaturas de pelotões diferentes conta para os dois — é o número que
+   interessa ("quantas o Açorianos atendeu"), não uma divisão do total. */
+function contarPorPelotao(mapaVtr){
+  const porPel = new Map(), semPelotao = new Set();
+  for (const vtr in (mapaVtr || {})){
+    const pel = pelotaoDaVtr(vtr);
+    if (pel && PELOTOES_OPERACIONAIS.includes(pel)){
+      if (!porPel.has(pel)) porPel.set(pel, new Set());
+      mapaVtr[vtr].forEach(id => porPel.get(pel).add(id));
+    } else {
+      mapaVtr[vtr].forEach(id => semPelotao.add(id));
+    }
+  }
+  const lista = PELOTOES_OPERACIONAIS
+    .map(pel => [pel, porPel.has(pel) ? porPel.get(pel).size : 0])
+    .sort((a, b) => b[1] - a[1]);
+  return { lista, semPelotao: semPelotao.size };
+}
+
 function renderMes(){
   const m = estado.mes;
   if (!m){
@@ -1031,50 +1112,61 @@ function renderMes(){
     ? "mês fechado"
     : (m.ultimoDia || agora.getDate()) + " dias de " + MES_EXTENSO[m.refMes.getMonth()];
 
-  // O cabeçalho de cima some: os totais passaram para o topo de cada coluna,
-  // onde o comandante lê os dois números de uma olhada só.
   $("mes-cab").innerHTML = m.atrasado
     ? `<div class="mes-aviso">${MES_EXTENSO[m.refMes.getMonth()]} — o mês corrente ainda não foi compilado</div>`
     : "";
   $("mes-cab").style.display = m.atrasado ? "flex" : "none";
 
-  // Uma linha por natureza; a barra é o fundo da própria linha.
-  const linhas = (tipos, doDia) => {
-    const max = Math.max(1, ...tipos.map(t => t[1]));
-    return tipos.slice(0, 10).map(([nat, n]) => `
-      <div class="linha-nat${doDia ? " detalhavel" : ""}"${doDia ? ` data-nat="${nat.replace(/"/g, "&quot;")}"` : ""}
-           style="--c:${COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"]}">
-        <span class="rot">${CURTO_NATUREZA[nat] || nat}</span>
+  // Uma linha por item; a barra é a cor cheia, o trilho atrás é fraco.
+  const linhas = (itens, cores, tipo, doDia) => {
+    const max = Math.max(1, ...itens.map(t => t[1]));
+    return itens.slice(0, 10).map(([rot, n]) => `
+      <div class="linha-nat${doDia ? " detalhavel" : ""}"${doDia ? ` data-${tipo}="${rot.replace(/"/g, "&quot;")}"` : ""}
+           style="--c:${cores(rot)}">
+        <span class="rot">${tipo === "nat" ? (CURTO_NATUREZA[rot] || rot) : rot}</span>
         <span class="trilha"><i style="width:${(n / max * 100).toFixed(0)}%"></i></span>
         <span class="val">${n}</span>
       </div>`).join("");
   };
+  const corNat = nat => COR_NATUREZA[nat] || COR_NATUREZA["OUTROS"];
+  const corPel = pel => COR_PELOTAO[pel] || "#FF8C00";
 
-  const colunaMes = `
-    <div class="col-nat" style="--c:var(--laranja)">
-      <div class="col-cab"><b>${m.total}</b><span>No mês<i>${dias}</i></span></div>
-      <div class="lista-nat">${linhas(m.tipos, false)}</div>
+  const bloco = (cor, total, titulo, legenda, tipos, pelotoes, doDia, vazio) => `
+    <div class="bloco-tempo" style="--c:${cor}">
+      <div class="col-cab"><b>${total}</b><span>${titulo}<i>${legenda}</i></span></div>
+      ${vazio ? `<div class="vazio-dia">${vazio}</div>` : `
+      <div class="duplo">
+        <div class="col-nat">
+          <div class="sub-cab">Por natureza</div>
+          <div class="lista-nat">${linhas(tipos, corNat, "nat", doDia)}</div>
+        </div>
+        <div class="col-nat">
+          <div class="sub-cab">Por pelotão</div>
+          <div class="lista-nat">${linhas(pelotoes.lista, corPel, "pel", doDia)}</div>
+        </div>
+      </div>
+      ${pelotoes.semPelotao ? `<div class="rodape-pel">${pelotoes.semPelotao} sem pelotão identificado</div>` : ""}`}
     </div>`;
 
+  const blocoMes = bloco("var(--laranja)", m.total, "No mês", dias,
+    m.tipos, contarPorPelotao(m.vtrsMes), false, null);
+
   // "Sem cobertura" não é o mesmo que "zero hoje". Se o arquivo não alcança
-  // hoje, a coluna diz isso em vez de mostrar um zero que seria lido como
+  // hoje, a coluna diz isso em vez de exibir um zero que seria lido como
   // "nenhuma ocorrência até agora".
   const hora = m.horaMaisTarde ? " · última " + m.horaMaisTarde : "";
-  const colunaDia = !m.cobreHoje
-    ? `<div class="col-nat" style="--c:var(--txt-fraco)">
-         <div class="col-cab"><b>—</b><span>Hoje<i>consolidado vai até ${m.ultimaData
-            ? String(m.ultimaData.getDate()).padStart(2,"0") + "/" + String(m.ultimaData.getMonth()+1).padStart(2,"0")
-            : "data desconhecida"}</i></span></div>
-         <div class="vazio-dia">A leitura ainda não alcança o dia de hoje.</div>
-       </div>`
-    : `<div class="col-nat" style="--c:var(--ok)">
-         <div class="col-cab"><b>${m.hoje}</b><span>Hoje<i>desde 00:00${hora}</i></span></div>
-         <div class="lista-nat">${m.tiposHoje.length
-            ? linhas(m.tiposHoje, true)
-            : `<div class="vazio-dia">Nenhuma ocorrência atendida hoje até agora.</div>`}</div>
-       </div>`;
+  const blocoDia = !m.cobreHoje
+    ? bloco("var(--txt-fraco)", "—", "Hoje",
+        "consolidado vai até " + (m.ultimaData
+          ? String(m.ultimaData.getDate()).padStart(2,"0") + "/" + String(m.ultimaData.getMonth()+1).padStart(2,"0")
+          : "data desconhecida"),
+        [], { lista: [], semPelotao: 0 }, false,
+        "A leitura ainda não alcança o dia de hoje.")
+    : bloco("var(--ok)", m.hoje, "Hoje", "desde 00:00" + hora,
+        m.tiposHoje, contarPorPelotao(m.vtrsDia), true,
+        m.tiposHoje.length ? null : "Nenhuma ocorrência atendida hoje até agora.");
 
-  $("barras-mes").innerHTML = colunaMes + colunaDia;
+  $("barras-mes").innerHTML = blocoMes + blocoDia;
 }
 
 /* Guarnição de um pelotão no turno corrente, sem repetir gente.
@@ -1415,6 +1507,28 @@ function montarBalaoNatureza(nat){
     ${!porPelotao.size && !semPelotao.length ? `<div class="rodape-tip">Nenhuma viatura registrada.</div>` : ""}` };
 }
 
+/* Quais naturezas um pelotão atendeu hoje. Espelho do balão da natureza. */
+function montarBalaoPelotao(pel){
+  const m = estado.mes, cor = COR_PELOTAO[pel] || "#FF8C00";
+  if (!m || !m.detalheHoje) return { cor, html: `<h4>${pel}</h4><div class="sub">Sem detalhe</div>` };
+
+  const linhas = [];
+  const ocs = new Set();
+  for (const nat in m.detalheHoje){
+    const d = m.detalheHoje[nat];
+    const minhas = [...d.vtrs].filter(v => pelotaoDaVtr(v) === pel);
+    if (!minhas.length) continue;
+    linhas.push(`<li><b>${CURTO_NATUREZA[nat] || nat}</b><i>${minhas.join(", ")}</i></li>`);
+    d.ocs.forEach(id => ocs.add(id));
+  }
+  const n = ocs.size;
+  return { cor, html: `
+    <h4>${pel}</h4>
+    <div class="sub">${n} ${n === 1 ? "ocorrência atendida hoje" : "ocorrências atendidas hoje"}</div>
+    ${linhas.length ? `<ul>${linhas.join("")}</ul>`
+                    : `<div class="rodape-tip">Nenhuma ocorrência hoje.</div>`}` };
+}
+
 function ligarTooltip(){
   // Anéis: a guarnição do pelotão
   $("lista-pelotoes").addEventListener("mouseover", e => {
@@ -1431,7 +1545,9 @@ function ligarTooltip(){
   $("barras-mes").addEventListener("mouseover", e => {
     const alvo = e.target.closest(".linha-nat.detalhavel");
     if (!alvo) return;
-    const { cor, html } = montarBalaoNatureza(alvo.dataset.nat);
+    const { cor, html } = alvo.dataset.nat
+      ? montarBalaoNatureza(alvo.dataset.nat)
+      : montarBalaoPelotao(alvo.dataset.pel);
     mostrarBalao(alvo, html, cor);
   });
   $("barras-mes").addEventListener("mouseout", e => {
@@ -1540,9 +1656,15 @@ function trocarTela(i){
   if (telaAtual === 1) renderGuarnicoes();
 }
 
+/* Modo folha fixa (TV e monitor deitado) x modo empilhado (janela estreita
+   ou em pé). O limite é o mesmo do CSS acima — precisam concordar, senão o
+   palco fica escalado e empilhado ao mesmo tempo. */
+const modoEmpilhado = () => innerWidth <= 1100 || innerHeight > innerWidth;
+
 function ajustarEscala(){
-  const s = Math.min(innerWidth / 1920, innerHeight / 1080);
-  $("palco").style.transform = `scale(${s})`;
+  const palco = $("palco");
+  if (modoEmpilhado()){ palco.style.transform = ""; return; }
+  palco.style.transform = `scale(${Math.min(innerWidth / 1920, innerHeight / 1080)})`;
 }
 
 // Teclas úteis na sala: 1/2 força a tela, F entra em tela cheia, R relê agora.
