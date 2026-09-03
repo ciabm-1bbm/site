@@ -33,6 +33,10 @@ body{font-family:'Inter',sans-serif;color:var(--txt)}
 
 #viewport{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
 #palco{
+  /* A altura é definida pelo script: a folha acompanha a proporção da janela
+     em vez de assumir 1080 fixos. Sem isso, fora do modo tela cheia sobra
+     faixa preta ou falta espaço, porque a janela do navegador é mais baixa
+     que a tela. */
   width:1920px;height:1080px;transform-origin:center center;position:relative;
   padding:18px 24px 0;display:flex;flex-direction:column;
   background:
@@ -130,7 +134,10 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 .numerao{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
 .numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
 .numerao .rot{font-size:11px;color:var(--txt-fraco);letter-spacing:2px;text-transform:uppercase;line-height:1.3}
-.numerao .rot b{display:block;font-size:15px;color:var(--txt);letter-spacing:.5px}
+.numerao .rot b{display:block;font-size:13px;color:var(--txt);letter-spacing:.5px}
+/* Empenhada continua na lista, só apagada — sumir com ela esconderia metade
+   do quadro operacional. */
+.chip.ocupada{opacity:.45;border-bottom-style:dashed}
 
 .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0;margin-top:8px}
 .split section{display:flex;flex-direction:column;min-height:0}
@@ -362,7 +369,10 @@ body.parado{cursor:none}
 .barras-mes{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .bloco-tempo{display:flex;flex-direction:column;min-height:0}
 .bloco-tempo + .bloco-tempo{border-left:2px solid var(--linha);padding-left:16px}
-.duplo{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* Divisória e folga entre natureza e pelotão: sem elas a barra de uma lista
+   encostava no rótulo da outra e o quadro virava um borrão. */
+.duplo{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.duplo .col-nat + .col-nat{border-left:1px solid var(--linha);padding-left:20px}
 .col-nat{display:flex;flex-direction:column;min-height:0}
 .sub-cab{flex:none;font-size:9.5px;font-weight:700;letter-spacing:1.6px;
   text-transform:uppercase;color:var(--txt-fraco);padding-bottom:3px;margin-bottom:3px;
@@ -383,11 +393,11 @@ body.parado{cursor:none}
 /* Rótulo, barra e número em colunas próprias: o nome da natureza tem espaço
    garantido e nunca é cortado. A barra é a cor cheia; o trilho atrás é que
    fica fraco — a cor forte é o dado, não o fundo. */
-.linha-nat{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(26px,.75fr) 24px;
-  align-items:center;gap:5px}
+.linha-nat{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(24px,.55fr) 26px;
+  align-items:center;gap:7px}
 .linha-nat .rot{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;
   letter-spacing:.2px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.linha-nat .trilha{height:8px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.linha-nat .trilha{height:7px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
 .linha-nat .trilha i{display:block;height:100%;border-radius:3px;background:var(--c);
   box-shadow:0 0 7px color-mix(in srgb, var(--c) 60%, transparent);transition:width .6s ease}
 .linha-nat .val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
@@ -477,7 +487,7 @@ body.parado{cursor:none}
     <div id="grade-painel">
 
       <div class="painel" id="p-viaturas" style="--cor:var(--laranja)">
-        <h2>Viaturas disponíveis <span class="selo" id="selo-vtr">—</span></h2>
+        <h2>Viaturas em serviço no dia <span class="selo" id="selo-vtr">—</span></h2>
         <div class="corpo">
           <div class="numerao">
             <div class="n" id="vtr-total">0</div>
@@ -493,7 +503,6 @@ body.parado{cursor:none}
               <div class="chips" id="vtr-apoio"></div>
             </section>
           </div>
-          <div class="empenhadas" id="vtr-empenhadas"></div>
         </div>
       </div>
 
@@ -1251,32 +1260,32 @@ function guarnicaoDoPelotao(nome, apenasAgora = true){
 }
 
 function renderPanorama(){
-  // ── Viaturas ──────────────────────────────────────────────────────────
-  // Disponível = está na escala do dia e NÃO aparece em nenhuma ocorrência
-  // ativa. É a pergunta que a sala faz: com o que ainda posso contar agora?
+  // ── Viaturas em serviço no dia ────────────────────────────────────────
+  // O painel mostra a frota escalada para hoje, inteira. Quem está empenhada
+  // não sai da lista: fica com a etiqueta apagada e o balão, ao passar o
+  // mouse, diz em qual ocorrência ela está.
   const oco = estado.ocorrencias;
   const empenhadas = new Set();
   oco.forEach(o => o.vtrs.forEach(v => empenhadas.add(chaveVtr(v.prefixo))));
 
-  const livre = v => !empenhadas.has(chaveVtr(v));
-  const comb  = [...estado.vtrCombate].sort().filter(livre);
-  const apoio = [...estado.vtrApoio].sort().filter(livre);
-  const naEscala = estado.vtrCombate.size + estado.vtrApoio.size;
-  const fora = [...estado.vtrCombate, ...estado.vtrApoio].sort().filter(v => !livre(v));
+  const comb  = [...estado.vtrCombate].sort();
+  const apoio = [...estado.vtrApoio].sort();
+  const naEscala = comb.length + apoio.length;
+  const nEmpenhadas = [...comb, ...apoio].filter(v => empenhadas.has(chaveVtr(v))).length;
 
-  $("vtr-total").textContent     = comb.length + apoio.length;
+  $("vtr-total").textContent     = naEscala;
   $("vtr-combate-n").textContent = comb.length;
   $("vtr-apoio-n").textContent   = apoio.length;
-  $("vtr-escala").textContent    = "de " + naEscala + " na escala do dia";
-  $("selo-vtr").textContent      = fora.length ? fora.length + " empenhadas" : "nenhuma empenhada";
-  // data-vtr habilita o balão que diz de qual pelotão a viatura é.
+  $("vtr-escala").textContent    = nEmpenhadas
+    ? nEmpenhadas + (nEmpenhadas === 1 ? " empenhada agora" : " empenhadas agora")
+    : "frota inteira disponível";
+  $("selo-vtr").textContent = naEscala + " na escala";
+
   const chips = arr => arr.map(v =>
-    `<span class="chip" data-vtr="${v}" style="--c:${corDaVtr(v)}">${v}</span>`).join("");
-  $("vtr-combate").innerHTML = chips(comb) || `<span class="chip">nenhuma livre</span>`;
-  $("vtr-apoio").innerHTML   = chips(apoio) || `<span class="chip">nenhuma livre</span>`;
-  $("vtr-empenhadas").innerHTML = fora.length
-    ? `<b>Empenhadas</b>` + chips(fora)
-    : `<b>Empenhadas</b><span style="opacity:.7">nenhuma — frota inteira disponível</span>`;
+    `<span class="chip${empenhadas.has(chaveVtr(v)) ? " ocupada" : ""}" data-vtr="${v}"
+           style="--c:${corDaVtr(v)}">${v}</span>`).join("");
+  $("vtr-combate").innerHTML = chips(comb) || `<span class="chip">nenhuma</span>`;
+  $("vtr-apoio").innerHTML   = chips(apoio) || `<span class="chip">nenhuma</span>`;
 
   // ── Efetivo de serviço AGORA, por pelotão ─────────────────────────────
   // A escala do dia traz o turno inteiro: Teresópolis aparece com 7 porque
@@ -1697,10 +1706,34 @@ function tickAnel(){
    fica escalado e empilhado ao mesmo tempo. */
 const modoEmpilhado = () => innerWidth <= 1100 || innerHeight > innerWidth;
 
+/* A folha tem 1920 de largura fixa, mas a ALTURA acompanha a proporção da
+   janela. Numa TV 16:9 dá os 1080 de sempre; numa janela de navegador, que é
+   mais baixa por causa das abas, a folha encolhe na vertical e o conteúdo se
+   acomoda — em vez de a página inteira diminuir e sobrar tarja preta.
+   O piso de 860 evita que uma janela muito achatada esmague tudo; abaixo
+   disso volta a valer a redução proporcional. */
+const ALTURA_MIN = 860, ALTURA_MAX = 1350;
+
 function ajustarEscala(){
   const palco = $("palco");
-  if (modoEmpilhado()){ palco.style.transform = ""; return; }
-  palco.style.transform = `scale(${Math.min(innerWidth / 1920, innerHeight / 1080)})`;
+  if (modoEmpilhado()){
+    palco.style.transform = "";
+    palco.style.height = "auto";
+    return;
+  }
+  let escala = innerWidth / 1920;
+  let altura = innerHeight / escala;
+
+  if (altura < ALTURA_MIN){          // janela baixa demais: reduz mais
+    altura = ALTURA_MIN;
+    escala = Math.min(innerWidth / 1920, innerHeight / ALTURA_MIN);
+  } else if (altura > ALTURA_MAX){   // janela muito alta: não estica sem limite
+    altura = ALTURA_MAX;
+    escala = Math.min(innerWidth / 1920, innerHeight / ALTURA_MAX);
+  }
+
+  palco.style.height = altura + "px";
+  palco.style.transform = `scale(${escala})`;
 }
 
 // Teclas úteis na sala: 1/2 força a tela, F entra em tela cheia, R relê agora.
