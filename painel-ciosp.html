@@ -70,22 +70,53 @@ header img{height:64px}
 .pulso.erro .rotulo{color:var(--alerta)}
 
 /* ---------- Telas ---------- */
-main{flex:1;position:relative;padding:16px 0 8px}
-.tela{position:absolute;inset:16px 0 8px;opacity:0;pointer-events:none;transition:opacity .5s ease}
-.tela.ativa{opacity:1;pointer-events:auto}
+main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 
-/* ---------- Tela 1: 4 quadrantes ---------- */
-#tela-panorama{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:16px}
+/* Tela única em 16:9. Linha de cima com os três painéis de situação, meio com
+   as estatísticas e base com as guarnições. As alturas são fracionárias, então
+   a grade se acomoda sozinha se a faixa de ocorrência ao vivo aparecer. */
+#grade-painel{
+  flex:1;min-height:0;display:grid;gap:11px;
+  grid-template-columns:355px 290px minmax(0,1fr);
+  grid-template-rows:minmax(0,0.63fr) minmax(0,0.95fr) minmax(0,1fr);
+}
+#p-viaturas   {grid-area:1/1/2/2}
+#p-tropa      {grid-area:1/2/2/3}
+#p-aneis      {grid-area:1/3/2/4}
+#painel-oco   {grid-area:2/1/3/4}
+#p-guarnicoes {grid-area:3/1/4/4}
+
+/* Faixa de ocorrência ao vivo. Fica fora da grade e some quando não há nada —
+   estatística é o normal do painel, ocorrência correndo é a exceção. */
+#faixa-oco{display:flex;align-items:stretch;gap:14px;margin-top:10px;
+  border:1px solid rgba(239,68,68,.5);border-left:6px solid #ef4444;border-radius:10px;
+  background:linear-gradient(90deg,rgba(239,68,68,.16),rgba(239,68,68,.04));
+  padding:7px 14px;animation:respira 2.6s ease-in-out infinite}
+#faixa-oco[hidden]{display:none}
+.faixa-n{display:flex;align-items:center;gap:9px;flex:none;padding-right:14px;
+  border-right:1px solid rgba(255,255,255,.12)}
+.faixa-n b{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:700;
+  line-height:.85;color:#ff5a4d;font-variant-numeric:tabular-nums}
+.faixa-n span{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;line-height:1.05}
+.faixa-lista{flex:1;min-width:0;display:flex;gap:20px;align-items:center;overflow:hidden}
+.faixa-item{display:flex;align-items:baseline;gap:7px;white-space:nowrap;min-width:0}
+.faixa-item .h{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.faixa-item .n{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:600;
+  letter-spacing:.5px}
+.faixa-item .e{font-size:12px;color:var(--txt-fraco);overflow:hidden;text-overflow:ellipsis}
+
 
 .painel{
-  background:var(--bg-card);border:1px solid var(--linha);border-radius:12px;
-  border-left:6px solid var(--cor,var(--laranja));
-  padding:16px 22px;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--bg-card);border:1px solid var(--linha);border-radius:10px;
+  border-left:5px solid var(--cor,var(--laranja));
+  padding:9px 14px 11px;display:flex;flex-direction:column;overflow:hidden;
 }
 .painel > h2{
-  font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;letter-spacing:3px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--linha);flex:none;
+  font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-bottom:5px;margin-bottom:7px;border-bottom:1px solid var(--linha);flex:none;
 }
 .painel > h2 .selo{
   font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;
@@ -97,9 +128,9 @@ main{flex:1;position:relative;padding:16px 0 8px}
 
 /* Q1 — viaturas */
 .numerao{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
-.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:104px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
-.numerao .rot{font-size:15px;color:var(--txt-fraco);letter-spacing:3px;text-transform:uppercase;line-height:1.3}
-.numerao .rot b{display:block;font-size:22px;color:var(--txt);letter-spacing:1px}
+.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
+.numerao .rot{font-size:11px;color:var(--txt-fraco);letter-spacing:2px;text-transform:uppercase;line-height:1.3}
+.numerao .rot b{display:block;font-size:15px;color:var(--txt);letter-spacing:.5px}
 
 .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0;margin-top:8px}
 .split section{display:flex;flex-direction:column;min-height:0}
@@ -108,10 +139,14 @@ main{flex:1;position:relative;padding:16px 0 8px}
 
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;overflow:hidden}
 .chip{
-  font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:600;letter-spacing:1px;
-  background:rgba(255,255,255,.06);border:1px solid var(--linha);border-radius:6px;padding:3px 9px;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;letter-spacing:.5px;
+  background:rgba(255,255,255,.06);border:1px solid var(--linha);border-radius:5px;padding:1px 6px;
   border-bottom:3px solid var(--c,var(--laranja));
 }
+/* Passando o mouse na viatura, o painel diz de qual pelotão ela é. */
+#vtr-combate .chip, #vtr-apoio .chip, .empenhadas .chip{cursor:pointer}
+#vtr-combate .chip:hover, #vtr-apoio .chip:hover, .empenhadas .chip:hover{
+  background:rgba(255,255,255,.14)}
 
 /* Q2 — efetivo por pelotão */
 .pelotoes{flex:1;min-height:0;display:grid;grid-template-rows:repeat(auto-fit,minmax(0,1fr));gap:5px;align-content:start}
@@ -122,19 +157,19 @@ main{flex:1;position:relative;padding:16px 0 8px}
 .linha-pel .qtd{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
 
 /* Q3 — tropa */
-.grade-tropa{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:none}
-.bloco{background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;padding:12px 14px;text-align:center}
-.bloco .v{font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
-.bloco .k{font-size:12px;letter-spacing:3px;color:var(--txt-fraco);text-transform:uppercase;margin-top:4px}
+.grade-tropa{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:none}
+.bloco{background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:8px;padding:6px 8px;text-align:center}
+.bloco .v{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.bloco .k{font-size:10px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase;margin-top:2px}
 
-.turnos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;flex:1;min-height:0}
-.turno{border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:16px;border:1px solid var(--linha)}
+.turnos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;flex:1;min-height:0}
+.turno{border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:9px;border:1px solid var(--linha)}
 .turno.dia{background:linear-gradient(135deg,rgba(234,179,8,.16),rgba(234,179,8,.04));border-color:rgba(234,179,8,.35)}
 .turno.noite{background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(56,189,248,.04));border-color:rgba(56,189,248,.35)}
-.turno .icone{font-size:38px;line-height:1}
-.turno .v{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
-.turno .k{font-size:12px;letter-spacing:3px;color:var(--txt-fraco);text-transform:uppercase}
-.turno .h{font-size:13px;color:var(--txt-fraco);margin-top:2px}
+.turno .icone{font-size:24px;line-height:1}
+.turno .v{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.turno .k{font-size:10px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase}
+.turno .h{font-size:11px;color:var(--txt-fraco);margin-top:1px}
 
 /* Q4 — ocorrências */
 .ocorrencias{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;overflow:hidden}
@@ -158,12 +193,14 @@ main{flex:1;position:relative;padding:16px 0 8px}
 .vazio span{font-size:14px;max-width:420px;line-height:1.5}
 
 /* ---------- Tela 2: guarnições com foto ---------- */
-#tela-guarnicoes{display:flex;flex-direction:column;gap:14px}
-.faixa-grupo{
+#tela-guarnicoes{flex:1;min-height:0;display:flex;flex-direction:column}
+.faixa-grupo{display:none;
   font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:4px;
   padding:5px 16px;border-radius:8px;background:var(--cor);color:#fff;flex:none;
 }
-.grade-guarnicoes{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:12px}
+/* Os oito pelotões numa linha só: é o que cabe na base de uma tela 16:9. */
+.grade-guarnicoes{flex:1;min-height:0;display:grid;
+  grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
 .card-guarnicao{
   background:var(--bg-card);border:1px solid var(--linha);border-left:5px solid var(--cor);
   border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;
@@ -223,7 +260,7 @@ footer{
 .empenhadas b{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-fraco);margin-right:4px}
 .empenhadas .chip{opacity:.62;text-decoration:line-through}
 
-.nota-turno{flex:none;margin-top:12px;font-size:13px;color:var(--txt-fraco);text-align:center}
+.nota-turno{flex:none;margin-top:6px;font-size:10.5px;color:var(--txt-fraco);text-align:center}
 .nota-turno b{color:var(--txt)}
 
 /* Anéis por pelotão. No meio vai a viatura, na volta o efetivo de serviço
@@ -384,18 +421,18 @@ body.parado{cursor:none}
   .titulo h1{font-size:26px;letter-spacing:1px}
   .relogio .hora{font-size:46px}
 
-  main{flex:none}
-  .tela{position:static;opacity:1;pointer-events:auto;display:none}
-  .tela.ativa{display:block}
-  #tela-panorama{grid-template-columns:1fr;grid-template-rows:none;gap:12px}
-  .painel{min-height:300px}
+  main{flex:none;display:block}
+  #grade-painel{grid-template-columns:1fr;grid-template-rows:none;gap:12px}
+  #p-viaturas,#p-tropa,#p-aneis,#painel-oco,#p-guarnicoes{grid-area:auto}
+  .painel{min-height:280px}
+  #faixa-oco{flex-wrap:wrap}
+  .faixa-lista{flex-wrap:wrap;gap:10px}
 
   .aneis{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
   .barras-mes{grid-template-columns:1fr;gap:12px}
   .bloco-tempo + .bloco-tempo{border-left:0;padding-left:0;
     border-top:2px solid var(--linha);padding-top:12px}
-  .grade-guarnicoes{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-    grid-template-rows:none}
+  .grade-guarnicoes{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
   .linha-nat{grid-template-columns:minmax(0,1.3fr) minmax(40px,1fr) 28px}
   .barras-mes .lista-nat{grid-auto-rows:22px}
 
@@ -415,7 +452,7 @@ body.parado{cursor:none}
     <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="">
     <div class="titulo">
       <h1>CIOSP · <b>1º BATALHÃO</b> DE BOMBEIROS MILITARES</h1>
-      <p id="rotulo-tela">Panorama operacional do dia</p>
+      <p>Panorama operacional do dia</p>
     </div>
     <div class="pulso" id="pulso">
       <svg class="anel" viewBox="0 0 64 64">
@@ -430,16 +467,21 @@ body.parado{cursor:none}
     </div>
   </header>
 
-  <main>
-    <!-- ===== TELA 1 ===== -->
-    <div class="tela ativa" id="tela-panorama">
+  <!-- Faixa de ocorrência ao vivo: só aparece quando há alguma correndo. -->
+  <div id="faixa-oco" hidden>
+    <div class="faixa-n"><b id="faixa-num">0</b><span>em<br>andamento</span></div>
+    <div class="faixa-lista" id="faixa-lista"></div>
+  </div>
 
-      <div class="painel" style="--cor:var(--laranja)">
+  <main>
+    <div id="grade-painel">
+
+      <div class="painel" id="p-viaturas" style="--cor:var(--laranja)">
         <h2>Viaturas disponíveis <span class="selo" id="selo-vtr">—</span></h2>
         <div class="corpo">
           <div class="numerao">
             <div class="n" id="vtr-total">0</div>
-            <div class="rot">prontas para empenho<br><b id="vtr-escala">de 0 na escala</b></div>
+            <div class="rot">prontas<br><b id="vtr-escala">de 0 na escala</b></div>
           </div>
           <div class="split">
             <section>
@@ -447,7 +489,7 @@ body.parado{cursor:none}
               <div class="chips" id="vtr-combate"></div>
             </section>
             <section>
-              <h3>Apoio e resgate <span id="vtr-apoio-n">0</span></h3>
+              <h3>Apoio <span id="vtr-apoio-n">0</span></h3>
               <div class="chips" id="vtr-apoio"></div>
             </section>
           </div>
@@ -455,58 +497,53 @@ body.parado{cursor:none}
         </div>
       </div>
 
-      <div class="painel" style="--cor:var(--amarelo)">
-        <h2>De serviço agora <span class="selo" id="selo-pel">—</span></h2>
-        <div class="corpo"><div class="aneis" id="lista-pelotoes"></div></div>
-      </div>
-
-      <div class="painel" style="--cor:var(--verde)">
+      <div class="painel" id="p-tropa" style="--cor:var(--verde)">
         <h2>Tropa de serviço <span class="selo" id="selo-tropa">—</span></h2>
         <div class="corpo">
           <div class="grade-tropa">
-            <div class="bloco"><div class="v" id="t-of">0</div><div class="k">Oficiais</div></div>
-            <div class="bloco"><div class="v" id="t-sgt">0</div><div class="k">Sargentos</div></div>
+            <div class="bloco"><div class="v" id="t-of">0</div><div class="k">Of</div></div>
+            <div class="bloco"><div class="v" id="t-sgt">0</div><div class="k">Sgt</div></div>
             <div class="bloco"><div class="v" id="t-pr">0</div><div class="k">Praças</div></div>
           </div>
           <div class="turnos">
             <div class="turno dia">
               <div class="icone">☀</div>
-              <div><div class="v" id="t-dia">0</div><div class="k">Diurno</div><div class="h">08:00 → 20:00</div></div>
+              <div><div class="v" id="t-dia">0</div><div class="k">Diurno</div><div class="h">08→20</div></div>
             </div>
             <div class="turno noite">
               <div class="icone">☾</div>
-              <div><div class="v" id="t-noite">0</div><div class="k">Noturno</div><div class="h">20:00 → 08:00</div></div>
+              <div><div class="v" id="t-noite">0</div><div class="k">Noturno</div><div class="h">20→08</div></div>
             </div>
           </div>
           <div class="nota-turno" id="nota-24h">—</div>
         </div>
       </div>
 
-      <div class="painel calmo" id="painel-oco">
-        <h2>Ocorrências em andamento <span class="selo" id="selo-oco">—</span></h2>
+      <div class="painel" id="p-aneis" style="--cor:var(--amarelo)">
+        <h2>De serviço agora <span class="selo" id="selo-pel">—</span></h2>
+        <div class="corpo"><div class="aneis" id="lista-pelotoes"></div></div>
+      </div>
+
+      <div class="painel" id="painel-oco" style="--cor:var(--laranja)">
+        <h2>Estatísticas de ocorrências atendidas <span class="selo" id="selo-oco">—</span></h2>
         <div class="corpo">
-          <div class="placar" id="placar-oco">
-            <div class="n" id="oco-n">0</div>
-            <div class="rot" id="oco-rot">—</div>
-            <div class="repartido" id="oco-repartido"></div>
-          </div>
-          <div class="ocorrencias" id="lista-ocorrencias"></div>
           <div class="mes-cab" id="mes-cab"></div>
           <div class="barras-mes" id="barras-mes"></div>
         </div>
       </div>
 
-    </div>
+      <div class="painel" id="p-guarnicoes" style="--cor:var(--verde)">
+        <h2>Guarnições de serviço <span class="selo" id="selo-guarnicoes">1ª e 2ª Cia</span></h2>
+        <div class="corpo"><div id="tela-guarnicoes"></div></div>
+      </div>
 
-    <!-- ===== TELA 2 ===== -->
-    <div class="tela" id="tela-guarnicoes"></div>
+    </div>
   </main>
 
   <div id="tooltip"></div>
 
   <footer>
     <div id="rodape-fonte">Fonte: Sistema E-193 · CBMRS</div>
-    <div class="pontos" id="pontos"></div>
     <div id="rodape-atualizacao">Aguardando primeira leitura</div>
   </footer>
 
@@ -548,8 +585,7 @@ const CONFIG = {
   urlFotos: "https://raw.githubusercontent.com/ciabm-1bbm/site/main/images/fotos-ciosp/",
 
   intervaloDados: 15000,   // releitura das ocorrências (muda o tempo todo)
-  intervaloEscala: 300000, // releitura da escala (muda uma vez por dia)
-  intervaloTelas: 25000    // troca entre panorama e guarnições
+  intervaloEscala: 300000  // releitura da escala (muda uma vez por dia)
 };
 
 /* Só o 1º BBM. O BBS é outra unidade e fica fora de tudo.
@@ -672,6 +708,13 @@ function normalizarPelotao(obmRaw){
 /* ============================================================
    ESTADO
    ============================================================ */
+/* Declarados junto do estado, antes de qualquer função que os leia. Ficavam
+   depois de renderPanorama, que usa atrasoOco — funcionava só pela ordem em
+   que o navegador chamava as coisas, e quebrava se essa ordem mudasse. */
+let atrasoOco = null;      // minutos de atraso quando a leitura veio do espelho
+let fonteOcOk = null;      // caminho do AODC que respondeu por último
+let ultimaEscala = 0, ultimoMes = 0;
+
 let estado = { pelotoes:{}, vtrCombate:new Set(), vtrApoio:new Set(),
                oficiais:new Map(), sargentos:new Map(), pracas:new Map(),
                dia:new Set(), noite:new Set(), vinteQuatro:new Set(),
@@ -1226,7 +1269,9 @@ function renderPanorama(){
   $("vtr-apoio-n").textContent   = apoio.length;
   $("vtr-escala").textContent    = "de " + naEscala + " na escala do dia";
   $("selo-vtr").textContent      = fora.length ? fora.length + " empenhadas" : "nenhuma empenhada";
-  const chips = arr => arr.map(v => `<span class="chip" style="--c:${corDaVtr(v)}">${v}</span>`).join("");
+  // data-vtr habilita o balão que diz de qual pelotão a viatura é.
+  const chips = arr => arr.map(v =>
+    `<span class="chip" data-vtr="${v}" style="--c:${corDaVtr(v)}">${v}</span>`).join("");
   $("vtr-combate").innerHTML = chips(comb) || `<span class="chip">nenhuma livre</span>`;
   $("vtr-apoio").innerHTML   = chips(apoio) || `<span class="chip">nenhuma livre</span>`;
   $("vtr-empenhadas").innerHTML = fora.length
@@ -1289,52 +1334,26 @@ function renderPanorama(){
     : "Nenhum militar em turno de 24 h nesta escala";
 
   // ── Ocorrências ───────────────────────────────────────────────────────
-  const painel = $("painel-oco");
-  const semLeitura = !oco.length && !oco.totalEstado;
-  painel.classList.toggle("ativo", oco.length > 0);
-  painel.classList.toggle("calmo", oco.length === 0);
-
-  $("oco-n").textContent = semLeitura ? (estado.mes ? estado.mes.total : "—") : oco.length;
-  $("oco-rot").innerHTML = semLeitura ? "No mês<br>até hoje"
-    : oco.length === 0 ? "Nenhuma<br>em andamento"
-    : (oco.length === 1 ? "Ocorrência<br>em andamento" : "Ocorrências<br>em andamento");
-  $("selo-oco").textContent = semLeitura ? "consolidado do mês" : (oco.totalEstado || 0) + " no estado";
-
-  const porSit = {};
-  oco.forEach(o => { porSit[o.situacao.chave] = (porSit[o.situacao.chave] || 0) + 1; });
-  $("oco-repartido").innerHTML = ["SemVtr","Desl","Cheg","Retor"]
-    .filter(k => porSit[k])
-    .map(k => `<span style="color:${SITUACOES[k].cor}">${SITUACOES[k].sinal} ${porSit[k]} ${SITUACOES[k].curto.toLowerCase()}</span>`)
-    .join("");
-
-  // Ocorrência correndo manda no quadrante: numa sala de operações, o que está
-  // acontecendo agora vale mais que o acumulado do mês. Sem ocorrência — ou sem
-  // AODC, que é o caso fora da rede do e193 — entra o consolidado.
-  const mostraLista = oco.length > 0;
-  // O placar repete os totais que já estão no topo de cada coluna. Escondê-lo
-  // quando o gráfico está no ar devolve altura para as dez naturezas caberem.
-  $("placar-oco").style.display = mostraLista ? "flex" : "none";
-  $("lista-ocorrencias").style.display = mostraLista ? "flex" : "none";
-  $("mes-cab").style.display    = "none";   // controlado por renderMes
-  $("barras-mes").style.display = mostraLista ? "none" : "grid";
-
-  if (mostraLista){
-    $("lista-ocorrencias").innerHTML = oco.slice(0, 4).map(o => `
-        <div class="ocorrencia" style="border-left-color:${o.situacao.cor}">
-          <div>
-            <div class="hora">${o.hora}</div>
-            <div class="situacao" style="color:${o.situacao.cor}">${o.situacao.sinal} ${o.situacao.curto}</div>
-          </div>
-          <div>
-            <div class="nat">${o.natureza}</div>
-            <div class="end">${o.municipio}${o.endereco ? " · " + o.endereco : ""} · nº ${o.numero}</div>
-          </div>
-          <div class="vtrs">${o.vtrs.map(v => `<span class="chip" style="--c:${SITUACOES[v.sit] ? SITUACOES[v.sit].cor : "#FF8C00"}">${v.prefixo}</span>`).join("") || `<span class="chip">sem VTR</span>`}</div>
-        </div>`).join("")
-      + (oco.length > 4 ? `<div class="nota-turno">e mais ${oco.length - 4} — a lista completa fica no painel do AODC</div>` : "");
-  } else {
-    renderMes();
+  // O painel agora é de estatística. Ocorrência correndo é exceção e aparece
+  // numa faixa acima da grade, que some quando não há nenhuma.
+  const faixa = $("faixa-oco");
+  faixa.hidden = oco.length === 0;
+  if (oco.length){
+    $("faixa-num").textContent = oco.length;
+    $("faixa-lista").innerHTML = oco.slice(0, 4).map(o => `
+      <div class="faixa-item">
+        <span class="h" style="color:${o.situacao.cor}">${o.situacao.sinal} ${o.hora}</span>
+        <span class="n">${CURTO_NATUREZA[normalizarNatureza(o.natureza)] || o.natureza}</span>
+        <span class="e">${o.municipio}${o.endereco ? " · " + o.endereco : ""}</span>
+        <span class="h" style="color:${o.situacao.cor}">${o.vtrs.map(v => v.prefixo).join(" ")}</span>
+      </div>`).join("")
+      + (oco.length > 4 ? `<div class="faixa-item"><span class="e">e mais ${oco.length - 4}</span></div>` : "");
   }
+
+  $("selo-oco").textContent = estado.mes
+    ? "1º BBM · fonte E-193" + (atrasoOco != null ? " · AODC há " + atrasoOco + " min" : "")
+    : "aguardando leitura";
+  renderMes();
 }
 
 function corDaVtr(v){
@@ -1529,6 +1548,27 @@ function montarBalaoPelotao(pel){
                     : `<div class="rodape-tip">Nenhuma ocorrência hoje.</div>`}` };
 }
 
+/* De qual pelotão é a viatura, e se está livre ou empenhada. */
+function montarBalaoVtr(vtr){
+  const pel = pelotaoDaVtr(vtr);
+  const cor = pel ? (COR_PELOTAO[pel] || "#FF8C00") : "var(--txt-fraco)";
+  const combate = [...estado.vtrCombate].some(v => chaveVtr(v) === chaveVtr(vtr));
+  const emUso = (estado.ocorrencias || []).find(o =>
+    o.vtrs.some(v => chaveVtr(v.prefixo) === chaveVtr(vtr)));
+  const g = pel ? guarnicaoDoPelotao(pel) : null;
+  const naVtr = g ? g.militares.filter(m => m.vtrs.some(v => chaveVtr(v) === chaveVtr(vtr))) : [];
+
+  return { cor, html: `
+    <h4>${vtr}</h4>
+    <div class="sub">${pel || "pelotão não identificado"} · ${combate ? "combate" : "apoio e resgate"}</div>
+    <div class="vtr-bloco">
+      <div class="vtr-cab">${emUso ? "Empenhada" : "Disponível"}
+        <span>${emUso ? emUso.natureza + " · " + emUso.municipio : "pronta para empenho"}</span></div>
+      ${naVtr.length ? `<ul>${naVtr.map(m =>
+        `<li><b>${m.nome}</b><i>${m.funcao || "—"}</i></li>`).join("")}</ul>` : ""}
+    </div>` };
+}
+
 function ligarTooltip(){
   // Anéis: a guarnição do pelotão
   $("lista-pelotoes").addEventListener("mouseover", e => {
@@ -1539,6 +1579,17 @@ function ligarTooltip(){
   });
   $("lista-pelotoes").addEventListener("mouseout", e => {
     if (!e.relatedTarget || !e.relatedTarget.closest(".anel-pel")) esconderBalao();
+  });
+
+  // Viaturas: de qual pelotão são
+  $("p-viaturas").addEventListener("mouseover", e => {
+    const alvo = e.target.closest(".chip[data-vtr]");
+    if (!alvo) return;
+    const { cor, html } = montarBalaoVtr(alvo.dataset.vtr);
+    mostrarBalao(alvo, html, cor);
+  });
+  $("p-viaturas").addEventListener("mouseout", e => {
+    if (!e.relatedTarget || !e.relatedTarget.closest(".chip[data-vtr]")) esconderBalao();
   });
 
   // Barras do dia: quais pelotões atenderam aquelas ocorrências
@@ -1569,8 +1620,6 @@ document.body.classList.add("parado");
    CICLO DE VIDA
    ============================================================ */
 const CIRC = 2 * Math.PI * 27;
-let fonteOcOk = null;   // caminho do AODC que respondeu por último
-let ultimaEscala = 0, ultimoMes = 0;
 
 async function buscarDados(){
   const pulso = $("pulso"), falhas = [];
@@ -1643,24 +1692,6 @@ function tickAnel(){
   $("anel-barra").style.strokeDashoffset = CIRC * (1 - restante / (CONFIG.intervaloDados / 1000));
 }
 
-let telaAtual = 0;
-const TELAS = [
-  { el:"tela-panorama",   rotulo:"Panorama operacional do dia" },
-  { el:"tela-guarnicoes", rotulo:"Guarnições de serviço agora — 1ª e 2ª Cia" }
-];
-function trocarTela(i){
-  telaAtual = (i + TELAS.length) % TELAS.length;
-  TELAS.forEach((t, k) => $(t.el).classList.toggle("ativa", k === telaAtual));
-  $("rotulo-tela").textContent = TELAS[telaAtual].rotulo;
-  $("pontos").innerHTML = TELAS.map((_, k) => `<i class="${k === telaAtual ? "on" : ""}"></i>`).join("");
-  if (telaAtual === 1) renderGuarnicoes();
-}
-
-/* Modo folha fixa (TV e monitor deitado) x modo empilhado (janela estreita
-   ou em pé). O limite é o mesmo do CSS acima — precisam concordar, senão o
-   palco fica escalado e empilhado ao mesmo tempo. */
-const modoEmpilhado = () => innerWidth <= 1100 || innerHeight > innerWidth;
-
 function ajustarEscala(){
   const palco = $("palco");
   if (modoEmpilhado()){ palco.style.transform = ""; return; }
@@ -1669,8 +1700,6 @@ function ajustarEscala(){
 
 // Teclas úteis na sala: 1/2 força a tela, F entra em tela cheia, R relê agora.
 addEventListener("keydown", e => {
-  if (e.key === "1") trocarTela(0);
-  if (e.key === "2") trocarTela(1);
   if (e.key.toLowerCase() === "f") document.documentElement.requestFullscreen?.();
   if (e.key.toLowerCase() === "r") buscarDados();
 });
@@ -1679,11 +1708,9 @@ addEventListener("resize", ajustarEscala);
 ajustarEscala();
 ligarTooltip();
 tickRelogio();
-trocarTela(0);
 buscarDados();
 setInterval(tickRelogio, 1000);
 setInterval(tickAnel, 1000);
-setInterval(() => trocarTela(telaAtual + 1), CONFIG.intervaloTelas);
 
 </script>
 </body>
