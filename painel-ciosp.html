@@ -1692,6 +1692,11 @@ function tickAnel(){
   $("anel-barra").style.strokeDashoffset = CIRC * (1 - restante / (CONFIG.intervaloDados / 1000));
 }
 
+/* Modo folha fixa (TV e monitor deitado) x modo empilhado (janela estreita ou
+   em pé). O limite tem de ser o mesmo da media query lá em cima, senão o palco
+   fica escalado e empilhado ao mesmo tempo. */
+const modoEmpilhado = () => innerWidth <= 1100 || innerHeight > innerWidth;
+
 function ajustarEscala(){
   const palco = $("palco");
   if (modoEmpilhado()){ palco.style.transform = ""; return; }
@@ -1705,12 +1710,28 @@ addEventListener("keydown", e => {
 });
 addEventListener("resize", ajustarEscala);
 
-ajustarEscala();
-ligarTooltip();
-tickRelogio();
-buscarDados();
-setInterval(tickRelogio, 1000);
-setInterval(tickAnel, 1000);
+/* Se algo quebrar na partida, o painel escreve o erro no rodapé em vez de
+   ficar em branco. Numa sala de operações, tela vazia sem explicação é o
+   pior resultado possível: ninguém sabe se não há ocorrência ou se o painel
+   morreu. */
+function partir(){
+  try {
+    ajustarEscala();
+    ligarTooltip();
+    tickRelogio();
+    buscarDados();
+    setInterval(tickRelogio, 1000);
+    setInterval(tickAnel, 1000);
+  } catch (err){
+    console.error(err);
+    const r = $("rodape-atualizacao");
+    if (r) r.textContent = "ERRO NA PARTIDA: " + err.message;
+    const pr = $("pulso-rotulo");
+    if (pr) pr.textContent = "Falhou";
+    $("pulso").classList.add("erro");
+  }
+}
+partir();
 
 </script>
 </body>
