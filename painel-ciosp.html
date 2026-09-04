@@ -31,13 +31,17 @@
 html,body{height:100%;background:var(--bg);overflow:hidden}
 body{font-family:'Inter',sans-serif;color:var(--txt)}
 
-#viewport{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
+#viewport{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);overflow:hidden}
 #palco{
   /* A altura é definida pelo script: a folha acompanha a proporção da janela
      em vez de assumir 1080 fixos. Sem isso, fora do modo tela cheia sobra
      faixa preta ou falta espaço, porque a janela do navegador é mais baixa
      que a tela. */
-  width:1920px;height:1080px;transform-origin:center center;position:relative;
+  /* min-width:0 e max-width são obrigatórios: item de grade tem min-width
+     automático, então um conteúdo interno mais largo empurrava a folha para
+     além dos 1920 e o excesso saía pela direita da tela. */
+  width:1920px;min-width:0;max-width:1920px;height:1080px;overflow:hidden;
+  transform-origin:center center;position:relative;
   padding:18px 24px 0;display:flex;flex-direction:column;
   background:
     radial-gradient(circle at 50% 40%, rgba(30,41,59,.55) 0%, rgba(11,17,32,.97) 70%),
@@ -79,8 +83,9 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 /* Tela única em 16:9. Linha de cima com os três painéis de situação, meio com
    as estatísticas e base com as guarnições. As alturas são fracionárias, então
    a grade se acomoda sozinha se a faixa de ocorrência ao vivo aparecer. */
+#grade-painel > *{min-width:0;min-height:0}
 #grade-painel{
-  flex:1;min-height:0;display:grid;gap:11px;
+  flex:1;min-height:0;min-width:0;display:grid;gap:11px;
   grid-template-columns:355px 290px minmax(0,1fr);
   grid-template-rows:minmax(0,0.63fr) minmax(0,0.95fr) minmax(0,1fr);
 }
@@ -128,7 +133,7 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
   border:1px solid color-mix(in srgb,var(--cor) 45%,transparent);
   padding:3px 10px;border-radius:99px;
 }
-.corpo{flex:1;min-height:0;display:flex;flex-direction:column}
+.corpo{flex:1;min-height:0;min-width:0;display:flex;flex-direction:column}
 
 /* Q1 — viaturas */
 .numerao{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
@@ -225,8 +230,10 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
   background:rgba(255,255,255,.06);border:1px solid var(--linha);
   display:grid;place-items:center;
 }
-.retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.retrato .iniciais{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--txt-fraco)}
+.retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+/* Enquanto a foto não é enviada, entra uma silhueta de bombeiro com capacete.
+   Uniformiza o quadro: iniciais soltas davam aparência de erro. */
+.retrato .silhueta{width:64%;height:auto;opacity:.34;color:var(--txt-fraco)}
 .militar .nm{font-size:9.5px;font-weight:700;margin-top:4px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .militar .fn{font-size:8px;letter-spacing:1px;color:var(--txt-fraco);text-transform:uppercase}
 
@@ -270,33 +277,19 @@ footer{
 .nota-turno{flex:none;margin-top:6px;font-size:10.5px;color:var(--txt-fraco);text-align:center}
 .nota-turno b{color:var(--txt)}
 
-/* Anéis por pelotão. No meio vai a viatura, na volta o efetivo de serviço
-   AGORA. O arco é proporcional ao maior pelotão da leitura, então dá para
-   comparar as frações de relance, sem ler número por número. */
-.aneis{flex:1;min-height:0;display:grid;gap:4px;
-  grid-template-columns:repeat(5,1fr);align-content:center;justify-items:center}
-.anel-pel{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
-.anel-pel .rosca{position:relative;width:92px;height:92px}
-.anel-pel svg{width:100%;height:100%;transform:rotate(-90deg)}
-.anel-pel svg circle{fill:none;stroke-linecap:round}
-.anel-pel .trilho{stroke:rgba(255,255,255,.08);stroke-width:9}
-.anel-pel .arco{stroke:var(--c);stroke-width:9;transition:stroke-dasharray .6s ease}
-.anel-pel .centro{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:1px;text-align:center;padding:0 8px}
-.anel-pel .vtr-num{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;
-  letter-spacing:.5px;line-height:1;color:var(--txt);white-space:nowrap}
-.anel-pel .vtr-num.dupla{font-size:12.5px}
-.anel-pel .vtr-num + .vtr-num{margin-top:1px;color:var(--txt-fraco)}
-.anel-pel .contagem{position:absolute;top:-3px;left:50%;transform:translateX(-50%);
-  min-width:27px;height:27px;padding:0 6px;border-radius:99px;background:var(--c);color:#0b1120;
-  display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;
-  font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;
-  box-shadow:0 2px 8px rgba(0,0,0,.5)}
-.anel-pel .rotulo{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
-  letter-spacing:1px;color:var(--txt);text-align:center;line-height:1.05;
-  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.anel-pel.zerado{opacity:.32}
-.anel-pel.zerado .contagem{background:rgba(255,255,255,.14);color:var(--txt-fraco)}
+/* Efetivo por pelotão em etiquetas, no mesmo formato das viaturas: o detalhe
+   de quem é quem está logo abaixo, nas fotos das guarnições. */
+.chips-pel{align-content:flex-start;gap:5px}
+.chip-pel{display:flex;align-items:center;gap:6px;padding:2px 8px 3px;border-radius:5px;
+  background:rgba(255,255,255,.05);border:1px solid var(--linha);
+  border-left:4px solid var(--c);cursor:pointer}
+.chip-pel:hover{background:rgba(255,255,255,.13)}
+.chip-pel .p{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;
+  letter-spacing:.5px;color:var(--txt);white-space:nowrap}
+.chip-pel .q{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--c);line-height:1}
+.chip-pel .v{font-size:9.5px;letter-spacing:.5px;color:var(--txt-fraco);white-space:nowrap}
+.chip-pel.zerado{opacity:.35}
 
 .selo-turno{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;
   padding:3px 10px;border-radius:99px}
@@ -337,8 +330,6 @@ body.parado{cursor:none}
 #tooltip li.repetido i{color:var(--laranja)}
 #tooltip .rodape-tip{margin-top:8px;padding-top:6px;border-top:1px solid var(--linha);
   font-size:11px;color:var(--txt-fraco)}
-.anel-pel{cursor:pointer}
-.anel-pel:hover .rosca{filter:brightness(1.18)}
 
 /* Consolidado do mês. Ocupa o quadrante quando não há ocorrência correndo —
    ou quando o AODC não responde, que é o caso fora da rede do e193. */
@@ -530,7 +521,13 @@ body.parado{cursor:none}
 
       <div class="painel" id="p-aneis" style="--cor:var(--amarelo)">
         <h2>De serviço agora <span class="selo" id="selo-pel">—</span></h2>
-        <div class="corpo"><div class="aneis" id="lista-pelotoes"></div></div>
+        <div class="corpo">
+          <div class="numerao">
+            <div class="n" id="ef-total">0</div>
+            <div class="rot">militares<br><b id="ef-turno">no turno corrente</b></div>
+          </div>
+          <div class="chips chips-pel" id="lista-pelotoes"></div>
+        </div>
       </div>
 
       <div class="painel" id="painel-oco" style="--cor:var(--laranja)">
@@ -1288,13 +1285,13 @@ function renderPanorama(){
   $("vtr-apoio").innerHTML   = chips(apoio) || `<span class="chip">nenhuma</span>`;
 
   // ── Efetivo de serviço AGORA, por pelotão ─────────────────────────────
-  // A escala do dia traz o turno inteiro: Teresópolis aparece com 7 porque
-  // soma diurno e noturno. Aqui entra só quem cobre o turno corrente — 3 num
-  // pelotão de uma ABT, 5 onde há também uma AR com 2 por turno.
+  // Só o quantitativo: quem é quem aparece nas fotos, logo abaixo. Antes eram
+  // dez roscas ocupando um terço da tela para dizer oito números.
   const agora = turnoAgora();
   const ordemPel = GRUPOS.flatMap(g => g.pelotoes);
   const pel = Object.keys(estado.pelotoes)
     .map(nome => guarnicaoDoPelotao(nome))
+    .filter(p => p.militares.length)
     .sort((a, b) => ordemPel.indexOf(a.nome) - ordemPel.indexOf(b.nome));
 
   // Total por ID, não pela soma dos pelotões: militar lançado em duas frações
@@ -1302,32 +1299,15 @@ function renderPanorama(){
   const idsUnicos = new Set();
   pel.forEach(p => p.militares.forEach(m => idsUnicos.add(m.id)));
 
-  const maxPel = Math.max(1, ...pel.map(p => p.militares.length));
-  const totalAgora = idsUnicos.size;
-  $("selo-pel").innerHTML = `<span class="selo-turno" style="background:${agora === "dia" ? "rgba(234,179,8,.2)" : "rgba(56,189,248,.2)"};color:${agora === "dia" ? "#EAB308" : "#38bdf8"}">${agora === "dia" ? "☀ DIURNO" : "☾ NOTURNO"}</span> ${totalAgora} militares`;
-
-  const R = 48, C = 2 * Math.PI * R;
-  $("lista-pelotoes").innerHTML = pel.map(p => {
-    const cor = COR_PELOTAO[p.nome] || "#FF8C00";
-    const n = p.militares.length;
-    const arco = n ? (n / maxPel) * C : 0;
-    const nums = p.vtrs.length
-      ? p.vtrs.slice(0, 2).map(v => `<div class="vtr-num${p.vtrs.length > 1 ? " dupla" : ""}">${v}</div>`).join("")
-      : `<div class="vtr-num dupla" style="color:var(--txt-fraco)">sem VTR</div>`;
-    return `
-    <div class="anel-pel ${n ? "" : "zerado"}" style="--c:${cor}" data-pel="${p.nome}">
-      <div class="rosca">
-        <svg viewBox="0 0 112 112">
-          <circle class="trilho" cx="56" cy="56" r="${R}"></circle>
-          <circle class="arco" cx="56" cy="56" r="${R}"
-                  stroke-dasharray="${arco.toFixed(1)} ${(C - arco).toFixed(1)}"></circle>
-        </svg>
-        <div class="centro">${nums}</div>
-        <div class="contagem">${n}</div>
-      </div>
-      <div class="rotulo">${p.nome}</div>
-    </div>`;
-  }).join("");
+  $("ef-total").textContent = idsUnicos.size;
+  $("ef-turno").innerHTML = agora === "dia" ? "☀ turno diurno" : "☾ turno noturno";
+  $("selo-pel").textContent = pel.length + " frações";
+  $("lista-pelotoes").innerHTML = pel.map(p => `
+    <div class="chip-pel" data-pel="${p.nome}" style="--c:${COR_PELOTAO[p.nome] || "#FF8C00"}">
+      <span class="q">${p.militares.length}</span>
+      <span class="p">${p.nome}</span>
+      <span class="v">${p.vtrs.join(" · ") || "sem VTR"}</span>
+    </div>`).join("");
 
   // ── Tropa ─────────────────────────────────────────────────────────────
   const conta = mapa => [...mapa.values()].filter(deServicoAgora).length;
@@ -1407,7 +1387,7 @@ function renderGuarnicoes(){
             ${c.militares.slice(0, 10).map(m => `
               <div class="militar">
                 <div class="retrato">
-                  <span class="iniciais">${iniciais(m.nome)}</span>
+                  ${SILHUETA}
                   ${idFuncional(m.id) ? `<img src="${CONFIG.urlFotos}${nomeArquivo(m.nome)}_${m.id}.jpg" data-reserva="${CONFIG.urlFotos}${m.id}.jpg" alt="" loading="lazy" onerror="if(this.dataset.reserva){this.src=this.dataset.reserva;this.dataset.reserva='';}else{this.remove();}">` : ""}
                 </div>
                 <div class="nm">${m.nome}</div>
@@ -1427,6 +1407,14 @@ function nomeArquivo(nome){
   return partes.join("-").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
     .toLowerCase().replace(/[^a-z0-9-]/g,"");
 }
+
+/* Silhueta de bombeiro: busto com capacete de aba larga. Vai embutida no
+   arquivo, sem depender de imagem externa que a rede possa bloquear. */
+const SILHUETA = `<svg class="silhueta" viewBox="0 0 48 56" fill="currentColor" aria-hidden="true">
+  <path d="M24 6c-6.2 0-11 4.3-11.6 10H9.4c-1.4 0-2.6 1-2.9 2.4L6 21.5h36l-.5-3.1c-.3-1.4-1.5-2.4-2.9-2.4h-3C35 10.3 30.2 6 24 6zm-2.4 4.6h4.8l.7 5.4h-6.2l.7-5.4z"/>
+  <path d="M13.6 23.5c.9 5.3 5.3 9.3 10.4 9.3s9.5-4 10.4-9.3H13.6z"/>
+  <path d="M24 35.4c-7.4 0-13.6 4.3-15.6 10.2-.6 1.8-.9 3.4-1 4.6-.1 1 .7 1.8 1.7 1.8h29.8c1 0 1.8-.8 1.7-1.8-.1-1.2-.4-2.8-1-4.6-2-5.9-8.2-10.2-15.6-10.2z"/>
+</svg>`;
 
 function iniciais(nome){
   const p = nome.split(/\s+/).filter(w => w.length > 2);
@@ -1581,13 +1569,13 @@ function montarBalaoVtr(vtr){
 function ligarTooltip(){
   // Anéis: a guarnição do pelotão
   $("lista-pelotoes").addEventListener("mouseover", e => {
-    const alvo = e.target.closest(".anel-pel");
+    const alvo = e.target.closest(".chip-pel");
     if (!alvo) return;
     const pel = alvo.dataset.pel;
     mostrarBalao(alvo, montarTooltip(pel), COR_PELOTAO[pel] || "#FF8C00");
   });
   $("lista-pelotoes").addEventListener("mouseout", e => {
-    if (!e.relatedTarget || !e.relatedTarget.closest(".anel-pel")) esconderBalao();
+    if (!e.relatedTarget || !e.relatedTarget.closest(".chip-pel")) esconderBalao();
   });
 
   // Viaturas: de qual pelotão são
