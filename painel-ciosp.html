@@ -86,11 +86,11 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 #grade-painel > *{min-width:0;min-height:0}
 #grade-painel{
   flex:1;min-height:0;min-width:0;display:grid;gap:11px;
-  grid-template-columns:355px 290px minmax(0,1fr);
-  grid-template-rows:minmax(0,0.63fr) minmax(0,0.95fr) minmax(0,1fr);
+  grid-template-columns:300px 330px minmax(0,1fr);
+  grid-template-rows:minmax(0,0.52fr) minmax(0,0.88fr) minmax(0,1.16fr);
 }
-#p-viaturas   {grid-area:1/1/2/2}
-#p-tropa      {grid-area:1/2/2/3}
+#p-efetivo    {grid-area:1/1/2/2}
+#p-viaturas   {grid-area:1/2/2/3}
 #p-aneis      {grid-area:1/3/2/4}
 #painel-oco   {grid-area:2/1/3/4}
 #p-guarnicoes {grid-area:3/1/4/4}
@@ -174,107 +174,20 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 .bloco .v{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
 .bloco .k{font-size:10px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase;margin-top:2px}
 
-.turnos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;flex:1;min-height:0}
-.turno{border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:9px;border:1px solid var(--linha)}
-.turno.dia{background:linear-gradient(135deg,rgba(234,179,8,.16),rgba(234,179,8,.04));border-color:rgba(234,179,8,.35)}
-.turno.noite{background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(56,189,248,.04));border-color:rgba(56,189,248,.35)}
-.turno .icone{font-size:24px;line-height:1}
-.turno .v{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
-.turno .k{font-size:10px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase}
-.turno .h{font-size:11px;color:var(--txt-fraco);margin-top:1px}
+/* Diurno e noturno numa linha só. Antes eram duas caixas altas com ícone,
+   número e legenda empilhados — ocupavam metade do quadro para dizer dois
+   números, e a nota das 24 h acabava por cima delas. */
+.turnos{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px;flex:none}
+.turno{border-radius:7px;padding:5px 9px;display:flex;align-items:baseline;gap:7px;
+  border:1px solid var(--linha)}
+.turno .i{font-size:14px;line-height:1}
+.turno b{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;
+  line-height:1;font-variant-numeric:tabular-nums}
+.turno .k{font-size:10px;letter-spacing:1.5px;color:var(--txt-fraco);text-transform:uppercase}
+.turno.dia{background:rgba(234,179,8,.13);border-color:rgba(234,179,8,.32)}
+.turno.noite{background:rgba(56,189,248,.13);border-color:rgba(56,189,248,.32)}
 
-/* Q4 — ocorrências */
-.ocorrencias{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;overflow:hidden}
-.ocorrencia{
-  display:grid;grid-template-columns:78px 1fr auto;gap:14px;align-items:center;
-  background:rgba(255,255,255,.04);border:1px solid var(--linha);border-left:4px solid var(--vermelho);
-  border-radius:8px;padding:10px 14px;
-}
-.ocorrencia .hora{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;line-height:1}
-.ocorrencia .situacao{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
-.ocorrencia .nat{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:600;letter-spacing:1px}
-.ocorrencia .end{font-size:14px;color:var(--txt-fraco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ocorrencia .vtrs{display:flex;gap:5px}
-
-.vazio{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-  color:var(--txt-fraco);text-align:center;border:2px dashed var(--linha);border-radius:10px;
-}
-.vazio .icone{font-size:52px;opacity:.4}
-.vazio strong{font-family:'Barlow Condensed',sans-serif;font-size:26px;letter-spacing:2px;color:var(--txt)}
-.vazio span{font-size:14px;max-width:420px;line-height:1.5}
-
-/* ---------- Tela 2: guarnições com foto ---------- */
-#tela-guarnicoes{flex:1;min-height:0;display:flex;flex-direction:column}
-.faixa-grupo{display:none;
-  font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:4px;
-  padding:5px 16px;border-radius:8px;background:var(--cor);color:#fff;flex:none;
-}
-/* Os oito pelotões numa linha só: é o que cabe na base de uma tela 16:9. */
-.grade-guarnicoes{flex:1;min-height:0;display:grid;
-  grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
-.card-guarnicao{
-  background:var(--bg-card);border:1px solid var(--linha);border-left:5px solid var(--cor);
-  border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;overflow:hidden;
-}
-.card-guarnicao h3{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:700;letter-spacing:2px}
-.card-guarnicao .vtr{font-size:12px;letter-spacing:2px;color:var(--cor);font-weight:700;margin-bottom:10px}
-/* auto-fill com largura mínima: todas do mesmo tamanho, proporção 3x4 travada,
-   e a quantidade por linha se ajusta ao tamanho da guarnição. */
-.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));
-  gap:6px;align-content:start;justify-items:center}
-.militar{width:100%;max-width:80px}
-.militar{text-align:center}
-.retrato{
-  position:relative;width:100%;aspect-ratio:3/4;border-radius:6px;overflow:hidden;
-  background:rgba(255,255,255,.06);border:1px solid var(--linha);
-  display:grid;place-items:center;
-}
-.retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
-/* Enquanto a foto não é enviada, entra uma silhueta de bombeiro com capacete.
-   Uniformiza o quadro: iniciais soltas davam aparência de erro. */
-.retrato .silhueta{width:64%;height:auto;opacity:.34;color:var(--txt-fraco)}
-.militar .nm{font-size:9.5px;font-weight:700;margin-top:4px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.militar .fn{font-size:8px;letter-spacing:1px;color:var(--txt-fraco);text-transform:uppercase}
-
-/* ---------- Rodapé ---------- */
-footer{
-  flex:none;display:flex;align-items:center;justify-content:space-between;
-  padding:8px 2px 10px;border-top:1px solid var(--linha);
-  font-size:12px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase;
-}
-.pontos{display:flex;gap:7px}
-.pontos i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .3s,width .3s}
-.pontos i.on{background:var(--laranja);width:26px;border-radius:5px}
-
-
-/* Placar das ocorrências: é o número que se lê da porta da sala. Verde e
-   parado quando não há nada; vermelho e respirando quando há. */
-.placar{display:flex;align-items:center;gap:20px;flex:none;padding:4px 0 14px;
-  border-bottom:1px solid var(--linha);margin-bottom:12px}
-.placar .n{font-family:'Barlow Condensed',sans-serif;font-size:100px;font-weight:700;
-  line-height:.78;font-variant-numeric:tabular-nums;min-width:120px;text-align:center}
-.placar .rot{font-family:'Barlow Condensed',sans-serif;font-size:29px;font-weight:700;
-  letter-spacing:3px;line-height:1.05}
-.placar .repartido{display:flex;flex-direction:column;gap:4px;margin-left:auto;text-align:right}
-.placar .repartido span{font-size:14px;font-weight:700;letter-spacing:1px;white-space:nowrap}
-
-#painel-oco.calmo{--cor:var(--ok)}
-#painel-oco.calmo .placar .n{color:var(--ok)}
-#painel-oco.ativo{--cor:#ef4444}
-#painel-oco.ativo .placar .n{color:#ff5a4d}
-#painel-oco.ativo{box-shadow:0 0 0 2px rgba(239,68,68,.5), 0 0 32px rgba(239,68,68,.22);
-  animation:respira 2.6s ease-in-out infinite}
-@keyframes respira{50%{box-shadow:0 0 0 2px rgba(239,68,68,.9), 0 0 46px rgba(239,68,68,.45)}}
-
-/* Viaturas já empenhadas: ficam fora da contagem de disponíveis, mas
-   continuam visíveis — sumir com elas esconderia metade do quadro. */
-.empenhadas{flex:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--linha);
-  display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--txt-fraco)}
-.empenhadas b{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-fraco);margin-right:4px}
-.empenhadas .chip{opacity:.62;text-decoration:line-through}
-
-.nota-turno{flex:none;margin-top:6px;font-size:10.5px;color:var(--txt-fraco);text-align:center}
+.nota-turno{flex:none;margin-top:5px;font-size:9.5px;color:var(--txt-fraco);text-align:center;line-height:1.3}
 .nota-turno b{color:var(--txt)}
 
 /* Efetivo por pelotão em etiquetas, no mesmo formato das viaturas: o detalhe
@@ -442,6 +355,44 @@ body.parado{cursor:none}
   body.parado{cursor:default}
 }
 
+/* ─── Guarnições com foto ──────────────────────────────────────────────
+   Este bloco havia se perdido numa edição anterior; as classes existiam no
+   script mas não tinham estilo. Refeito com as fotos menores, para a segunda
+   fileira de cada guarnição caber sem corte. */
+#tela-guarnicoes{flex:1;min-height:0;display:flex;flex-direction:column}
+/* Estado vazio, usado quando não há guarnição montada nem estatística. */
+.vazio{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;color:var(--txt-fraco);text-align:center;border:2px dashed var(--linha);
+  border-radius:9px;padding:12px}
+.vazio .icone{font-size:38px;opacity:.4}
+.vazio strong{font-family:'Barlow Condensed',sans-serif;font-size:20px;letter-spacing:1.5px;color:var(--txt)}
+.vazio span{font-size:12px;max-width:420px;line-height:1.5}
+.grade-guarnicoes{flex:1;min-height:0;display:grid;
+  grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+
+.card-guarnicao{background:var(--bg-card);border:1px solid var(--linha);
+  border-left:4px solid var(--cor);border-radius:8px;padding:7px 8px;
+  display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.card-guarnicao h3{font-family:'Barlow Condensed',sans-serif;font-size:17px;
+  font-weight:700;letter-spacing:1.5px;line-height:1.05}
+.card-guarnicao .vtr{font-size:9px;letter-spacing:.6px;color:var(--cor);
+  font-weight:700;margin-bottom:5px;line-height:1.35}
+
+.fotos{flex:1;min-height:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(48px,1fr));
+  gap:4px;align-content:start;justify-items:center}
+.militar{width:100%;max-width:58px;min-width:0}
+.retrato{position:relative;width:100%;aspect-ratio:3/4;border-radius:5px;
+  overflow:hidden;background:rgba(255,255,255,.05);border:1px solid var(--linha);
+  display:grid;place-items:center}
+.retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+/* Silhueta de bombeiro enquanto a foto não é enviada. */
+.retrato .silhueta{width:62%;height:auto;opacity:.32;color:var(--txt-fraco)}
+.militar .nm{font-size:8px;font-weight:700;margin-top:3px;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.militar .fn{font-size:7px;letter-spacing:.4px;color:var(--txt-fraco);
+  text-transform:uppercase;text-align:center;line-height:1.1}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -477,12 +428,34 @@ body.parado{cursor:none}
   <main>
     <div id="grade-painel">
 
+      <!-- Três quadros sem repetição: gente, frota e frações. Cada número
+           aparece num lugar só. -->
+      <div class="painel" id="p-efetivo" style="--cor:var(--verde)">
+        <h2>Efetivo de serviço <span class="selo" id="ef-turno">—</span></h2>
+        <div class="corpo">
+          <div class="numerao">
+            <div class="n" id="ef-total">0</div>
+            <div class="rot">militares<br><b>no turno corrente</b></div>
+          </div>
+          <div class="grade-tropa">
+            <div class="bloco"><div class="v" id="t-of">0</div><div class="k">Of</div></div>
+            <div class="bloco"><div class="v" id="t-sgt">0</div><div class="k">Sgt</div></div>
+            <div class="bloco"><div class="v" id="t-pr">0</div><div class="k">Praças</div></div>
+          </div>
+          <div class="turnos">
+            <div class="turno dia"><span class="i">☀</span><b id="t-dia">0</b><span class="k">diurno</span></div>
+            <div class="turno noite"><span class="i">☾</span><b id="t-noite">0</b><span class="k">noturno</span></div>
+          </div>
+          <div class="nota-turno" id="nota-24h">—</div>
+        </div>
+      </div>
+
       <div class="painel" id="p-viaturas" style="--cor:var(--laranja)">
-        <h2>Viaturas em serviço no dia <span class="selo" id="selo-vtr">—</span></h2>
+        <h2>Viaturas <span class="selo" id="selo-vtr">—</span></h2>
         <div class="corpo">
           <div class="numerao">
             <div class="n" id="vtr-total">0</div>
-            <div class="rot">prontas<br><b id="vtr-escala">de 0 na escala</b></div>
+            <div class="rot">na escala<br><b id="vtr-escala">—</b></div>
           </div>
           <div class="split">
             <section>
@@ -497,37 +470,9 @@ body.parado{cursor:none}
         </div>
       </div>
 
-      <div class="painel" id="p-tropa" style="--cor:var(--verde)">
-        <h2>Tropa de serviço <span class="selo" id="selo-tropa">—</span></h2>
-        <div class="corpo">
-          <div class="grade-tropa">
-            <div class="bloco"><div class="v" id="t-of">0</div><div class="k">Of</div></div>
-            <div class="bloco"><div class="v" id="t-sgt">0</div><div class="k">Sgt</div></div>
-            <div class="bloco"><div class="v" id="t-pr">0</div><div class="k">Praças</div></div>
-          </div>
-          <div class="turnos">
-            <div class="turno dia">
-              <div class="icone">☀</div>
-              <div><div class="v" id="t-dia">0</div><div class="k">Diurno</div><div class="h">08→20</div></div>
-            </div>
-            <div class="turno noite">
-              <div class="icone">☾</div>
-              <div><div class="v" id="t-noite">0</div><div class="k">Noturno</div><div class="h">20→08</div></div>
-            </div>
-          </div>
-          <div class="nota-turno" id="nota-24h">—</div>
-        </div>
-      </div>
-
       <div class="painel" id="p-aneis" style="--cor:var(--amarelo)">
-        <h2>De serviço agora <span class="selo" id="selo-pel">—</span></h2>
-        <div class="corpo">
-          <div class="numerao">
-            <div class="n" id="ef-total">0</div>
-            <div class="rot">militares<br><b id="ef-turno">no turno corrente</b></div>
-          </div>
-          <div class="chips chips-pel" id="lista-pelotoes"></div>
-        </div>
+        <h2>Frações de serviço <span class="selo" id="selo-pel">—</span></h2>
+        <div class="corpo"><div class="chips chips-pel" id="lista-pelotoes"></div></div>
       </div>
 
       <div class="painel" id="painel-oco" style="--cor:var(--laranja)">
@@ -1299,8 +1244,31 @@ function renderPanorama(){
   const idsUnicos = new Set();
   pel.forEach(p => p.militares.forEach(m => idsUnicos.add(m.id)));
 
+  // Postos contados a partir do MESMO conjunto do total, para os três blocos
+  // sempre fecharem com o número grande. Antes o total vinha dos pelotões e os
+  // postos de outra lista, e a tela mostrava 45 em cima e 44 na soma abaixo.
+  const posto = { of:0, sgt:0, pr:0 };
+  idsUnicos.forEach(id => {
+    if (estado.oficiais.has(id)) posto.of++;
+    else if (estado.sargentos.has(id)) posto.sgt++;
+    else posto.pr++;
+  });
+
   $("ef-total").textContent = idsUnicos.size;
   $("ef-turno").innerHTML = agora === "dia" ? "☀ turno diurno" : "☾ turno noturno";
+  $("t-of").textContent  = posto.of;
+  $("t-sgt").textContent = posto.sgt;
+  $("t-pr").textContent  = posto.pr;
+
+  // Diurno e noturno são a escala do DIA inteiro, não do turno corrente —
+  // por isso ficam separados do número grande.
+  $("t-dia").textContent   = estado.dia.size;
+  $("t-noite").textContent = estado.noite.size;
+  const n24 = estado.vinteQuatro.size;
+  $("nota-24h").innerHTML = n24
+    ? `Escala do dia · <b>${n24}</b> em turno de 24 h contam nas duas faixas`
+    : "Escala do dia · ninguém em turno de 24 h";
+
   $("selo-pel").textContent = pel.length + " frações";
   $("lista-pelotoes").innerHTML = pel.map(p => `
     <div class="chip-pel" data-pel="${p.nome}" style="--c:${COR_PELOTAO[p.nome] || "#FF8C00"}">
@@ -1308,19 +1276,6 @@ function renderPanorama(){
       <span class="p">${p.nome}</span>
       <span class="v">${p.vtrs.join(" · ") || "sem VTR"}</span>
     </div>`).join("");
-
-  // ── Tropa ─────────────────────────────────────────────────────────────
-  const conta = mapa => [...mapa.values()].filter(deServicoAgora).length;
-  const of = conta(estado.oficiais), sg = conta(estado.sargentos), pr = conta(estado.pracas);
-  $("t-of").textContent = of; $("t-sgt").textContent = sg; $("t-pr").textContent = pr;
-  $("selo-tropa").textContent = (of + sg + pr) + " no turno corrente";
-  $("t-dia").textContent   = estado.dia.size;
-  $("t-noite").textContent = estado.noite.size;
-  const n24 = estado.vinteQuatro.size;
-  // Sem esta linha os dois números pareceriam não fechar com o total.
-  $("nota-24h").innerHTML = n24
-    ? `<b>${n24}</b> ${n24 === 1 ? "militar está" : "militares estão"} em turno de 24 h e ${n24 === 1 ? "conta" : "contam"} nas duas faixas`
-    : "Nenhum militar em turno de 24 h nesta escala";
 
   // ── Ocorrências ───────────────────────────────────────────────────────
   // O painel agora é de estatística. Ocorrência correndo é exceção e aparece
@@ -1659,7 +1614,10 @@ async function buscarDados(){
       if (lidas.totalEstado){ estado.ocorrencias = lidas; fonteOcOk = f; leuOco = true; break; }
     } catch(e){ /* tenta o próximo caminho */ }
   }
-  if (!leuOco) falhas.push("AODC: nenhum caminho respondeu (" + CONFIG.fontesOcorrencias.join(", ") + ")");
+  // O AODC só responde dentro da rede do e193 ou pelo espelho do repositório.
+  // Fora disso é o esperado, não um defeito — fica no console, não no rodapé,
+  // que deve mostrar apenas o que exige providência.
+  if (!leuOco) console.info("Ocorrências ao vivo indisponíveis (AODC fora de alcance).");
 
   renderPanorama();
   renderGuarnicoes();
