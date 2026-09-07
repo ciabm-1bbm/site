@@ -90,7 +90,7 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
   /* A primeira linha tem altura mínima garantida: o conteúdo dela é fixo
      (números e etiquetas) e não tem como encolher. As outras duas dividem o
      que sobrar. */
-  grid-template-rows:minmax(228px,0.56fr) minmax(0,0.9fr) minmax(0,1.18fr);
+  grid-template-rows:minmax(200px,0.5fr) minmax(0,0.92fr) minmax(0,1.24fr);
 }
 #p-efetivo    {grid-area:1/1/2/2}
 #p-viaturas   {grid-area:1/2/2/3}
@@ -138,9 +138,26 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 }
 .corpo{flex:1;min-height:0;min-width:0;display:flex;flex-direction:column}
 
+/* Número grande e composição lado a lado. */
+.linha-topo{display:flex;align-items:center;gap:14px;flex:none}
+.postos{list-style:none;display:flex;flex-direction:column;gap:1px}
+.postos li{display:flex;align-items:baseline;gap:7px}
+.postos b{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700;
+  line-height:1.15;font-variant-numeric:tabular-nums;min-width:26px;text-align:right;color:var(--cor)}
+.postos span{font-size:9.5px;letter-spacing:1.4px;color:var(--txt-fraco);text-transform:uppercase}
+
+/* Estado da frota: verde quando tudo está em casa, âmbar quando há viatura
+   fora. É a linha que o comando lê de relance. */
+.estado-frota{flex:none;margin-top:9px;padding:5px 9px;border-radius:6px;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;
+  text-align:center;background:rgba(74,222,128,.13);border:1px solid rgba(74,222,128,.32);
+  color:var(--ok)}
+.estado-frota.ocupada{background:rgba(234,179,8,.14);border-color:rgba(234,179,8,.35);color:var(--amarelo)}
+#vtr-empenhadas{margin-top:7px}
+
 /* Q1 — viaturas */
 .numerao{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
-.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
+.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:50px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
 .numerao .rot{font-size:11px;color:var(--txt-fraco);letter-spacing:2px;text-transform:uppercase;line-height:1.3}
 .numerao .rot b{display:block;font-size:13px;color:var(--txt);letter-spacing:.5px}
 /* Empenhada continua na lista, só apagada — sumir com ela esconderia metade
@@ -382,9 +399,9 @@ body.parado{cursor:none}
   font-weight:700;margin-bottom:5px;line-height:1.35}
 
 .fotos{flex:1;min-height:0;display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(48px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(41px,1fr));
   gap:4px;align-content:start;justify-items:center}
-.militar{width:100%;max-width:58px;min-width:0}
+.militar{width:100%;max-width:48px;min-width:0}
 .retrato{position:relative;width:100%;aspect-ratio:3/4;border-radius:5px;
   overflow:hidden;background:rgba(255,255,255,.05);border:1px solid var(--linha);
   display:grid;place-items:center}
@@ -449,17 +466,21 @@ footer .velha{color:var(--ouro)}
 
       <!-- Três quadros sem repetição: gente, frota e frações. Cada número
            aparece num lugar só. -->
+      <!-- Efetivo: número grande à esquerda, composição à direita. Empilhar
+           tudo era o que estourava a altura do quadro. -->
       <div class="painel" id="p-efetivo" style="--cor:var(--verde)">
         <h2>Efetivo de serviço <span class="selo" id="ef-turno">—</span></h2>
         <div class="corpo">
-          <div class="numerao">
-            <div class="n" id="ef-total">0</div>
-            <div class="rot">militares<br><b>no turno corrente</b></div>
-          </div>
-          <div class="grade-tropa">
-            <div class="bloco"><div class="v" id="t-of">0</div><div class="k">Of</div></div>
-            <div class="bloco"><div class="v" id="t-sgt">0</div><div class="k">Sgt</div></div>
-            <div class="bloco"><div class="v" id="t-pr">0</div><div class="k">Praças</div></div>
+          <div class="linha-topo">
+            <div class="numerao">
+              <div class="n" id="ef-total">0</div>
+              <div class="rot">militares<br><b>turno corrente</b></div>
+            </div>
+            <ul class="postos">
+              <li><b id="t-of">0</b><span>Oficiais</span></li>
+              <li><b id="t-sgt">0</b><span>Sargentos</span></li>
+              <li><b id="t-pr">0</b><span>Praças</span></li>
+            </ul>
           </div>
           <div class="turnos">
             <div class="turno dia"><span class="i">☀</span><b id="t-dia">0</b><span class="k">diurno</span></div>
@@ -469,23 +490,23 @@ footer .velha{color:var(--ouro)}
         </div>
       </div>
 
+      <!-- Viaturas: só o quantitativo. Os prefixos de cada fração já aparecem
+           no quadro ao lado, e repeti-los aqui era o que transbordava. -->
       <div class="painel" id="p-viaturas" style="--cor:var(--laranja)">
         <h2>Viaturas <span class="selo" id="selo-vtr">—</span></h2>
         <div class="corpo">
-          <div class="numerao">
-            <div class="n" id="vtr-total">0</div>
-            <div class="rot">na escala<br><b id="vtr-escala">—</b></div>
+          <div class="linha-topo">
+            <div class="numerao">
+              <div class="n" id="vtr-total">0</div>
+              <div class="rot">viaturas<br><b>na escala do dia</b></div>
+            </div>
+            <ul class="postos">
+              <li><b id="vtr-combate-n">0</b><span>Combate</span></li>
+              <li><b id="vtr-apoio-n">0</b><span>Apoio</span></li>
+            </ul>
           </div>
-          <div class="split">
-            <section>
-              <h3>Combate <span id="vtr-combate-n">0</span></h3>
-              <div class="chips" id="vtr-combate"></div>
-            </section>
-            <section>
-              <h3>Apoio <span id="vtr-apoio-n">0</span></h3>
-              <div class="chips" id="vtr-apoio"></div>
-            </section>
-          </div>
+          <div class="estado-frota" id="vtr-estado">—</div>
+          <div class="chips" id="vtr-empenhadas"></div>
         </div>
       </div>
 
@@ -1222,32 +1243,33 @@ function guarnicaoDoPelotao(nome, apenasAgora = true){
 }
 
 function renderPanorama(){
-  // ── Viaturas em serviço no dia ────────────────────────────────────────
-  // O painel mostra a frota escalada para hoje, inteira. Quem está empenhada
-  // não sai da lista: fica com a etiqueta apagada e o balão, ao passar o
-  // mouse, diz em qual ocorrência ela está.
+  // ── Viaturas ──────────────────────────────────────────────────────────
+  // Só o quantitativo. Os prefixos de cada fração aparecem no quadro
+  // "Frações de serviço"; repeti-los aqui estourava a altura do painel.
+  // A lista de etiquetas só entra quando há viatura empenhada — que é a
+  // informação que exige olhar.
   const oco = estado.ocorrencias;
   const empenhadas = new Set();
   oco.forEach(o => o.vtrs.forEach(v => empenhadas.add(chaveVtr(v.prefixo))));
 
   const comb  = [...estado.vtrCombate].sort();
   const apoio = [...estado.vtrApoio].sort();
-  const naEscala = comb.length + apoio.length;
-  const nEmpenhadas = [...comb, ...apoio].filter(v => empenhadas.has(chaveVtr(v))).length;
+  const todasVtr = [...comb, ...apoio];
+  const fora = todasVtr.filter(v => empenhadas.has(chaveVtr(v)));
 
-  $("vtr-total").textContent     = naEscala;
+  $("vtr-total").textContent     = todasVtr.length;
   $("vtr-combate-n").textContent = comb.length;
   $("vtr-apoio-n").textContent   = apoio.length;
-  $("vtr-escala").textContent    = nEmpenhadas
-    ? nEmpenhadas + (nEmpenhadas === 1 ? " empenhada agora" : " empenhadas agora")
-    : "frota inteira disponível";
-  $("selo-vtr").textContent = naEscala + " na escala";
+  $("selo-vtr").textContent      = (todasVtr.length - fora.length) + " disponíveis";
 
-  const chips = arr => arr.map(v =>
-    `<span class="chip${empenhadas.has(chaveVtr(v)) ? " ocupada" : ""}" data-vtr="${v}"
-           style="--c:${corDaVtr(v)}">${v}</span>`).join("");
-  $("vtr-combate").innerHTML = chips(comb) || `<span class="chip">nenhuma</span>`;
-  $("vtr-apoio").innerHTML   = chips(apoio) || `<span class="chip">nenhuma</span>`;
+  const est = $("vtr-estado");
+  est.textContent = fora.length
+    ? fora.length + (fora.length === 1 ? " viatura empenhada" : " viaturas empenhadas")
+    : "frota inteira disponível";
+  est.classList.toggle("ocupada", fora.length > 0);
+
+  $("vtr-empenhadas").innerHTML = fora.map(v =>
+    `<span class="chip" data-vtr="${v}" style="--c:${corDaVtr(v)}">${v}</span>`).join("");
 
   // ── Efetivo de serviço AGORA, por pelotão ─────────────────────────────
   // Só o quantitativo: quem é quem aparece nas fotos, logo abaixo. Antes eram
