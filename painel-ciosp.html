@@ -87,7 +87,10 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 #grade-painel{
   flex:1;min-height:0;min-width:0;display:grid;gap:11px;
   grid-template-columns:300px 330px minmax(0,1fr);
-  grid-template-rows:minmax(0,0.52fr) minmax(0,0.88fr) minmax(0,1.16fr);
+  /* A primeira linha tem altura mínima garantida: o conteúdo dela é fixo
+     (números e etiquetas) e não tem como encolher. As outras duas dividem o
+     que sobrar. */
+  grid-template-rows:minmax(228px,0.56fr) minmax(0,0.9fr) minmax(0,1.18fr);
 }
 #p-efetivo    {grid-area:1/1/2/2}
 #p-viaturas   {grid-area:1/2/2/3}
@@ -137,7 +140,7 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 
 /* Q1 — viaturas */
 .numerao{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
-.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
+.numerao .n{font-family:'Barlow Condensed',sans-serif;font-size:54px;font-weight:700;line-height:.85;font-variant-numeric:tabular-nums;color:var(--cor)}
 .numerao .rot{font-size:11px;color:var(--txt-fraco);letter-spacing:2px;text-transform:uppercase;line-height:1.3}
 .numerao .rot b{display:block;font-size:13px;color:var(--txt);letter-spacing:.5px}
 /* Empenhada continua na lista, só apagada — sumir com ela esconderia metade
@@ -170,8 +173,8 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 
 /* Q3 — tropa */
 .grade-tropa{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:none}
-.bloco{background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:8px;padding:6px 8px;text-align:center}
-.bloco .v{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.bloco{background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:7px;padding:4px 6px;text-align:center}
+.bloco .v{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
 .bloco .k{font-size:10px;letter-spacing:2px;color:var(--txt-fraco);text-transform:uppercase;margin-top:2px}
 
 /* Diurno e noturno numa linha só. Antes eram duas caixas altas com ícone,
@@ -181,7 +184,7 @@ main{flex:1;min-height:0;padding:12px 0 6px;display:flex}
 .turno{border-radius:7px;padding:5px 9px;display:flex;align-items:baseline;gap:7px;
   border:1px solid var(--linha)}
 .turno .i{font-size:14px;line-height:1}
-.turno b{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;
+.turno b{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;
   line-height:1;font-variant-numeric:tabular-nums}
 .turno .k{font-size:10px;letter-spacing:1.5px;color:var(--txt-fraco);text-transform:uppercase}
 .turno.dia{background:rgba(234,179,8,.13);border-color:rgba(234,179,8,.32)}
@@ -388,10 +391,26 @@ body.parado{cursor:none}
 .retrato img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 /* Silhueta de bombeiro enquanto a foto não é enviada. */
 .retrato .silhueta{width:62%;height:auto;opacity:.32;color:var(--txt-fraco)}
-.militar .nm{font-size:8px;font-weight:700;margin-top:3px;line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
-.militar .fn{font-size:7px;letter-spacing:.4px;color:var(--txt-fraco);
-  text-transform:uppercase;text-align:center;line-height:1.1}
+/* O nome quebra em até duas linhas em vez de virar reticências. "SD TEMP
+   RHODEN" cabia pela metade; agora aparece inteiro, com a fonte um ponto
+   menor. */
+.militar .nm{font-size:7.5px;font-weight:700;margin-top:3px;line-height:1.12;
+  text-align:center;overflow-wrap:anywhere;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.militar .fn{font-size:6.5px;letter-spacing:.3px;color:var(--txt-fraco);
+  text-transform:uppercase;text-align:center;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Rodapé de assinatura: uma linha, discreta, encostada à direita. Não é
+   informação operacional — é procedência, e não deve competir com o painel. */
+footer{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:7px;
+  padding:3px 2px 4px;border-top:1px solid var(--linha);
+  font-size:9px;letter-spacing:.5px;color:#7d8896;white-space:nowrap}
+footer .sep{opacity:.45}
+/* Leitura velha fica âmbar: num painel de situação, dado parado precisa
+   aparecer, senão o comando lê a escala de três horas atrás como se fosse a
+   de agora. */
+footer .velha{color:var(--ouro)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -494,8 +513,9 @@ body.parado{cursor:none}
   <div id="tooltip"></div>
 
   <footer>
-    <div id="rodape-fonte">Fonte: Sistema E-193 · CBMRS</div>
-    <div id="rodape-atualizacao">Aguardando primeira leitura</div>
+    <span id="rodape-fonte">Fonte: Sistema E-193 · CBMRS</span>
+    <span class="sep">·</span>
+    <span id="rodape-atualizacao">aguardando primeira leitura</span>
   </footer>
 
 </div></div>
@@ -1628,9 +1648,20 @@ async function buscarDados(){
   pulso.classList.toggle("erro", falhas.length >= 2);
   $("pulso-rotulo").textContent = falhas.length === 0 ? "No ar"
     : falhas.length === 1 ? "Parcial" : "Sem sinal";
-  $("rodape-atualizacao").textContent = falhas.length === 0
-    ? "Última leitura " + new Date(estado.carimbo).toLocaleTimeString("pt-BR")
-    : falhas.join(" · ");
+  // Idade da escala: é a hora em que o coletor rodou, não a de agora. Passando
+  // de 90 min o texto fica âmbar — escala parada num painel de situação é
+  // exatamente o tipo de coisa que passa despercebida.
+  const rod = $("rodape-atualizacao");
+  if (falhas.length){
+    rod.textContent = falhas.join(" · ");
+    rod.className = "velha";
+  } else {
+    const lida = new Date(estado.carimbo);
+    const min = Math.round((Date.now() - lida) / 60000);
+    rod.textContent = "escala lida às " + lida.toLocaleTimeString("pt-BR") +
+      (min >= 90 ? ` (há ${Math.floor(min / 60)} h ${min % 60} min)` : "");
+    rod.className = min >= 90 ? "velha" : "";
+  }
   if (falhas.length) console.warn("Painel CIOSP —", falhas.join(" | "));
 }
 
