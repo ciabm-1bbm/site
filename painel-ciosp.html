@@ -312,8 +312,11 @@ body.parado{cursor:none}
   font-size:10px;font-weight:400;letter-spacing:.5px;color:var(--txt-fraco);text-transform:none}
 /* align-content:stretch + grid-auto-rows:1fr faz as linhas se distribuírem
    pela altura que houver: cabem as 10 sem corte, seja qual for o quadrante. */
+/* Piso de 17px por linha. Com minmax(0,1fr) a grade espremia as linhas abaixo
+   da altura do texto quando faltava espaço, e os rótulos se sobrepunham —
+   pior que cortar, porque fica ilegível sem parecer defeito. */
 .lista-nat{flex:1;min-height:0;display:grid;gap:2px;align-content:stretch;
-  grid-auto-rows:minmax(0,1fr)}
+  grid-auto-rows:minmax(17px,1fr)}
 /* Rótulo, barra e número em colunas próprias: o nome da natureza tem espaço
    garantido e nunca é cortado. A barra é a cor cheia; o trilho atrás é que
    fica fraco — a cor forte é o dado, não o fundo. */
@@ -577,7 +580,12 @@ const CONFIG = {
   urlFotos: "https://raw.githubusercontent.com/ciabm-1bbm/site/main/images/fotos-ciosp/",
 
   intervaloDados: 15000,   // releitura das ocorrências (muda o tempo todo)
-  intervaloEscala: 300000  // releitura da escala (muda uma vez por dia)
+  // Releitura da escala. A ponte do Apps Script é gratuita e leve, então
+  // consultar de minuto em minuto não custa nada — o painel passa a mostrar
+  // a escala nova assim que o coletor a deposita, sem esperar cinco minutos.
+  // ATENÇÃO: isto não deixa o dado mais novo, só encurta o atraso entre o
+  // coletor gravar e o painel exibir. A idade do dado depende do coletor.
+  intervaloEscala: 60000
 };
 
 /* Só o 1º BBM. O BBS é outra unidade e fica fora de tudo.
@@ -919,7 +927,7 @@ const COR_NATUREZA = {
 const CURTO_NATUREZA = {
   "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"VISTORIA",
   "MANEJO DE INSETOS":"INSETOS", "AÇÕES PREVENTIVAS":"PREVENTIVAS",
-  "PRODUTOS PERIGOSOS":"PERIGOSOS", "BUSCA E RESGATE":"BUSCA/RESGATE",
+  "BUSCA E RESGATE":"BUSCA/RESGATE",
   "CORTE DE ÁRVORE":"ÁRVORE", "PRÉ-HOSPITALAR":"PRÉ-HOSPITALAR"
 };
 
@@ -1663,6 +1671,7 @@ async function buscarDados(){
 
   renderPanorama();
   renderGuarnicoes();
+  ajustarConteudo();   // o conteúdo mudou de tamanho; refaz o encaixe
 
   // ── Estado da leitura ─────────────────────────────────────────────────
   // Dizer QUAL fonte falhou e por quê. "Sem sinal" sozinho não permite
@@ -1680,9 +1689,10 @@ async function buscarDados(){
   } else {
     const lida = new Date(estado.carimbo);
     const min = Math.round((Date.now() - lida) / 60000);
+    // 45 min já é sinal de coletor parado: ele deveria rodar a cada 30.
     rod.textContent = "escala lida às " + lida.toLocaleTimeString("pt-BR") +
-      (min >= 90 ? ` (há ${Math.floor(min / 60)} h ${min % 60} min)` : "");
-    rod.className = min >= 90 ? "velha" : "";
+      (min >= 45 ? ` — há ${min >= 60 ? Math.floor(min / 60) + " h " : ""}${min % 60} min` : "");
+    rod.className = min >= 45 ? "velha" : "";
   }
   if (falhas.length) console.warn("Painel CIOSP —", falhas.join(" | "));
 }
@@ -1713,6 +1723,28 @@ const modoEmpilhado = () => innerWidth <= 1100 || innerHeight > innerWidth;
    disso volta a valer a redução proporcional. */
 const ALTURA_MIN = 860, ALTURA_MAX = 1350;
 
+/* Encolhe o conteúdo de cada quadro até caber, em vez de deixar transbordar.
+   Substitui o cálculo de altura no papel: o navegador mede o que realmente
+   foi desenhado, com a fonte que realmente carregou, e o painel se adapta.
+   O piso de 0,62 evita que um caso extremo torne tudo ilegível — abaixo
+   disso é melhor cortar e a gente investigar. */
+const ZOOM_MIN = 0.62;
+
+function ajustarConteudo(){
+  document.querySelectorAll("#grade-painel .corpo").forEach(corpo => {
+    corpo.style.zoom = "";
+    // Duas passadas: o zoom reflui o conteúdo, então a primeira estimativa
+    // muda a altura necessária e vale conferir de novo.
+    for (let passo = 0; passo < 2; passo++){
+      const sobra = corpo.clientHeight, preciso = corpo.scrollHeight;
+      if (preciso <= sobra + 1) break;
+      const atual = parseFloat(corpo.style.zoom) || 1;
+      const fator = Math.max(ZOOM_MIN, atual * (sobra / preciso) * 0.99);
+      corpo.style.zoom = fator.toFixed(3);
+    }
+  });
+}
+
 function ajustarEscala(){
   const palco = $("palco");
   if (modoEmpilhado()){
@@ -1733,6 +1765,7 @@ function ajustarEscala(){
 
   palco.style.height = altura + "px";
   palco.style.transform = `scale(${escala})`;
+  ajustarConteudo();
 }
 
 // Teclas úteis na sala: 1/2 força a tela, F entra em tela cheia, R relê agora.
@@ -1741,6 +1774,9 @@ addEventListener("keydown", e => {
   if (e.key.toLowerCase() === "r") buscarDados();
 });
 addEventListener("resize", ajustarEscala);
+// As fontes do Google chegam depois do primeiro desenho e mudam a altura do
+// texto; sem este reajuste o painel fica medido pela fonte de reserva.
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarEscala);
 
 /* Se algo quebrar na partida, o painel escreve o erro no rodapé em vez de
    ficar em branco. Numa sala de operações, tela vazia sem explicação é o
