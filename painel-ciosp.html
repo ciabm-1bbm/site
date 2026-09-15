@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel CIOSP — 1º BBM</title>
+<title>Painel COBOM — 1º BBM</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   PAINEL CIOSP — 1º BBM
+   PAINEL COBOM — 1º BBM
    Alvo: TV 55" 1920x1080 via HDMI, modo quiosque, sem interação.
    Palco fixo de 1920x1080 escalado por transform: nunca há scroll.
    ============================================================ */
@@ -442,7 +442,7 @@ footer .velha{color:var(--ouro)}
   <header>
     <img src="https://github.com/ciabm-1bbm/site/blob/main/images/brasao_1BBM_PARA_site.png?raw=true" alt="">
     <div class="titulo">
-      <h1>CIOSP · <b>1º BATALHÃO</b> DE BOMBEIROS MILITARES</h1>
+      <h1>COBOM · <b>1º BATALHÃO</b> DE BOMBEIROS MILITARES</h1>
       <p>Panorama operacional do dia</p>
     </div>
     <div class="pulso" id="pulso">
@@ -920,15 +920,15 @@ const MES_EXTENSO = ["janeiro","fevereiro","março","abril","maio","junho",
 // não ter de reaprender a legenda ao trocar de tela.
 const COR_NATUREZA = {
   "INCÊNDIO":"#FFD700", "MANEJO DE INSETOS":"#B8860B", "BUSCA E RESGATE":"#F97316",
-  "CORTE DE ÁRVORE":"#4ADE80", "AÇÕES PREVENTIVAS":"#87CEEB",
+  "AVERIGUAÇÃO DE ÁRVORE":"#4ADE80", "AÇÕES PREVENTIVAS":"#87CEEB",
   "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"#60A5FA", "PRÉ-HOSPITALAR":"#EF4444",
   "PRODUTOS PERIGOSOS":"#E2E8F0", "TROTE":"#A78BFA", "OUTROS":"#64748B"
 };
 const CURTO_NATUREZA = {
   "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO":"VISTORIA",
-  "MANEJO DE INSETOS":"INSETOS", "AÇÕES PREVENTIVAS":"PREVENTIVAS",
+  "AÇÕES PREVENTIVAS":"PREVENTIVAS",
   "BUSCA E RESGATE":"BUSCA/RESGATE",
-  "CORTE DE ÁRVORE":"ÁRVORE", "PRÉ-HOSPITALAR":"PRÉ-HOSPITALAR"
+  "PRÉ-HOSPITALAR":"PRÉ-HOSPITALAR"
 };
 
 // Os oito pelotões operacionais do 1º BBM, na ordem da 1ª e da 2ª Cia.
@@ -943,7 +943,7 @@ function normalizarNatureza(bruta){
   if (n.includes("SALVAMENTO") || n.includes("BUSCA") || n.includes("RESGATE")) return "BUSCA E RESGATE";
   if (n.includes("APH") || n.includes("PRÉ-HOSPITALAR") || n.includes("PRE-HOSPITALAR")) return "PRÉ-HOSPITALAR";
   if (n.includes("VISTORIA")) return "VISTORIA DE SEGURANÇA CONTRA INCÊNDIO";
-  if (n.includes("CORTE") && (n.includes("ÁRVORE") || n.includes("ARVORE"))) return "CORTE DE ÁRVORE";
+  if (n.includes("ÁRVORE") || n.includes("ARVORE")) return "AVERIGUAÇÃO DE ÁRVORE";
   if (n.includes("PREVENTIVA")) return "AÇÕES PREVENTIVAS";
   if (n.includes("PRODUTO") && n.includes("PERIGOSO")) return "PRODUTOS PERIGOSOS";
   if (n.includes("TROTE")) return "TROTE";
@@ -1694,7 +1694,7 @@ async function buscarDados(){
       (min >= 45 ? ` — há ${min >= 60 ? Math.floor(min / 60) + " h " : ""}${min % 60} min` : "");
     rod.className = min >= 45 ? "velha" : "";
   }
-  if (falhas.length) console.warn("Painel CIOSP —", falhas.join(" | "));
+  if (falhas.length) console.warn("Painel COBOM —", falhas.join(" | "));
 }
 
 function tickRelogio(){
